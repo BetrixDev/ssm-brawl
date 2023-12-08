@@ -1,0 +1,9 @@
+name: SuperSmashMobsBrawl
+version: '${project.version}'
+main: dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
+api-version: 1.20
+author: BetrixDev
+commands:
+  queue:
+    description: "Joins the designated queue for a game"
+    usage: "/queue <casual|ranked>"

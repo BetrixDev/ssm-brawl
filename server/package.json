@@ -1,0 +1,13 @@
+{
+  "name": "server",
+  "private": true,
+  "scripts": {
+    "dev": "dotenv -e ../.env \"java -Xmx8G -jar paper.jar -nogui\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv-cli": "^7.3.0"
+  }
+}
