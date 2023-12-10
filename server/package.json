@@ -2,7 +2,7 @@
   "name": "server",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e ../.env \"java -Xmx8G -jar paper.jar -nogui\""
+    "dev": "dotenv -e ../.env \"java -Xmx8G -jar pufferfish.jar -nogui\""
   },
   "keywords": [],
   "author": "",
