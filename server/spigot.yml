@@ -56,7 +56,7 @@ players:
 advancements:
   disable-saving: false
   disabled:
-  - minecraft:story/disabled
+  - '*'
 world-settings:
   default:
     verbose: false

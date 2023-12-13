@@ -3,13 +3,13 @@ import {
   db,
   eq,
   gte,
+  kitsTable,
   lte,
   mapsTable,
   minigamesTables,
   ongoingGamesTable,
   or,
   playersTables,
-  queueTable,
 } from "@/db";
 import { getRandomElement, isAuthedForRequest } from "@/utils";
 import { z } from "zod";
@@ -42,9 +42,23 @@ export async function POST(request: Request) {
   }
 
   const players = await db
-    .select()
+    .select({
+      uuid: playersTables.uuid,
+      kit: {
+        id: kitsTable.id,
+        displayName: kitsTable.displayName,
+        inventoryIcon: kitsTable.inventoryIcon,
+        visualArmor: kitsTable.visualArmor,
+        passives: kitsTable.passives,
+        abilities: kitsTable.abilities,
+        damage: kitsTable.damage,
+        armor: kitsTable.armor,
+        knockback: kitsTable.knockback,
+      },
+    })
     .from(playersTables)
     .where(or(...body.playerUuids.map((u) => eq(playersTables.uuid, u))))
+    .innerJoin(kitsTable, eq(kitsTable.id, playersTables.selectedKit))
     .execute();
 
   if (players.length !== body.playerUuids.length) {
@@ -52,11 +66,6 @@ export async function POST(request: Request) {
       status: 400,
     });
   }
-
-  // await db
-  //   .delete(queueTable)
-  //   .where(or(...body.playerUuids.map((u) => eq(playersTables.uuid, u))))
-  //   .execute();
 
   const validMaps = await db
     .select()

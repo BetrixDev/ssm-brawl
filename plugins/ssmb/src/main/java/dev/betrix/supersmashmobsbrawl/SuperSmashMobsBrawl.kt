@@ -3,8 +3,7 @@ package dev.betrix.supersmashmobsbrawl
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import com.github.shynixn.mccoroutine.bukkit.setSuspendingExecutor
 import dev.betrix.supersmashmobsbrawl.commands.QueueCommand
-import dev.betrix.supersmashmobsbrawl.listeners.PlayerJoinListener
-import dev.betrix.supersmashmobsbrawl.listeners.TeleportListener
+import dev.betrix.supersmashmobsbrawl.listeners.*
 import dev.betrix.supersmashmobsbrawl.managers.ApiManager
 import dev.betrix.supersmashmobsbrawl.managers.GameManager
 import dev.betrix.supersmashmobsbrawl.managers.QueueManager
@@ -36,6 +35,12 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
 
         server.pluginManager.registerEvents(TeleportListener(), this)
         server.pluginManager.registerEvents(PlayerJoinListener(), this)
+        server.pluginManager.registerEvents(PlayerInteractListener(), this)
+        server.pluginManager.registerEvents(PotionSplashListener(), this)
+        server.pluginManager.registerEvents(EntityPickupItemListener(), this)
+        server.pluginManager.registerEvents(PlayerPickItemListener(), this)
+        server.pluginManager.registerEvents(PlayerDropItemListener(), this)
+        server.pluginManager.registerEvents(InventoryClickListener(), this)
 
         getCommand("queue")?.setSuspendingExecutor(QueueCommand(this))
 
