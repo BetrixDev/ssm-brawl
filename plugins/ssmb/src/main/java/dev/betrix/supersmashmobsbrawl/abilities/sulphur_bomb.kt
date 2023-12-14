@@ -3,14 +3,12 @@ package dev.betrix.supersmashmobsbrawl.abilities
 import br.com.devsrsouza.kotlinbukkitapi.extensions.item
 import dev.betrix.supersmashmobsbrawl.SSMBPlayer
 import dev.betrix.supersmashmobsbrawl.enums.SSMBAbility
-import dev.betrix.supersmashmobsbrawl.enums.TaggedKey
-import dev.betrix.supersmashmobsbrawl.extensions.setDouble
-import dev.betrix.supersmashmobsbrawl.extensions.setString
-import dev.betrix.supersmashmobsbrawl.extensions.setValues
+import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyNum
+import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyStr
+import dev.betrix.supersmashmobsbrawl.extensions.setMetadata
+import dev.betrix.supersmashmobsbrawl.managers.api.payloads.ValueNumOrStr
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Material
-import org.bukkit.Particle
-import org.bukkit.Sound
 import org.bukkit.entity.ThrownPotion
 import kotlin.collections.set
 
@@ -31,18 +29,31 @@ fun tryUseSulphurBomb(player: SSMBPlayer) {
         return
     }
 
+    val abilityMetaData = player.selectedKitData?.abilities?.find {
+        it.id === "sulphur_bomb"
+    }?.meta ?: return
+
     val location = player.bukkitPlayer.eyeLocation
     val direction = location.direction
 
     val projectile = player.bukkitPlayer.world.spawn(location, ThrownPotion::class.java)
     projectile.velocity = direction.multiply(1.55)
     projectile.shooter = player.bukkitPlayer
-    projectile.persistentDataContainer.setValues {
-        setDouble(TaggedKey.PROJECTILE_DAMAGE, 6.5)
-        setDouble(TaggedKey.PROJECTILE_DAMAGE_RANGE, 3.0)
-        setString(TaggedKey.PROJECTILE_THROWER_UUID, player.bukkitPlayer.uniqueId.toString())
-        setString(TaggedKey.PROJECTILE_EXPLOSION_PARTICLE, Particle.EXPLOSION_LARGE.toString())
-        setString(TaggedKey.PROJECT_EXPLOSION_SOUND, Sound.ENTITY_GENERIC_EXPLODE.toString())
+
+    projectile.setMetadata {
+        abilityMetaData.map.forEach {
+            when (it.value) {
+                is ValueNumOrStr.StringValue -> set(
+                    TaggedKeyStr.fromId(it.key)!!,
+                    (it.value as ValueNumOrStr.StringValue).value
+                )
+
+                is ValueNumOrStr.DoubleValue -> set(
+                    TaggedKeyNum.fromId(it.key)!!,
+                    (it.value as ValueNumOrStr.DoubleValue).value
+                )
+            }
+        }
     }
 
     projectile.item = item(Material.COAL)

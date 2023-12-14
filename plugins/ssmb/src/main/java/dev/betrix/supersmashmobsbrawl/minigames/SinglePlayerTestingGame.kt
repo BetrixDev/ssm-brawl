@@ -2,13 +2,9 @@ package dev.betrix.supersmashmobsbrawl.minigames
 
 import br.com.devsrsouza.kotlinbukkitapi.extensions.item
 import dev.betrix.supersmashmobsbrawl.SSMBPlayer
-import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
-import dev.betrix.supersmashmobsbrawl.enums.GameState
-import dev.betrix.supersmashmobsbrawl.enums.TaggedKey
-import dev.betrix.supersmashmobsbrawl.extensions.setDouble
-import dev.betrix.supersmashmobsbrawl.extensions.setString
-import dev.betrix.supersmashmobsbrawl.extensions.setValues
-import dev.betrix.supersmashmobsbrawl.kits.BaseKit
+import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyNum
+import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyStr
+import dev.betrix.supersmashmobsbrawl.extensions.setData
 import dev.betrix.supersmashmobsbrawl.managers.api.payloads.StartGameResponse
 import dev.betrix.supersmashmobsbrawl.maps.GameMap
 import net.kyori.adventure.audience.Audience
@@ -24,12 +20,9 @@ import java.util.*
 
 class SinglePlayerTestingGame(private val gameData: StartGameResponse) : Listener {
 
-    private val plugin = SuperSmashMobsBrawl.instance
     private val map = GameMap(gameData.gameId, gameData.map.mapId)
-    private val gameState = GameState.COUNTDOWN
     private val generalAudience: Audience
     private val players: ArrayList<Player> = arrayListOf()
-    private val kits: HashMap<Player, BaseKit> = hashMapOf()
 
     init {
         gameData.players.forEachIndexed { playerIndex, data ->
@@ -41,17 +34,20 @@ class SinglePlayerTestingGame(private val gameData: StartGameResponse) : Listene
             ssmbPlayer.selectedKitData = data.kit
 
             data.kit.visualArmor.forEach {
-                player.inventory.setItem(EquipmentSlot.valueOf(it.slot), item(Material.getMaterial(it.id)!!))
+                player.inventory.setItem(
+                    EquipmentSlot.valueOf(it.slot.uppercase()),
+                    item(Material.getMaterial(it.id.uppercase())!!)
+                )
             }
 
             data.kit.abilities.forEachIndexed { i, abilityData ->
-                val tool = item(Material.getMaterial(abilityData.toolId)!!)
-                val newMetaData = tool.itemMeta
-                newMetaData.persistentDataContainer.setValues {
-                    setDouble(TaggedKey.TOOL_MELEE_DAMAGE, data.kit.damage)
-                    setString(TaggedKey.ABILITY_ITEM_ID, abilityData.id)
-                }
-                tool.itemMeta = newMetaData
+                val tool = item(Material.getMaterial(abilityData.toolId.uppercase())!!, meta = {
+                    persistentDataContainer.setData {
+                        set(TaggedKeyNum.TOOL_MELEE_DAMAGE, data.kit.damage)
+                        set(TaggedKeyStr.ABILITY_ITEM_ID, abilityData.id)
+                    }
+                })
+
                 player.inventory.setItem(i, tool)
             }
 
@@ -60,6 +56,8 @@ class SinglePlayerTestingGame(private val gameData: StartGameResponse) : Listene
                 player,
                 Location(map.worldInstance, spawnPos.x.toDouble(), spawnPos.y.toDouble(), spawnPos.z.toDouble())
             )
+
+            player.allowFlight = true
 
             players.add(player)
         }

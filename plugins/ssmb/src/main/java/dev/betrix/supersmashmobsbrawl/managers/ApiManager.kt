@@ -12,6 +12,9 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 import org.bukkit.entity.Player
 
 class ApiManager {
@@ -125,8 +128,17 @@ class ApiManager {
             setBody(StartGameRequest(playerUuids, modeId, isRanked))
         }
 
+        val polyJson = Json {
+            serializersModule = SerializersModule {
+                polymorphic(ValueNumOrStr::class) {
+                    subclass(ValueNumOrStr.StringValue::class)
+                    subclass(ValueNumOrStr.DoubleValue::class)
+                }
+            }
+        }
+
         return when (response.status.value) {
-            200 -> StartGame.Success(json.decodeFromString((response.bodyAsText())))
+            200 -> StartGame.Success(polyJson.decodeFromString((response.bodyAsText())))
             else -> StartGame.Error(StartGameError.UNKNOWN)
         }
     }

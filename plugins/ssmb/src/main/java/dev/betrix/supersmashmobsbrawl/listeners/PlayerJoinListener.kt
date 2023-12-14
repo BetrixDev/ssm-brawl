@@ -12,11 +12,14 @@ class PlayerJoinListener : Listener {
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
-        plugin.hub.teleportPlayer(event.player)
+        val player = event.player
+
+        plugin.hub.teleportPlayer(player)
+        player.saturation = 1F
 
         plugin.launch {
-            plugin.api.fetchPlayerData(event.player)
-            SSMBPlayer.addPlayer(event.player)
+            plugin.api.fetchPlayerData(player)
+            SSMBPlayer.addPlayer(player)
         }
     }
 }

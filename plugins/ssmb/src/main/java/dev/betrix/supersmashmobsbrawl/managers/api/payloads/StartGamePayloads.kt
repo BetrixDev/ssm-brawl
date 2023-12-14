@@ -1,5 +1,6 @@
 package dev.betrix.supersmashmobsbrawl.managers.api.payloads
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -44,7 +45,7 @@ data class StartGameResponse(
         val displayName: String,
         val toolId: String,
         val cooldown: Int,
-        val meta: Map<String, Int>
+        val meta: MapWrapper
     )
 
     @Serializable
@@ -52,7 +53,7 @@ data class StartGameResponse(
         val id: String,
         val displayName: String,
         val cooldown: Int,
-        val meta: Map<String, Int>
+        val meta: MapWrapper
     )
 
     @Serializable
@@ -64,3 +65,17 @@ data class StartGameResponse(
     @Serializable
     data class SpawnLocation(val x: Int, val y: Int, val z: Int)
 }
+
+@Serializable
+sealed class ValueNumOrStr {
+    @Serializable
+    @SerialName("string")
+    data class StringValue(val value: String) : ValueNumOrStr()
+
+    @Serializable
+    @SerialName("double")
+    data class DoubleValue(val value: Double) : ValueNumOrStr()
+}
+
+@Serializable
+data class MapWrapper(val map: Map<String, ValueNumOrStr>)

@@ -1,16 +1,15 @@
 package dev.betrix.supersmashmobsbrawl.listeners
 
 import dev.betrix.supersmashmobsbrawl.SSMBPlayer
-import dev.betrix.supersmashmobsbrawl.enums.TaggedKey
-import dev.betrix.supersmashmobsbrawl.extensions.getDouble
-import dev.betrix.supersmashmobsbrawl.extensions.getString
+import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyNum
+import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyStr
+import dev.betrix.supersmashmobsbrawl.extensions.getMetadata
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PotionSplashEvent
-import java.util.*
 
 class PotionSplashListener : Listener {
 
@@ -19,27 +18,19 @@ class PotionSplashListener : Listener {
         val splashedItem = event.entity
         val splashedLocation = splashedItem.location
 
-        if (!splashedItem.persistentDataContainer.has(TaggedKey.PROJECTILE_THROWER_UUID.key)) {
-            return
-        }
-
         val thrower =
-            SSMBPlayer.fromUuid(
-                UUID.fromString(
-                    splashedItem.persistentDataContainer.getString(TaggedKey.PROJECTILE_THROWER_UUID)
+            splashedItem.ownerUniqueId?.let {
+                SSMBPlayer.fromUuid(
+                    it
                 )
-            ) ?: return
+            } ?: return
 
         event.isCancelled = true
 
-        val projectileDamage =
-            splashedItem.persistentDataContainer.getDouble(TaggedKey.PROJECTILE_DAMAGE)!!
-        val projectileDamageRange =
-            splashedItem.persistentDataContainer.getDouble(TaggedKey.PROJECTILE_DAMAGE_RANGE)!!
-        val projectileExplosionParticle =
-            splashedItem.persistentDataContainer.getString(TaggedKey.PROJECTILE_EXPLOSION_PARTICLE)!!
-        val projectileExplosionSound =
-            splashedItem.persistentDataContainer.getString(TaggedKey.PROJECT_EXPLOSION_SOUND)!!
+        val projectileDamage = splashedItem.getMetadata(TaggedKeyNum.PROJECTILE_DAMAGE)!!
+        val projectileDamageRange = splashedItem.getMetadata(TaggedKeyNum.PROJECTILE_DAMAGE_RANGE) ?: 1.0
+        val projectileExplosionParticle = splashedItem.getMetadata(TaggedKeyStr.PROJECTILE_EXPLOSION_PARTICLE)!!
+        val projectileExplosionSound = splashedItem.getMetadata(TaggedKeyStr.PROJECTILE_EXPLOSION_SOUND)!!
 
         if (event.hitEntity != null && event.hitEntity is Player && event.hitEntity != thrower.bukkitPlayer) {
             val target = event.hitEntity as Player

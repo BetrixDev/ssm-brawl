@@ -41,6 +41,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         server.pluginManager.registerEvents(PlayerPickItemListener(), this)
         server.pluginManager.registerEvents(PlayerDropItemListener(), this)
         server.pluginManager.registerEvents(InventoryClickListener(), this)
+        server.pluginManager.registerEvents(PlayerToggleFlightListener(), this)
 
         getCommand("queue")?.setSuspendingExecutor(QueueCommand(this))
 
