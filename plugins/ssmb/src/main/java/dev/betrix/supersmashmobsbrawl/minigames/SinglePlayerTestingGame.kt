@@ -20,7 +20,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.inventory.EquipmentSlot
-import org.bukkit.persistence.PersistentDataType
 import java.util.*
 
 class SinglePlayerTestingGame(private val gameData: StartGameResponse) : Listener {
@@ -50,11 +49,7 @@ class SinglePlayerTestingGame(private val gameData: StartGameResponse) : Listene
                 val newMetaData = tool.itemMeta
                 newMetaData.persistentDataContainer.setValues {
                     setDouble(TaggedKey.TOOL_MELEE_DAMAGE, data.kit.damage)
-
-                    if (abilityData.abilityId != null) {
-                        setString(TaggedKey.ABILITY_ITEM_ID, abilityData.abilityId)
-                        plugin.logger.info(get(TaggedKey.ABILITY_ITEM_ID.key, PersistentDataType.STRING))
-                    }
+                    setString(TaggedKey.ABILITY_ITEM_ID, abilityData.id)
                 }
                 tool.itemMeta = newMetaData
                 player.inventory.setItem(i, tool)
@@ -68,7 +63,7 @@ class SinglePlayerTestingGame(private val gameData: StartGameResponse) : Listene
 
             players.add(player)
         }
-        
+
         generalAudience = Audience.audience(players)
     }
 

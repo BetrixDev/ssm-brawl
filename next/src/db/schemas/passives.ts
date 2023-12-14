@@ -6,12 +6,11 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-export const abilitiesTables = pgTable(
-  "abilities",
+export const passivesTable = pgTable(
+  "passives",
   {
     id: text("id").primaryKey(),
     displayName: text("display_name").notNull(),
-    toolId: text("tool_id").notNull(),
     cooldown: doublePrecision("cooldown").notNull(),
     meta: json("meta").$type<Record<string, number>>().notNull(),
   },

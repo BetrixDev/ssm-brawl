@@ -31,7 +31,7 @@ data class StartGameResponse(
         val displayName: String,
         val inventoryIcon: String,
         val visualArmor: List<VisualArmorData>,
-        val passives: List<String>,
+        val passives: List<PassivesData>,
         val abilities: List<AbilitiesData>,
         val damage: Double,
         val armor: Double,
@@ -39,7 +39,21 @@ data class StartGameResponse(
     )
 
     @Serializable
-    data class AbilitiesData(val toolId: String, val abilityId: String?)
+    data class AbilitiesData(
+        val id: String,
+        val displayName: String,
+        val toolId: String,
+        val cooldown: Int,
+        val meta: Map<String, Int>
+    )
+
+    @Serializable
+    data class PassivesData(
+        val id: String,
+        val displayName: String,
+        val cooldown: Int,
+        val meta: Map<String, Int>
+    )
 
     @Serializable
     data class VisualArmorData(val id: String, val slot: String)

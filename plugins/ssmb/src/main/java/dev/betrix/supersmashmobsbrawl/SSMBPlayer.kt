@@ -8,7 +8,7 @@ class SSMBPlayer(val bukkitPlayer: Player) {
 
     var selectedKitData: StartGameResponse.KitData? = null
     var abilities = listOf<StartGameResponse.AbilitiesData>()
-    var passives = listOf<String>()
+    var passives = listOf<StartGameResponse.PassivesData>()
     val cooldowns = hashMapOf<String, Long>()
 
     companion object {
