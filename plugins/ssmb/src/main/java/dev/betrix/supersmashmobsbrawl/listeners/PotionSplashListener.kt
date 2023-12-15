@@ -43,7 +43,16 @@ class PotionSplashListener : Listener {
             }
         }
 
-        thrower.bukkitPlayer.world.spawnParticle(Particle.valueOf(projectileExplosionParticle), splashedLocation, 1)
-        thrower.bukkitPlayer.world.playSound(splashedLocation, Sound.valueOf(projectileExplosionSound), 1F, 1.5F)
+        thrower.bukkitPlayer.world.spawnParticle(
+            Particle.valueOf(projectileExplosionParticle.uppercase()),
+            splashedLocation,
+            1
+        )
+        thrower.bukkitPlayer.world.playSound(
+            splashedLocation,
+            Sound.valueOf(projectileExplosionSound.uppercase()),
+            1F,
+            1.5F
+        )
     }
 }

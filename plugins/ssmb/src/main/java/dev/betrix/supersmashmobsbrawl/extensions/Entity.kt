@@ -38,5 +38,5 @@ fun Entity.getMetadata(metadataKey: TaggedKeyNum): Double? {
 
 fun Entity.getMetadata(metadataKey: TaggedKeyStr): String? {
     val value = this.getMetadata(metadataKey.id).getOrNull(0) ?: return null
-    return value.toString()
+    return value.value().toString()
 }
