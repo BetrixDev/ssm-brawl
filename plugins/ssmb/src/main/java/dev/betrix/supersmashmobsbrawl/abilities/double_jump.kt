@@ -15,12 +15,12 @@ fun tryDoubleJump(player: SSMBPlayer) {
     val plugin = SuperSmashMobsBrawl.instance
     val bukkitPlayer = player.bukkitPlayer
 
-    if (bukkitPlayer.getMetadata(TaggedKeyBool.CAN_DOUBLE_JUMP) == false) {
+    if (bukkitPlayer.getMetadata(TaggedKeyBool.PLAYER_CAN_DOUBLE_JUMP) == false) {
         return
     }
 
     bukkitPlayer.setMetadata {
-        set(TaggedKeyBool.CAN_DOUBLE_JUMP, false)
+        set(TaggedKeyBool.PLAYER_CAN_DOUBLE_JUMP, false)
     }
 
     bukkitPlayer.isFlying = true
@@ -48,7 +48,7 @@ fun tryDoubleJump(player: SSMBPlayer) {
 
             if (nearestBlockBelow.type.isSolid) {
                 bukkitPlayer.setMetadata {
-                    set(TaggedKeyBool.CAN_DOUBLE_JUMP, true)
+                    set(TaggedKeyBool.PLAYER_CAN_DOUBLE_JUMP, true)
                 }
                 bukkitPlayer.allowFlight = true
                 this.cancel()
