@@ -45,7 +45,7 @@ fun tryDoubleJump(player: SSMBPlayer) {
     plugin.launch {
         while (true) {
             val nearestBlockBelow = bukkitPlayer.location.subtract(0.0, 1.0, 0.0).block
-            plugin.logger.info(nearestBlockBelow.type.isSolid.toString())
+
             if (nearestBlockBelow.type.isSolid) {
                 bukkitPlayer.setMetadata {
                     set(TaggedKeyBool.CAN_DOUBLE_JUMP, true)
