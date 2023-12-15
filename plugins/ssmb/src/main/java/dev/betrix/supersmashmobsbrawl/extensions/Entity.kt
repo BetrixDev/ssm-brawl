@@ -1,6 +1,7 @@
 package dev.betrix.supersmashmobsbrawl.extensions
 
 import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
+import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyBool
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyNum
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyStr
 import org.bukkit.entity.Entity
@@ -14,6 +15,10 @@ class EntityMetadataBuilder(private val entity: Entity) {
     }
 
     fun set(metadataKey: TaggedKeyStr, value: String) {
+        metadata[metadataKey.id] = value
+    }
+
+    fun set(metadataKey: TaggedKeyBool, value: Boolean) {
         metadata[metadataKey.id] = value
     }
 
@@ -39,4 +44,9 @@ fun Entity.getMetadata(metadataKey: TaggedKeyNum): Double? {
 fun Entity.getMetadata(metadataKey: TaggedKeyStr): String? {
     val value = this.getMetadata(metadataKey.id).getOrNull(0) ?: return null
     return value.value().toString()
+}
+
+fun Entity.getMetadata(metadataKey: TaggedKeyBool): Boolean? {
+    val value = this.getMetadata(metadataKey.id).getOrNull(0) ?: return null
+    return value.value().toString().toBoolean()
 }
