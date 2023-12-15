@@ -28,16 +28,16 @@ class PotionSplashListener : Listener {
         event.isCancelled = true
 
         val projectileDamage = splashedItem.getMetadata(TaggedKeyNum.PROJECTILE_DAMAGE)!!
-        val projectileDamageRange = splashedItem.getMetadata(TaggedKeyNum.PROJECTILE_DAMAGE_RANGE) ?: 1.0
+        val projectileDamageAoe = splashedItem.getMetadata(TaggedKeyNum.PROJECTILE_DAMAGE_AOE)
         val projectileExplosionParticle = splashedItem.getMetadata(TaggedKeyStr.PROJECTILE_EXPLOSION_PARTICLE)!!
         val projectileExplosionSound = splashedItem.getMetadata(TaggedKeyStr.PROJECTILE_EXPLOSION_SOUND)!!
 
         if (event.hitEntity != null && event.hitEntity is Player && event.hitEntity != thrower.bukkitPlayer) {
             val target = event.hitEntity as Player
-            target.damage(projectileDamage)
-        } else if (event.hitBlock != null) {
+            target.damage(projectileDamage, splashedItem)
+        } else if (event.hitBlock != null && projectileDamageAoe != null) {
             thrower.bukkitPlayer.world.players.forEach {
-                if (it.location.distance(splashedLocation) <= projectileDamageRange && it.player != thrower.bukkitPlayer) {
+                if (it.location.distance(splashedLocation) <= projectileDamageAoe && it.player != thrower.bukkitPlayer) {
                     it.damage(projectileDamage)
                 }
             }
