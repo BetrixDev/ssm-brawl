@@ -15,7 +15,7 @@ class PlayerJoinListener : Listener {
         val player = event.player
 
         plugin.hub.teleportPlayer(player)
-        player.saturation = 1F
+        player.foodLevel = 18
 
         plugin.launch {
             plugin.api.fetchPlayerData(player)
