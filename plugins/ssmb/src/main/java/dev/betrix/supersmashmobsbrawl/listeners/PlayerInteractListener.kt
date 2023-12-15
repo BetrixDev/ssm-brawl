@@ -1,7 +1,6 @@
 package dev.betrix.supersmashmobsbrawl.listeners
 
 import dev.betrix.supersmashmobsbrawl.SSMBPlayer
-import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
 import dev.betrix.supersmashmobsbrawl.abilities.tryUseSulphurBomb
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyStr
 import dev.betrix.supersmashmobsbrawl.extensions.get
@@ -31,13 +30,10 @@ class PlayerInteractListener : Listener {
 
             val abilityId = event.item!!.itemMeta.persistentDataContainer.get(TaggedKeyStr.ABILITY_ITEM_ID)
 
-            SuperSmashMobsBrawl.instance.logger.info(abilityId)
 
             val abilityData = ssmbPlayer.selectedKitData?.abilities?.find {
                 it.id == abilityId
             } ?: return
-
-            SuperSmashMobsBrawl.instance.logger.info(abilityData.toString())
 
             if (abilityId == "sulphur_bomb") {
                 tryUseSulphurBomb(ssmbPlayer, abilityData)

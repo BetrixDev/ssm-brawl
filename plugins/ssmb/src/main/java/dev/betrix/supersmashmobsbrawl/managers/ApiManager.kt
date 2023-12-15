@@ -1,6 +1,5 @@
 package dev.betrix.supersmashmobsbrawl.managers
 
-import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
 import dev.betrix.supersmashmobsbrawl.managers.api.payloads.*
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -41,7 +40,6 @@ class ApiManager {
     }
 
     suspend fun fetchPlayerData(player: Player): PlayerDataResponse {
-        SuperSmashMobsBrawl.instance.logger.info(player.uniqueId.toString())
         val response = client.post("api/player/general") {
             headers {
                 append(
@@ -124,7 +122,7 @@ class ApiManager {
             contentType(ContentType.Application.Json)
             setBody(StartGameRequest(playerUuids, modeId, isRanked))
         }
-        
+
         return when (response.status.value) {
             200 -> StartGame.Success(json.decodeFromString((response.bodyAsText())))
             else -> StartGame.Error(StartGameError.UNKNOWN)
