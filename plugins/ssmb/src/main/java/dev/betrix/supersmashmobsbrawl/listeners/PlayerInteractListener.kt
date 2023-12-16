@@ -1,6 +1,7 @@
 package dev.betrix.supersmashmobsbrawl.listeners
 
 import dev.betrix.supersmashmobsbrawl.SSMBPlayer
+import dev.betrix.supersmashmobsbrawl.abilities.tryUseExplode
 import dev.betrix.supersmashmobsbrawl.abilities.tryUseSulphurBomb
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyStr
 import dev.betrix.supersmashmobsbrawl.extensions.get
@@ -37,6 +38,8 @@ class PlayerInteractListener : Listener {
 
             if (abilityId == "sulphur_bomb") {
                 tryUseSulphurBomb(ssmbPlayer, abilityData)
+            } else if (abilityId == "explode") {
+                tryUseExplode(ssmbPlayer, abilityData)
             }
         }
     }

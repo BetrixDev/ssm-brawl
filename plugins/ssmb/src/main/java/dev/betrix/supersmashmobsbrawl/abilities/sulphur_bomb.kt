@@ -64,10 +64,10 @@ fun tryUseSulphurBomb(player: SSMBPlayer, abilityData: StartGameResponse.Abiliti
                 projectile.getNearbyEntities(projectileHitboxSize, projectileHitboxSize, projectileHitboxSize)
 
             nearbyEntities.forEach {
-                if (it !is Player) {
+                if (it !is Player || it == player.bukkitPlayer) {
                     return@forEach
                 }
-                
+
                 val splashEvent = PotionSplashEvent(projectile, it, null, null, mutableMapOf(it to 1.0))
                 splashEvent.callEvent()
                 this.cancel()

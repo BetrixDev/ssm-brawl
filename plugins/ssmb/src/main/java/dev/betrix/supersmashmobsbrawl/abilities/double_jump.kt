@@ -7,6 +7,7 @@ import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyBool
 import dev.betrix.supersmashmobsbrawl.extensions.getMetadata
 import dev.betrix.supersmashmobsbrawl.extensions.setMetadata
+import dev.betrix.supersmashmobsbrawl.utils.isOnGround
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import org.bukkit.Sound
@@ -44,16 +45,14 @@ fun tryDoubleJump(player: SSMBPlayer) {
 
     plugin.launch {
         while (true) {
-            val nearestBlockBelow = bukkitPlayer.location.subtract(0.0, 1.0, 0.0).block
-
-            if (nearestBlockBelow.type.isSolid) {
+            if (isOnGround(bukkitPlayer)) {
                 bukkitPlayer.setMetadata {
                     set(TaggedKeyBool.PLAYER_CAN_DOUBLE_JUMP, true)
                 }
                 bukkitPlayer.allowFlight = true
                 this.cancel()
             }
-
+            
             delay(1.ticks)
         }
     }
