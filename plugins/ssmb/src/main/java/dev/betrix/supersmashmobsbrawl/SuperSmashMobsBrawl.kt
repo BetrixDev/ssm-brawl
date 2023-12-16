@@ -24,7 +24,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         logger.info("Initializing Super Smash Mobs Brawl!")
 
         instance = this
-        
+
         api = ApiManager()
         queue = QueueManager()
         games = GameManager()
@@ -42,6 +42,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         server.pluginManager.registerEvents(InventoryClickListener(), this)
         server.pluginManager.registerEvents(PlayerToggleFlightListener(), this)
         server.pluginManager.registerEvents(PlayerToggleSneakListener(), this)
+        server.pluginManager.registerEvents(EntityDamageByBlockListener(), this)
 
         getCommand("queue")?.setSuspendingExecutor(QueueCommand(this))
 

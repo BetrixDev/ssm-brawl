@@ -3,6 +3,7 @@ package dev.betrix.supersmashmobsbrawl.listeners
 import dev.betrix.supersmashmobsbrawl.SSMBPlayer
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyNum
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyStr
+import dev.betrix.supersmashmobsbrawl.extensions.doKnockback
 import dev.betrix.supersmashmobsbrawl.extensions.getMetadata
 import org.bukkit.Particle
 import org.bukkit.Sound
@@ -27,6 +28,7 @@ class PotionSplashListener : Listener {
 
         event.isCancelled = true
 
+        val projectKnockbackMultiplier = splashedItem.getMetadata(TaggedKeyNum.PROJECTILE_KNOCKBACK_MULTIPLIER)!!
         val projectileDamage = splashedItem.getMetadata(TaggedKeyNum.PROJECTILE_DAMAGE)!!
         val projectileDamageAoe = splashedItem.getMetadata(TaggedKeyNum.PROJECTILE_DAMAGE_AOE)
         val projectileExplosionParticle = splashedItem.getMetadata(TaggedKeyStr.PROJECTILE_EXPLOSION_PARTICLE)!!
@@ -34,10 +36,24 @@ class PotionSplashListener : Listener {
 
         if (event.hitEntity != null && event.hitEntity is Player && event.hitEntity != thrower.bukkitPlayer) {
             val target = event.hitEntity as Player
+            target.doKnockback(
+                projectKnockbackMultiplier,
+                projectileDamage,
+                target.health,
+                thrower.bukkitPlayer.location.toVector(),
+                null
+            )
             target.damage(projectileDamage, splashedItem)
         } else if (event.hitBlock != null && projectileDamageAoe != null) {
             thrower.bukkitPlayer.world.players.forEach {
                 if (it.location.distance(splashedLocation) <= projectileDamageAoe && it.player != thrower.bukkitPlayer) {
+                    it.doKnockback(
+                        projectKnockbackMultiplier,
+                        projectileDamage,
+                        it.health,
+                        thrower.bukkitPlayer.location.toVector(),
+                        null
+                    )
                     it.damage(projectileDamage)
                 }
             }

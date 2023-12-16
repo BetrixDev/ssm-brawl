@@ -57,7 +57,6 @@ fun tryUseSulphurBomb(player: SSMBPlayer, abilityData: StartGameResponse.Abiliti
 
     plugin.launch {
         val projectileHitboxSize = projectile.getMetadata(TaggedKeyNum.PROJECTILE_HITBOX_SIZE)!!
-        val projectileDamage = projectile.getMetadata(TaggedKeyNum.PROJECTILE_DAMAGE)!!
 
         while (true) {
             val nearbyEntities =
