@@ -41,6 +41,11 @@ class PlayerInteractListener : Listener {
             } else if (abilityId == "explode") {
                 tryUseExplode(ssmbPlayer, abilityData)
             }
+        } else if (
+            event.action == Action.LEFT_CLICK_BLOCK ||
+            event.action == Action.LEFT_CLICK_AIR
+        ) {
+            event.player.resetCooldown()
         }
     }
 }
