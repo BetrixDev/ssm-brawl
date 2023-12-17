@@ -26,10 +26,16 @@ export async function POST(request: Request) {
   if (dbSelect !== undefined) {
     playerData = dbSelect;
   } else {
-    playerData = await db
+    const playerId = await db
       .insert(playersTables)
       .values({ uuid: body.uuid })
-      .returning()
+      .execute();
+
+    playerData = await db
+      .select()
+      .from(playersTables)
+      .where(eq(playersTables.uuid, playerId.insertId))
+      .limit(1)
       .execute()
       .then((p) => p[0]!);
   }

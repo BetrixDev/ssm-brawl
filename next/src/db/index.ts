@@ -1,8 +1,12 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { drizzle } from "drizzle-orm/planetscale-serverless";
+import { connect } from "@planetscale/database";
 import { env } from "@/env";
 
-const client = postgres(env.DB_CONNECTION_STRING!);
+const client = connect({
+  host: env.DATABASE_HOST,
+  username: env.DATABASE_USERNAME,
+  password: env.DATABASE_PASSWORD,
+});
 export const db = drizzle(client);
 
 export * from "drizzle-orm";

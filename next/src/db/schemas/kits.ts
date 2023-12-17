@@ -1,7 +1,13 @@
-import { decimal, json, pgTable, text } from "drizzle-orm/pg-core";
+import {
+  decimal,
+  json,
+  mysqlTable,
+  text,
+  varchar,
+} from "drizzle-orm/mysql-core";
 
-export const kitsTable = pgTable("kits", {
-  id: text("id").primaryKey(),
+export const kitsTable = mysqlTable("kits", {
+  id: varchar("id", { length: 15 }).primaryKey(),
   displayName: text("display_name").notNull(),
   inventoryIcon: text("inventory_icon").notNull(),
   visualArmor: json("visual_armor")
