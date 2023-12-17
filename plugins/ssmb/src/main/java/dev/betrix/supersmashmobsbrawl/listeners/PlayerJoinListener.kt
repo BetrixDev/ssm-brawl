@@ -1,6 +1,7 @@
 package dev.betrix.supersmashmobsbrawl.listeners
 
 import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.supersmashmobsbrawl.SSMBPlayer
 import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -11,10 +12,14 @@ class PlayerJoinListener : Listener {
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
-        plugin.hub.teleportPlayer(event.player)
+        val player = event.player
+
+        plugin.hub.teleportPlayer(player)
+        player.foodLevel = 18
 
         plugin.launch {
-            plugin.api.fetchPlayerData(event.player)
+            plugin.api.fetchPlayerData(player)
+            SSMBPlayer.addPlayer(player)
         }
     }
 }

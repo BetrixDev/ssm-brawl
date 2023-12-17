@@ -1,16 +1,18 @@
 import {
+  abilitiesTables,
   and,
   db,
   eq,
   gte,
+  kitsTable,
   lte,
   mapsTable,
   minigamesTables,
   ongoingGamesTable,
   or,
   playersTables,
-  queueTable,
 } from "@/db";
+import { passivesTable } from "@/db/schemas/passives";
 import { getRandomElement, isAuthedForRequest } from "@/utils";
 import { z } from "zod";
 
@@ -42,9 +44,23 @@ export async function POST(request: Request) {
   }
 
   const players = await db
-    .select()
+    .select({
+      uuid: playersTables.uuid,
+      kit: {
+        id: kitsTable.id,
+        displayName: kitsTable.displayName,
+        inventoryIcon: kitsTable.inventoryIcon,
+        visualArmor: kitsTable.visualArmor,
+        passives: kitsTable.passives,
+        abilities: kitsTable.abilities,
+        damage: kitsTable.damage,
+        armor: kitsTable.armor,
+        knockback: kitsTable.knockback,
+      },
+    })
     .from(playersTables)
     .where(or(...body.playerUuids.map((u) => eq(playersTables.uuid, u))))
+    .innerJoin(kitsTable, eq(kitsTable.id, playersTables.selectedKit))
     .execute();
 
   if (players.length !== body.playerUuids.length) {
@@ -53,10 +69,49 @@ export async function POST(request: Request) {
     });
   }
 
-  // await db
-  //   .delete(queueTable)
-  //   .where(or(...body.playerUuids.map((u) => eq(playersTables.uuid, u))))
-  //   .execute();
+  const abilitiesToQuery = players.reduce<string[]>(
+    (acc, curr) => [...acc, ...curr.kit.abilities],
+    []
+  );
+
+  const passivesToQuery = players.reduce<string[]>(
+    (acc, curr) => [...acc, ...curr.kit.passives],
+    []
+  );
+
+  const abilitiesData = await db
+    .select()
+    .from(abilitiesTables)
+    .where(or(...abilitiesToQuery.map((a) => eq(abilitiesTables.id, a))))
+    .execute()
+    .then((data) =>
+      data.reduce<Record<string, typeof abilitiesTables.$inferSelect>>(
+        (acc, curr) => ({ ...acc, [curr.id]: curr }),
+        {}
+      )
+    );
+
+  const passivesData = await db
+    .select()
+    .from(passivesTable)
+    .where(or(...passivesToQuery.map((a) => eq(passivesTable.id, a))))
+    .execute()
+    .then((data) =>
+      data.reduce<Record<string, typeof passivesTable.$inferSelect>>(
+        (acc, curr) => ({ ...acc, [curr.id]: curr }),
+        {}
+      )
+    );
+
+  const injectedPlayerData = players.map((player) => {
+    const kitAbilities = player.kit.abilities.map((id) => abilitiesData[id]!!);
+    const kitPassives = player.kit.passives.map((id) => passivesData[id]!!);
+
+    return {
+      ...player,
+      kit: { ...player.kit, abilities: kitAbilities, passives: kitPassives },
+    };
+  });
 
   const validMaps = await db
     .select()
@@ -85,6 +140,10 @@ export async function POST(request: Request) {
     .then((g) => g[0]!);
 
   return new Response(
-    JSON.stringify({ ...ongoingGame, players, map: selectedMap })
+    JSON.stringify({
+      ...ongoingGame,
+      players: injectedPlayerData,
+      map: selectedMap,
+    })
   );
 }

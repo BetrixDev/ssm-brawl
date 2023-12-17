@@ -1,6 +1,5 @@
 package dev.betrix.supersmashmobsbrawl.managers
 
-import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
 import dev.betrix.supersmashmobsbrawl.managers.api.payloads.*
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -41,7 +40,6 @@ class ApiManager {
     }
 
     suspend fun fetchPlayerData(player: Player): PlayerDataResponse {
-        SuperSmashMobsBrawl.instance.logger.info(player.uniqueId.toString())
         val response = client.post("api/player/general") {
             headers {
                 append(
