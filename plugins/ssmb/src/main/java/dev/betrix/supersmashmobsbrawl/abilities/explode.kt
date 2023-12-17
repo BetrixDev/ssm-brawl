@@ -4,6 +4,7 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.ticks
 import dev.betrix.supersmashmobsbrawl.SSMBPlayer
 import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
+import dev.betrix.supersmashmobsbrawl.disguises.CreeperDisguise
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyBool
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyNum
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyStr
@@ -42,6 +43,10 @@ fun tryUseExplode(player: SSMBPlayer, abilityData: StartGameResponse.AbilitiesDa
         bukkitPlayer.level = 0
         bukkitPlayer.exp = 0F
 
+        if (player.disguise is CreeperDisguise) {
+            (player.disguise as CreeperDisguise).setPowered(true)
+        }
+
         repeat(30) { index ->
             if (bukkitPlayer.getMetadata(TaggedKeyBool.PLAYER_IS_EXPLODE_ACTIVE)!!) {
                 bukkitPlayer.exp = (index + 1) / 30F
@@ -51,6 +56,9 @@ fun tryUseExplode(player: SSMBPlayer, abilityData: StartGameResponse.AbilitiesDa
 
                 delay(1.ticks)
             } else {
+                if (player.disguise is CreeperDisguise) {
+                    (player.disguise as CreeperDisguise).setPowered(false)
+                }
                 this.cancel()
             }
         }
@@ -89,6 +97,10 @@ fun tryUseExplode(player: SSMBPlayer, abilityData: StartGameResponse.AbilitiesDa
 
                 it.doKnockback(2.5, damage, it.health, bukkitPlayer.location.toVector(), null)
                 it.damage(damage, bukkitPlayer)
+            }
+
+            if (player.disguise is CreeperDisguise) {
+                (player.disguise as CreeperDisguise).setPowered(false)
             }
 
             player.cooldowns[abilityData.id] = currentTime

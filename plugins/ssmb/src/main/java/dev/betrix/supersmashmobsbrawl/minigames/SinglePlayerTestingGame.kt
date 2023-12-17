@@ -2,6 +2,7 @@ package dev.betrix.supersmashmobsbrawl.minigames
 
 import br.com.devsrsouza.kotlinbukkitapi.extensions.item
 import dev.betrix.supersmashmobsbrawl.SSMBPlayer
+import dev.betrix.supersmashmobsbrawl.disguises.CreeperDisguise
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyNum
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyStr
 import dev.betrix.supersmashmobsbrawl.extensions.setData
@@ -32,6 +33,11 @@ class SinglePlayerTestingGame(private val gameData: StartGameResponse) : Listene
             ssmbPlayer.abilities = data.kit.abilities
             ssmbPlayer.passives = data.kit.passives
             ssmbPlayer.selectedKitData = data.kit
+
+            if (data.kit.id == "creeper") {
+                ssmbPlayer.disguise = CreeperDisguise(ssmbPlayer)
+                ssmbPlayer.disguise!!.createDisguise()
+            }
 
             data.kit.visualArmor.forEach {
                 player.inventory.setItem(

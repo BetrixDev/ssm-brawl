@@ -1,5 +1,6 @@
 package dev.betrix.supersmashmobsbrawl
 
+import dev.betrix.supersmashmobsbrawl.disguises.SSMBDisguise
 import dev.betrix.supersmashmobsbrawl.managers.api.payloads.StartGameResponse
 import org.bukkit.entity.Player
 import java.util.*
@@ -10,6 +11,7 @@ class SSMBPlayer(val bukkitPlayer: Player) {
     var abilities = listOf<StartGameResponse.AbilitiesData>()
     var passives = listOf<StartGameResponse.PassivesData>()
     val cooldowns = hashMapOf<String, Long>()
+    var disguise: SSMBDisguise? = null
 
     companion object {
         private val players = hashMapOf<UUID, SSMBPlayer>()

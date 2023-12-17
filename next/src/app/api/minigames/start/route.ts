@@ -14,6 +14,7 @@ import {
 } from "@/db";
 import { passivesTable } from "@/db/schemas/passives";
 import { getRandomElement, isAuthedForRequest } from "@/utils";
+import { randomUUID } from "crypto";
 import { z } from "zod";
 
 const requestSchema = z.object({
@@ -128,9 +129,12 @@ export async function POST(request: Request) {
 
   const selectedMap = getRandomElement(validMaps);
 
-  const gameId = await db
+  const gameId = randomUUID();
+
+  await db
     .insert(ongoingGamesTable)
     .values({
+      gameId,
       playerUuids: body.playerUuids,
       modeId: body.modeId,
       isRanked: body.isRanked,
@@ -140,8 +144,9 @@ export async function POST(request: Request) {
   const ongoingGame = await db
     .select()
     .from(ongoingGamesTable)
-    .where(eq(ongoingGamesTable.gameId, gameId.insertId))
-    .execute();
+    .where(eq(ongoingGamesTable.gameId, gameId))
+    .execute()
+    .then((o) => o[0]!);
 
   return new Response(
     JSON.stringify({

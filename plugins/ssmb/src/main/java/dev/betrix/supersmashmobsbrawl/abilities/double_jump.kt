@@ -29,7 +29,7 @@ fun tryDoubleJump(player: SSMBPlayer) {
     bukkitPlayer.allowFlight = false
     bukkitPlayer.fallDistance = 0F
     bukkitPlayer.playSound(bukkitPlayer.location, Sound.ENTITY_BLAZE_SHOOT, 1F, 1F)
-    bukkitPlayer.setVelocity(bukkitPlayer, bukkitPlayer.location.direction, 0.9, true, 0.9, 0.0, 0.9, true)
+    bukkitPlayer.setVelocity(bukkitPlayer.location.direction, 0.9, true, 0.9, 0.0, 0.9, true)
 
     plugin.launch {
         while (true) {
