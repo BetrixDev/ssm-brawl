@@ -1,18 +1,19 @@
 import {
-  doublePrecision,
+  decimal,
   json,
-  pgTable,
+  mysqlTable,
   text,
   uniqueIndex,
-} from "drizzle-orm/pg-core";
+  varchar,
+} from "drizzle-orm/mysql-core";
 
-export const abilitiesTables = pgTable(
+export const abilitiesTables = mysqlTable(
   "abilities",
   {
-    id: text("id").primaryKey(),
+    id: varchar("id", { length: 25 }).primaryKey(),
     displayName: text("display_name").notNull(),
     toolId: text("tool_id").notNull(),
-    cooldown: doublePrecision("cooldown").notNull(),
+    cooldown: decimal("cooldown", { precision: 1 }).notNull(),
     meta: json("meta").$type<Record<string, number>>().notNull(),
   },
   (table) => {

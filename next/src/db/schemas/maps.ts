@@ -1,12 +1,19 @@
-import { boolean, integer, json, pgTable, text } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  int,
+  json,
+  mysqlTable,
+  text,
+  varchar,
+} from "drizzle-orm/mysql-core";
 
-export const mapsTable = pgTable("maps", {
-  mapId: text("map_id").primaryKey().notNull(),
+export const mapsTable = mysqlTable("maps", {
+  mapId: varchar("map_id", { length: 25 }).primaryKey().notNull(),
   displayName: text("display_name").notNull(),
   canBeRanked: boolean("can_be_ranked").notNull().default(false),
   isHidden: boolean("is_hidden").notNull().default(false),
-  minPlayerCount: integer("min_player_count").notNull(),
-  maxPlayerCount: integer("max_player_count").notNull(),
+  minPlayerCount: int("min_player_count").notNull(),
+  maxPlayerCount: int("max_player_count").notNull(),
   spawnLocations: json("spawn_locations")
     .$type<{ x: number; y: number; z: number }[]>()
     .notNull(),

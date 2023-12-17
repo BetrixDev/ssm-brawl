@@ -128,16 +128,20 @@ export async function POST(request: Request) {
 
   const selectedMap = getRandomElement(validMaps);
 
-  const ongoingGame = await db
+  const gameId = await db
     .insert(ongoingGamesTable)
     .values({
       playerUuids: body.playerUuids,
       modeId: body.modeId,
       isRanked: body.isRanked,
     })
-    .returning()
-    .execute()
-    .then((g) => g[0]!);
+    .execute();
+
+  const ongoingGame = await db
+    .select()
+    .from(ongoingGamesTable)
+    .where(eq(ongoingGamesTable.gameId, gameId.insertId))
+    .execute();
 
   return new Response(
     JSON.stringify({

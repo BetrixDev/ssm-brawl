@@ -4,17 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "dotenv -e ../.env next dev",
-    "build": "next build",
+    "build": "dotenv -e ../.env next build",
     "start": "dotenv -e ../.env next start",
-    "lint": "next lint",
-    "db:push": "dotenv -e ../.env drizzle-kit push:pg"
+    "lint": "dotenv -e ../.env next lint",
+    "db:push": "dotenv -e ../.env drizzle-kit push:mysql"
   },
   "dependencies": {
+    "@planetscale/database": "^1.13.0",
     "dotenv-cli": "^7.3.0",
     "drizzle-orm": "^0.29.1",
     "envsafe": "^2.0.3",
     "next": "14.0.3",
-    "postgres": "^3.4.3",
     "react": "^18",
     "react-dom": "^18",
     "zod": "^3.22.4"
