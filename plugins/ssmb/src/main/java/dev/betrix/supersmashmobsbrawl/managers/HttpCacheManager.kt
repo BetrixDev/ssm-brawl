@@ -1,13 +1,7 @@
 package dev.betrix.supersmashmobsbrawl.managers
 
-import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
 import dev.betrix.supersmashmobsbrawl.utils.md5
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.json.Json
+import kotlin.collections.set
 
 class HttpCacheManager {
 
@@ -15,58 +9,29 @@ class HttpCacheManager {
 
     fun set(
         url: String,
-        headers: HashMap<String, String>,
-        body: String,
+        body: String? = null,
         response: String
     ) {
-        val hash = md5("$url$body$headers")
+        val hash = md5("$url$body")
         cache[hash] = CacheEntry(System.currentTimeMillis(), response)
     }
 
-    fun <T> get(
+    fun get(
         url: String,
-        headers: HashMap<String, String>,
-        body: String,
-        deserializer: DeserializationStrategy<T>
-    ): T? {
-        val hash = md5("$url$body$headers")
+        body: String? = null
+    ): String? {
+        val hash = md5("$url$body")
         val cacheEntry = cache[hash] ?: return null
 
-        return Json.decodeFromString(deserializer, cacheEntry.response)
+        return cacheEntry.response
     }
 
     fun invalidate(
         url: String,
         body: String,
-        headers: HashMap<String, String>
     ) {
-        val hash = md5("$url$body$headers")
+        val hash = md5("$url$body")
         cache.remove(hash)
-    }
-
-    suspend fun <T, V> revalidate(
-        url: String,
-        headers: HashMap<String, String>,
-        body: V,
-        serializer: SerializationStrategy<V>,
-        deserializer: DeserializationStrategy<T>
-    ): T? {
-        val hash = md5("$url$body$headers")
-
-        val newResponse = SuperSmashMobsBrawl.instance.api.client.post(url) {
-            headers {
-                headers.forEach {
-                    append(it.key, it.value)
-                }
-            }
-            contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(serializer, body))
-        }
-
-        val responseString = newResponse.bodyAsText()
-
-        cache[hash] = CacheEntry(System.currentTimeMillis(), responseString)
-        return Json.decodeFromString(deserializer, responseString)
     }
 }
 

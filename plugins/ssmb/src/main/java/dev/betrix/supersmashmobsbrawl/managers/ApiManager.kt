@@ -1,5 +1,6 @@
 package dev.betrix.supersmashmobsbrawl.managers
 
+import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
 import dev.betrix.supersmashmobsbrawl.managers.api.payloads.*
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -14,6 +15,8 @@ import kotlinx.serialization.json.Json
 import org.bukkit.entity.Player
 
 class ApiManager {
+    val plugin = SuperSmashMobsBrawl.instance
+
     val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json()
@@ -129,7 +132,30 @@ class ApiManager {
         }
     }
 
+    suspend fun fetchLang(forceRevalidate: Boolean = false): Map<String, Map<String, String>> {
+        val url = "api/lang"
+
+        val responseString = if (forceRevalidate) {
+            val response = doRequest(url)
+            response.bodyAsText()
+        } else {
+            plugin.cache.get(url)!!
+        }
+
+        return json.decodeFromString(responseString)
+    }
+
     fun destroyClient() {
         client.close()
+    }
+
+    private suspend fun doRequest(url: String, body: String = ""): HttpResponse {
+        return client.post(url) {
+            headers {
+                append("Authorization", "Bearer $apiToken")
+            }
+            setBody(body)
+            contentType(ContentType.Application.Json)
+        }
     }
 }
