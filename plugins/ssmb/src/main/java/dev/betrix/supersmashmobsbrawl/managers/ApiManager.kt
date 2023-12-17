@@ -14,7 +14,7 @@ import kotlinx.serialization.json.Json
 import org.bukkit.entity.Player
 
 class ApiManager {
-    private val client = HttpClient(CIO) {
+    val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json()
         }

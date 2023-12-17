@@ -6,6 +6,7 @@ import dev.betrix.supersmashmobsbrawl.commands.QueueCommand
 import dev.betrix.supersmashmobsbrawl.listeners.*
 import dev.betrix.supersmashmobsbrawl.managers.ApiManager
 import dev.betrix.supersmashmobsbrawl.managers.GameManager
+import dev.betrix.supersmashmobsbrawl.managers.HttpCacheManager
 import dev.betrix.supersmashmobsbrawl.managers.QueueManager
 import dev.betrix.supersmashmobsbrawl.maps.BaseMap
 import dev.betrix.supersmashmobsbrawl.maps.HubMap
@@ -14,6 +15,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var api: ApiManager
     lateinit var queue: QueueManager
     lateinit var games: GameManager
+    lateinit var cache: HttpCacheManager
     lateinit var hub: HubMap
 
     companion object {
@@ -28,6 +30,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         api = ApiManager()
         queue = QueueManager()
         games = GameManager()
+        cache = HttpCacheManager()
 
         BaseMap.clearCurrentWorlds()
         hub = HubMap("hub", "main_hub")
