@@ -185,7 +185,7 @@ class CreeperKit constructor(
     private var isExplodeActive = false
     private fun tryUseExplode() {
         val currentTime = System.currentTimeMillis()
-        if (currentTime < lastExplodeTime + explodeCooldown * 1000) {
+        if (currentTime < lastExplodeTime + explodeCooldown) {
             val timeLeft = ((lastExplodeTime + explodeCooldown) - currentTime) / 1000.0
 
             val cooldownMessage = plugin.lang.sendToPlayer(
