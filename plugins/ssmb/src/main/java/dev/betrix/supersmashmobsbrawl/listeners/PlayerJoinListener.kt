@@ -1,6 +1,5 @@
 package dev.betrix.supersmashmobsbrawl.listeners
 
-import dev.betrix.supersmashmobsbrawl.SSMBPlayer
 import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
 import dev.betrix.supersmashmobsbrawl.enums.LangEntry
 import org.bukkit.event.EventHandler
@@ -18,10 +17,9 @@ class PlayerJoinListener : Listener {
         plugin.hub.teleportPlayer(player)
         player.foodLevel = 18
 
-        plugin.api.fetchPlayerData(player)
-        SSMBPlayer.addPlayer(player)
+        plugin.api.fetchPlayerData(player, true)
 
-        val joinMessage = plugin.lang.process(LangEntry.SERVER_PLAYER_JOINED, player)
+        val joinMessage = plugin.lang.sendToPlayer(LangEntry.SERVER_PLAYER_JOINED, player)
         event.joinMessage(joinMessage)
     }
 }

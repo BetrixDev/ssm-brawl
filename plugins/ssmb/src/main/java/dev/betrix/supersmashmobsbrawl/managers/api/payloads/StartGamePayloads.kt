@@ -28,35 +28,11 @@ data class StartGameResponse(
     @Serializable
     data class KitData(
         val id: String,
-        val displayName: String,
         val inventoryIcon: String,
-        val visualArmor: List<VisualArmorData>,
-        val passives: List<PassivesData>,
-        val abilities: List<AbilitiesData>,
         val damage: Double,
         val armor: Double,
         val knockback: Double
     )
-
-    @Serializable
-    data class AbilitiesData(
-        val id: String,
-        val displayName: String,
-        val toolId: String,
-        val cooldown: Int,
-        val meta: Map<String, String>
-    )
-
-    @Serializable
-    data class PassivesData(
-        val id: String,
-        val displayName: String,
-        val cooldown: Int,
-        val meta: Map<String, String>
-    )
-
-    @Serializable
-    data class VisualArmorData(val id: String, val slot: String)
 
     @Serializable
     data class MapData(val mapId: String, val displayName: String, val spawnLocations: List<SpawnLocation>)

@@ -37,16 +37,12 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         BaseMap.clearCurrentWorlds()
         hub = HubMap("hub", "main_hub")
 
-        server.pluginManager.registerEvents(TeleportListener(), this)
+        server.pluginManager.registerEvents(PlayerTeleportListener(), this)
         server.pluginManager.registerSuspendingEvents(PlayerJoinListener(), this)
-        server.pluginManager.registerEvents(PlayerInteractListener(), this)
-        server.pluginManager.registerEvents(PotionSplashListener(), this)
         server.pluginManager.registerEvents(EntityPickupItemListener(), this)
         server.pluginManager.registerEvents(PlayerPickItemListener(), this)
         server.pluginManager.registerEvents(PlayerDropItemListener(), this)
         server.pluginManager.registerEvents(InventoryClickListener(), this)
-        server.pluginManager.registerEvents(PlayerToggleFlightListener(), this)
-        server.pluginManager.registerEvents(PlayerToggleSneakListener(), this)
         server.pluginManager.registerEvents(EntityDamageByBlockListener(), this)
 
         getCommand("queue")?.setSuspendingExecutor(QueueCommand(this))

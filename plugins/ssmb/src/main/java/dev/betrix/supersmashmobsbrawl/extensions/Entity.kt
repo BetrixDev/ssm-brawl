@@ -1,6 +1,5 @@
 package dev.betrix.supersmashmobsbrawl.extensions
 
-import dev.betrix.supersmashmobsbrawl.SSMBPlayer
 import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyBool
 import dev.betrix.supersmashmobsbrawl.enums.TaggedKeyNum
@@ -114,16 +113,13 @@ fun Entity.doKnockback(
     knockback *= multiplier
 
     if (this is Player) {
-        val ssmbPlayer = SSMBPlayer.fromUuid(this.uniqueId)
+        val kitKnockbackMult = this.getMetadata(TaggedKeyNum.PLAYER_KIT_KNOCKBACK_MULT)
 
-        if (ssmbPlayer != null) {
-            val kitKnockback = ssmbPlayer.selectedKitData?.knockback
-
-            if (kitKnockback != null) {
-                knockback *= knockback
-            }
-            knockback *= (1 + 0.1 * (this.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value!! - startingHealth))
+        if (kitKnockbackMult != null) {
+            knockback *= kitKnockbackMult
         }
+        
+        knockback *= (1 + 0.1 * (this.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value!! - startingHealth))
     }
 
     var trajectory: Vector? = null

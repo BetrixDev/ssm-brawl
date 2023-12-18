@@ -18,18 +18,18 @@ class LangManager {
         rawLangEntries = plugin.api.fetchLang(true)
     }
 
-    fun process(entry: LangEntry, viewer: Player, customPlaceholders: HashMap<String, String>? = null): Component {
+    fun sendToPlayer(entry: LangEntry, viewer: Player, customPlaceholders: HashMap<String, String>? = null): Component {
         val langEntry = rawLangEntries["en"]?.get(entry.id)!!
 
-        val parsedText = PlaceholderAPI.setPlaceholders(viewer, langEntry)
+        var parsedText = PlaceholderAPI.setPlaceholders(viewer, langEntry)
 
         if (customPlaceholders != null) {
             customPlaceholderPattern.findAll(parsedText).forEach {
-                if (customPlaceholders.containsKey(it.value)) {
-                    plugin.logger.info(it.value + "    " + customPlaceholders[it.value]!!)
-                    parsedText.replace(it.value, customPlaceholders[it.value]!!)
-                } else {
-                    plugin.logger.warning("Attempted to find custom placeholder for ${it.value} in lang entry ${entry.id} but got null")
+                if (customPlaceholders.containsKey(it.value.substring(1, it.value.length - 1))) {
+                    parsedText = parsedText.replace(
+                        it.value,
+                        customPlaceholders[it.value.substring(1, it.value.length - 1)]!!
+                    )
                 }
             }
         }

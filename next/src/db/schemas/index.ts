@@ -4,5 +4,4 @@ export * from "./players";
 export * from "./ongoing-games";
 export * from "./maps";
 export * from "./kits";
-export * from "./abilities";
 export * from "./lang";

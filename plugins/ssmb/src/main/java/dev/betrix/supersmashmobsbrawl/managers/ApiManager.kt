@@ -11,13 +11,14 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.bukkit.entity.Player
 
 class ApiManager {
     val plugin = SuperSmashMobsBrawl.instance
 
-    val client = HttpClient(CIO) {
+    private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json()
         }
@@ -42,19 +43,17 @@ class ApiManager {
         }
     }
 
-    suspend fun fetchPlayerData(player: Player): PlayerDataResponse {
-        val response = client.post("api/player/general") {
-            headers {
-                append(
-                    "Authorization",
-                    "Bearer $apiToken"
-                )
-            }
-            contentType(ContentType.Application.Json)
-            setBody(PlayerDataRequest(player.uniqueId.toString()))
+    suspend fun fetchPlayerData(player: Player, forceRevalidate: Boolean = false): PlayerDataResponse {
+        val url = "api/player/general"
+
+        val responseString = if (forceRevalidate || plugin.cache.get(url) == null) {
+            val response = doRequest(url, json.encodeToString(PlayerDataRequest(player.uniqueId.toString())))
+            response.bodyAsText()
+        } else {
+            plugin.cache.get(url)!!
         }
 
-        return json.decodeFromString(response.bodyAsText())
+        return json.decodeFromString(responseString)
     }
 
     suspend fun addPlayerToQueue(player: Player, modeId: String, isRanked: Boolean): JoinQueue {
@@ -135,7 +134,7 @@ class ApiManager {
     suspend fun fetchLang(forceRevalidate: Boolean = false): Map<String, Map<String, String>> {
         val url = "api/lang"
 
-        val responseString = if (forceRevalidate) {
+        val responseString = if (forceRevalidate || plugin.cache.get(url) == null) {
             val response = doRequest(url)
             response.bodyAsText()
         } else {
