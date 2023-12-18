@@ -6,8 +6,8 @@ import com.github.shynixn.mccoroutine.bukkit.setSuspendingExecutor
 import dev.betrix.supersmashmobsbrawl.commands.QueueCommand
 import dev.betrix.supersmashmobsbrawl.listeners.*
 import dev.betrix.supersmashmobsbrawl.managers.*
-import dev.betrix.supersmashmobsbrawl.maps.BaseMap
 import dev.betrix.supersmashmobsbrawl.maps.HubMap
+import dev.betrix.supersmashmobsbrawl.maps.SSMBMap
 
 class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var api: ApiManager
@@ -34,7 +34,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
 
         SSMBPlaceholderExpansion().register()
 
-        BaseMap.clearCurrentWorlds()
+        SSMBMap.clearCurrentWorlds()
         hub = HubMap("hub", "main_hub")
 
         server.pluginManager.registerEvents(PlayerTeleportListener(), this)

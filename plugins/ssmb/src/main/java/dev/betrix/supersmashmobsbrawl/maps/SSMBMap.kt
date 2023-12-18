@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 import org.codehaus.plexus.util.FileUtils
 import java.io.File
 
-open class BaseMap constructor(
+open class SSMBMap constructor(
     private val serverName: String,
     private val mapId: String
 ) {

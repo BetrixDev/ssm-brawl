@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack
 class HubMap constructor(
     serverName: String,
     mapId: String
-) : BaseMap(serverName, mapId) {
+) : SSMBMap(serverName, mapId) {
     override fun afterPlayerTeleport(player: Player) {
         val actionItem = ItemStack(Material.COMPASS)
         val actionItemMeta = actionItem.itemMeta
