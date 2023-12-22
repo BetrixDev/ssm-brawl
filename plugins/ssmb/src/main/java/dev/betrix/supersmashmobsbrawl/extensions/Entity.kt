@@ -17,6 +17,7 @@ import kotlin.math.log10
 
 class EntityMetadataBuilder(private val entity: Entity) {
     private val metadata = mutableMapOf<String, Any>()
+    private val metadataToRemove = arrayListOf<String>()
 
     fun set(metadataKey: TaggedKeyNum, value: Double) {
         metadata[metadataKey.id] = value
@@ -30,16 +31,32 @@ class EntityMetadataBuilder(private val entity: Entity) {
         metadata[metadataKey.id] = value
     }
 
+    fun remove(metadataKey: TaggedKeyNum) {
+        metadataToRemove.add(metadataKey.id)
+    }
+
+    fun remove(metadataKey: TaggedKeyStr) {
+        metadataToRemove.add(metadataKey.id)
+    }
+
+    fun remove(metadataKey: TaggedKeyBool) {
+        metadataToRemove.add(metadataKey.id)
+    }
+
     fun build() {
         val plugin = SuperSmashMobsBrawl.instance
 
         metadata.forEach {
             entity.setMetadata(it.key, FixedMetadataValue(plugin, it.value))
         }
+
+        metadataToRemove.forEach {
+            entity.removeMetadata(it, plugin)
+        }
     }
 }
 
-fun Entity.setMetadata(builder: EntityMetadataBuilder.() -> Unit) {
+fun Entity.metadata(builder: EntityMetadataBuilder.() -> Unit) {
     val metadataBuilder = EntityMetadataBuilder(this)
     builder(metadataBuilder)
     metadataBuilder.build()
@@ -118,7 +135,7 @@ fun Entity.doKnockback(
         if (kitKnockbackMult != null) {
             knockback *= kitKnockbackMult
         }
-        
+
         knockback *= (1 + 0.1 * (this.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value!! - startingHealth))
     }
 

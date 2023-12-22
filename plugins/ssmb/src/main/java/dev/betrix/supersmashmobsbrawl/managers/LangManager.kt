@@ -18,7 +18,7 @@ class LangManager {
         rawLangEntries = plugin.api.fetchLang(true)
     }
 
-    fun sendToPlayer(entry: LangEntry, viewer: Player, customPlaceholders: HashMap<String, String>? = null): Component {
+    fun getComponent(entry: LangEntry, viewer: Player, customPlaceholders: HashMap<String, String>? = null): Component {
         val langEntry = rawLangEntries["en"]?.get(entry.id)!!
 
         var parsedText = PlaceholderAPI.setPlaceholders(viewer, langEntry)
@@ -35,6 +35,23 @@ class LangManager {
         }
 
         return MiniMessage.miniMessage().deserialize(parsedText)
+    }
+
+    fun getComponent(entry: LangEntry, customPlaceholders: HashMap<String, String>? = null): Component {
+        var langEntry = rawLangEntries["en"]?.get(entry.id)!!
+
+        if (customPlaceholders != null) {
+            customPlaceholderPattern.findAll(langEntry).forEach {
+                if (customPlaceholders.containsKey(it.value.substring(1, it.value.length - 1))) {
+                    langEntry = langEntry.replace(
+                        it.value,
+                        customPlaceholders[it.value.substring(1, it.value.length - 1)]!!
+                    )
+                }
+            }
+        }
+
+        return MiniMessage.miniMessage().deserialize(langEntry)
     }
 
     fun getRaw(entry: LangEntry): String {

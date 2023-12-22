@@ -1,40 +1,30 @@
 package dev.betrix.supersmashmobsbrawl.views
 
-import br.com.devsrsouza.kotlinbukkitapi.extensions.item
-import br.com.devsrsouza.kotlinbukkitapi.menu.dsl.menu
-import br.com.devsrsouza.kotlinbukkitapi.menu.dsl.slot
 import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
-import net.kyori.adventure.text.minimessage.MiniMessage
+import dev.betrix.supersmashmobsbrawl.enums.LangEntry
+import dev.triumphteam.gui.builder.item.ItemBuilder
+import dev.triumphteam.gui.guis.Gui
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 
-class QueueSelectionView constructor(plugin: SuperSmashMobsBrawl, private val player: Player) : Listener {
-    companion object {
-        suspend fun showMenuToPlayer(player: Player) {
-            val view = menu("<bold><gold>Join a Queue", 3, SuperSmashMobsBrawl.instance, true) {
-                slot(1, 3, item(Material.IRON_BLOCK, 1, 1) {
-                    displayName(MiniMessage.miniMessage().deserialize("<bold><aqua>Casual Queue"))
-                }) {
-                    onClick {
-                        Bukkit.dispatchCommand(player, "queue casual")
-                        close()
-                    }
-                }
+class QueueSelectionView constructor(private val player: Player) : Listener {
 
-                slot(1, 5, item(Material.GOLD_BLOCK, 1, 1) {
-                    displayName(MiniMessage.miniMessage().deserialize("<bold><aqua>Ranked Queue"))
-                }) {
-                    onClick {
-                        Bukkit.dispatchCommand(player, "queue ranked")
-                        close()
-                    }
-                }
-            }
+    private val plugin = SuperSmashMobsBrawl.instance
 
-            view.openToPlayer(player)
+    fun showMenuToPlayer() {
+        val guiTitle = plugin.lang.getComponent(LangEntry.GUI_QUEUE_TITLE)
+        val gui = Gui.gui().title(guiTitle).rows(5).create()
+
+        val twoPlayerSingles = ItemBuilder.from(Material.GOLD_BLOCK).asGuiItem {
+            Bukkit.dispatchCommand(player, "queue two_player_singles")
         }
-    }
 
+        gui.setItem(2, 4, twoPlayerSingles)
+
+        gui.filler.fill(ItemBuilder.from(Material.BLACK_STAINED_GLASS_PANE).asGuiItem())
+
+        gui.open(player)
+    }
 }

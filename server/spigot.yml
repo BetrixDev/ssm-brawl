@@ -173,6 +173,8 @@ world-settings:
     max-tnt-per-tick: 100
   worldeditregentempworld:
     verbose: false
+  faweregentempworld:
+    verbose: false
 config-version: 12
 stats:
   disable-saving: false

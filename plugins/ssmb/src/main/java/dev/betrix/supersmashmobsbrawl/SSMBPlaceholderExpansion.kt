@@ -24,6 +24,10 @@ class SSMBPlaceholderExpansion : PlaceholderExpansion() {
             return plugin.lang.getRaw(LangEntry.PREFIX)
         }
 
+        if (params.contains(".")) {
+            return plugin.lang.getRaw(LangEntry.fromId(params)!!)
+        }
+
         return null
     }
 }

@@ -1,14 +1,28 @@
 package dev.betrix.supersmashmobsbrawl.maps
 
+import com.sk89q.worldedit.math.Vector3
+import dev.betrix.supersmashmobsbrawl.enums.WorldGeneratorType
+import eu.decentsoftware.holograms.api.DHAPI
+import eu.decentsoftware.holograms.api.holograms.Hologram
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import net.citizensnpcs.api.CitizensAPI
+import net.citizensnpcs.api.npc.NPC
+import net.citizensnpcs.trait.SkinTrait
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 class HubMap constructor(
     serverName: String,
-    mapId: String
-) : SSMBMap(serverName, mapId) {
+) : SSMBMap(serverName, "main_hub", WorldGeneratorType.VOID) {
+
+    private var podiumNpcs = arrayListOf<NPC>()
+    private var holograms = arrayListOf<Hologram>()
+
     override fun afterPlayerTeleport(player: Player) {
         val actionItem = ItemStack(Material.COMPASS)
         val actionItemMeta = actionItem.itemMeta
@@ -20,4 +34,100 @@ class HubMap constructor(
         player.updateInventory()
         player.inventory.heldItemSlot = 4
     }
+
+    override fun createWorld() {
+        val json = Json { ignoreUnknownKeys = true }
+        val hubMetaData = json.decodeFromString<MetaData>(readMetaDataAsString()!!)
+
+        super.createWorld(
+            Vector3.at(
+                hubMetaData.schematicLocation.x,
+                hubMetaData.schematicLocation.y,
+                hubMetaData.schematicLocation.z
+            )
+        )
+
+        worldInstance.worldBorder.size = hubMetaData.worldBorderRadius
+        worldInstance.spawnLocation = Location(
+            worldInstance,
+            hubMetaData.spawnLocation.x,
+            hubMetaData.spawnLocation.y,
+            hubMetaData.spawnLocation.z
+        )
+
+        hubMetaData.holograms.forEach {
+            val hologramLocation = Location(worldInstance, it.x, it.y, it.z)
+
+            val hologram = DHAPI.createHologram(it.id, hologramLocation, it.lines)
+            hologram.displayRange = it.displayRange
+            hologram.updateInterval = it.updateIntervalTicks
+
+            holograms.add(hologram)
+        }
+    }
+
+    override fun destroyWorld() {
+        podiumNpcs.forEach {
+            it.destroy()
+        }
+
+        super.destroyWorld()
+    }
+
+    fun spawnNPCs() {
+        val json = Json { ignoreUnknownKeys = true }
+        val hubMetaData = json.decodeFromString<MetaData>(readMetaDataAsString()!!)
+
+        val npcRegistry = CitizensAPI.getNPCRegistry()
+
+        repeat(5) { index ->
+            val npc = npcRegistry.createNPC(EntityType.PLAYER, index.toString())
+
+            val spawnLocation = hubMetaData.podiumLocations[index]
+            val npcLocation = Location(worldInstance, spawnLocation.x, spawnLocation.y, spawnLocation.z)
+            npc.spawn(npcLocation)
+
+            val skinTrait = npc.getTraitNullable(SkinTrait::class.java)
+            skinTrait.skinName = "Airbays"
+
+            podiumNpcs.add(npc)
+        }
+    }
+
 }
+
+@Serializable
+private data class SpawnLocation(
+    val x: Double,
+    val y: Double,
+    val z: Double
+)
+
+@Serializable
+private data class PodiumLocation(
+    val x: Double,
+    val y: Double,
+    val z: Double,
+    val yaw: Double,
+    val pitch: Double
+)
+
+@Serializable
+private data class Hologram(
+    val id: String,
+    val x: Double,
+    val y: Double,
+    val z: Double,
+    val displayRange: Int,
+    val updateIntervalTicks: Int,
+    val lines: List<String>
+)
+
+@Serializable
+private data class MetaData(
+    val worldBorderRadius: Double,
+    val spawnLocation: SpawnLocation,
+    val schematicLocation: SpawnLocation,
+    val podiumLocations: List<PodiumLocation>,
+    val holograms: List<dev.betrix.supersmashmobsbrawl.maps.Hologram>
+)

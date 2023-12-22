@@ -38,7 +38,7 @@ class HungerPassive(
                 player.exhaustion = 0F
 
                 if (player.foodLevel <= 0) {
-                    plugin.lang.sendToPlayer(LangEntry.PASSIVE_HUNGER_CTA, player)
+                    plugin.lang.getComponent(LangEntry.PASSIVE_HUNGER_CTA, player)
 
                     val damageEvent = EntityDamageEvent(player, EntityDamageEvent.DamageCause.STARVATION, 1.0)
                     damageEvent.callEvent()

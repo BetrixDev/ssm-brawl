@@ -38,7 +38,7 @@ class CreeperKit constructor(
 
     private val passives = arrayListOf<SSMBPassive>()
 
-    init {
+    override fun equipKit() {
         plugin.server.pluginManager.registerEvents(this, plugin)
 
         val inventory = player.inventory
@@ -101,7 +101,7 @@ class CreeperKit constructor(
         if (currentTime < lastSulphurBombTime + sulphurBombCooldown) {
             val timeLeft = ((lastSulphurBombTime + sulphurBombCooldown) - currentTime) / 1000.0
 
-            val cooldownMessage = plugin.lang.sendToPlayer(
+            val cooldownMessage = plugin.lang.getComponent(
                 LangEntry.ABILITY_COOLDOWN,
                 player,
                 hashMapOf("ability_name" to "Sulphur Bomb", "time_left" to "$timeLeft")
@@ -188,7 +188,7 @@ class CreeperKit constructor(
         if (currentTime < lastExplodeTime + explodeCooldown) {
             val timeLeft = ((lastExplodeTime + explodeCooldown) - currentTime) / 1000.0
 
-            val cooldownMessage = plugin.lang.sendToPlayer(
+            val cooldownMessage = plugin.lang.getComponent(
                 LangEntry.ABILITY_COOLDOWN,
                 player,
                 hashMapOf("ability_name" to "Explode", "time_left" to "$timeLeft")

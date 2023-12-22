@@ -1,20 +1,31 @@
 package dev.betrix.supersmashmobsbrawl.maps
 
+import com.github.shynixn.mccoroutine.bukkit.launch
+import com.onarandombox.MultiverseCore.api.MultiverseWorld
+import com.sk89q.worldedit.math.Vector3
 import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
+import dev.betrix.supersmashmobsbrawl.enums.WorldGeneratorType
+import dev.betrix.supersmashmobsbrawl.managers.SchematicManager
+import kotlinx.coroutines.Dispatchers
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
-import org.bukkit.WorldCreator
+import org.bukkit.WorldType
 import org.bukkit.entity.Player
 import org.codehaus.plexus.util.FileUtils
 import java.io.File
 
-open class SSMBMap constructor(
+abstract class SSMBMap constructor(
     private val serverName: String,
-    private val mapId: String
+    private val worldId: String,
+    private val generatorType: WorldGeneratorType
 ) {
     private val plugin = SuperSmashMobsBrawl.instance
-    val worldInstance: World
+
+    private val worldName = "ssmb_world_$serverName"
+    lateinit var world: MultiverseWorld
+    lateinit var worldInstance: World
+    lateinit var schematicManager: SchematicManager
 
     companion object {
         private val cwd = System.getProperty("user.dir")
@@ -24,24 +35,66 @@ open class SSMBMap constructor(
 
             FileUtils.deleteDirectory(worldDirectory)
         }
-
-        fun prepareShutdown() {}
     }
 
-    init {
-        val baseWorldDirectory = File("$cwd\\worlds\\$mapId")
-        val copiedWorldDirectory = File("$cwd\\current_worlds\\$serverName")
+    open fun createWorld() {
+        createWorld(Vector3.ZERO)
+    }
 
-        FileUtils.copyDirectoryStructure(baseWorldDirectory, copiedWorldDirectory)
-
-        if (Bukkit.getWorld(copiedWorldDirectory.path) != null) {
-            throw RuntimeException()
+    open fun createWorld(schematicOrigin: Vector3) {
+        val worldGenerator = when (generatorType) {
+            WorldGeneratorType.VOID -> "VoidGen"
+            WorldGeneratorType.ISLANDS -> "Terra:SKYLANDS"
         }
 
-        val worldCreator = WorldCreator.name("current_worlds/$serverName")
+        val success = plugin.mvc.mvWorldManager.addWorld(
+            worldName,
+            World.Environment.NORMAL,
+            null, WorldType.NORMAL,
+            false,
+            worldGenerator
+        )
 
-        worldInstance = plugin.server.createWorld(worldCreator) ?: plugin.server.worlds[0]
-        worldInstance.isAutoSave = false
+        if (success) {
+            world = plugin.mvc.mvWorldManager.getMVWorld(worldName)
+            worldInstance = world.cbWorld
+        } else {
+            plugin.logger.info("Unable to create world $worldName / $worldId with generator $generatorType")
+        }
+
+        plugin.launch(Dispatchers.IO) {
+            schematicManager = SchematicManager(worldInstance, "$cwd\\worlds\\$worldId\\schematic.schem")
+            schematicManager.pasteSchematic(
+                Location(
+                    worldInstance,
+                    schematicOrigin.x,
+                    schematicOrigin.y,
+                    schematicOrigin.z
+                )
+            )
+
+            if (generatorType !== WorldGeneratorType.VOID) {
+                plugin.chunky.startTask(worldId, "square", 0.0, 0.0, 500.0, 500.0, "concentric")
+            }
+        }
+    }
+
+    fun readMetaDataAsString(): String? {
+        val metaJson = File("$cwd//worlds//$worldId//meta.json")
+
+        if (!metaJson.exists()) {
+            return null
+        }
+
+        return metaJson.readText()
+    }
+
+    fun saveMainSchematic() {
+        schematicManager.saveSchematic()
+    }
+
+    open fun destroyWorld() {
+        plugin.mvc.deleteWorld(serverName)
     }
 
     fun teleportAllToDefaultWorld() {
@@ -59,6 +112,4 @@ open class SSMBMap constructor(
     }
 
     open fun afterPlayerTeleport(player: Player) {}
-
-    fun destroyServer() {}
 }

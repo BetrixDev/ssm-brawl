@@ -3,6 +3,7 @@ package dev.betrix.supersmashmobsbrawl.managers
 import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
 import dev.betrix.supersmashmobsbrawl.managers.api.payloads.StartGame
 import dev.betrix.supersmashmobsbrawl.minigames.SinglePlayerTestingGame
+import dev.betrix.supersmashmobsbrawl.minigames.TwoPlayerSinglesGame
 import org.bukkit.entity.Player
 
 class GameManager {
@@ -18,6 +19,7 @@ class GameManager {
 
             when (gameData.modeId) {
                 "single_player_testing" -> SinglePlayerTestingGame(gameData)
+                "two_player_singles" -> TwoPlayerSinglesGame(gameData)
                 else -> throw RuntimeException("Unable to locate correct game id ${gameData.modeId}")
             }
 

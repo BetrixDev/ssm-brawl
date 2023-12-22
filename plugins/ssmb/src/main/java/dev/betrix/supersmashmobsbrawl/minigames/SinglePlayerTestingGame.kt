@@ -9,11 +9,10 @@ import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
 import java.util.*
 
-class SinglePlayerTestingGame(private val gameData: StartGameResponse) : Listener {
+class SinglePlayerTestingGame(private val gameData: StartGameResponse) : SSMBGame() {
 
     private val map = GameMap(gameData.gameId, gameData.map.mapId)
     private val generalAudience: Audience

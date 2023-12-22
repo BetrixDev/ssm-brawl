@@ -2,12 +2,15 @@ package dev.betrix.supersmashmobsbrawl
 
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
-import com.github.shynixn.mccoroutine.bukkit.setSuspendingExecutor
+import com.onarandombox.MultiverseCore.MultiverseCore
 import dev.betrix.supersmashmobsbrawl.commands.QueueCommand
 import dev.betrix.supersmashmobsbrawl.listeners.*
 import dev.betrix.supersmashmobsbrawl.managers.*
 import dev.betrix.supersmashmobsbrawl.maps.HubMap
 import dev.betrix.supersmashmobsbrawl.maps.SSMBMap
+import dev.rollczi.litecommands.LiteCommands
+import dev.rollczi.litecommands.bukkit.LiteCommandsBukkit
+import org.popcraft.chunky.api.ChunkyAPI
 
 class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var api: ApiManager
@@ -15,6 +18,10 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var games: GameManager
     lateinit var cache: HttpCacheManager
     lateinit var lang: LangManager
+    lateinit var mvc: MultiverseCore
+    lateinit var chunky: ChunkyAPI
+    private lateinit var commands: LiteCommands<*>
+
     lateinit var hub: HubMap
 
     companion object {
@@ -31,11 +38,14 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         games = GameManager()
         cache = HttpCacheManager()
         lang = LangManager()
+        mvc = server.pluginManager.getPlugin("Multiverse-Core") as MultiverseCore
+        chunky = server.servicesManager.load(ChunkyAPI::class.java)!!
 
         SSMBPlaceholderExpansion().register()
 
         SSMBMap.clearCurrentWorlds()
-        hub = HubMap("hub", "main_hub")
+        hub = HubMap("hub-1")
+        hub.createWorld()
 
         server.pluginManager.registerEvents(PlayerTeleportListener(), this)
         server.pluginManager.registerSuspendingEvents(PlayerJoinListener(), this)
@@ -45,7 +55,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         server.pluginManager.registerEvents(InventoryClickListener(), this)
         server.pluginManager.registerEvents(EntityDamageByBlockListener(), this)
 
-        getCommand("queue")?.setSuspendingExecutor(QueueCommand(this))
+        commands = LiteCommandsBukkit.builder("ssmb", this).commands(QueueCommand()).build()
 
         lang.revalidateLangCache()
 

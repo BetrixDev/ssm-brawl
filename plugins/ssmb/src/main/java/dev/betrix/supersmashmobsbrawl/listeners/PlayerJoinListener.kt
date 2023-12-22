@@ -19,7 +19,7 @@ class PlayerJoinListener : Listener {
 
         plugin.api.fetchPlayerData(player, true)
 
-        val joinMessage = plugin.lang.sendToPlayer(LangEntry.SERVER_PLAYER_JOINED, player)
+        val joinMessage = plugin.lang.getComponent(LangEntry.SERVER_PLAYER_JOINED, player)
         event.joinMessage(joinMessage)
     }
 }
