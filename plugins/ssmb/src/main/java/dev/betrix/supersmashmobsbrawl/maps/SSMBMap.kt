@@ -14,7 +14,6 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.WorldType
 import org.bukkit.entity.Player
-import org.codehaus.plexus.util.FileUtils
 import java.io.File
 
 abstract class SSMBMap constructor(
@@ -42,9 +41,9 @@ abstract class SSMBMap constructor(
         }
 
         fun clearCurrentWorlds() {
-            val worldDirectory = File("$cwd\\current_worlds")
-
-            FileUtils.deleteDirectory(worldDirectory)
+            File(cwd).listFiles { file -> file.isDirectory && file.name.startsWith("ssmb_world_") }?.forEach {
+                it.deleteRecursively()
+            }
         }
     }
 
