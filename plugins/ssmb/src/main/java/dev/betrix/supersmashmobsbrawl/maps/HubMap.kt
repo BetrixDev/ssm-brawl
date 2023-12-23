@@ -102,7 +102,7 @@ class HubMap constructor(
 
 
 @Serializable
-sealed class HubMetadata(
+data class HubMetadata(
     val worldBorderRadius: Double,
     val schematicRadius: Double,
     val schematicLowerLimit: Double,

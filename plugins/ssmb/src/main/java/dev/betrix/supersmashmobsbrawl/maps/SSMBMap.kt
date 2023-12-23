@@ -110,7 +110,7 @@ abstract class SSMBMap constructor(
 }
 
 @Serializable
-sealed class Metadata(
+data class Metadata(
     val worldBorderRadius: Double,
     val schematicRadius: Double,
     val schematicLowerLimit: Double,
