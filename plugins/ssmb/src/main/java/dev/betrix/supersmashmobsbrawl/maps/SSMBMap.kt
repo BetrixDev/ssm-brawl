@@ -33,6 +33,14 @@ abstract class SSMBMap constructor(
         val cwd: String = System.getProperty("user.dir")
         val json = Json { ignoreUnknownKeys = true }
 
+        private val loadedWorlds = arrayListOf<SSMBMap>()
+
+        fun mapFromWorld(worldInstance: World): SSMBMap? {
+            return loadedWorlds.find {
+                it.worldInstance == worldInstance
+            }
+        }
+
         fun clearCurrentWorlds() {
             val worldDirectory = File("$cwd\\current_worlds")
 
@@ -73,6 +81,8 @@ abstract class SSMBMap constructor(
                 worldMetadata.spawnLocation.y,
                 worldMetadata.spawnLocation.z
             )
+
+            loadedWorlds.add(this)
         } else {
             plugin.logger.info("Unable to create world $worldName / $worldId with generator $generatorType")
         }
@@ -101,6 +111,7 @@ abstract class SSMBMap constructor(
     }
 
     open fun destroyWorld() {
+        loadedWorlds.remove(this)
         plugin.mvc.deleteWorld(serverName)
     }
 
