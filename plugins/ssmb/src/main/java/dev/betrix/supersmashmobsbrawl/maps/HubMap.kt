@@ -5,7 +5,6 @@ import dev.betrix.supersmashmobsbrawl.enums.WorldGeneratorType
 import eu.decentsoftware.holograms.api.DHAPI
 import eu.decentsoftware.holograms.api.holograms.Hologram
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import net.citizensnpcs.api.CitizensAPI
 import net.citizensnpcs.api.npc.NPC
 import net.citizensnpcs.trait.SkinTrait
@@ -15,6 +14,7 @@ import org.bukkit.Material
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.io.File
 
 class HubMap constructor(
     serverName: String,
@@ -35,9 +35,14 @@ class HubMap constructor(
         player.inventory.heldItemSlot = 4
     }
 
+    private fun readHubMetadata(): HubMetadata {
+        val metaJson = File("$cwd//worlds//main_hub//meta.json")
+
+        return json.decodeFromString(metaJson.readText())
+    }
+
     override fun createWorld() {
-        val json = Json { ignoreUnknownKeys = true }
-        val hubMetaData = json.decodeFromString<MetaData>(readMetaDataAsString()!!)
+        val hubMetaData = readHubMetadata()
 
         super.createWorld(
             Vector3.at(
@@ -75,8 +80,7 @@ class HubMap constructor(
     }
 
     fun spawnNPCs() {
-        val json = Json { ignoreUnknownKeys = true }
-        val hubMetaData = json.decodeFromString<MetaData>(readMetaDataAsString()!!)
+        val hubMetaData = readHubMetadata()
 
         val npcRegistry = CitizensAPI.getNPCRegistry()
 
@@ -96,38 +100,42 @@ class HubMap constructor(
 
 }
 
-@Serializable
-private data class SpawnLocation(
-    val x: Double,
-    val y: Double,
-    val z: Double
-)
 
 @Serializable
-private data class PodiumLocation(
-    val x: Double,
-    val y: Double,
-    val z: Double,
-    val yaw: Double,
-    val pitch: Double
-)
-
-@Serializable
-private data class Hologram(
-    val id: String,
-    val x: Double,
-    val y: Double,
-    val z: Double,
-    val displayRange: Int,
-    val updateIntervalTicks: Int,
-    val lines: List<String>
-)
-
-@Serializable
-private data class MetaData(
+sealed class HubMetadata(
     val worldBorderRadius: Double,
+    val schematicRadius: Double,
+    val schematicLowerLimit: Double,
+    val schematicUpperLimit: Double,
     val spawnLocation: SpawnLocation,
     val schematicLocation: SpawnLocation,
     val podiumLocations: List<PodiumLocation>,
-    val holograms: List<dev.betrix.supersmashmobsbrawl.maps.Hologram>
-)
+    val holograms: List<Hologram>
+) {
+    @Serializable
+    data class SpawnLocation(
+        val x: Double,
+        val y: Double,
+        val z: Double
+    )
+
+    @Serializable
+    data class PodiumLocation(
+        val x: Double,
+        val y: Double,
+        val z: Double,
+        val yaw: Double,
+        val pitch: Double
+    )
+
+    @Serializable
+    data class Hologram(
+        val id: String,
+        val x: Double,
+        val y: Double,
+        val z: Double,
+        val displayRange: Int,
+        val updateIntervalTicks: Int,
+        val lines: List<String>
+    )
+}

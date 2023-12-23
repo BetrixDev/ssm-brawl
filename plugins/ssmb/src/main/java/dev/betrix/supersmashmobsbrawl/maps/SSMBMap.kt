@@ -7,6 +7,8 @@ import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
 import dev.betrix.supersmashmobsbrawl.enums.WorldGeneratorType
 import dev.betrix.supersmashmobsbrawl.managers.SchematicManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
@@ -23,12 +25,13 @@ abstract class SSMBMap constructor(
     private val plugin = SuperSmashMobsBrawl.instance
 
     private val worldName = "ssmb_world_$serverName"
-    lateinit var world: MultiverseWorld
+    private lateinit var world: MultiverseWorld
     lateinit var worldInstance: World
     lateinit var schematicManager: SchematicManager
 
     companion object {
-        private val cwd = System.getProperty("user.dir")
+        val cwd: String = System.getProperty("user.dir")
+        val json = Json { ignoreUnknownKeys = true }
 
         fun clearCurrentWorlds() {
             val worldDirectory = File("$cwd\\current_worlds")
@@ -74,23 +77,15 @@ abstract class SSMBMap constructor(
             )
 
             if (generatorType !== WorldGeneratorType.VOID) {
-                plugin.chunky.startTask(worldId, "square", 0.0, 0.0, 500.0, 500.0, "concentric")
+                plugin.chunky.startTask(worldId, "square", 0.0, 0.0, 250.0, 250.0, "concentric")
             }
         }
     }
 
-    fun readMetaDataAsString(): String? {
+    fun readMetadata(): Metadata {
         val metaJson = File("$cwd//worlds//$worldId//meta.json")
 
-        if (!metaJson.exists()) {
-            return null
-        }
-
-        return metaJson.readText()
-    }
-
-    fun saveMainSchematic() {
-        schematicManager.saveSchematic()
+        return json.decodeFromString(metaJson.readText())
     }
 
     open fun destroyWorld() {
@@ -112,4 +107,22 @@ abstract class SSMBMap constructor(
     }
 
     open fun afterPlayerTeleport(player: Player) {}
+}
+
+@Serializable
+sealed class Metadata(
+    val worldBorderRadius: Double,
+    val schematicRadius: Double,
+    val schematicLowerLimit: Double,
+    val schematicUpperLimit: Double,
+    val spawnLocations: SpawnLocation,
+    val schematicLocation: SpawnLocation,
+) {
+    @Serializable
+    data class SpawnLocation(
+        val x: Double,
+        val y: Double,
+        val z: Double
+    )
+
 }

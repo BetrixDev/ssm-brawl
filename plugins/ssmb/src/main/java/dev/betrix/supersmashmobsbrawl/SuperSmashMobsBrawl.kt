@@ -4,6 +4,7 @@ import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import com.onarandombox.MultiverseCore.MultiverseCore
 import dev.betrix.supersmashmobsbrawl.commands.QueueCommand
+import dev.betrix.supersmashmobsbrawl.commands.SchematicCommand
 import dev.betrix.supersmashmobsbrawl.listeners.*
 import dev.betrix.supersmashmobsbrawl.managers.*
 import dev.betrix.supersmashmobsbrawl.maps.HubMap
@@ -18,6 +19,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var games: GameManager
     lateinit var cache: HttpCacheManager
     lateinit var lang: LangManager
+    lateinit var editorManager: SchematicEditorManager
     lateinit var mvc: MultiverseCore
     lateinit var chunky: ChunkyAPI
     private lateinit var commands: LiteCommands<*>
@@ -38,6 +40,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         games = GameManager()
         cache = HttpCacheManager()
         lang = LangManager()
+        editorManager = SchematicEditorManager()
         mvc = server.pluginManager.getPlugin("Multiverse-Core") as MultiverseCore
         chunky = server.servicesManager.load(ChunkyAPI::class.java)!!
 
@@ -54,8 +57,15 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         server.pluginManager.registerEvents(PlayerDropItemListener(), this)
         server.pluginManager.registerEvents(InventoryClickListener(), this)
         server.pluginManager.registerEvents(EntityDamageByBlockListener(), this)
+        server.pluginManager.registerEvents(PlayerQuitListener(), this)
 
-        commands = LiteCommandsBukkit.builder("ssmb", this).commands(QueueCommand()).build()
+        commands = LiteCommandsBukkit
+            .builder("ssmb", this)
+            .commands(
+                QueueCommand(),
+                SchematicCommand()
+            )
+            .build()
 
         lang.revalidateLangCache()
 

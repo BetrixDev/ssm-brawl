@@ -10,5 +10,6 @@ class CitizensLoadListener : Listener {
 
     @EventHandler
     fun onCitizensEnable(event: CitizensEnableEvent) {
+        plugin.hub.spawnNPCs()
     }
 }
