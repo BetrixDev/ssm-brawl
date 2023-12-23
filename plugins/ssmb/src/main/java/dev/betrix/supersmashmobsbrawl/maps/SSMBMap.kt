@@ -41,10 +41,14 @@ abstract class SSMBMap constructor(
     }
 
     open fun createWorld() {
-        createWorld(Vector3.ZERO)
-    }
+        val worldMetadata = readMetadata()
 
-    open fun createWorld(schematicOrigin: Vector3) {
+        val schematicOrigin = Vector3.at(
+            worldMetadata.schematicLocation.x,
+            worldMetadata.schematicLocation.y,
+            worldMetadata.schematicLocation.z
+        )
+
         val worldGenerator = when (generatorType) {
             WorldGeneratorType.VOID -> "VoidGen"
             WorldGeneratorType.ISLANDS -> "Terra:SKYLANDS"
@@ -60,7 +64,15 @@ abstract class SSMBMap constructor(
 
         if (success) {
             world = plugin.mvc.mvWorldManager.getMVWorld(worldName)
+
             worldInstance = world.cbWorld
+            worldInstance.worldBorder.size = worldMetadata.worldBorderRadius * 2
+            worldInstance.spawnLocation = Location(
+                worldInstance,
+                worldMetadata.spawnLocation.x,
+                worldMetadata.spawnLocation.y,
+                worldMetadata.spawnLocation.z
+            )
         } else {
             plugin.logger.info("Unable to create world $worldName / $worldId with generator $generatorType")
         }
@@ -115,7 +127,7 @@ data class Metadata(
     val schematicRadius: Double,
     val schematicLowerLimit: Double,
     val schematicUpperLimit: Double,
-    val spawnLocations: SpawnLocation,
+    val spawnLocation: SpawnLocation,
     val schematicLocation: SpawnLocation,
 ) {
     @Serializable

@@ -1,6 +1,5 @@
 package dev.betrix.supersmashmobsbrawl.maps
 
-import com.sk89q.worldedit.math.Vector3
 import dev.betrix.supersmashmobsbrawl.enums.WorldGeneratorType
 import eu.decentsoftware.holograms.api.DHAPI
 import eu.decentsoftware.holograms.api.holograms.Hologram
@@ -42,24 +41,10 @@ class HubMap constructor(
     }
 
     override fun createWorld() {
+        super.createWorld()
+
         val hubMetaData = readHubMetadata()
-
-        super.createWorld(
-            Vector3.at(
-                hubMetaData.schematicLocation.x,
-                hubMetaData.schematicLocation.y,
-                hubMetaData.schematicLocation.z
-            )
-        )
-
-        worldInstance.worldBorder.size = hubMetaData.worldBorderRadius
-        worldInstance.spawnLocation = Location(
-            worldInstance,
-            hubMetaData.spawnLocation.x,
-            hubMetaData.spawnLocation.y,
-            hubMetaData.spawnLocation.z
-        )
-
+        
         hubMetaData.holograms.forEach {
             val hologramLocation = Location(worldInstance, it.x, it.y, it.z)
 
