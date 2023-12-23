@@ -1,6 +1,8 @@
 {
     "worldBorderRadius": 220.0,
     "schematicRadius": 250.0,
+    "schematicLowerLimit": -100.0,
+    "schematicUpperLimit": 100.0,
     "schematicLocation": {
         "x": 0.0,
         "y": 100.0,
