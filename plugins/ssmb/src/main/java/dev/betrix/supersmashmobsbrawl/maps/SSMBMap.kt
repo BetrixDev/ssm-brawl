@@ -117,7 +117,7 @@ abstract class SSMBMap constructor(
     fun teleportAllToDefaultWorld() {
         val defaultWorld = Bukkit.getWorlds()[0]
 
-        worldInstance.players.forEach {
+        plugin.server.onlinePlayers.forEach {
             it.teleport(defaultWorld.spawnLocation)
         }
     }

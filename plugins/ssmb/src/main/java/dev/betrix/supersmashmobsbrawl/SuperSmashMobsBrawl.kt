@@ -5,12 +5,14 @@ import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import com.onarandombox.MultiverseCore.MultiverseCore
 import dev.betrix.supersmashmobsbrawl.commands.QueueCommand
 import dev.betrix.supersmashmobsbrawl.commands.SchematicCommand
+import dev.betrix.supersmashmobsbrawl.commands.ShutdownCommand
 import dev.betrix.supersmashmobsbrawl.listeners.*
 import dev.betrix.supersmashmobsbrawl.managers.*
 import dev.betrix.supersmashmobsbrawl.maps.HubMap
 import dev.betrix.supersmashmobsbrawl.maps.SSMBMap
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteCommandsBukkit
+import org.bukkit.Bukkit
 import org.popcraft.chunky.api.ChunkyAPI
 
 class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
@@ -25,6 +27,8 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     private lateinit var commands: LiteCommands<*>
 
     lateinit var hub: HubMap
+
+    var isShuttingDown = false
 
     companion object {
         lateinit var instance: SuperSmashMobsBrawl
@@ -63,7 +67,8 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
             .builder("ssmb", this)
             .commands(
                 QueueCommand(),
-                SchematicCommand()
+                SchematicCommand(),
+                ShutdownCommand()
             )
             .build()
 
@@ -72,10 +77,24 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         logger.info("initialized")
     }
 
+    fun prepareShutdown() {
+        isShuttingDown = true
+
+        if (games.ongoingGames.size == 0) {
+            Bukkit.getPluginManager().disablePlugin(this)
+        }
+    }
+
     // TODO: Create a much better shutdown sequence
     override suspend fun onDisableAsync() {
         hub.teleportAllToDefaultWorld()
         api.clearQueue()
         api.destroyClient()
+
+        val defaultWorld = Bukkit.getWorlds()[0]
+
+        server.onlinePlayers.forEach {
+            it.teleport(defaultWorld.spawnLocation)
+        }
     }
 }

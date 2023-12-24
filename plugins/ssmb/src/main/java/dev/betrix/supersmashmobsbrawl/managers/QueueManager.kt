@@ -1,6 +1,7 @@
 package dev.betrix.supersmashmobsbrawl.managers
 
 import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
+import dev.betrix.supersmashmobsbrawl.enums.LangEntry
 import dev.betrix.supersmashmobsbrawl.managers.api.payloads.JoinQueue
 import dev.betrix.supersmashmobsbrawl.managers.api.payloads.JoinQueueError
 import dev.betrix.supersmashmobsbrawl.managers.api.payloads.JoinQueueResponse
@@ -14,6 +15,11 @@ class QueueManager {
     private val api = plugin.api
 
     suspend fun tryAddPlayerToQueue(player: Player, modeId: String, isRanked: Boolean) {
+        if (plugin.isShuttingDown) {
+            player.sendMessage(plugin.lang.getComponent(LangEntry.QUEUE_SHUTDOWN, player))
+            return
+        }
+
         val response = api.addPlayerToQueue(player, modeId, isRanked)
 
         if (response is JoinQueue.Success) {
