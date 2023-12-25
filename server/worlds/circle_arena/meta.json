@@ -1,0 +1,16 @@
+{
+    "worldBorderRadius": 100.0,
+    "schematicRadius": 50.0,
+    "schematicLowerLimit": -1.0,
+    "schematicUpperLimit": 1.0,
+    "spawnLocation": {
+        "x": 0.5,
+        "y": 1,
+        "z": 0.5
+    },
+    "schematicLocation": {
+        "x": 0.5,
+        "y": 1,
+        "z": 0.5
+    }
+}
