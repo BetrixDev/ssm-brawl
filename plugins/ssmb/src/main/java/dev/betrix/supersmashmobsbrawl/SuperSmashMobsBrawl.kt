@@ -50,9 +50,10 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
 
         SSMBPlaceholderExpansion().register()
 
-        SSMBMap.clearCurrentWorlds()
+        SSMBMap.clearLoadedWorlds()
         hub = HubMap("hub-1")
         hub.createWorld()
+        mvc.mvWorldManager.setFirstSpawnWorld("world")
 
         server.pluginManager.registerEvents(PlayerTeleportListener(), this)
         server.pluginManager.registerSuspendingEvents(PlayerJoinListener(), this)
@@ -85,16 +86,14 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         }
     }
 
-    // TODO: Create a much better shutdown sequence
     override suspend fun onDisableAsync() {
-        hub.teleportAllToDefaultWorld()
         api.clearQueue()
         api.destroyClient()
 
-        val defaultWorld = Bukkit.getWorlds()[0]
+        SSMBMap.clearLoadedWorlds()
 
         server.onlinePlayers.forEach {
-            it.teleport(defaultWorld.spawnLocation)
+            it.teleport(mvc.mvWorldManager.spawnWorld.spawnLocation)
         }
     }
 }

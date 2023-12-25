@@ -9,7 +9,7 @@ import dev.betrix.supersmashmobsbrawl.managers.SchematicManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.bukkit.Bukkit
+import org.bukkit.Difficulty
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.WorldType
@@ -21,8 +21,6 @@ abstract class SSMBMap constructor(
     private val worldId: String,
     private val generatorType: WorldGeneratorType
 ) {
-    private val plugin = SuperSmashMobsBrawl.instance
-
     private val worldName = "ssmb_world_$serverName"
     private lateinit var world: MultiverseWorld
     lateinit var worldInstance: World
@@ -31,18 +29,13 @@ abstract class SSMBMap constructor(
     companion object {
         val cwd: String = System.getProperty("user.dir")
         val json = Json { ignoreUnknownKeys = true }
+        private val plugin = SuperSmashMobsBrawl.instance
 
         private val loadedWorlds = arrayListOf<SSMBMap>()
 
-        fun mapFromWorld(worldInstance: World): SSMBMap? {
-            return loadedWorlds.find {
-                it.worldInstance == worldInstance
-            }
-        }
-
-        fun clearCurrentWorlds() {
-            File(cwd).listFiles { file -> file.isDirectory && file.name.startsWith("ssmb_world_") }?.forEach {
-                it.deleteRecursively()
+        fun clearLoadedWorlds() {
+            loadedWorlds.forEach {
+                it.destroyWorld()
             }
         }
     }
@@ -80,6 +73,18 @@ abstract class SSMBMap constructor(
                 worldMetadata.spawnLocation.y,
                 worldMetadata.spawnLocation.z
             )
+            world.adjustSpawn = true
+            world.autoHeal = true
+            world.difficulty = Difficulty.PEACEFUL
+            world.setPVPMode(false)
+            world.setAllowAnimalSpawn(false)
+            world.setAllowMonsterSpawn(false)
+            world.spawnLocation = Location(
+                worldInstance,
+                worldMetadata.spawnLocation.x,
+                worldMetadata.spawnLocation.y,
+                worldMetadata.spawnLocation.z
+            )
 
             loadedWorlds.add(this)
         } else {
@@ -103,7 +108,7 @@ abstract class SSMBMap constructor(
         }
     }
 
-    fun readMetadata(): Metadata {
+    fun readMetadata(): WorldMetadata {
         val metaJson = File("$cwd//worlds//$worldId//meta.json")
 
         return json.decodeFromString(metaJson.readText())
@@ -114,16 +119,8 @@ abstract class SSMBMap constructor(
         plugin.mvc.deleteWorld(serverName)
     }
 
-    fun teleportAllToDefaultWorld() {
-        val defaultWorld = Bukkit.getWorlds()[0]
-
-        plugin.server.onlinePlayers.forEach {
-            it.teleport(defaultWorld.spawnLocation)
-        }
-    }
-
     fun teleportPlayer(player: Player, location: Location? = null) {
-        player.teleport(location ?: worldInstance.spawnLocation)
+        plugin.mvc.teleportPlayer(player, player, location ?: worldInstance.spawnLocation)
 
         afterPlayerTeleport(player)
     }
@@ -132,19 +129,18 @@ abstract class SSMBMap constructor(
 }
 
 @Serializable
-data class Metadata(
+data class WorldMetadata(
     val worldBorderRadius: Double,
     val schematicRadius: Double,
     val schematicLowerLimit: Double,
     val schematicUpperLimit: Double,
     val spawnLocation: SpawnLocation,
     val schematicLocation: SpawnLocation,
-) {
-    @Serializable
-    data class SpawnLocation(
-        val x: Double,
-        val y: Double,
-        val z: Double
-    )
+)
 
-}
+@Serializable
+data class SpawnLocation(
+    val x: Double,
+    val y: Double,
+    val z: Double
+)

@@ -44,7 +44,7 @@ class HubMap constructor(
         super.createWorld()
 
         val hubMetaData = readHubMetadata()
-        
+
         hubMetaData.holograms.forEach {
             val hologramLocation = Location(worldInstance, it.x, it.y, it.z)
 
@@ -57,6 +57,10 @@ class HubMap constructor(
     }
 
     override fun destroyWorld() {
+        holograms.forEach {
+            it.destroy()
+        }
+
         podiumNpcs.forEach {
             it.destroy()
         }
@@ -95,32 +99,25 @@ data class HubMetadata(
     val spawnLocation: SpawnLocation,
     val schematicLocation: SpawnLocation,
     val podiumLocations: List<PodiumLocation>,
-    val holograms: List<Hologram>
-) {
-    @Serializable
-    data class SpawnLocation(
-        val x: Double,
-        val y: Double,
-        val z: Double
-    )
+    val holograms: List<HologramData>
+)
 
-    @Serializable
-    data class PodiumLocation(
-        val x: Double,
-        val y: Double,
-        val z: Double,
-        val yaw: Double,
-        val pitch: Double
-    )
+@Serializable
+data class PodiumLocation(
+    val x: Double,
+    val y: Double,
+    val z: Double,
+    val yaw: Double,
+    val pitch: Double
+)
 
-    @Serializable
-    data class Hologram(
-        val id: String,
-        val x: Double,
-        val y: Double,
-        val z: Double,
-        val displayRange: Int,
-        val updateIntervalTicks: Int,
-        val lines: List<String>
-    )
-}
+@Serializable
+data class HologramData(
+    val id: String,
+    val x: Double,
+    val y: Double,
+    val z: Double,
+    val displayRange: Int,
+    val updateIntervalTicks: Int,
+    val lines: List<String>
+)
