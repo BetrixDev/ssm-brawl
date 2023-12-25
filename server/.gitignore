@@ -18,3 +18,4 @@ current_worlds
 config
 ssmb*.jar
 plugins/WorldEdit
+ssmb_world_*
