@@ -73,10 +73,10 @@ world-settings:
       item: 2.5
     view-distance: default
     simulation-distance: default
-    mob-spawn-range: 8
+    mob-spawn-range: 0
     arrow-despawn-rate: 1200
     trident-despawn-rate: 1200
-    nerf-spawner-mobs: false
+    nerf-spawner-mobs: true
     thunder-chance: 100000
     growth:
       cactus-modifier: 100
