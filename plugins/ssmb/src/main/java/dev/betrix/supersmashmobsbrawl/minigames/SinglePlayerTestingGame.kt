@@ -19,6 +19,8 @@ class SinglePlayerTestingGame(private val gameData: StartGameResponse) : SSMBGam
     private val players = hashMapOf<Player, SSMBKit>()
 
     init {
+        map.createWorld()
+
         gameData.players.forEachIndexed { playerIndex, data ->
             val player = Bukkit.getPlayer(UUID.fromString(data.uuid))!!
 
