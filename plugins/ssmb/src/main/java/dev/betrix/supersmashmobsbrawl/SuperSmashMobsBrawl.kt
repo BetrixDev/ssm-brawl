@@ -63,6 +63,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         server.pluginManager.registerEvents(InventoryClickListener(), this)
         server.pluginManager.registerEvents(EntityDamageByBlockListener(), this)
         server.pluginManager.registerEvents(PlayerQuitListener(), this)
+        server.pluginManager.registerEvents(CitizensLoadListener(), this)
 
         commands = LiteCommandsBukkit
             .builder("ssmb", this)
