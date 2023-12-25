@@ -19,12 +19,19 @@ class QueueCommand {
         sender.sendMessage("You have queue for ranked")
     }
 
+    @Execute(name = "leave")
+    fun queueLeave(@Context sender: Player) {
+        plugin.launch {
+            plugin.queue.tryRemovePlayerFromQueue(sender)
+        }
+    }
+
     @Execute
     fun queue(@Context sender: Player, @Arg modeId: Optional<String>) {
         if (modeId.isEmpty) {
             QueueSelectionView(sender).showMenuToPlayer()
         }
-        
+
         plugin.launch {
             plugin.queue.tryAddPlayerToQueue(sender, modeId.get(), false)
         }

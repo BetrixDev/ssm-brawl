@@ -5,6 +5,7 @@ enum class LangEntry(val id: String) {
     QUEUE_ALREADY_JOINED("queue.already.joined"),
     QUEUE_JOINED("queue.joined"),
     QUEUE_LEFT("queue.left"),
+    QUEUE_LEFT_ERROR("queue.left.error"),
     QUEUE_SHUTDOWN("queue.shutdown"),
     SERVER_PLAYER_LEFT("server.player.left"),
     SERVER_PLAYER_JOINED("server.player.joined"),

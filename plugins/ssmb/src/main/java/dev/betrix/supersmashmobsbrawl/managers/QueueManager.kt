@@ -5,6 +5,7 @@ import dev.betrix.supersmashmobsbrawl.enums.LangEntry
 import dev.betrix.supersmashmobsbrawl.managers.api.payloads.JoinQueue
 import dev.betrix.supersmashmobsbrawl.managers.api.payloads.JoinQueueError
 import dev.betrix.supersmashmobsbrawl.managers.api.payloads.JoinQueueResponse
+import dev.betrix.supersmashmobsbrawl.managers.api.payloads.LeaveQueue
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -47,5 +48,11 @@ class QueueManager {
 
     suspend fun tryRemovePlayerFromQueue(player: Player) {
         val response = api.removePlayerFromQueue(player)
+
+        if (response is LeaveQueue.Success) {
+            player.sendMessage(plugin.lang.getComponent(LangEntry.QUEUE_LEFT, player))
+        } else {
+            player.sendMessage(plugin.lang.getComponent(LangEntry.QUEUE_LEFT_ERROR, player))
+        }
     }
 }
