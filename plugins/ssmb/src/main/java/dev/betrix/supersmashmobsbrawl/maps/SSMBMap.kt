@@ -116,7 +116,7 @@ abstract class SSMBMap constructor(
 
     open fun destroyWorld() {
         loadedWorlds.remove(this)
-        plugin.mvc.deleteWorld(serverName)
+        plugin.mvc.deleteWorld(worldName)
     }
 
     fun teleportPlayer(player: Player, location: Location? = null) {
