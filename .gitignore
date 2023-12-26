@@ -38,3 +38,5 @@ yarn-error.log*
 .idea
 
 server/plugins/Multiverse-Core/worlds.yml
+*.bd
+server/plugins/Citizens/saves.yml
