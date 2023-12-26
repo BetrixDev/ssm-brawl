@@ -37,3 +37,4 @@ yarn-error.log*
 *.pem
 .idea
 
+server/plugins/Multiverse-Core/worlds.yml
