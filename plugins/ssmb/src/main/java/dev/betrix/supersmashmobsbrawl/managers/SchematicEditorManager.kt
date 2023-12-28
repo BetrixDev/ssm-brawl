@@ -13,6 +13,7 @@ class SchematicEditorManager {
     private val editorSessions = arrayListOf<EditorSession>()
 
     fun createEditorSession(players: ArrayList<Player>, mapId: String) {
+        plugin.logger.info("attempting to create editor session")
         val canCreateSession = editorSessions.find { it.players.find { p -> players.contains(p) } != null } == null
 
         if (!canCreateSession) {
@@ -23,7 +24,7 @@ class SchematicEditorManager {
             return
         }
 
-        val editableMap = EditableMap("editor-${editorSessions.size}", mapId)
+        val editableMap = EditableMap("editor-${editorSessions.size}", mapId, players)
 
         editorSessions.add(EditorSession(players, editableMap))
     }

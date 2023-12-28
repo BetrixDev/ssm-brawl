@@ -68,7 +68,7 @@ class HubMap constructor(
         super.destroyWorld()
     }
 
-    fun spawnNPCs() {
+    private fun spawnNPCs() {
         val hubMetaData = readHubMetadata()
 
         val npcRegistry = CitizensAPI.getNPCRegistry()
@@ -77,7 +77,15 @@ class HubMap constructor(
             val npc = npcRegistry.createNPC(EntityType.PLAYER, index.toString())
 
             val spawnLocation = hubMetaData.podiumLocations[index]
-            val npcLocation = Location(worldInstance, spawnLocation.x, spawnLocation.y, spawnLocation.z)
+            val npcLocation = Location(
+                worldInstance,
+                spawnLocation.x,
+                spawnLocation.y,
+                spawnLocation.z,
+                spawnLocation.yaw.toFloat(),
+                spawnLocation.pitch.toFloat()
+            )
+            
             npc.spawn(npcLocation)
 
             val skinTrait = npc.getTraitNullable(SkinTrait::class.java)
@@ -87,6 +95,9 @@ class HubMap constructor(
         }
     }
 
+    override fun afterWorldLoad() {
+        spawnNPCs()
+    }
 }
 
 

@@ -1,12 +1,10 @@
 package dev.betrix.supersmashmobsbrawl.maps
 
-import com.github.shynixn.mccoroutine.bukkit.launch
 import com.onarandombox.MultiverseCore.api.MultiverseWorld
 import com.sk89q.worldedit.math.Vector3
 import dev.betrix.supersmashmobsbrawl.SuperSmashMobsBrawl
 import dev.betrix.supersmashmobsbrawl.enums.WorldGeneratorType
 import dev.betrix.supersmashmobsbrawl.managers.SchematicManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.bukkit.Difficulty
@@ -35,7 +33,11 @@ abstract class SSMBMap constructor(
 
         fun clearLoadedWorlds() {
             loadedWorlds.forEach {
-                it.destroyWorld()
+                try {
+                    it.destroyWorld()
+                } catch (e: Exception) {
+                    plugin.logger.warning("${it.serverName} couldn't delete")
+                }
             }
         }
     }
@@ -57,56 +59,52 @@ abstract class SSMBMap constructor(
         val success = plugin.mvc.mvWorldManager.addWorld(
             worldName,
             World.Environment.NORMAL,
-            null, WorldType.NORMAL,
+            null,
+            WorldType.NORMAL,
             false,
             worldGenerator
         )
 
         if (success) {
             world = plugin.mvc.mvWorldManager.getMVWorld(worldName)
-
             worldInstance = world.cbWorld
-            worldInstance.worldBorder.size = worldMetadata.worldBorderRadius * 2
-            worldInstance.spawnLocation = Location(
-                worldInstance,
-                worldMetadata.spawnLocation.x,
-                worldMetadata.spawnLocation.y,
-                worldMetadata.spawnLocation.z
-            )
-            world.adjustSpawn = true
-            world.autoHeal = true
-            world.difficulty = Difficulty.PEACEFUL
-            world.setPVPMode(false)
-            world.setAllowAnimalSpawn(false)
-            world.setAllowMonsterSpawn(false)
-            world.spawnLocation = Location(
-                worldInstance,
-                worldMetadata.spawnLocation.x,
-                worldMetadata.spawnLocation.y,
-                worldMetadata.spawnLocation.z
-            )
-
-            loadedWorlds.add(this)
         } else {
             plugin.logger.info("Unable to create world $worldName / $worldId with generator $generatorType")
+            return
         }
 
-        plugin.launch(Dispatchers.IO) {
-            schematicManager = SchematicManager(worldInstance, "$cwd\\worlds\\$worldId\\schematic.schem")
-            schematicManager.pasteSchematic(
-                Location(
-                    worldInstance,
-                    schematicOrigin.x,
-                    schematicOrigin.y,
-                    schematicOrigin.z
-                )
+        schematicManager = SchematicManager(worldInstance, "$cwd\\worlds\\$worldId\\schematic.schem")
+        schematicManager.pasteSchematic(
+            Location(
+                worldInstance,
+                schematicOrigin.x,
+                schematicOrigin.y,
+                schematicOrigin.z
             )
+        )
 
-            if (generatorType !== WorldGeneratorType.VOID) {
-                plugin.chunky.startTask(worldId, "square", 0.0, 0.0, 250.0, 250.0, "concentric")
-            }
-        }
+//        plugin.chunky.startTask(worldId, "square", 0.0, 0.0, 100.0, 100.0, "concentric")
+
+        worldInstance.worldBorder.size = worldMetadata.worldBorderRadius * 2
+        world.adjustSpawn = true
+        world.autoHeal = true
+        world.difficulty = Difficulty.PEACEFUL
+        world.setPVPMode(false)
+        world.setAllowAnimalSpawn(false)
+        world.setAllowMonsterSpawn(false)
+        world.spawnLocation = Location(
+            worldInstance,
+            worldMetadata.spawnLocation.x,
+            worldMetadata.spawnLocation.y,
+            worldMetadata.spawnLocation.z
+        )
+
+        loadedWorlds.add(this)
+
+        afterWorldLoad()
     }
+
+    open fun afterWorldLoad() {}
 
     fun readMetadata(): WorldMetadata {
         val metaJson = File("$cwd//worlds//$worldId//meta.json")
