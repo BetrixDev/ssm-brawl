@@ -19,3 +19,7 @@ config
 ssmb*.jar
 plugins/WorldEdit
 ssmb_world_*
+plugins/Citizens/saves.yml
+plugins/Multiverse-Core/worlds.yml
+plugin/FastAsyncWorldEdit/clipboard/*
+plugin/FastAsyncWorldEdit/history/*
