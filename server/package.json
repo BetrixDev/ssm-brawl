@@ -2,12 +2,16 @@
   "name": "server",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e ../.env \"java -Xmx8G -jar pufferfish.jar -nogui\""
+    "dev": "tsx scripts/warmup.ts && dotenv -e ../.env \"java -Xmx8G -jar pufferfish.jar -nogui\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "dotenv-cli": "^7.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "typescript": "^5.3.3"
   }
 }
