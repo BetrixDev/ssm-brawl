@@ -1,4 +1,3 @@
 packages:
-  - "remix"
-  - "brawlie"
-  - "server"
+  - "api"
+  - "packages/*"

@@ -36,7 +36,3 @@ yarn-error.log*
 .DS_Store
 *.pem
 .idea
-
-server/plugins/Multiverse-Core/worlds.yml
-*.bd
-server/plugins/Citizens/saves.yml
