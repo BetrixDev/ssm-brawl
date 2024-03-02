@@ -1,7 +1,6 @@
 import { relations } from "drizzle-orm";
-import { randomUUID } from "crypto";
 import {
-  decimal,
+  double,
   index,
   json,
   mysqlTable,
@@ -14,8 +13,8 @@ export const kitsTable = mysqlTable(
   "kits",
   {
     id: varchar("id", { length: 36 }).primaryKey().notNull(),
-    meleeDamage: decimal("melee_damage").notNull(),
-    armor: decimal("armor").notNull(),
+    meleeDamage: double("melee_damage").notNull(),
+    armor: double("armor").notNull(),
     inventoryIcon: varchar("inventory_icon", { length: 32 }).notNull(),
     meta: json("meta"),
   },
@@ -50,14 +49,12 @@ export const minigamesTable = mysqlTable(
 export const queueTable = mysqlTable(
   "queue",
   {
-    id: varchar("id", { length: 36 })
-      .primaryKey()
-      .$defaultFn(() => randomUUID()),
+    playerUuid: varchar("player_uuid", { length: 36 }).primaryKey(),
     minigameId: varchar("minigame_id", { length: 64 }).notNull(),
-    playerId: varchar("player_id", { length: 32 }).notNull(),
   },
   (table) => ({
     minigameIdIdx: index("minigame_id_idx").on(table.minigameId),
+    playerUuidIdx: index("player_uuid_idx").on(table.playerUuid),
   })
 );
 
@@ -77,9 +74,9 @@ export const mapSpawnpointsTable = mysqlTable(
   "map_spawnpoints",
   {
     mapId: varchar("map_id", { length: 32 }).notNull(),
-    x: decimal("x").notNull(),
-    y: decimal("y").notNull(),
-    z: decimal("z").notNull(),
+    x: double("x").notNull(),
+    y: double("y").notNull(),
+    z: double("z").notNull(),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.mapId, table.x, table.y, table.z] }),
@@ -111,7 +108,7 @@ export const queueRelations = relations(queueTable, ({ one }) => ({
     references: [minigamesTable.id],
   }),
   player: one(basicPlayerDataTable, {
-    fields: [queueTable.playerId],
+    fields: [queueTable.playerUuid],
     references: [basicPlayerDataTable.uuid],
   }),
 }));

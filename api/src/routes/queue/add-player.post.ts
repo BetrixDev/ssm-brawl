@@ -1,8 +1,10 @@
 import {
   and,
+  basicPlayerDataTable,
   db,
   eq,
   gte,
+  inArray,
   lte,
   mapsTable,
   minigamesTable,
@@ -13,10 +15,26 @@ import * as v from "valibot";
 const bodySchema = v.object({
   playerUuid: v.string(),
   minigameId: v.string(),
+  force: v.optional(v.boolean()),
 });
 
 export default defineEventHandler(async (event) => {
   const body = v.parse(bodySchema, await readBody(event));
+
+  if (body.force) {
+    await db
+      .delete(queueTable)
+      .where(eq(queueTable.playerUuid, body.playerUuid));
+  } else {
+    const playerInQueue = await db.query.queueTable.findFirst({
+      where: eq(queueTable.playerUuid, body.playerUuid),
+    });
+
+    if (playerInQueue !== undefined) {
+      setResponseStatus(event, 409);
+      return;
+    }
+  }
 
   const data = await db.query.minigamesTable.findFirst({
     where: eq(minigamesTable.id, body.minigameId),
@@ -30,10 +48,10 @@ export default defineEventHandler(async (event) => {
 
   setResponseStatus(event, 200);
 
-  const playerInQueue = data.queueEntries.length;
+  const playersInQueue = data.queueEntries.length;
 
-  if (playerInQueue + 1 >= data.minPlayers) {
-    const queuedPlayers = data.queueEntries.map((q) => q.playerId);
+  if (playersInQueue + 1 >= data.minPlayers) {
+    const queuedPlayers = data.queueEntries.map((q) => q.playerUuid);
 
     const queryClient = useQueryClient();
 
@@ -54,15 +72,21 @@ export default defineEventHandler(async (event) => {
 
     const mapIndex = useRandomInt(0, validMaps.length - 1);
 
+    const playerData = await db.query.basicPlayerDataTable.findMany({
+      where: inArray(basicPlayerDataTable.uuid, [
+        body.playerUuid,
+        ...queuedPlayers,
+      ]),
+      with: {
+        selectedKit: true,
+      },
+    });
+
     return {
       action: "start_game",
-      players: [body.playerUuid, ...queuedPlayers],
+      players: playerData,
       minigameId: data.id,
       map: validMaps[mapIndex],
     };
   }
-
-  await db
-    .insert(queueTable)
-    .values([{ minigameId: data.id, playerId: body.playerUuid }]);
 });
