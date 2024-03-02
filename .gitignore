@@ -36,3 +36,10 @@ yarn-error.log*
 .DS_Store
 *.pem
 .idea
+
+*.log*
+.nitro
+.cache
+.output
+.env
+dist
