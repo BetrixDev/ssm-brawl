@@ -2,13 +2,15 @@
   "name": "db",
   "type": "module",
   "scripts": {
-    "db:push": "dotenv -e ../../.env drizzle-kit push:mysql"
+    "db:push": "dotenv -e ../../.env drizzle-kit push:mysql",
+    "db:studio": "dotenv -e ../../.env drizzle-kit studio"
   },
   "dependencies": {
     "@planetscale/database": "^1.16.0",
     "dotenv-cli": "^7.3.0",
     "drizzle-orm": "^0.29.4",
     "env": "workspace:*",
+    "mysql2": "^3.9.2",
     "postgres": "^3.4.3"
   },
   "devDependencies": {

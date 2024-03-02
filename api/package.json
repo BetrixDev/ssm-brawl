@@ -2,14 +2,15 @@
   "private": true,
   "scripts": {
     "prepare": "nitropack prepare",
-    "dev": "nitropack dev",
+    "dev": "dotenv -e ../.env nitropack dev",
     "build": "nitropack build",
     "preview": "node .output/server/index.mjs"
   },
   "dependencies": {
     "@tanstack/query-core": "^5.24.2",
-    "env": "workspace:*",
     "db": "workspace:*",
+    "dotenv-cli": "^7.3.0",
+    "env": "workspace:*",
     "nitropack": "latest",
     "valibot": "^0.29.0"
   }

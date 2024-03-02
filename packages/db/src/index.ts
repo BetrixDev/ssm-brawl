@@ -11,3 +11,4 @@ const client = new Client({
 
 export const db = drizzle(client, { schema });
 export * from "drizzle-orm";
+export * from "./schema/_schema.js";
