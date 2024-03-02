@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import {
   decimal,
+  index,
   json,
   mysqlTable,
   primaryKey,
@@ -9,38 +10,68 @@ import {
   varchar,
 } from "drizzle-orm/mysql-core";
 
-export const kitsTable = mysqlTable("kits", {
-  id: varchar("id", { length: 36 }).primaryKey().notNull(),
-  meleeDamage: decimal("melee_damage").notNull(),
-  armor: decimal("armor").notNull(),
-  inventoryIcon: varchar("inventory_icon", { length: 32 }).notNull(),
-  meta: json("meta"),
-});
+export const kitsTable = mysqlTable(
+  "kits",
+  {
+    id: varchar("id", { length: 36 }).primaryKey().notNull(),
+    meleeDamage: decimal("melee_damage").notNull(),
+    armor: decimal("armor").notNull(),
+    inventoryIcon: varchar("inventory_icon", { length: 32 }).notNull(),
+    meta: json("meta"),
+  },
+  (table) => ({
+    idIdx: index("id_idx").on(table.id),
+  })
+);
 
-export const basicPlayerDataTable = mysqlTable("basic_player_data", {
-  uuid: varchar("uuid", { length: 36 }).primaryKey().notNull(),
-  selectedKitId: varchar("selected_kit_id", { length: 32 }).notNull(),
-});
+export const basicPlayerDataTable = mysqlTable(
+  "basic_player_data",
+  {
+    uuid: varchar("uuid", { length: 36 }).primaryKey().notNull(),
+    selectedKitId: varchar("selected_kit_id", { length: 32 }).notNull(),
+  },
+  (table) => ({
+    uuidIdx: index("uuid_idx").on(table.uuid),
+  })
+);
 
-export const minigamesTable = mysqlTable("minigames", {
-  id: varchar("id", { length: 64 }).primaryKey(),
-  minPlayers: tinyint("min_players").notNull(),
-  maxPlayers: tinyint("max_players").notNull(),
-});
+export const minigamesTable = mysqlTable(
+  "minigames",
+  {
+    id: varchar("id", { length: 64 }).primaryKey(),
+    minPlayers: tinyint("min_players").notNull(),
+    maxPlayers: tinyint("max_players").notNull(),
+  },
+  (table) => ({
+    idIdx: index("id_idx").on(table.id),
+  })
+);
 
-export const queueTable = mysqlTable("queue", {
-  id: varchar("id", { length: 36 })
-    .primaryKey()
-    .$defaultFn(() => randomUUID()),
-  minigameId: varchar("minigame_id", { length: 64 }).notNull(),
-  playerId: varchar("player_id", { length: 32 }).notNull(),
-});
+export const queueTable = mysqlTable(
+  "queue",
+  {
+    id: varchar("id", { length: 36 })
+      .primaryKey()
+      .$defaultFn(() => randomUUID()),
+    minigameId: varchar("minigame_id", { length: 64 }).notNull(),
+    playerId: varchar("player_id", { length: 32 }).notNull(),
+  },
+  (table) => ({
+    minigameIdIdx: index("minigame_id_idx").on(table.minigameId),
+  })
+);
 
-export const mapsTable = mysqlTable("maps", {
-  id: varchar("id", { length: 32 }).primaryKey(),
-  minPlayers: tinyint("min_players").notNull(),
-  maxPlayers: tinyint("max_players").notNull(),
-});
+export const mapsTable = mysqlTable(
+  "maps",
+  {
+    id: varchar("id", { length: 32 }).primaryKey(),
+    minPlayers: tinyint("min_players").notNull(),
+    maxPlayers: tinyint("max_players").notNull(),
+  },
+  (table) => ({
+    idIdx: index("id_idx").on(table.id),
+  })
+);
 
 export const mapSpawnpointsTable = mysqlTable(
   "map_spawnpoints",
@@ -52,6 +83,7 @@ export const mapSpawnpointsTable = mysqlTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.mapId, table.x, table.y, table.z] }),
+    mapIdIdx: index("map_id_idx").on(table.mapId),
   })
 );
 
