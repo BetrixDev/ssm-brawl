@@ -1,0 +1,5 @@
+name: ssmb
+version: '${project.version}'
+main: net.ssmb.SuperSmashMobsBrawl
+api-version: '1.20'
+prefix: SSMB

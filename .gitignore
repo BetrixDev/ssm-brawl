@@ -43,3 +43,7 @@ yarn-error.log*
 .output
 .env
 dist
+
+plugin/target
+plugin/dependency-reduced-pom.xml
+plugin/.idea
