@@ -1,10 +1,13 @@
-package net.ssmb.ssmb
+package net.ssmb
 
+import net.ssmb.services.ApiService
 import org.bukkit.plugin.java.JavaPlugin
 
-class SuperSmashMobsBrawl : JavaPlugin() {
+class SSMB : JavaPlugin() {
+    lateinit var api: ApiService
+
     override fun onEnable() {
-        // Plugin startup logic
+        api = ApiService()
     }
 
     override fun onDisable() {

@@ -89,4 +89,9 @@ export default defineEventHandler(async (event) => {
       map: validMaps[mapIndex],
     };
   }
+
+  return {
+    action: "added",
+    playersInQueue: playersInQueue + 1,
+  };
 });
