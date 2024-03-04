@@ -30,8 +30,8 @@ export default defineEventHandler(async (event) => {
       with: {
         selectedKit: {
           with: {
-            abilities: true,
-            passives: true,
+            abilities: { with: { ability: true } },
+            passives: { with: { passive: true } },
           },
         },
       },
