@@ -34,10 +34,21 @@ export const abilitiesTable = mysqlTable(
   })
 );
 
-export const abilitiesToKitsTable = mysqlTable("abilities_to_kits", {
-  kitId: varchar("kit_id", { length: 36 }).notNull(),
-  abilityId: varchar("ability_id", { length: 36 }).notNull(),
-});
+export const abilitiesToKitsTable = mysqlTable(
+  "abilities_to_kits",
+  {
+    kitId: varchar("kit_id", { length: 36 }).notNull(),
+    abilityId: varchar("ability_id", { length: 36 }).notNull(),
+  },
+  (table) => ({
+    kitIdIdx: index("kit_id_idx").on(table.kitId),
+    abilityIdIdx: index("ability_id_idx").on(table.abilityId),
+    pk: primaryKey({
+      name: "abilities_to_kits_pk",
+      columns: [table.abilityId, table.kitId],
+    }),
+  })
+);
 
 export const passivesTable = mysqlTable(
   "passives",
@@ -50,10 +61,21 @@ export const passivesTable = mysqlTable(
   })
 );
 
-export const passivesToKitsTable = mysqlTable("passives_to_kits", {
-  kitId: varchar("kit_id", { length: 36 }).notNull(),
-  passiveId: varchar("passive_id", { length: 36 }).notNull(),
-});
+export const passivesToKitsTable = mysqlTable(
+  "passives_to_kits",
+  {
+    kitId: varchar("kit_id", { length: 36 }).notNull(),
+    passiveId: varchar("passive_id", { length: 36 }).notNull(),
+  },
+  (table) => ({
+    kitIdIdx: index("kit_id_idx").on(table.kitId),
+    passiveIdIdx: index("passive_id_idx").on(table.passiveId),
+    pk: primaryKey({
+      name: "passives_to_kits_pk",
+      columns: [table.passiveId, table.kitId],
+    }),
+  })
+);
 
 export const basicPlayerDataTable = mysqlTable(
   "basic_player_data",
