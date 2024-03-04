@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 import net.ssmb.dtos.queue.AddPlayerError
 import net.ssmb.dtos.queue.AddPlayerRequest
 import net.ssmb.dtos.queue.AddPlayerResponse
+import net.ssmb.dtos.queue.MinigameStartRequest
 import org.bukkit.entity.Player
 
 class ApiService {
@@ -33,9 +34,9 @@ class ApiService {
     }
 
     suspend fun queueAddPlayer(player: Player, minigameId: String, force: Boolean?): AddPlayerResponse {
-        val request = AddPlayerRequest(player.uniqueId.toString(), minigameId, force)
-
-        val response = client.post("queue/add-player")
+        val response = client.post("queue/add-player") {
+            setBody(AddPlayerRequest(player.identity().uuid().toString(), minigameId, force))
+        }
 
         val polymorphicJson = Json {
             ignoreUnknownKeys = true
@@ -45,6 +46,16 @@ class ApiService {
             200 -> polymorphicJson.decodeFromString(response.bodyAsText())
             409 -> AddPlayerResponse.Error(AddPlayerError.ALREADY_IN_QUEUE)
             else -> AddPlayerResponse.Error(AddPlayerError.UNKNOWN)
+        }
+    }
+
+    suspend fun queueRemovePlayers(playerUuids: List<String>) {
+
+    }
+
+    suspend fun minigameStart(playerUuids: List<String>, minigameId: String) {
+        val response = client.post("minigame/start") {
+            setBody(MinigameStartRequest(playerUuids, minigameId))
         }
     }
 }

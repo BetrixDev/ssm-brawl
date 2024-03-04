@@ -8,5 +8,5 @@ const bodySchema = v.object({
 export default defineEventHandler(async (event) => {
   const body = v.parse(bodySchema, await readBody(event));
 
-  await db.delete(queueTable).where(eq(queueTable.playerId, body.playerUuid));
+  await db.delete(queueTable).where(eq(queueTable.playerUuid, body.playerUuid));
 });

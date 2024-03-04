@@ -23,6 +23,38 @@ export const kitsTable = mysqlTable(
   })
 );
 
+export const abilitiesTable = mysqlTable(
+  "abilities",
+  {
+    id: varchar("id", { length: 36 }).primaryKey().notNull(),
+    meta: json("meta"),
+  },
+  (table) => ({
+    idIdx: index("id_idx").on(table.id),
+  })
+);
+
+export const abilitiesToKitsTable = mysqlTable("abilities_to_kits", {
+  kitId: varchar("kit_id", { length: 36 }).notNull(),
+  abilityId: varchar("ability_id", { length: 36 }).notNull(),
+});
+
+export const passivesTable = mysqlTable(
+  "passives",
+  {
+    id: varchar("id", { length: 36 }).primaryKey().notNull(),
+    meta: json("meta"),
+  },
+  (table) => ({
+    idIdx: index("id_idx").on(table.id),
+  })
+);
+
+export const passivesToKitsTable = mysqlTable("passives_to_kits", {
+  kitId: varchar("kit_id", { length: 36 }).notNull(),
+  passiveId: varchar("passive_id", { length: 36 }).notNull(),
+});
+
 export const basicPlayerDataTable = mysqlTable(
   "basic_player_data",
   {
@@ -81,6 +113,47 @@ export const mapSpawnpointsTable = mysqlTable(
   (table) => ({
     pk: primaryKey({ columns: [table.mapId, table.x, table.y, table.z] }),
     mapIdIdx: index("map_id_idx").on(table.mapId),
+  })
+);
+
+export const kitsRelations = relations(kitsTable, ({ many }) => ({
+  abilities: many(abilitiesToKitsTable),
+  passives: many(passivesToKitsTable),
+}));
+
+export const abilitiesRelations = relations(abilitiesTable, ({ many }) => ({
+  kits: many(abilitiesToKitsTable),
+}));
+
+export const passivesRelations = relations(passivesTable, ({ many }) => ({
+  kits: many(passivesToKitsTable),
+}));
+
+export const abilitiesToKitsRelations = relations(
+  abilitiesToKitsTable,
+  ({ one }) => ({
+    kit: one(kitsTable, {
+      fields: [abilitiesToKitsTable.kitId],
+      references: [kitsTable.id],
+    }),
+    ability: one(abilitiesTable, {
+      fields: [abilitiesToKitsTable.abilityId],
+      references: [abilitiesTable.id],
+    }),
+  })
+);
+
+export const passivesToKitsRelations = relations(
+  passivesToKitsTable,
+  ({ one }) => ({
+    kit: one(kitsTable, {
+      fields: [passivesToKitsTable.kitId],
+      references: [kitsTable.id],
+    }),
+    passive: one(passivesTable, {
+      fields: [passivesToKitsTable.passiveId],
+      references: [passivesTable.id],
+    }),
   })
 );
 
