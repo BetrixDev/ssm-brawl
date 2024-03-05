@@ -8,10 +8,10 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
+import net.ssmb.dtos.minigame.AddPlayerRequest
 import net.ssmb.dtos.queue.AddPlayerError
-import net.ssmb.dtos.queue.AddPlayerRequest
 import net.ssmb.dtos.queue.AddPlayerResponse
-import net.ssmb.dtos.queue.MinigameStartRequest
+import net.ssmb.dtos.queue.minigame.MinigameStartRequest
 import org.bukkit.entity.Player
 
 class ApiService {
