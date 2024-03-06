@@ -1,17 +1,26 @@
 {
   "private": true,
+  "type": "module",
   "scripts": {
-    "prepare": "nitropack prepare",
-    "dev": "dotenv -e ../.env nitropack dev",
-    "build": "nitropack build",
-    "preview": "node .output/server/index.mjs"
+    "dev": "dotenv -e ../.env tsx watch src/index"
   },
   "dependencies": {
+    "@fastify/bearer-auth": "^9.3.0",
+    "@fastify/cors": "^9.0.1",
     "@tanstack/query-core": "^5.24.2",
+    "@trpc/server": "^10.45.1",
+    "@types/lodash.get": "^4.4.9",
     "db": "workspace:*",
     "dotenv-cli": "^7.3.0",
     "env": "workspace:*",
-    "nitropack": "latest",
-    "valibot": "^0.29.0"
+    "fastify": "^4.26.2",
+    "lodash-es": "^4.17.21",
+    "lodash.get": "^4.4.2",
+    "trpc-panel": "^1.3.4",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "tsx": "^4.7.1"
   }
 }

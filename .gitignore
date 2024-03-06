@@ -38,9 +38,7 @@ yarn-error.log*
 .idea
 
 *.log*
-.nitro
 .cache
-.output
 .env
 dist
 
