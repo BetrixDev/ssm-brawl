@@ -1,48 +1,47 @@
 import { relations } from "drizzle-orm";
 import {
-  double,
+  real,
   index,
-  json,
-  mysqlTable,
+  sqliteTable,
   primaryKey,
-  tinyint,
-  varchar,
-} from "drizzle-orm/mysql-core";
+  integer,
+  text,
+} from "drizzle-orm/sqlite-core";
 
-export const kitsTable = mysqlTable(
+export const kitsTable = sqliteTable(
   "kits",
   {
-    id: varchar("id", { length: 36 }).primaryKey().notNull(),
-    meleeDamage: double("melee_damage").notNull(),
-    armor: double("armor").notNull(),
-    inventoryIcon: varchar("inventory_icon", { length: 32 }).notNull(),
-    meta: json("meta"),
+    id: text("id").primaryKey().notNull(),
+    meleeDamage: real("melee_damage").notNull(),
+    armor: real("armor").notNull(),
+    inventoryIcon: text("inventory_icon").notNull(),
+    meta: text("meta", { mode: "json" }),
   },
   (table) => ({
-    idIdx: index("id_idx").on(table.id),
+    idIdx: index("kits_id_idx").on(table.id),
   })
 );
 
-export const abilitiesTable = mysqlTable(
+export const abilitiesTable = sqliteTable(
   "abilities",
   {
-    id: varchar("id", { length: 36 }).primaryKey().notNull(),
-    meta: json("meta"),
+    id: text("id").primaryKey().notNull(),
+    meta: text("meta", { mode: "json" }),
   },
   (table) => ({
-    idIdx: index("id_idx").on(table.id),
+    idIdx: index("abilities_id_idx").on(table.id),
   })
 );
 
-export const abilitiesToKitsTable = mysqlTable(
+export const abilitiesToKitsTable = sqliteTable(
   "abilities_to_kits",
   {
-    kitId: varchar("kit_id", { length: 36 }).notNull(),
-    abilityId: varchar("ability_id", { length: 36 }).notNull(),
+    kitId: text("kit_id").notNull(),
+    abilityId: text("ability_id").notNull(),
   },
   (table) => ({
-    kitIdIdx: index("kit_id_idx").on(table.kitId),
-    abilityIdIdx: index("ability_id_idx").on(table.abilityId),
+    kitIdIdx: index("atk_kit_id_idx").on(table.kitId),
+    abilityIdIdx: index("atk_ability_id_idx").on(table.abilityId),
     pk: primaryKey({
       name: "abilities_to_kits_pk",
       columns: [table.abilityId, table.kitId],
@@ -50,26 +49,26 @@ export const abilitiesToKitsTable = mysqlTable(
   })
 );
 
-export const passivesTable = mysqlTable(
+export const passivesTable = sqliteTable(
   "passives",
   {
-    id: varchar("id", { length: 36 }).primaryKey().notNull(),
-    meta: json("meta"),
+    id: text("id").primaryKey().notNull(),
+    meta: text("meta", { mode: "json" }),
   },
   (table) => ({
-    idIdx: index("id_idx").on(table.id),
+    idIdx: index("passives_id_idx").on(table.id),
   })
 );
 
-export const passivesToKitsTable = mysqlTable(
+export const passivesToKitsTable = sqliteTable(
   "passives_to_kits",
   {
-    kitId: varchar("kit_id", { length: 36 }).notNull(),
-    passiveId: varchar("passive_id", { length: 36 }).notNull(),
+    kitId: text("kit_id").notNull(),
+    passiveId: text("passive_id").notNull(),
   },
   (table) => ({
-    kitIdIdx: index("kit_id_idx").on(table.kitId),
-    passiveIdIdx: index("passive_id_idx").on(table.passiveId),
+    kitIdIdx: index("ptk_kit_id_idx").on(table.kitId),
+    passiveIdIdx: index("ptk_passive_id_idx").on(table.passiveId),
     pk: primaryKey({
       name: "passives_to_kits_pk",
       columns: [table.passiveId, table.kitId],
@@ -77,64 +76,64 @@ export const passivesToKitsTable = mysqlTable(
   })
 );
 
-export const basicPlayerDataTable = mysqlTable(
+export const basicPlayerDataTable = sqliteTable(
   "basic_player_data",
   {
-    uuid: varchar("uuid", { length: 36 }).primaryKey().notNull(),
-    selectedKitId: varchar("selected_kit_id", { length: 32 }).notNull(),
+    uuid: text("uuid", { length: 36 }).primaryKey().notNull(),
+    selectedKitId: text("selected_kit_id").notNull(),
   },
   (table) => ({
-    uuidIdx: index("uuid_idx").on(table.uuid),
+    uuidIdx: index("b_player_uuid_idx").on(table.uuid),
   })
 );
 
-export const minigamesTable = mysqlTable(
+export const minigamesTable = sqliteTable(
   "minigames",
   {
-    id: varchar("id", { length: 64 }).primaryKey(),
-    minPlayers: tinyint("min_players").notNull(),
-    maxPlayers: tinyint("max_players").notNull(),
+    id: text("id").primaryKey(),
+    minPlayers: integer("min_players").notNull(),
+    maxPlayers: integer("max_players").notNull(),
   },
   (table) => ({
-    idIdx: index("id_idx").on(table.id),
+    idIdx: index("minigames_id_idx").on(table.id),
   })
 );
 
-export const queueTable = mysqlTable(
+export const queueTable = sqliteTable(
   "queue",
   {
-    playerUuid: varchar("player_uuid", { length: 36 }).primaryKey(),
-    minigameId: varchar("minigame_id", { length: 64 }).notNull(),
+    playerUuid: text("player_uuid", { length: 36 }).primaryKey(),
+    minigameId: text("minigame_id").notNull(),
   },
   (table) => ({
-    minigameIdIdx: index("minigame_id_idx").on(table.minigameId),
-    playerUuidIdx: index("player_uuid_idx").on(table.playerUuid),
+    minigameIdIdx: index("queue_minigame_id_idx").on(table.minigameId),
+    playerUuidIdx: index("queue_player_uuid_idx").on(table.playerUuid),
   })
 );
 
-export const mapsTable = mysqlTable(
+export const mapsTable = sqliteTable(
   "maps",
   {
-    id: varchar("id", { length: 32 }).primaryKey(),
-    minPlayers: tinyint("min_players").notNull(),
-    maxPlayers: tinyint("max_players").notNull(),
+    id: text("id").primaryKey(),
+    minPlayers: integer("min_players").notNull(),
+    maxPlayers: integer("max_players").notNull(),
   },
   (table) => ({
-    idIdx: index("id_idx").on(table.id),
+    idIdx: index("maps_id_idx").on(table.id),
   })
 );
 
-export const mapSpawnpointsTable = mysqlTable(
+export const mapSpawnpointsTable = sqliteTable(
   "map_spawnpoints",
   {
-    mapId: varchar("map_id", { length: 32 }).notNull(),
-    x: double("x").notNull(),
-    y: double("y").notNull(),
-    z: double("z").notNull(),
+    mapId: text("map_id").notNull(),
+    x: real("x").notNull(),
+    y: real("y").notNull(),
+    z: real("z").notNull(),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.mapId, table.x, table.y, table.z] }),
-    mapIdIdx: index("map_id_idx").on(table.mapId),
+    mapIdIdx: index("spawnpoints_map_id_idx").on(table.mapId),
   })
 );
 
