@@ -1,0 +1,51 @@
+package net.ssmb.dtos.minigame
+
+import kotlinx.serialization.Serializable
+
+sealed class MinigameStartResponse {
+    data class Success(val value: MinigameStartSuccess) : MinigameStartResponse()
+    data class Error(val value: MiniGameError) : MinigameStartResponse()
+}
+
+enum class MiniGameError {
+    UNKNOWN
+}
+
+@Serializable
+sealed class MinigameStartSuccess(val players: List<String>, val map: MapData) {
+    @Serializable
+    sealed class PlayerData(val uuid: String, val selectedKit: KitData) {
+        @Serializable
+        sealed class KitData(
+            val id: String,
+            val meleeDamage: Double,
+            val armor: Double,
+            val inventoryIcon: String,
+            val meta: Map<String, String>?,
+            val abilities: List<AbilityEntry>,
+            val passives: List<PassiveEntry>,
+            val disguise: DisguiseData
+        ) {
+            @Serializable
+            sealed class AbilityEntry(val ability: AbilityData) {
+                @Serializable
+                data class AbilityData(val id: String, val meta: Map<String, String>?)
+            }
+
+            @Serializable
+            sealed class PassiveEntry(val passive: PassiveData) {
+                @Serializable
+                data class PassiveData(val id: String, val meta: Map<String, String>?)
+            }
+
+            @Serializable
+            data class DisguiseData(val id: String, val displayEntity: String, val hurtSound: String)
+        }
+    }
+
+    @Serializable
+    sealed class MapData(val id: String, val spawnPoints: List<SpawnPoint>) {
+        @Serializable
+        data class SpawnPoint(val x: Double, val y: Double, val z: Double)
+    }
+}
