@@ -6,16 +6,19 @@ import net.ssmb.commands.QueueCommand
 import net.ssmb.services.ApiService
 import net.ssmb.services.LangService
 import net.ssmb.services.MinigameService
+import net.ssmb.services.WorldService
 
 class SSMB : SuspendingJavaPlugin() {
     lateinit var api: ApiService
     lateinit var lang: LangService
     lateinit var minigames: MinigameService
+    lateinit var worlds: WorldService
 
     override suspend fun onEnableAsync() {
         api = ApiService()
         lang = LangService(this)
         minigames = MinigameService(this)
+        worlds = WorldService(this)
 
         getCommand("queue")!!.setSuspendingExecutor(QueueCommand(this))
     }

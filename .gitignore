@@ -65,3 +65,4 @@ server/spigot.yml
 server/usercache.json
 server/version_history.json
 server/whitelist.json
+/.vscode
