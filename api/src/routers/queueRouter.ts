@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { procedure, router } from "../trpc.js";
-import { db, queueTable, eq, minigamesTable } from "db";
+import { db, queueTable, eq, minigamesTable, inArray } from "db";
 import { TRPCError } from "@trpc/server";
 
 export const queueRouter = router({
@@ -55,11 +55,11 @@ export const queueRouter = router({
         playersInQueue: playersInQueue + 1,
       };
     }),
-  removePlayer: procedure
-    .input(z.object({ playerUuid: z.string() }))
+  removePlayers: procedure
+    .input(z.object({ playerUuids: z.array(z.string()) }))
     .mutation(async ({ input }) => {
       await db
         .delete(queueTable)
-        .where(eq(queueTable.playerUuid, input.playerUuid));
+        .where(inArray(queueTable.playerUuid, input.playerUuids));
     }),
 });

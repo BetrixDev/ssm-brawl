@@ -15,6 +15,7 @@ export const kitsTable = sqliteTable(
     meleeDamage: real("melee_damage").notNull(),
     armor: real("armor").notNull(),
     inventoryIcon: text("inventory_icon").notNull(),
+    disguiseId: text("disguise_id").notNull(),
     meta: text("meta", { mode: "json" }),
   },
   (table) => ({
@@ -32,6 +33,12 @@ export const abilitiesTable = sqliteTable(
     idIdx: index("abilities_id_idx").on(table.id),
   })
 );
+
+export const disguisesTable = sqliteTable("disguises", {
+  id: text("id").primaryKey().notNull(),
+  displayEntity: text("display_entity").notNull(),
+  hurtSound: text("hurt_sound").notNull(),
+});
 
 export const abilitiesToKitsTable = sqliteTable(
   "abilities_to_kits",
@@ -137,9 +144,13 @@ export const mapSpawnpointsTable = sqliteTable(
   })
 );
 
-export const kitsRelations = relations(kitsTable, ({ many }) => ({
+export const kitsRelations = relations(kitsTable, ({ many, one }) => ({
   abilities: many(abilitiesToKitsTable),
   passives: many(passivesToKitsTable),
+  disguise: one(disguisesTable, {
+    fields: [kitsTable.disguiseId],
+    references: [disguisesTable.id],
+  }),
 }));
 
 export const abilitiesRelations = relations(abilitiesTable, ({ many }) => ({

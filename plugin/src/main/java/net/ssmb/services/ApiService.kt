@@ -8,10 +8,13 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.Json
+import net.ssmb.dtos.minigame.MiniGameError
 import net.ssmb.dtos.minigame.MinigameStartRequest
+import net.ssmb.dtos.minigame.MinigameStartResponse
 import net.ssmb.dtos.queue.AddPlayerError
 import net.ssmb.dtos.queue.AddPlayerRequest
 import net.ssmb.dtos.queue.AddPlayerResponse
+import net.ssmb.dtos.queue.RemovePlayerResponse
 import org.bukkit.entity.Player
 
 class ApiService {
@@ -27,14 +30,14 @@ class ApiService {
             level = LogLevel.HEADERS
         }
         defaultRequest {
-            url(System.getenv("API_ENDPOINT") ?: "http://localhost:3000")
+            url(System.getenv("API_ENDPOINT") ?: "http://localhost:3000/api")
             bearerAuth(apiToken)
             contentType(ContentType.Application.Json)
         }
     }
 
     suspend fun queueAddPlayer(player: Player, minigameId: String, force: Boolean?): AddPlayerResponse {
-        val response = client.post("queue/add-player") {
+        val response = client.post("queue.addPlayer") {
             setBody(AddPlayerRequest(player.identity().uuid().toString(), minigameId, force))
         }
 
@@ -49,13 +52,22 @@ class ApiService {
         }
     }
 
-    suspend fun queueRemovePlayers(playerUuids: List<String>) {
+    suspend fun queueRemovePlayers(playerUuids: List<String>): Int {
+        val response = client.post("queue.removePlayer") {
+            setBody(RemovePlayerResponse(playerUuids))
+        }
 
+        return response.status.value
     }
 
-    suspend fun minigameStart(playerUuids: List<String>, minigameId: String) {
-        val response = client.post("minigame/start") {
+    suspend fun minigameStart(playerUuids: List<String>, minigameId: String): MinigameStartResponse {
+        val response = client.post("minigame.start") {
             setBody(MinigameStartRequest(playerUuids, minigameId))
+        }
+
+        return when (response.status.value) {
+            200 -> MinigameStartResponse.Success(json.decodeFromString(response.bodyAsText()))
+            else -> MinigameStartResponse.Error(MiniGameError.UNKNOWN)
         }
     }
 }

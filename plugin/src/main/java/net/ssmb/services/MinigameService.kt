@@ -2,6 +2,7 @@ package net.ssmb.services
 
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
+import net.ssmb.dtos.minigame.MinigameStartResponse
 import org.bukkit.entity.Player
 import java.util.*
 
@@ -28,5 +29,11 @@ class MinigameService(private val plugin: SSMB) {
         }
 
         val startResponse = plugin.api.minigameStart(playerUuids, minigameId)
+
+        if (startResponse is MinigameStartResponse.Error) {
+            //
+        } else if (startResponse is MinigameStartResponse.Success) {
+            val startData = startResponse.value
+        }
     }
 }

@@ -12,7 +12,7 @@ import {
   lte,
   mapsTable,
 } from "db";
-import { useQueryClient } from "../utils/query-client.js";
+import { queryClient } from "../utils/query-client.js";
 import { useRandomInt } from "../utils/math.js";
 import { TRPCError } from "@trpc/server";
 
@@ -22,7 +22,7 @@ export const minigameRouter = router({
       z.object({ playerUuids: z.array(z.string()), minigameId: z.string() })
     )
     .mutation(async ({ input }) => {
-      const [minigame, playerData] = await Promise.all([
+      const [minigame, playerData] = await db.batch([
         db.query.minigamesTable.findFirst({
           where: eq(minigamesTable.id, input.minigameId),
         }),
@@ -33,6 +33,7 @@ export const minigameRouter = router({
               with: {
                 abilities: { with: { ability: true } },
                 passives: { with: { passive: true } },
+                disguise: true,
               },
             },
           },
@@ -46,15 +47,12 @@ export const minigameRouter = router({
         throw new TRPCError({ code: "BAD_REQUEST" });
       }
 
-      const queryClient = useQueryClient();
-
       const validMaps = await queryClient.fetchQuery({
         queryKey: ["mapsTable", minigame.minPlayers, minigame.maxPlayers],
         queryFn: async () => {
           return await db.query.mapsTable.findMany({
             where: and(
               lte(mapsTable.minPlayers, minigame.minPlayers),
-
               gte(mapsTable.maxPlayers, minigame.maxPlayers)
             ),
             with: {
