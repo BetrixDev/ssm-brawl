@@ -6,6 +6,7 @@ import {
   primaryKey,
   integer,
   text,
+  int,
 } from "drizzle-orm/sqlite-core";
 
 export const kitsTable = sqliteTable(
@@ -28,6 +29,7 @@ export const abilitiesTable = sqliteTable(
   {
     id: text("id").primaryKey().notNull(),
     meta: text("meta", { mode: "json" }),
+    cooldown: int("cooldown").notNull(),
   },
   (table) => ({
     idIdx: index("abilities_id_idx").on(table.id),
@@ -61,6 +63,7 @@ export const passivesTable = sqliteTable(
   {
     id: text("id").primaryKey().notNull(),
     meta: text("meta", { mode: "json" }),
+    cooldown: int("cooldown").notNull(),
   },
   (table) => ({
     idIdx: index("passives_id_idx").on(table.id),

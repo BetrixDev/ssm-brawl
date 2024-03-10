@@ -1,3 +1,9 @@
 package net.ssmb.minigames
 
-class TestMinigame : SSMBMinigame()
+import net.ssmb.SSMB
+
+class TestMinigame(private val plugin: SSMB) : IMinigame {
+    override fun initializeMinigame() {
+        TODO("Not yet implemented")
+    }
+}
