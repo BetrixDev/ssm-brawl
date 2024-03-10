@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react";
 import {
   Links,
   Meta,
@@ -16,6 +17,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <Analytics />
         {children}
         <ScrollRestoration />
         <Scripts />

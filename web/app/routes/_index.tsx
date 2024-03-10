@@ -1,4 +1,4 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { HeadersFunction, MetaFunction } from "@vercel/remix";
 
 export const meta: MetaFunction = () => {
   return [
@@ -6,6 +6,10 @@ export const meta: MetaFunction = () => {
     { name: "description", content: "Soon" },
   ];
 };
+
+export const headers: HeadersFunction = () => ({
+  "Cache-Control": "s-maxage=1, stale-while-revalidate=59",
+});
 
 export default function Index() {
   return <div>SSMB</div>;
