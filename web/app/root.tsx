@@ -1,4 +1,5 @@
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/remix";
 import {
   Links,
   Meta,
@@ -19,6 +20,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <SpeedInsights />
         <Analytics />
         {children}
         <ScrollRestoration />
