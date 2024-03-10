@@ -115,6 +115,10 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>kotlinminecrafts</id>
+            <url>https://raw.githubusercontent.com/KotlinMinecraft/KotlinBukkitAPI-Repository/main</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -184,6 +188,26 @@
             <groupId>com.github.shynixn.mccoroutine</groupId>
             <artifactId>mccoroutine-bukkit-core</artifactId>
             <version>2.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>br.com.devsrsouza.kotlinbukkitapi</groupId>
+            <artifactId>architecture</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>br.com.devsrsouza.kotlinbukkitapi</groupId>
+            <artifactId>extensions</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>br.com.devsrsouza.kotlinbukkitapi</groupId>
+            <artifactId>utility</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>br.com.devsrsouza.kotlinbukkitapi</groupId>
+            <artifactId>menu</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

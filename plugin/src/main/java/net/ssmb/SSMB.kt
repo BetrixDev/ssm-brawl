@@ -14,7 +14,13 @@ class SSMB : SuspendingJavaPlugin() {
     lateinit var minigames: MinigameService
     lateinit var worlds: WorldService
 
+    companion object {
+        lateinit var instance: SSMB
+    }
+
     override suspend fun onEnableAsync() {
+        instance = this
+
         api = ApiService()
         lang = LangService(this)
         minigames = MinigameService(this)

@@ -11,6 +11,23 @@ open class SSMBAbility(
     private val cooldown: Long,
     private val meta: Map<String, String>?
 ) : Listener {
+
+    companion object {
+        fun getAbilityFromId(
+            abilityId: String,
+            player: Player,
+            plugin: SSMB,
+            cooldown: Long,
+            meta: Map<String, String>?,
+            index: Int
+        ): SSMBAbility {
+            return when (abilityId) {
+                "sulphur_bomb" -> SulphurBombAbility(player, plugin, cooldown, meta, index)
+                else -> throw RuntimeException("No ability exists for id $abilityId")
+            }
+        }
+    }
+
     open fun tryActivateAbility() {}
     open fun initializeAbility() {
         plugin.server.pluginManager.registerEvents(this, plugin)
