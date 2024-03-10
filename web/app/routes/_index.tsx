@@ -12,5 +12,13 @@ export const headers: HeadersFunction = () => ({
 });
 
 export default function Index() {
-  return <div>SSMB</div>;
+  return (
+    <div className="bg-background p-2">
+      <div className="rounded-lg border border-1 border-input p-2">
+        <h1 className="text-gradient font-kanit font-normal tracking-wider text-5xl">
+          SSMB
+        </h1>
+      </div>
+    </div>
+  );
 }

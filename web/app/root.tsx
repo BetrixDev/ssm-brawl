@@ -8,7 +8,19 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-import "./styles.css";
+import styles from "./styles.css?url";
+import type { LinksFunction } from "@remix-run/node";
+
+export const links: LinksFunction = () => [
+  {
+    rel: "stylesheet",
+    href: styles,
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Kanit:wght@500&display=swap",
+  },
+];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
