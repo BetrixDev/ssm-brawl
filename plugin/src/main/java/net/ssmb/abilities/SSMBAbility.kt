@@ -23,6 +23,7 @@ open class SSMBAbility(
         ): SSMBAbility {
             return when (abilityId) {
                 "sulphur_bomb" -> SulphurBombAbility(player, plugin, cooldown, meta, index)
+                "explode" -> ExplodeAbility(player, plugin, cooldown, meta, index)
                 else -> throw RuntimeException("No ability exists for id $abilityId")
             }
         }

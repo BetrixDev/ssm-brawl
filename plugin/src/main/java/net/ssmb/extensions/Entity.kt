@@ -6,6 +6,7 @@ import net.ssmb.utils.TaggedKeyNum
 import net.ssmb.utils.TaggedKeyStr
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
 import org.bukkit.metadata.FixedMetadataValue
@@ -153,4 +154,8 @@ fun Entity.doKnockback(
     val vel = 0.2 + trajectory!!.length() * 0.8
 
     this.setVelocity(trajectory, vel, false, 0.0, abs(0.2 * knockback), 0.4 + (0.04 * knockback), true)
+}
+
+fun Entity.getLivingEntitiesInRadius(radius: Double): List<LivingEntity> {
+    return this.getNearbyEntities(radius, radius, radius).filterIsInstance<LivingEntity>()
 }
