@@ -4,6 +4,8 @@ import br.com.devsrsouza.kotlinbukkitapi.extensions.item
 import net.ssmb.SSMB
 import net.ssmb.abilities.SSMBAbility
 import net.ssmb.dtos.minigame.MinigameStartSuccess
+import net.ssmb.passives.IPassive
+import net.ssmb.passives.constructPassiveFromId
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -14,6 +16,7 @@ class CreeperKit(
     private val kitData: MinigameStartSuccess.PlayerData.KitData
 ) : IKit {
     private val abilities = arrayListOf<SSMBAbility>()
+    private val passives = arrayListOf<IPassive>()
     private val playerInv = player.inventory
 
     override fun initializeKit() {
@@ -35,8 +38,13 @@ class CreeperKit(
             )
 
             ability.initializeAbility()
-
             abilities.add(ability)
+        }
+
+        kitData.passives.forEach {
+            val passive = constructPassiveFromId(player, it.passive.id, it.passive.meta)
+            passive.createPassive()
+            passives.add(passive)
         }
     }
 
