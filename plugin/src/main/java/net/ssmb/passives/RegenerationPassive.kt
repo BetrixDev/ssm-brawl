@@ -14,7 +14,7 @@ class RegenerationPassive(private val player: Player, meta: Map<String, String>)
     private val regenDelayTicks = meta["regen_delay_ticks"]!!.toInt()
     private val regenRate = meta["regen_rate"]!!.toDouble()
 
-    private lateinit var regenerationJob: Job
+    private var regenerationJob: Job? = null
 
     override fun createPassive() {
         regenerationJob = plugin.launch {
@@ -32,6 +32,6 @@ class RegenerationPassive(private val player: Player, meta: Map<String, String>)
     }
 
     override fun destroyPassive() {
-        regenerationJob.cancel()
+        regenerationJob?.cancel()
     }
 }
