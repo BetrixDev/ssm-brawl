@@ -47,6 +47,7 @@ export const abilitiesToKitsTable = sqliteTable(
   {
     kitId: text("kit_id").notNull(),
     abilityId: text("ability_id").notNull(),
+    abilityToolSlot: int("ability_tool_slot").notNull(),
   },
   (table) => ({
     kitIdIdx: index("atk_kit_id_idx").on(table.kitId),
@@ -63,7 +64,6 @@ export const passivesTable = sqliteTable(
   {
     id: text("id").primaryKey().notNull(),
     meta: text("meta", { mode: "json" }),
-    cooldown: int("cooldown").notNull(),
   },
   (table) => ({
     idIdx: index("passives_id_idx").on(table.id),

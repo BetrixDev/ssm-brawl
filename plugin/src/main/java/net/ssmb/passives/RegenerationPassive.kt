@@ -5,14 +5,18 @@ import com.github.shynixn.mccoroutine.bukkit.ticks
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import net.ssmb.SSMB
+import net.ssmb.dtos.minigame.MinigameStartSuccess
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import kotlin.math.min
 
-class RegenerationPassive(private val player: Player, meta: Map<String, String>) : IPassive {
+class RegenerationPassive(
+    private val player: Player,
+    passiveData: MinigameStartSuccess.PlayerData.KitData.PassiveEntry.PassiveData
+) : IPassive {
     private val plugin = SSMB.instance
-    private val regenDelayTicks = meta["regen_delay_ticks"]!!.toInt()
-    private val regenRate = meta["regen_rate"]!!.toDouble()
+    private val regenDelayTicks = passiveData.meta?.get("regen_delay_ticks")!!.toInt()
+    private val regenRate = passiveData.meta?.get("regen_rate")!!.toDouble()
 
     private var regenerationJob: Job? = null
 

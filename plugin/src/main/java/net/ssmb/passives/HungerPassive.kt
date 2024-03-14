@@ -5,6 +5,7 @@ import com.github.shynixn.mccoroutine.bukkit.ticks
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import net.ssmb.SSMB
+import net.ssmb.dtos.minigame.MinigameStartSuccess
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
@@ -14,10 +15,14 @@ import org.bukkit.event.entity.EntityDamageEvent
 import kotlin.math.max
 import kotlin.math.min
 
-class HungerPassive(private val player: Player, meta: Map<String, String>) : IPassive, Listener {
+class HungerPassive(
+    private val player: Player,
+    passiveData: MinigameStartSuccess.PlayerData.KitData.PassiveEntry.PassiveData
+) :
+    IPassive, Listener {
     private val plugin = SSMB.instance
-    private val secondsToDrain = meta["seconds_to_drain"]!!.toDouble()
-    private val hungerRestoreDelay = meta["hunger_restore_delay"]!!.toInt()
+    private val secondsToDrain = passiveData.meta?.get("seconds_to_drain")!!.toDouble()
+    private val hungerRestoreDelay = passiveData.meta?.get("hunger_restore_delay")!!.toInt()
 
     private var hungerJob: Job? = null
     private var hungerTicks: Long = 0

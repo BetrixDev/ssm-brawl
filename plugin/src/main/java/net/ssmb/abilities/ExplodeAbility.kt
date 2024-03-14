@@ -7,6 +7,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
+import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.extensions.*
 import net.ssmb.utils.TaggedKeyBool
 import org.bukkit.Material
@@ -14,26 +15,27 @@ import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.HandlerList
+import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
 
 class ExplodeAbility(
     private val player: Player,
-    private val plugin: SSMB,
-    private val cooldown: Long,
-    private val meta: Map<String, String>?,
-    private val index: Int
-) : SSMBAbility(player, plugin, cooldown, meta) {
+    private val abilityEntry: MinigameStartSuccess.PlayerData.KitData.AbilityEntry
+) : IAbility, Listener {
+    private val plugin = SSMB.instance
     private val playerInv = player.inventory
+    private val abilityCooldown = abilityEntry.ability.cooldown
 
     private var lastTimeUsed: Long = 0
     private var isExplodeActive = false
 
     override fun initializeAbility() {
-        super.initializeAbility()
+        plugin.server.pluginManager.registerEvents(this, plugin)
 
-        playerInv.setItem(index, item(Material.IRON_SHOVEL) {
+        playerInv.setItem(abilityEntry.abilityToolSlot, item(Material.IRON_SHOVEL) {
             displayName(Component.text("Explode"))
             persistentDataContainer.setData {
                 set("ability_item_id", "explode")
@@ -41,11 +43,15 @@ class ExplodeAbility(
         })
     }
 
-    override fun tryActivateAbility() {
+    override fun destroyAbility() {
+        HandlerList.unregisterAll(this)
+    }
+
+    private fun tryActivateAbility() {
         val currentTime = System.currentTimeMillis()
 
-        if (lastTimeUsed + cooldown > currentTime) {
-            val timeLeft = ((lastTimeUsed + cooldown) - currentTime) / 1000.0
+        if (lastTimeUsed + abilityCooldown > currentTime) {
+            val timeLeft = ((lastTimeUsed + abilityCooldown) - currentTime) / 1000.0
             player.sendMessage(Component.text("You have $timeLeft seconds till use again"))
             return
         }

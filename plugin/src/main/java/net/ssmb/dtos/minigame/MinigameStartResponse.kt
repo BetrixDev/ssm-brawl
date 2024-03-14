@@ -27,7 +27,7 @@ sealed class MinigameStartSuccess(val players: List<String>, val map: MapData) {
             val disguise: DisguiseData
         ) {
             @Serializable
-            sealed class AbilityEntry(val ability: AbilityData) {
+            sealed class AbilityEntry(val ability: AbilityData, val abilityToolSlot: Int) {
                 @Serializable
                 data class AbilityData(val id: String, val cooldown: Long, val meta: Map<String, String>?)
             }
@@ -35,7 +35,7 @@ sealed class MinigameStartSuccess(val players: List<String>, val map: MapData) {
             @Serializable
             sealed class PassiveEntry(val passive: PassiveData) {
                 @Serializable
-                data class PassiveData(val id: String, val cooldown: Long, val meta: Map<String, String>?)
+                data class PassiveData(val id: String, val meta: Map<String, String>?)
             }
 
             @Serializable
