@@ -9,6 +9,8 @@ import {
   int,
 } from "drizzle-orm/sqlite-core";
 
+export type MapRole = "game" | "hub";
+
 export const kitsTable = sqliteTable(
   "kits",
   {
@@ -127,11 +129,24 @@ export const mapsTable = sqliteTable(
     id: text("id").primaryKey(),
     minPlayers: integer("min_players").notNull(),
     maxPlayers: integer("max_players").notNull(),
+    originId: text("origin_id").notNull(),
+    worldBorderRadius: integer("world_border_radius").notNull(),
+    role: text("role", { enum: ["game", "hub"] })
+      .$type<MapRole>()
+      .notNull()
+      .default("game"),
   },
   (table) => ({
     idIdx: index("maps_id_idx").on(table.id),
   })
 );
+
+export const mapOriginsTable = sqliteTable("map_origins", {
+  mapId: text("map_id").primaryKey(),
+  x: real("x").notNull(),
+  y: real("y").notNull(),
+  z: real("z").notNull(),
+});
 
 export const mapSpawnpointsTable = sqliteTable(
   "map_spawnpoints",
@@ -192,8 +207,12 @@ export const passivesToKitsRelations = relations(
   })
 );
 
-export const mapsRelations = relations(mapsTable, ({ many }) => ({
+export const mapsRelations = relations(mapsTable, ({ many, one }) => ({
   spawnPoints: many(mapSpawnpointsTable),
+  origin: one(mapOriginsTable, {
+    fields: [mapsTable.originId],
+    references: [mapOriginsTable.mapId],
+  }),
 }));
 
 export const mapSpawnpointsRelations = relations(

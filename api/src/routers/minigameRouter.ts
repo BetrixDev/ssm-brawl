@@ -48,15 +48,22 @@ export const minigameRouter = router({
       }
 
       const validMaps = await queryClient.fetchQuery({
-        queryKey: ["mapsTable", minigame.minPlayers, minigame.maxPlayers],
+        queryKey: [
+          "mapsTable",
+          "game",
+          minigame.minPlayers,
+          minigame.maxPlayers,
+        ],
         queryFn: async () => {
           return await db.query.mapsTable.findMany({
             where: and(
               lte(mapsTable.minPlayers, minigame.minPlayers),
-              gte(mapsTable.maxPlayers, minigame.maxPlayers)
+              gte(mapsTable.maxPlayers, minigame.maxPlayers),
+              eq(mapsTable.role, "game")
             ),
             with: {
               spawnPoints: true,
+              origin: true,
             },
           });
         },

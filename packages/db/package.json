@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "db:push": "dotenv -e ../../.env drizzle-kit push:sqlite",
-    "db:studio": "dotenv -e ../../.env drizzle-kit studio"
+    "db:studio": "dotenv -e ../../.env drizzle-kit studio --port 3000 --verbose"
   },
   "dependencies": {
     "@libsql/client": "^0.5.3",
