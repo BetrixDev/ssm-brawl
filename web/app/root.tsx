@@ -11,6 +11,11 @@ import {
 import styles from "./styles.css?url";
 import type { LinksFunction } from "@remix-run/node";
 
+export const config = {
+  runtime: "edge",
+  regions: ["iad1"],
+};
+
 export const links: LinksFunction = () => [
   {
     rel: "stylesheet",
