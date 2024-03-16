@@ -38,7 +38,15 @@ export const queueRouter = router({
 
       const playersInQueue = minigameData.queueEntries.length;
 
-      if (playersInQueue + 1 >= minigameData.minPlayers) {
+      if (minigameData.playersPerTeam % (playersInQueue + 1) !== 0) {
+      }
+
+      const isValidGroupSizeForQueue =
+        minigameData.playersPerTeam % (playersInQueue + 1) !== 0;
+      const isEnoughPlayersInQueue =
+        playersInQueue + 1 >= minigameData.minPlayers;
+
+      if (isValidGroupSizeForQueue && isEnoughPlayersInQueue) {
         const queuedPlayers = minigameData.queueEntries.map(
           (q) => q.playerUuid
         );

@@ -105,6 +105,7 @@ export const minigamesTable = sqliteTable(
     id: text("id").primaryKey(),
     minPlayers: integer("min_players").notNull(),
     maxPlayers: integer("max_players").notNull(),
+    playersPerTeam: integer("players_per_team").notNull().default(1),
   },
   (table) => ({
     idIdx: index("minigames_id_idx").on(table.id),
