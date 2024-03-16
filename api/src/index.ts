@@ -1,69 +1,66 @@
-import fastify from "fastify";
-import cors from "@fastify/cors";
-import {
-  fastifyTRPCPlugin,
-  FastifyTRPCPluginOptions,
-} from "@trpc/server/adapters/fastify";
-import { appRouter, AppRouter } from "./routers/router.js";
+import { Hono } from "hono";
+import { bearerAuth } from "hono/bearer-auth";
+import { trpcServer } from "@hono/trpc-server";
+import { serve } from "@hono/node-server";
+import { logger } from "hono/logger";
+import { appRouter } from "./routers/router.js";
 import { get } from "lodash-es";
 import { t } from "./trpc.js";
 import { renderTrpcPanel } from "trpc-panel";
 import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
-import bearerAuth from "@fastify/bearer-auth";
 import { env } from "env";
 
-const server = fastify();
-server.register(cors);
-server.register(bearerAuth, {
-  keys: [],
-  auth: (key) => key === env.API_AUTH_TOKEN,
-});
+const app = new Hono();
 
-server.register(fastifyTRPCPlugin, {
-  prefix: "/trpc",
-  trpcOptions: {
+app.use(logger());
+app.use("/api/*", bearerAuth({ token: env.API_AUTH_TOKEN }));
+app.use("/trpc/*", bearerAuth({ token: env.API_AUTH_TOKEN }));
+
+app.use(
+  "/trpc/*",
+  trpcServer({
     router: appRouter,
-  } satisfies FastifyTRPCPluginOptions<AppRouter>["trpcOptions"],
-});
+  })
+);
 
 const caller = t.createCallerFactory(appRouter)({});
 
-server.all("/api/*", async (req, res) => {
-  const paths = req.url.replace("/api/", "").replace("/", ".");
-
+app.all("/api/*", async (c) => {
+  const paths = c.req.url.split("/").at(-1)!;
   const routerProcedure = await get(caller, paths);
 
   if (routerProcedure === undefined) {
-    return res.status(404);
+    return c.notFound();
   }
 
   let routerResponse: unknown;
 
   try {
-    routerResponse = await routerProcedure(req.body);
+    const requestBody = await c.req.json();
+    routerResponse = await routerProcedure(requestBody);
   } catch (e: unknown) {
     if (e instanceof TRPCError) {
       const statusCode = getHTTPStatusCodeFromError(e);
-      return res.status(statusCode).send(e);
+      c.status(statusCode as any);
     } else {
-      res.status(500).send(e);
+      console.log(e);
+      c.status(500);
     }
+
+    return c.json(e);
   }
 
-  return res.status(200).send(routerResponse);
+  c.status(200);
+  return c.json(routerResponse);
 });
 
-server.get("/panel", (_, res) => {
-  return res
-    .type("text/html")
-    .send(renderTrpcPanel(appRouter, { url: "http://localhost:3000/trpc" }));
+app.get("/panel", async (c) => {
+  return c.html(
+    renderTrpcPanel(appRouter, { url: "http://localhost:3000/trpc" })
+  );
 });
 
-async function main() {
-  await server.listen({ port: 3000 });
-
-  console.log("listening");
-}
-
-main();
+serve(app, (info) => {
+  console.log(`Backend listening on http://localhost:${info.port}`);
+});
