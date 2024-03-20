@@ -1,24 +1,33 @@
 package net.ssmb.services
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.ssmb.SSMB
-import org.bukkit.configuration.file.YamlConfiguration
-import java.io.File
 
-class LangService(private val plugin: SSMB) {
-    private val locales = hashMapOf<String, YamlConfiguration>()
+class LangService {
+    private val plugin = SSMB.instance
+    private val api = plugin.api
+    private lateinit var langEntries: Map<String, String>
+    private val regex = Regex("\\{([^}]*)}")
 
-    init {
-        val localesDir = File("${plugin.dataFolder}${File.separator}lang")
-
-        localesDir.listFiles()?.forEach {
-            val yaml = YamlConfiguration()
-            yaml.load(it)
-            locales[it.name.substringBefore(".")] = yaml
-        }
+    suspend fun initLangService() {
+        langEntries = api.langAllEntries()
     }
 
-    fun getComponent(locale: String, key: String, variables: HashMap<String, String>) {
-        val rawString = locales[locale]?.getString(key)!!
+    fun getComponent(key: String, variables: HashMap<String, String>? = null): Component {
+        var rawString = langEntries[key] ?: return Component.text("NO ENTRY EXISTS FOR ID $key")
 
+        val variablesToReplace = regex.findAll(rawString)
+
+        variablesToReplace.forEach {
+            rawString = if (langEntries[it.value] != null) {
+                rawString.replace("{${it.value}}", langEntries[it.value]!!, ignoreCase = true)
+            } else {
+                val variable = variables!![it.value]!!
+                rawString.replace("{${it.value}}", variable, ignoreCase = true)
+            }
+        }
+
+        return MiniMessage.miniMessage().deserialize(rawString)
     }
 }

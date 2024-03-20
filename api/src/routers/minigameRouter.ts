@@ -11,9 +11,9 @@ import {
   gte,
   lte,
   mapsTable,
-} from "db";
+} from "../db/db.js";
 import { queryClient } from "../utils/query-client.js";
-import { useRandomInt } from "../utils/math.js";
+import { generateRandomInt32, useRandomInt } from "../utils/math.js";
 import { TRPCError } from "@trpc/server";
 
 export const minigameRouter = router({
@@ -72,6 +72,8 @@ export const minigameRouter = router({
       const mapIndex = useRandomInt(0, validMaps.length - 1);
 
       return {
+        gameId: generateRandomInt32(),
+        minigame,
         players: playerData,
         map: validMaps[mapIndex],
       };

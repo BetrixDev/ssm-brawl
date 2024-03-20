@@ -37,7 +37,7 @@ app.all("/api/*", async (c) => {
   let routerResponse: unknown;
 
   try {
-    const requestBody = await c.req.json();
+    const requestBody = await c.req.json().catch(() => undefined);
     routerResponse = await routerProcedure(requestBody);
   } catch (e: unknown) {
     if (e instanceof TRPCError) {

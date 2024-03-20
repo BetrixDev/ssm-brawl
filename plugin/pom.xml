@@ -22,9 +22,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.5.1</version>
                 <configuration>
-                    <finalName>ssmb-${project.version}</finalName>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <finalName>ssmb</finalName>
+                    <outputDirectory>../server/plugins</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
@@ -45,13 +47,6 @@
                         <phase>compile</phase>
                         <goals>
                             <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -92,9 +87,6 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <compilerArgs>
-                        <arg>-parameters</arg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>

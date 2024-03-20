@@ -3,10 +3,12 @@ package net.ssmb.services
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartResponse
+import net.ssmb.minigames.constructMinigameFromData
 import org.bukkit.entity.Player
 import java.util.*
 
-class MinigameService(private val plugin: SSMB) {
+class MinigameService {
+    private val plugin = SSMB.instance
     suspend fun tryStartMinigame(playerUuids: List<String>, minigameId: String) {
         val onlinePlayers = mutableListOf<Player>()
         val offlinePlayers = playerUuids.filter {
@@ -31,9 +33,14 @@ class MinigameService(private val plugin: SSMB) {
         val startResponse = plugin.api.minigameStart(playerUuids, minigameId)
 
         if (startResponse is MinigameStartResponse.Error) {
-            //
+            onlinePlayers.forEach {
+                it.sendMessage(Component.text("An error occurred while trying to start the game."))
+            }
         } else if (startResponse is MinigameStartResponse.Success) {
             val startData = startResponse.value
+            val minigame = constructMinigameFromData(onlinePlayers, startData)
+
+            minigame.initializeMinigame()
         }
     }
 }

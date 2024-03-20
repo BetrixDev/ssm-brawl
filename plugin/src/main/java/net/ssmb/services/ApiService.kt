@@ -3,14 +3,20 @@ package net.ssmb.services
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import net.ssmb.dtos.minigame.MiniGameError
 import net.ssmb.dtos.minigame.MinigameStartRequest
 import net.ssmb.dtos.minigame.MinigameStartResponse
+import net.ssmb.dtos.player.BasicPlayerDataRequest
+import net.ssmb.dtos.player.BasicPlayerDataResponse
+import net.ssmb.dtos.player.IsIpBannedRequest
+import net.ssmb.dtos.player.IsIpBannedResponse
 import net.ssmb.dtos.queue.AddPlayerError
 import net.ssmb.dtos.queue.AddPlayerRequest
 import net.ssmb.dtos.queue.AddPlayerResponse
@@ -20,20 +26,23 @@ import org.bukkit.entity.Player
 class ApiService {
     private val apiToken = System.getenv("API_AUTH_TOKEN")
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
-
     private val client = HttpClient(CIO) {
         install(Logging) {
             logger = Logger.DEFAULT
             level = LogLevel.HEADERS
         }
+        install(ContentNegotiation) {
+            json()
+        }
         defaultRequest {
-            url(System.getenv("API_ENDPOINT") ?: "http://localhost:3000/api")
+            url("http://localhost:3000/api/")
             bearerAuth(apiToken)
             contentType(ContentType.Application.Json)
         }
+    }
+
+    private val json = Json {
+        ignoreUnknownKeys = true
     }
 
     suspend fun queueAddPlayer(player: Player, minigameId: String, force: Boolean?): AddPlayerResponse {
@@ -69,5 +78,27 @@ class ApiService {
             200 -> MinigameStartResponse.Success(json.decodeFromString(response.bodyAsText()))
             else -> MinigameStartResponse.Error(MiniGameError.UNKNOWN)
         }
+    }
+
+    suspend fun langAllEntries(): Map<String, String> {
+        val response = client.get("lang.getAllEntries")
+
+        return json.decodeFromString(response.bodyAsText())
+    }
+
+    suspend fun playerBasicData(player: Player): BasicPlayerDataResponse {
+        val response = client.post("player.getBasicPlayerData") {
+            setBody(BasicPlayerDataRequest(player.uniqueId.toString()))
+        }
+
+        return json.decodeFromString(response.bodyAsText())
+    }
+
+    suspend fun playerIsIpBanned(ip: String, player: Player): IsIpBannedResponse {
+        val response = client.post("player.isIpBanned") {
+            setBody(IsIpBannedRequest(ip, player.uniqueId.toString()))
+        }
+
+        return json.decodeFromString(response.bodyAsText())
     }
 }

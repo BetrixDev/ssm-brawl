@@ -1,0 +1,9 @@
+{
+  "name": "server",
+  "scripts": {
+    "start": "dotenv -e ../.env \"java -Xmx8G -jar pufferfish.jar -nogui\""
+  },
+  "devDependencies": {
+    "dotenv-cli": "^7.3.0"
+  }
+}

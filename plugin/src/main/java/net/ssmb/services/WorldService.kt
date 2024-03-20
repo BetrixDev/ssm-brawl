@@ -1,19 +1,18 @@
 package net.ssmb.services
 
-import net.ssmb.SSMB
+
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.WorldCreator
 import org.codehaus.plexus.util.FileUtils
-
-
 import java.io.File
 
-class WorldService(private val plugin: SSMB) {
+class WorldService {
     private val loadedWorlds = hashMapOf<String, World>()
+
     fun createSsmbWorld(worldName: String, serverName: String): World {
         val baseWorldDirectory = File("ssmb_worlds/$worldName")
-        val copyDirectory = File("servers/$serverName")
+        val copyDirectory = File("servers_$serverName")
 
         if (copyDirectory.exists()) {
             throw RuntimeException("Server already exists with name $serverName")
@@ -49,9 +48,27 @@ class WorldService(private val plugin: SSMB) {
         Bukkit.unloadWorld(loadedWorld, false)
 
         try {
-            FileUtils.deleteDirectory("servers/$serverName")
+            FileUtils.deleteDirectory("servers_$serverName")
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    fun deleteAllLoadedWorlds() {
+        val mainWorld = Bukkit.getWorlds()[0]
+
+        loadedWorlds.forEach { (k, v) ->
+            v.players.forEach {
+                it.teleport(mainWorld.spawnLocation)
+            }
+
+            Bukkit.unloadWorld(v, false)
+
+            try {
+                FileUtils.deleteDirectory("servers/$k")
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ import net.ssmb.abilities.IAbility
 import net.ssmb.abilities.constructAbilityFromData
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.passives.IPassive
-import net.ssmb.passives.constructPassiveFromId
+import net.ssmb.passives.constructPassiveFromData
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -35,7 +35,7 @@ class CreeperKit(
         }
 
         kitData.passives.forEach {
-            val passive = constructPassiveFromId(player, it.passive.id, it.passive.meta)
+            val passive = constructPassiveFromData(player, it)
             passive.createPassive()
             passives.add(passive)
         }

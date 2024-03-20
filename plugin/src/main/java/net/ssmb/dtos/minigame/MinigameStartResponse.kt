@@ -12,7 +12,15 @@ enum class MiniGameError {
 }
 
 @Serializable
-sealed class MinigameStartSuccess(val players: List<String>, val map: MapData) {
+sealed class MinigameStartSuccess(
+    val gameId: String,
+    val minigame: MinigameData,
+    val players: List<PlayerData>,
+    val map: MapData
+) {
+    @Serializable
+    data class MinigameData(val id: String)
+
     @Serializable
     sealed class PlayerData(val uuid: String, val selectedKit: KitData) {
         @Serializable
