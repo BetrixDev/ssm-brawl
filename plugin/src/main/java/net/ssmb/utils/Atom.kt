@@ -1,4 +1,4 @@
-package net.ssmb.extensions.atoms
+package net.ssmb.utils
 
 class Atom<T>(initialState: T) {
     private var state: T = initialState
