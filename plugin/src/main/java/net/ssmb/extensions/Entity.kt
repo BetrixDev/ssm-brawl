@@ -1,9 +1,7 @@
 package net.ssmb.extensions
 
 import net.ssmb.SSMB
-import net.ssmb.utils.TaggedKeyBool
-import net.ssmb.utils.TaggedKeyNum
-import net.ssmb.utils.TaggedKeyStr
+import net.ssmb.utils.*
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -18,7 +16,11 @@ class EntityMetadataBuilder(private val entity: Entity) {
     private val metadata = mutableMapOf<String, Any>()
     private val metadataToRemove = arrayListOf<String>()
 
-    fun set(metadataKey: TaggedKeyNum, value: Double) {
+    fun set(metadataKey: TaggedKeyDouble, value: Double) {
+        metadata[metadataKey.id] = value
+    }
+
+    fun set(metadataKey: TaggedKeyInt, value: Int) {
         metadata[metadataKey.id] = value
     }
 
@@ -30,7 +32,11 @@ class EntityMetadataBuilder(private val entity: Entity) {
         metadata[metadataKey.id] = value
     }
 
-    fun remove(metadataKey: TaggedKeyNum) {
+    fun remove(metadataKey: TaggedKeyDouble) {
+        metadataToRemove.add(metadataKey.id)
+    }
+
+    fun remove(metadataKey: TaggedKeyInt) {
         metadataToRemove.add(metadataKey.id)
     }
 
@@ -61,8 +67,12 @@ fun Entity.metadata(builder: EntityMetadataBuilder.() -> Unit) {
     metadataBuilder.build()
 }
 
-fun Entity.getMetadata(metadataKey: TaggedKeyNum): Double? {
+fun Entity.getMetadata(metadataKey: TaggedKeyDouble): Double? {
     return this.getMetadata(metadataKey.id).getOrNull(0)?.value() as Double?
+}
+
+fun Entity.getMetadata(metadataKey: TaggedKeyInt): Int? {
+    return this.getMetadata(metadataKey.id).getOrNull(0)?.value() as Int?
 }
 
 fun Entity.getMetadata(metadataKey: TaggedKeyStr): String? {
@@ -106,7 +116,7 @@ fun Entity.setVelocity(
     }
 
     if (groundBoost) {
-        if (net.ssmb.utils.isOnGround(this)) {
+        if (isOnGround(this)) {
             velocity.y += 0.2
         }
     }
@@ -129,7 +139,7 @@ fun Entity.doKnockback(
     knockback *= multiplier
 
     if (this is Player) {
-        val kitKnockbackMult = this.getMetadata(TaggedKeyNum("knockback_multiplier"))
+        val kitKnockbackMult = this.getMetadata(TaggedKeyDouble("knockback_multiplier"))
 
         if (kitKnockbackMult != null) {
             knockback *= kitKnockbackMult
