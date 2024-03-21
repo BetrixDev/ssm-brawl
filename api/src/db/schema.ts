@@ -19,6 +19,10 @@ export const kitsTable = sqliteTable(
     armor: real("armor").notNull(),
     inventoryIcon: text("inventory_icon").notNull(),
     disguiseId: text("disguise_id").notNull(),
+    helmetId: text("helmet_id"),
+    chestplateId: text("chestplate_id"),
+    leggingsId: text("leggings_id"),
+    bootsId: text("boots_id"),
     meta: text("meta", { mode: "json" }),
   },
   (table) => ({

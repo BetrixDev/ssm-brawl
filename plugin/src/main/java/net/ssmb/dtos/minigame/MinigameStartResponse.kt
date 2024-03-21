@@ -32,6 +32,10 @@ sealed class MinigameStartSuccess(
             val meta: Map<String, String>?,
             val abilities: List<AbilityEntry>,
             val passives: List<PassiveEntry>,
+            val helmetId: String?,
+            val chestplateId: String?,
+            val leggingsId: String?,
+            val bootsId: String?,
             val disguise: DisguiseData
         ) {
             @Serializable

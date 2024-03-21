@@ -21,10 +21,22 @@ class CreeperKit(
     override fun initializeKit() {
         playerInv.clear()
 
-        playerInv.setItem(EquipmentSlot.HEAD, item(Material.LEATHER_HELMET))
-        playerInv.setItem(EquipmentSlot.CHEST, item(Material.LEATHER_CHESTPLATE))
-        playerInv.setItem(EquipmentSlot.LEGS, item(Material.LEATHER_LEGGINGS))
-        playerInv.setItem(EquipmentSlot.FEET, item(Material.IRON_BOOTS))
+        if (kitData.helmetId != null) playerInv.setItem(
+            EquipmentSlot.HEAD,
+            item(Material.getMaterial(kitData.helmetId)!!)
+        )
+        if (kitData.chestplateId != null) playerInv.setItem(
+            EquipmentSlot.CHEST,
+            item(Material.getMaterial(kitData.chestplateId)!!)
+        )
+        if (kitData.leggingsId != null) playerInv.setItem(
+            EquipmentSlot.LEGS,
+            item(Material.getMaterial(kitData.leggingsId)!!)
+        )
+        if (kitData.bootsId != null) playerInv.setItem(
+            EquipmentSlot.FEET,
+            item(Material.getMaterial(kitData.bootsId)!!)
+        )
 
         kitData.abilities.forEach {
             val ability = constructAbilityFromData(player, it)
