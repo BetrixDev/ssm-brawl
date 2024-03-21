@@ -3,7 +3,7 @@ import { env } from "env";
 
 export default defineConfig({
   driver: "turso",
-  schema: "./src/schema/*.ts",
+  schema: "./src/db/schema.ts",
   dbCredentials: {
     url: env.DATABASE_URL,
     authToken: env.DATABASE_TOKEN,

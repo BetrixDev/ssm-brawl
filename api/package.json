@@ -2,7 +2,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "dotenv -e ../.env tsx watch src/index"
+    "dev": "dotenv -e ../.env tsx watch src/index",
+    "db:push": "dotenv -e ../.env drizzle-kit push:sqlite",
+    "db:studio": "dotenv -e ../.env drizzle-kit studio"
   },
   "dependencies": {
     "@hono/node-server": "^1.8.2",
