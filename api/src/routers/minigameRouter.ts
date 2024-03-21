@@ -13,7 +13,7 @@ import {
   mapsTable,
 } from "../db/db.js";
 import { queryClient } from "../utils/query-client.js";
-import { generateRandomInt32, useRandomInt } from "../utils/math.js";
+import { useRandomId, useRandomInt } from "../utils/math.js";
 import { TRPCError } from "@trpc/server";
 
 export const minigameRouter = router({
@@ -71,8 +71,19 @@ export const minigameRouter = router({
 
       const mapIndex = useRandomInt(0, validMaps.length - 1);
 
+      let gameId = useRandomId(15);
+
+      // Ensure there are no collisions with game ids even though it's unlikely
+      while (
+        await db.query.minigamesTable.findFirst({
+          where: eq(minigamesTable.id, gameId),
+        })
+      ) {
+        gameId = useRandomId(15);
+      }
+
       return {
-        gameId: generateRandomInt32(),
+        gameId,
         minigame,
         players: playerData,
         map: validMaps[mapIndex],
