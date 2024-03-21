@@ -1,3 +1,0 @@
-prefix: '[SSMB]'
-queue.added: '{prefix} You have been successfully added to the queue for {minigameName}! ({playersInQueue} in queue)'
-queue.alreadyinqueue: ''
