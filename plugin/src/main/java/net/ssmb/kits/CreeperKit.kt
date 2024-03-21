@@ -1,7 +1,6 @@
 package net.ssmb.kits
 
 import br.com.devsrsouza.kotlinbukkitapi.extensions.item
-import net.ssmb.SSMB
 import net.ssmb.abilities.IAbility
 import net.ssmb.abilities.constructAbilityFromData
 import net.ssmb.dtos.minigame.MinigameStartSuccess
@@ -15,7 +14,6 @@ class CreeperKit(
     private val player: Player,
     private val kitData: MinigameStartSuccess.PlayerData.KitData
 ) : IKit {
-    private val plugin = SSMB.instance
     private val abilities = arrayListOf<IAbility>()
     private val passives = arrayListOf<IPassive>()
     private val playerInv = player.inventory
@@ -44,6 +42,10 @@ class CreeperKit(
     override fun destroyKit() {
         abilities.forEach {
             it.destroyAbility()
+        }
+
+        passives.forEach {
+            it.destroyPassive()
         }
     }
 }
