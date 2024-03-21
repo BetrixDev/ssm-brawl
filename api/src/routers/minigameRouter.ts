@@ -74,13 +74,11 @@ export const minigameRouter = router({
       let gameId = useRandomId(15);
 
       // Ensure there are no collisions with game ids even though it's unlikely
-      while (
-        await db.query.minigamesTable.findFirst({
-          where: eq(minigamesTable.id, gameId),
-        })
-      ) {
-        gameId = useRandomId(15);
-      }
+      // while (
+      //   // query for already existing game ids once that table exists
+      // ) {
+      //   gameId = useRandomId(15);
+      // }
 
       return {
         gameId,
