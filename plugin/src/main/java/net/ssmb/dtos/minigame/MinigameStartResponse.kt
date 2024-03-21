@@ -28,6 +28,7 @@ sealed class MinigameStartSuccess(
             val id: String,
             val meleeDamage: Double,
             val armor: Double,
+            val knockbackMult: Double,
             val inventoryIcon: String,
             val meta: Map<String, String>?,
             val abilities: List<AbilityEntry>,

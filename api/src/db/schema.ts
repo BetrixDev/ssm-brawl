@@ -17,6 +17,7 @@ export const kitsTable = sqliteTable(
     id: text("id").primaryKey().notNull(),
     meleeDamage: real("melee_damage").notNull(),
     armor: real("armor").notNull(),
+    knockbackMult: real("knockback_mult").default(1.0).notNull(),
     inventoryIcon: text("inventory_icon").notNull(),
     disguiseId: text("disguise_id").notNull(),
     helmetId: text("helmet_id"),

@@ -4,8 +4,10 @@ import br.com.devsrsouza.kotlinbukkitapi.extensions.item
 import net.ssmb.abilities.IAbility
 import net.ssmb.abilities.constructAbilityFromData
 import net.ssmb.dtos.minigame.MinigameStartSuccess
+import net.ssmb.extensions.metadata
 import net.ssmb.passives.IPassive
 import net.ssmb.passives.constructPassiveFromData
+import net.ssmb.utils.TaggedKeyDouble
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -38,6 +40,10 @@ class CreeperKit(
             item(Material.getMaterial(kitData.bootsId)!!)
         )
 
+        player.metadata {
+            set(TaggedKeyDouble("knockback_multiplier"), kitData.knockbackMult)
+        }
+
         kitData.abilities.forEach {
             val ability = constructAbilityFromData(player, it)
             ability.initializeAbility()
@@ -52,6 +58,10 @@ class CreeperKit(
     }
 
     override fun destroyKit() {
+        player.metadata {
+            remove(TaggedKeyDouble("knockback_multiplier"))
+        }
+
         abilities.forEach {
             it.destroyAbility()
         }
