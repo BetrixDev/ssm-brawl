@@ -24,7 +24,7 @@ export const kitsTable = sqliteTable(
     chestplateId: text("chestplate_id"),
     leggingsId: text("leggings_id"),
     bootsId: text("boots_id"),
-    meta: text("meta", { mode: "json" }),
+    meta: text("meta", { mode: "json" }).$type<Record<string, string>>(),
   },
   (table) => ({
     idIdx: index("kits_id_idx").on(table.id),
@@ -70,7 +70,7 @@ export const passivesTable = sqliteTable(
   "passives",
   {
     id: text("id").primaryKey().notNull(),
-    meta: text("meta", { mode: "json" }),
+    meta: text("meta", { mode: "json" }).$type<Record<string, string>>(),
   },
   (table) => ({
     idIdx: index("passives_id_idx").on(table.id),
@@ -82,6 +82,7 @@ export const passivesToKitsTable = sqliteTable(
   {
     kitId: text("kit_id").notNull(),
     passiveId: text("passive_id").notNull(),
+    meta: text("meta", { mode: "json" }).$type<Record<string, string>>(),
   },
   (table) => ({
     kitIdIdx: index("ptk_kit_id_idx").on(table.kitId),

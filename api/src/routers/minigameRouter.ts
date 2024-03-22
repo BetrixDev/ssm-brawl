@@ -22,7 +22,7 @@ export const minigameRouter = router({
       z.object({ playerUuids: z.array(z.string()), minigameId: z.string() })
     )
     .mutation(async ({ input }) => {
-      const [minigame, playerData] = await db.batch([
+      const [minigame, dbPlayerData] = await db.batch([
         db.query.minigamesTable.findFirst({
           where: eq(minigamesTable.id, input.minigameId),
         }),
@@ -46,6 +46,27 @@ export const minigameRouter = router({
       if (minigame === undefined) {
         throw new TRPCError({ code: "BAD_REQUEST" });
       }
+
+      const playerData = dbPlayerData.map((data) => {
+        return {
+          ...data,
+          selectedKit: {
+            ...data.selectedKit,
+            passives: data.selectedKit.passives.map((relation) => {
+              return {
+                ...relation,
+                passive: {
+                  ...relation.passive,
+                  meta: {
+                    ...relation.passive.meta,
+                    ...relation.meta,
+                  },
+                },
+              };
+            }),
+          },
+        };
+      });
 
       const validMaps = await queryClient.fetchQuery({
         queryKey: [
