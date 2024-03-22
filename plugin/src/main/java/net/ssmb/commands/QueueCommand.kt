@@ -9,7 +9,9 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-class QueueCommand(private val plugin: SSMB) : SuspendingCommandExecutor {
+class QueueCommand : SuspendingCommandExecutor {
+    private val plugin = SSMB.instance
+
     override suspend fun onCommand(
         sender: CommandSender,
         command: Command,

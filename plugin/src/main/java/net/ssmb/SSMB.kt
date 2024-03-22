@@ -4,7 +4,7 @@ import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import com.github.shynixn.mccoroutine.bukkit.setSuspendingExecutor
 import net.ssmb.commands.QueueCommand
-import net.ssmb.listeners.PlayerJoinListener
+import net.ssmb.listeners.*
 import net.ssmb.services.ApiService
 import net.ssmb.services.LangService
 import net.ssmb.services.MinigameService
@@ -33,9 +33,13 @@ class SSMB : SuspendingJavaPlugin() {
 
         hub = worlds.createSsmbWorld("blue_forest", "hub_1")
 
-        getCommand("queue")!!.setSuspendingExecutor(QueueCommand(this))
+        getCommand("queue")!!.setSuspendingExecutor(QueueCommand())
 
         server.pluginManager.registerSuspendingEvents(PlayerJoinListener(), this)
+        server.pluginManager.registerEvents(InventoryOpenListener(), this)
+        server.pluginManager.registerEvents(PlayerPickItemListener(), this)
+        server.pluginManager.registerEvents(PlayerDropItemListener(), this)
+        server.pluginManager.registerEvents(EntityDamageByBlockListener(), this)
 
         logger.info("STARTED SSMB")
     }

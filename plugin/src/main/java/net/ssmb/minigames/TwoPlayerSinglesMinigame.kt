@@ -50,7 +50,6 @@ class TwoPlayerSinglesMinigame(
                 else -> {}
             }
         }
-
     }
 
     private fun doMinigameLoading() {
@@ -63,7 +62,6 @@ class TwoPlayerSinglesMinigame(
 
             it.walkSpeed = 0.0f
             it.lookAt(minigameWorld.spawnLocation, LookAnchor.EYES)
-
 
             val playerData = minigameData.players.find { itt -> itt.uuid == it.uniqueId.toString() }!!
             val kit = constructKitFromData(it, playerData.selectedKit)
@@ -184,8 +182,7 @@ class TwoPlayerSinglesMinigame(
                     player.sendMessage(Component.text("You died! You will respawn in ${5 - it} seconds"))
                     delay(1.ticks)
                 }
-
-
+                
                 val spawnCoords = minigameData.map.spawnPoints.random()
                 val tpLocation = Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
                 player.teleport(tpLocation)
