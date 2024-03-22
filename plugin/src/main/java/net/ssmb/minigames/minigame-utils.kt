@@ -5,7 +5,8 @@ import org.bukkit.entity.Player
 
 fun constructMinigameFromData(players: List<Player>, data: MinigameStartSuccess): IMinigame {
     return when (data.minigame.id) {
-        "test-minigame" -> TestMinigame(players, data)
+        "test_minigame" -> TestMinigame(players, data)
+        "two_player_singles" -> TwoPlayerSinglesMinigame(players, data)
         else -> throw IllegalArgumentException("Unknown minigame id: ${data.minigame.id}")
     }
 }
