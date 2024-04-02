@@ -19,10 +19,15 @@ import net.ssmb.utils.Atom
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
+import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.util.Vector
 import java.time.Duration
 
@@ -33,8 +38,8 @@ class TwoPlayerSinglesMinigame(
     private val plugin = SSMB.instance
     private val minigameState = Atom(MinigameState.LOADING)
     private lateinit var minigameWorld: World
-    private val playerKits = hashMapOf<Player, IKit>()
-    private val teamsStocks = hashMapOf<List<Player>, Int>()
+    override val playerKits = hashMapOf<Player, IKit>()
+    override val teamsStocks = hashMapOf<List<Player>, Int>()
 
     init {
         plugin.server.pluginManager.registerSuspendingEvents(this, plugin)
@@ -50,6 +55,20 @@ class TwoPlayerSinglesMinigame(
                 else -> {}
             }
         }
+    }
+
+    override fun damagePlayer(victim: Player, attacker: Player, damage: Double, knockbackMult: Double) {
+        val damageEvent =
+            EntityDamageByEntityEvent(
+                attacker,
+                victim,
+                EntityDamageEvent.DamageCause.ENTITY_ATTACK,
+                DamageSource.builder().withDirectEntity(attacker).build(),
+                damage,
+                mapOf(),
+                mapOf(),
+                false
+            )
     }
 
     private fun doMinigameLoading() {
@@ -182,7 +201,7 @@ class TwoPlayerSinglesMinigame(
                     player.sendMessage(Component.text("You died! You will respawn in ${5 - it} seconds"))
                     delay(1.ticks)
                 }
-                
+
                 val spawnCoords = minigameData.map.spawnPoints.random()
                 val tpLocation = Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
                 player.teleport(tpLocation)
@@ -192,4 +211,11 @@ class TwoPlayerSinglesMinigame(
         }
     }
 
+    @EventHandler
+    fun onPlayerInteract(event: PlayerInteractEvent) {
+        if (!players.contains(event.player)) return
+        if (event.action != Action.LEFT_CLICK_AIR) return
+
+        val player = event.player
+    }
 }

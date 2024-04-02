@@ -24,6 +24,8 @@ export const kitsTable = sqliteTable(
     chestplateId: text("chestplate_id"),
     leggingsId: text("leggings_id"),
     bootsId: text("boots_id"),
+    hitboxWidth: real("hitbox_width").notNull().default(0.6),
+    hitboxHeight: real("hitbox_height").notNull().default(1.8),
     meta: text("meta", { mode: "json" }).$type<Record<string, string>>(),
   },
   (table) => ({

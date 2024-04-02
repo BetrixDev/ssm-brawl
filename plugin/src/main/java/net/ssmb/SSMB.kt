@@ -40,6 +40,7 @@ class SSMB : SuspendingJavaPlugin() {
         server.pluginManager.registerEvents(PlayerPickItemListener(), this)
         server.pluginManager.registerEvents(PlayerDropItemListener(), this)
         server.pluginManager.registerEvents(EntityDamageByBlockListener(), this)
+        server.pluginManager.registerEvents(PlayerInteractListener(), this)
 
         logger.info("STARTED SSMB")
     }

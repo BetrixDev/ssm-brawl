@@ -7,8 +7,10 @@ import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartSuccess
+import net.ssmb.extensions.metadata
 import net.ssmb.kits.IKit
 import net.ssmb.kits.constructKitFromData
+import net.ssmb.utils.TaggedKeyStr
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.World
@@ -34,6 +36,10 @@ class TestMinigame(
         minigameWorld = plugin.worlds.createSsmbWorld(minigameData.map.id, minigameData.gameId)
 
         players.forEachIndexed { idx, it ->
+            it.metadata {
+                set(TaggedKeyStr("minigame_id"), minigameData.gameId)
+            }
+
             val spawnCoords = minigameData.map.spawnPoints[idx]
             val tpLocation = Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
             it.teleport(tpLocation)
@@ -46,8 +52,6 @@ class TestMinigame(
         }
 
         minigameWorld.sendMessage(Component.text("Testing game has started!"))
-
-
     }
 
     @EventHandler

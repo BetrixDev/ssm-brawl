@@ -37,6 +37,8 @@ sealed class MinigameStartSuccess(
             val chestplateId: String?,
             val leggingsId: String?,
             val bootsId: String?,
+            val hitboxWidth: Double,
+            val hitboxHeight: Double,
             val disguise: DisguiseData
         ) {
             @Serializable
