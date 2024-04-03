@@ -8,6 +8,4 @@ interface IMinigame {
     val teamsStocks: HashMap<List<Player>, Int>
 
     suspend fun initializeMinigame()
-
-    fun damagePlayer(victim: Player, attacker: Player, damage: Double, knockbackMult: Double)
 }
