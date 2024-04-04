@@ -10,8 +10,16 @@
     "strict": true,
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
-    "outDir": "dist",
+    "outDir": "build",
     "sourceMap": true,
-    "lib": ["es2022"]
+    "lib": [
+      "es2022"
+    ],
+    "plugins": [
+      {
+        "transform": "typia/lib/transform"
+      }
+    ],
+    "strictNullChecks": true
   }
 }

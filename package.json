@@ -2,17 +2,22 @@
   "name": "super-smash-mobs-brawl",
   "private": true,
   "scripts": {
+    "build:api": "turbo build --filter=env --filter=api",
+    "start:api": "dotenv -- turbo start --filter=api",
+    "dev:api": "dotenv -- turbo dev --filter=api",
+    "db:push": "dotenv -- turbo db:push --filter=api",
+    "db:studio": "dotenv -- turbo db:studio --filter=api",
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
+    "dotenv-cli": "^7.3.0",
     "prettier": "^3.1.0",
     "turbo": "latest"
   },
   "packageManager": "pnpm@8.9.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   }
 }

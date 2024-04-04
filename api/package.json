@@ -1,10 +1,14 @@
 {
+  "name": "api",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "dotenv -e ../.env tsx watch src/index",
-    "db:push": "dotenv -e ../.env drizzle-kit push:sqlite",
-    "db:studio": "dotenv -e ../.env drizzle-kit studio"
+    "start": "node ./build/index.js",
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsx watch src/index",
+    "db:push": "drizzle-kit push:sqlite",
+    "db:studio": "drizzle-kit studio",
+    "prepare": "ts-patch install && typia patch"
   },
   "dependencies": {
     "@hono/node-server": "^1.8.2",
@@ -13,7 +17,6 @@
     "@tanstack/query-core": "^5.24.2",
     "@trpc/server": "^10.45.1",
     "@types/lodash.get": "^4.4.9",
-    "db": "workspace:*",
     "dotenv-cli": "^7.3.0",
     "drizzle-orm": "^0.29.4",
     "env": "workspace:*",
@@ -22,11 +25,15 @@
     "lodash.get": "^4.4.2",
     "oslo": "^1.1.3",
     "trpc-panel": "^1.3.4",
+    "typia": "^5.5.10",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
     "drizzle-kit": "^0.20.14",
-    "tsx": "^4.7.1"
+    "ts-node": "^10.9.2",
+    "ts-patch": "^3.1.2",
+    "tsx": "^4.7.1",
+    "typescript": "5.4.2"
   }
 }

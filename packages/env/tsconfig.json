@@ -11,7 +11,7 @@
     "noUncheckedIndexedAccess": true,
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
-    "outDir": "dist",
+    "outDir": "build",
     "sourceMap": true,
     "composite": true,
     "declarationMap": true,
