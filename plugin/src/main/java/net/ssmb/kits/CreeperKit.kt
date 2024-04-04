@@ -4,6 +4,8 @@ import br.com.devsrsouza.kotlinbukkitapi.extensions.item
 import net.ssmb.abilities.IAbility
 import net.ssmb.abilities.constructAbilityFromData
 import net.ssmb.dtos.minigame.MinigameStartSuccess
+import net.ssmb.events.BrawlDamageEvent
+import net.ssmb.events.BrawlDamageType
 import net.ssmb.extensions.metadata
 import net.ssmb.minigames.IMinigame
 import net.ssmb.passives.IPassive
@@ -84,6 +86,9 @@ class CreeperKit(
 
         val player = event.player
 
+        // TODO: Ray cast to every player and hit the closest one,
+        //  just in case two players are directly in front of the player
+
         val enemyToAttack = minigame.teamsStocks.asSequence().filter {
             !it.key.contains(player)
         }.map {
@@ -101,11 +106,15 @@ class CreeperKit(
             val rayTraceResult = boundingBox.rayTrace(player.eyeLocation.toVector(), player.location.direction, 4.5)
 
             rayTraceResult != null && rayTraceResult.hitEntity != null
-        }?.player
-
-        if (enemyToAttack == null) return
+        }?.player ?: return
 
         event.isCancelled = true
-        minigame.damagePlayer(enemyToAttack, player, kitData.meleeDamage, kitData.knockbackMult)
+
+        BrawlDamageEvent(
+            enemyToAttack,
+            player,
+            kitData.meleeDamage,
+            BrawlDamageType.MELEE
+        ).callEvent()
     }
 }

@@ -11,6 +11,7 @@ import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.extensions.doKnockback
 import net.ssmb.extensions.get
 import net.ssmb.extensions.setData
+import net.ssmb.utils.TaggedKeyStr
 import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.Sound
@@ -39,7 +40,7 @@ class SulphurBombAbility(
         playerInv.setItem(abilityEntry.abilityToolSlot, item(Material.IRON_AXE) {
             displayName(Component.text("Sulphur Bomb"))
             persistentDataContainer.setData {
-                set("ability_item_id", "sulphur_bomb")
+                set(TaggedKeyStr("ability_item_id"), "sulphur_bomb")
             }
         })
     }
@@ -131,7 +132,7 @@ class SulphurBombAbility(
         if (event.player != player) return
         if (event.action != Action.RIGHT_CLICK_AIR || event.action != Action.RIGHT_CLICK_BLOCK) return
 
-        val itemAbilityId = event.item?.itemMeta?.persistentDataContainer?.get("ability_item_id")
+        val itemAbilityId = event.item?.itemMeta?.persistentDataContainer?.get(TaggedKeyStr("ability_item_id"))
         if (itemAbilityId != "sulphur_bomb") return
 
         event.isCancelled = true

@@ -13,21 +13,20 @@ import net.kyori.adventure.title.Title
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.enums.MinigameState
+import net.ssmb.events.BrawlDamageEvent
+import net.ssmb.events.BrawlDamageType
+import net.ssmb.events.BrawlRespawnEvent
+import net.ssmb.extensions.doKnockback
 import net.ssmb.kits.IKit
 import net.ssmb.kits.constructKitFromData
 import net.ssmb.utils.Atom
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.World
-import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
-import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.util.Vector
 import java.time.Duration
 
@@ -57,20 +56,6 @@ class TwoPlayerSinglesMinigame(
         }
     }
 
-    override fun damagePlayer(victim: Player, attacker: Player, damage: Double, knockbackMult: Double) {
-        val damageEvent =
-            EntityDamageByEntityEvent(
-                attacker,
-                victim,
-                EntityDamageEvent.DamageCause.ENTITY_ATTACK,
-                DamageSource.builder().withDirectEntity(attacker).build(),
-                damage,
-                mapOf(),
-                mapOf(),
-                false
-            )
-    }
-
     private fun doMinigameLoading() {
         minigameWorld = plugin.worlds.createSsmbWorld(minigameData.map.id, minigameData.gameId)
 
@@ -83,7 +68,7 @@ class TwoPlayerSinglesMinigame(
             it.lookAt(minigameWorld.spawnLocation, LookAnchor.EYES)
 
             val playerData = minigameData.players.find { itt -> itt.uuid == it.uniqueId.toString() }!!
-            val kit = constructKitFromData(it, playerData.selectedKit)
+            val kit = constructKitFromData(it, playerData.selectedKit, this)
             kit.initializeKit()
 
             teamsStocks[listOf(it)] = minigameData.minigame.stocks
@@ -207,15 +192,36 @@ class TwoPlayerSinglesMinigame(
                 player.teleport(tpLocation)
 
                 playerKits[player]!!.initializeKit()
+
+                BrawlRespawnEvent(player).callEvent()
             }
         }
     }
 
     @EventHandler
-    fun onPlayerInteract(event: PlayerInteractEvent) {
+    fun onBrawlRespawn(event: BrawlRespawnEvent) {
         if (!players.contains(event.player)) return
-        if (event.action != Action.LEFT_CLICK_AIR) return
 
-        val player = event.player
+        // TODO: log player respawn for game logs
+    }
+
+    @EventHandler
+    fun onBrawlDamage(event: BrawlDamageEvent) {
+        if (!players.contains(event.victim) || !players.contains(event.attacker)) return
+
+        val victimStartingHealth = event.victim.health
+
+        if (event.damageType == BrawlDamageType.MELEE) {
+            val victimKit = playerKits[event.victim]!!
+
+            event.victim.damage(event.damage, event.attacker)
+            event.victim.doKnockback(
+                victimKit.kitData.knockbackMult,
+                event.damage,
+                victimStartingHealth,
+                event.attacker.location.toVector(),
+                null
+            )
+        }
     }
 }

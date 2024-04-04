@@ -26,7 +26,8 @@ class TestMinigame(
 ) : IMinigame, Listener {
     private val plugin = SSMB.instance
     private lateinit var minigameWorld: World
-    private val playerKits = hashMapOf<Player, IKit>()
+    override val playerKits = hashMapOf<Player, IKit>()
+    override val teamsStocks: HashMap<List<Player>, Int> = hashMapOf()
 
     init {
         plugin.server.pluginManager.registerSuspendingEvents(this, plugin)
@@ -45,7 +46,7 @@ class TestMinigame(
             it.teleport(tpLocation)
 
             val playerData = minigameData.players.find { itt -> itt.uuid == it.uniqueId.toString() }!!
-            val kit = constructKitFromData(it, playerData.selectedKit)
+            val kit = constructKitFromData(it, playerData.selectedKit, this)
             kit.initializeKit()
 
             playerKits[it] = kit

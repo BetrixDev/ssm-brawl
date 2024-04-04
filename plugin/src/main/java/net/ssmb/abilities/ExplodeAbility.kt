@@ -10,6 +10,7 @@ import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.extensions.*
 import net.ssmb.utils.TaggedKeyBool
+import net.ssmb.utils.TaggedKeyStr
 import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.Sound
@@ -38,7 +39,7 @@ class ExplodeAbility(
         playerInv.setItem(abilityEntry.abilityToolSlot, item(Material.IRON_SHOVEL) {
             displayName(Component.text("Explode"))
             persistentDataContainer.setData {
-                set("ability_item_id", "explode")
+                set(TaggedKeyStr("ability_item_id"), "explode")
             }
         })
     }
@@ -106,7 +107,7 @@ class ExplodeAbility(
         if (event.player != player) return
         if (event.action != Action.RIGHT_CLICK_AIR || event.action != Action.RIGHT_CLICK_BLOCK) return
 
-        val itemAbilityId = event.item?.itemMeta?.persistentDataContainer?.get("ability_item_id")
+        val itemAbilityId = event.item?.itemMeta?.persistentDataContainer?.get(TaggedKeyStr("ability_item_id"))
         if (itemAbilityId != "explode") return
 
         event.isCancelled = true
