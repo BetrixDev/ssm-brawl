@@ -1,6 +1,32 @@
-import { initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
+import { JwtClaims } from "./db/jwt.js";
 
-export const t = initTRPC.create();
+export type TrpcContext = {
+  claims: JwtClaims;
+  resHeaders: Headers;
+};
+
+export const t = initTRPC.context<TrpcContext>().create();
 
 export const router = t.router;
 export const procedure = t.procedure;
+
+export const internalProcedure = t.procedure.use((opts) => {
+  if (opts.ctx.claims.source === "user") {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+
+  return opts.next({
+    ctx: { ...opts.ctx },
+  });
+});
+
+export const userProcedure = t.procedure.use((opts) => {
+  if (opts.ctx.claims.source !== "user") {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+
+  return opts.next({
+    ctx: { ...opts.ctx },
+  });
+});

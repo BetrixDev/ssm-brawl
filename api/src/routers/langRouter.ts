@@ -1,9 +1,9 @@
 import { db } from "../db/db.js";
-import { procedure, router } from "../trpc.js";
+import { internalProcedure, router } from "../trpc.js";
 import { queryClient } from "../utils/query-client.js";
 
 export const langRouter = router({
-  getAllEntries: procedure.query(async () => {
+  getAllEntries: internalProcedure.query(async () => {
     return queryClient.fetchQuery({
       queryKey: ["lang", "all"],
       queryFn: async () => {

@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { procedure, router } from "../trpc.js";
+import { internalProcedure, router } from "../trpc.js";
 import { db, queueTable, eq, minigamesTable, inArray } from "../db/db.js";
 import { TRPCError } from "@trpc/server";
 
 export const queueRouter = router({
-  addPlayer: procedure
+  addPlayer: internalProcedure
     .input(
       z.object({
         playerUuid: z.string(),
@@ -63,7 +63,7 @@ export const queueRouter = router({
         playersInQueue: playersInQueue + 1,
       };
     }),
-  removePlayers: procedure
+  removePlayers: internalProcedure
     .input(z.object({ playerUuids: z.array(z.string()) }))
     .mutation(async ({ input }) => {
       await db

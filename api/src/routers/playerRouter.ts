@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { procedure, router } from "../trpc.js";
+import { internalProcedure, router } from "../trpc.js";
 import { queryClient } from "../utils/query-client.js";
 import { basicPlayerDataTable, db, eq } from "../db/db.js";
 
 export const playerRouter = router({
-  getBasicPlayerData: procedure
+  getBasicPlayerData: internalProcedure
     .input(z.object({ playerUuid: z.string() }))
     .query(async ({ input }) => {
       return await queryClient.fetchQuery({
@@ -33,7 +33,7 @@ export const playerRouter = router({
         },
       });
     }),
-  isIpBanned: procedure
+  isIpBanned: internalProcedure
     .input(z.object({ ip: z.string(), playerUuid: z.string().optional() }))
     .query(async ({ input }) => {
       const ipEntry = await queryClient.fetchQuery({

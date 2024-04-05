@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { procedure, router } from "../trpc.js";
+import { internalProcedure, router } from "../trpc.js";
 import {
   db,
   eq,
@@ -17,7 +17,7 @@ import { useRandomId, useRandomInt } from "../utils/math.js";
 import { TRPCError } from "@trpc/server";
 
 export const minigameRouter = router({
-  start: procedure
+  start: internalProcedure
     .input(
       z.object({ playerUuids: z.array(z.string()), minigameId: z.string() })
     )
