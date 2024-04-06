@@ -7,7 +7,7 @@ export const playerRouter = router({
   getBasicPlayerData: internalProcedure
     .input(z.object({ playerUuid: z.string() }))
     .query(async ({ input }) => {
-      return await queryClient.fetchQuery({
+      const response = await queryClient.fetchQuery({
         queryKey: ["basicPlayerData", input.playerUuid],
         queryFn: async () => {
           const playerData = await db.query.basicPlayerDataTable.findFirst({
@@ -32,6 +32,14 @@ export const playerRouter = router({
           return { ...playerData, firstTime: false };
         },
       });
+
+      if (response.firstTime) {
+        await queryClient.invalidateQueries({
+          queryKey: ["basicPlayerData", input.playerUuid],
+        });
+      }
+
+      return response;
     }),
   isIpBanned: internalProcedure
     .input(z.object({ ip: z.string(), playerUuid: z.string().optional() }))
