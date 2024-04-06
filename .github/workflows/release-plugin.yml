@@ -19,7 +19,7 @@ jobs:
           java-version: "21"
 
       - name: "Build with Maven"
-        run: mvn package ./plugin/pom.xml
+        run: mvn package -f ./plugin/pom.xml
 
       - name: "Create release"
         id: create_release
