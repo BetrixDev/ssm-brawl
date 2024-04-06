@@ -7,7 +7,7 @@ const envSchema = v.object({
   JWT_PRIVATE_KEY: v.string(),
   WRANGLER_HOST: v.string(),
   WRANGLER_PORT: v.coerce(v.number(), Number),
-  PORT: v.optional(v.number()),
+  PORT: v.optional(v.coerce(v.number(), Number)),
 });
 
 const env = v.parse(envSchema, process.env);
