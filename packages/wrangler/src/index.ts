@@ -15,3 +15,4 @@ export const wranglerClient = WranglerDataSource.mongoManager;
 export * from "./entities/HistoricalGame";
 export * from "./models/HistoricalGamePlayer";
 export * from "./models/HistoricalGameKit";
+export * from "./models/HistoricalGameKitAbilityUse";

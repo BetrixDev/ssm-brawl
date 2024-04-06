@@ -21,8 +21,8 @@ import {
   HistoricalGame,
   HistoricalGamePlayer,
   HistoricalGameKit,
+  HistoricalGameKitAbilityUse,
 } from "wrangler";
-import { HistoricalGameKitAbilityUse } from "../../../packages/wrangler/src/models/HistoricalGameKitAbilityUse.js";
 
 export const minigameRouter = router({
   start: internalProcedure
