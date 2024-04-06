@@ -11,10 +11,17 @@ import {
   gte,
   lte,
   mapsTable,
+  sql,
 } from "../db/db.js";
 import { queryClient } from "../utils/query-client.js";
 import { useRandomId, useRandomInt } from "../utils/math.js";
 import { TRPCError } from "@trpc/server";
+import {
+  HistoricalGame,
+  HistoricalGamePlayer,
+  HistoricalGamePlayerKit,
+} from "wrangler";
+import { wranglerClient } from "../services/wrangler-service.js";
 
 export const minigameRouter = router({
   start: internalProcedure
@@ -107,5 +114,60 @@ export const minigameRouter = router({
         players: playerData,
         map: validMaps[mapIndex],
       };
+    }),
+  end: internalProcedure
+    .input(
+      z.object({
+        gameId: z.string(),
+        mapId: z.string(),
+        minigameId: z.string(),
+        winningUuids: z.array(z.string()),
+        players: z.array(
+          z.object({
+            uuid: z.string(),
+            stocksLeft: z.number(),
+            kits: z.array(
+              z.object({
+                id: z.string(),
+                startTime: z.number(),
+                endTime: z.number(),
+              })
+            ),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const historicalGameRepository =
+        wranglerClient.getRepository(HistoricalGame);
+
+      const historicalGamePlayers = input.players.map((p) => {
+        const kits = p.kits.map((k) => {
+          return new HistoricalGamePlayerKit(k.id, k.startTime, k.endTime);
+        });
+
+        return new HistoricalGamePlayer(p.uuid, p.stocksLeft, kits);
+      });
+
+      const wranglerTask = historicalGameRepository.save({
+        gameId: input.gameId,
+        mapId: input.mapId,
+        minigameId: input.minigameId,
+        players: historicalGamePlayers,
+      });
+
+      const tusslerTask = db.batch([
+        db.update(basicPlayerDataTable).set({
+          totalGamesPlayed: sql`${basicPlayerDataTable.totalGamesPlayed} + 1`,
+        }),
+        db
+          .update(basicPlayerDataTable)
+          .set({
+            totalGamesWon: sql`${basicPlayerDataTable.totalGamesWon} + 1`,
+          })
+          .where(inArray(basicPlayerDataTable.uuid, input.winningUuids)),
+      ]);
+
+      await Promise.all([wranglerTask, tusslerTask]);
     }),
 });

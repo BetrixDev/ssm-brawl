@@ -27,7 +27,8 @@
     "oslo": "^1.1.3",
     "trpc-panel": "^1.3.4",
     "typia": "^5.5.10",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "wrangler": "workspace:*"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.6",

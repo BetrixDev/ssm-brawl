@@ -4,8 +4,8 @@ import * as schema from "./schema.js";
 import { createClient } from "@libsql/client";
 
 const client = createClient({
-  url: env.DATABASE_URL,
-  authToken: env.DATABASE_TOKEN,
+  url: env.TUSSLER_URL,
+  authToken: env.TUSSLER_TOKEN,
 });
 
 export const db = drizzle(client, { schema });

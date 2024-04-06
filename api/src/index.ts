@@ -16,6 +16,7 @@ import {
   generateBackendToken,
 } from "./db/jwt.js";
 import typia from "typia";
+import { WranglerDataSource } from "wrangler";
 
 const app = new Hono();
 
@@ -100,11 +101,15 @@ app.post("/generateToken/:source", async (c) => {
     const token = await generateBackendToken(source);
 
     c.header("Set-Cookie", `token=${token}; HttpOnly`);
+
+    return c.status(200);
   } catch {
     return c.status(400);
   }
 });
 
-serve(app, (info) => {
+serve(app, async (info) => {
+  await WranglerDataSource.initialize();
+
   console.log(`Backend listening on http://localhost:${info.port}`);
 });
