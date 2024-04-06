@@ -50,7 +50,8 @@ app.all("/api/*", async (c) => {
 
   // Only the plugin should ever be calling this endpoint
   if (claims === undefined || claims.source !== "plugin") {
-    return c.status(403);
+    c.status(403);
+    return c.json({ message: "Forbidden" });
   }
 
   const caller = t.createCallerFactory(appRouter)({
@@ -106,7 +107,11 @@ app.post("/generateToken/:source", async (c) => {
 
     c.header("Set-Cookie", `token=${token}; HttpOnly`);
 
-    return c.status(200);
+    c.status(200);
+
+    return c.json({
+      token,
+    });
   } catch {
     return c.status(400);
   }
