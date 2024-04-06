@@ -26,8 +26,6 @@ class ExplodeAbility(
     private val player: Player,
     private val abilityEntry: MinigameStartSuccess.PlayerData.KitData.AbilityEntry
 ) : IAbility, Listener {
-    override val id = "explode"
-
     private val plugin = SSMB.instance
     private val playerInv = player.inventory
     private val abilityCooldown = abilityEntry.ability.cooldown
