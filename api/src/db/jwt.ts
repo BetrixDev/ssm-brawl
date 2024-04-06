@@ -1,25 +1,24 @@
 import jwt from "jsonwebtoken";
 import { env } from "env";
-import typia from "typia";
+import { z } from "zod";
 
-export type BackendSource = "plugin" | "web" | "brawlie";
+export const BackendSource = z.enum(["plugin", "web", "brawlie"]);
+export type BackendSource = z.infer<typeof BackendSource>;
 
 // Might also become valuable to include the uuid of the player
 //  who is reponsible so triggering the backend request
 
-type InternalClaims = {
-  source: BackendSource;
-};
+const InternalClaims = z.object({ source: BackendSource });
+type InternalClaims = z.infer<typeof InternalClaims>;
 
-type UserClaims = {
-  uuid: string;
-  source: "user";
-};
+const UserClaims = z.object({ uuid: z.string(), source: z.literal("user") });
+type UserClaims = z.infer<typeof UserClaims>;
 
-export type JwtClaims = { iat: number; exp?: number } & (
-  | InternalClaims
-  | UserClaims
-);
+const JwtClaims = z
+  .object({ iat: z.number(), exp: z.number().optional() })
+  .and(z.union([InternalClaims, UserClaims]));
+
+export type JwtClaims = z.infer<typeof JwtClaims>;
 
 export async function decodeTokenFromHeaders(headers: Headers) {
   try {
@@ -30,7 +29,7 @@ export async function decodeTokenFromHeaders(headers: Headers) {
 
     if (!encodedToken) return;
 
-    const decodedToken = typia.assert<JwtClaims>(
+    const decodedToken = JwtClaims.parse(
       jwt.verify(encodedToken, env.JWT_PRIVATE_KEY)
     );
 

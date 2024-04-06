@@ -10,6 +10,8 @@ export const WranglerDataSource = new DataSource({
   entities: [HistoricalGame],
 });
 
+export const wranglerClient = WranglerDataSource.mongoManager;
+
 export * from "./entities/HistoricalGame";
 export * from "./models/HistoricalGamePlayer";
-export * from "./models/HistoricalGamePlayerKit";
+export * from "./models/HistoricalGameKit";

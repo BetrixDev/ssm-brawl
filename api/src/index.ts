@@ -15,7 +15,6 @@ import {
   decodeTokenFromHeaders,
   generateBackendToken,
 } from "./db/jwt.js";
-import typia from "typia";
 import { WranglerDataSource } from "wrangler";
 
 const app = new Hono();
@@ -91,7 +90,7 @@ app.get("/panel", async (c) => {
 // Used when the server intially starts up to generate a token for the plugin
 app.post("/generateToken/:source", async (c) => {
   try {
-    const source = typia.assert<BackendSource>(c.req.param("source"));
+    const source = BackendSource.parse(c.req.param("source"));
     const secret = c.req.header("Secret");
 
     if (secret !== env.API_TOKEN_SECRET) {

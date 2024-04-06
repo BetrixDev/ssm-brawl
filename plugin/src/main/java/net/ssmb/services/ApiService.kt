@@ -10,9 +10,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
-import net.ssmb.dtos.minigame.MiniGameError
-import net.ssmb.dtos.minigame.MinigameStartRequest
-import net.ssmb.dtos.minigame.MinigameStartResponse
+import net.ssmb.dtos.minigame.*
 import net.ssmb.dtos.player.BasicPlayerDataRequest
 import net.ssmb.dtos.player.BasicPlayerDataResponse
 import net.ssmb.dtos.player.IsIpBannedRequest
@@ -77,6 +75,17 @@ class ApiService {
         return when (response.status.value) {
             200 -> MinigameStartResponse.Success(json.decodeFromString(response.bodyAsText()))
             else -> MinigameStartResponse.Error(MiniGameError.UNKNOWN)
+        }
+    }
+
+    suspend fun minigameEnd(payload: MinigameEndRequest): MinigameEndResponse {
+        val response = client.post("minigame.end") {
+            setBody(payload)
+        }
+
+        return when (response.status.value) {
+            200 -> MinigameEndResponse.SUCCESS
+            else -> MinigameEndResponse.ERROR
         }
     }
 

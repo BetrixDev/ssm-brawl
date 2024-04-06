@@ -17,11 +17,12 @@ import { queryClient } from "../utils/query-client.js";
 import { useRandomId, useRandomInt } from "../utils/math.js";
 import { TRPCError } from "@trpc/server";
 import {
+  wranglerClient,
   HistoricalGame,
   HistoricalGamePlayer,
-  HistoricalGamePlayerKit,
+  HistoricalGameKit,
 } from "wrangler";
-import { wranglerClient } from "../services/wrangler-service.js";
+import { HistoricalGameKitAbilityUse } from "../../../packages/wrangler/src/models/HistoricalGameKitAbilityUse.js";
 
 export const minigameRouter = router({
   start: internalProcedure
@@ -131,6 +132,13 @@ export const minigameRouter = router({
                 id: z.string(),
                 startTime: z.number(),
                 endTime: z.number(),
+                abilityUsage: z.array(
+                  z.object({
+                    abilityId: z.string(),
+                    usedAt: z.number(),
+                    damageDealt: z.number().optional(),
+                  })
+                ),
               })
             ),
           })
@@ -143,7 +151,19 @@ export const minigameRouter = router({
 
       const historicalGamePlayers = input.players.map((p) => {
         const kits = p.kits.map((k) => {
-          return new HistoricalGamePlayerKit(k.id, k.startTime, k.endTime);
+          const abilityUsage = k.abilityUsage.map(
+            (a) =>
+              new HistoricalGameKitAbilityUse(a.abilityId, a.usedAt, {
+                damageDealt: a.damageDealt,
+              })
+          );
+
+          return new HistoricalGameKit(
+            k.id,
+            k.startTime,
+            k.endTime,
+            abilityUsage
+          );
         });
 
         return new HistoricalGamePlayer(p.uuid, p.stocksLeft, kits);

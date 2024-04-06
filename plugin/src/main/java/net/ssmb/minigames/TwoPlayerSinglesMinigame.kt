@@ -13,12 +13,15 @@ import net.kyori.adventure.title.Title
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.enums.MinigameState
+import net.ssmb.events.BrawlAbilityUse
 import net.ssmb.events.BrawlDamageEvent
 import net.ssmb.events.BrawlDamageType
 import net.ssmb.events.BrawlRespawnEvent
 import net.ssmb.extensions.doKnockback
 import net.ssmb.kits.IKit
 import net.ssmb.kits.constructKitFromData
+import net.ssmb.models.RecordedMinigameAbilityUseEvent
+import net.ssmb.models.RecordedMinigameEvent
 import net.ssmb.utils.Atom
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -40,6 +43,8 @@ class TwoPlayerSinglesMinigame(
     override val playerKits = hashMapOf<Player, IKit>()
     override val teamsStocks = hashMapOf<List<Player>, Int>()
 
+    private val events = arrayListOf<RecordedMinigameEvent>()
+
     init {
         plugin.server.pluginManager.registerSuspendingEvents(this, plugin)
     }
@@ -51,7 +56,7 @@ class TwoPlayerSinglesMinigame(
                 MinigameState.COUNTDOWN -> doMinigameCountdown()
                 MinigameState.RUNNING -> doMinigameRunning()
                 MinigameState.ENDING -> doMinigameEnd()
-                else -> {}
+                else -> throw IllegalStateException("Invalid minigame state")
             }
         }
     }
@@ -196,6 +201,13 @@ class TwoPlayerSinglesMinigame(
                 BrawlRespawnEvent(player).callEvent()
             }
         }
+    }
+
+    @EventHandler
+    fun onBrawlAbilityUse(event: BrawlAbilityUse) {
+        if (!players.contains(event.player)) return
+
+        events.add(RecordedMinigameAbilityUseEvent(System.currentTimeMillis(), event.abilityId, event.damageDealt))
     }
 
     @EventHandler
