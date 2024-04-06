@@ -4,7 +4,7 @@ import { trpcServer } from "@hono/trpc-server";
 import { serve } from "@hono/node-server";
 import { logger } from "hono/logger";
 import { appRouter } from "./routers/router.js";
-import { get } from "lodash-es";
+import { castArray, get } from "lodash-es";
 import { t, TrpcContext } from "./trpc.js";
 import { renderTrpcPanel } from "trpc-panel";
 import { TRPCError } from "@trpc/server";
@@ -20,6 +20,11 @@ import { WranglerDataSource } from "wrangler";
 const app = new Hono();
 
 app.use(logger());
+
+app.get("/health", async (c) => {
+  c.status(200);
+  return c.text("Service is running");
+});
 
 app.use(
   "/trpc/*",
@@ -107,7 +112,7 @@ app.post("/generateToken/:source", async (c) => {
   }
 });
 
-serve(app, async (info) => {
+serve({ ...app, port: env.PORT ?? 3000 }, async (info) => {
   await WranglerDataSource.initialize();
 
   console.log(`Backend listening on http://localhost:${info.port}`);
