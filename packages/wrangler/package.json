@@ -1,5 +1,6 @@
 {
   "name": "wrangler",
+  "type": "module",
   "dependencies": {
     "env": "workspace:*",
     "mongodb": "^5.2.0",

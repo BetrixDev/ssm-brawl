@@ -1,5 +1,5 @@
 import { Column, Entity, ObjectId, ObjectIdColumn } from "typeorm";
-import { HistoricalGamePlayer } from "../models/HistoricalGamePlayer";
+import { HistoricalGamePlayer } from "../models/HistoricalGamePlayer.js";
 
 @Entity()
 export class HistoricalGame {

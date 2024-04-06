@@ -1,5 +1,5 @@
 import { Column } from "typeorm";
-import { HistoricalGameKitAbilityUse } from "./HistoricalGameKitAbilityUse";
+import { HistoricalGameKitAbilityUse } from "./HistoricalGameKitAbilityUse.js";
 
 export class HistoricalGameKit {
   @Column()
