@@ -28,3 +28,4 @@ jobs:
           files: ./plugin/target/*.jar
           tag_name: ${{ github.sha }}
           release_name: Release ${{ github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
