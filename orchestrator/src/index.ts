@@ -83,24 +83,11 @@ async function deployServices(deploymentPath: string) {
   subprocess = execa("pnpm start", {
     cwd: deploymentPath,
     env: process.env,
-  });
-
-  subprocess?.pipeAll?.(process.stdout);
-
-  subprocess.on("disconnect", () => {
-    console.log("Subprocess disconnected");
-  });
-
-  subprocess.on("error", (err) => {
-    console.error(err);
+    stdio: "inherit",
   });
 
   subprocess.on("close", (code) => {
     console.log(`Subprocess exited with code ${code}`);
-  });
-
-  subprocess.on("message", (msg) => {
-    console.log(`Message from subprocess: ${msg.toString()}`);
   });
 }
 

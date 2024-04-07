@@ -14,8 +14,6 @@
     "typescript": "5.4.4"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "typeorm": "typeorm-ts-node-commonjs",
     "build": "tsc"
   },
   "main": "./src/index.ts",
