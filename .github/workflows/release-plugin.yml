@@ -1,9 +1,15 @@
 name: "release-plugin"
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
       - main
+    paths:
+      - "plugin/**"
+      - ".github/workflows/release-plugin.yml"
 
 jobs:
   build:
