@@ -1,10 +1,9 @@
 import { Hono } from "hono";
-import { bearerAuth } from "hono/bearer-auth";
 import { trpcServer } from "@hono/trpc-server";
 import { serve } from "@hono/node-server";
 import { logger } from "hono/logger";
 import { appRouter } from "./routers/router.js";
-import { castArray, get } from "lodash-es";
+import { get } from "lodash-es";
 import { t, TrpcContext } from "./trpc.js";
 import { renderTrpcPanel } from "trpc-panel";
 import { TRPCError } from "@trpc/server";
