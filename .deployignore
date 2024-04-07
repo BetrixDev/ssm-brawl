@@ -1,5 +1,8 @@
 .github/**
 plugin/**
+web/**
+orchestrator/**
 .gitignore
 README.md
 .dockerignore
+.deployignore
