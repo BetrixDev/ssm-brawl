@@ -1,4 +1,4 @@
-name: "release-plugin"
+name: Release Plugin
 
 permissions:
   contents: write
@@ -40,3 +40,4 @@ jobs:
           tag_name: ${{ steps.get_short_sha.outputs.short-sha }}
           files: ./plugin/target/*.jar
           token: ${{ secrets.GITHUB_TOKEN }}
+          make_latest: true
