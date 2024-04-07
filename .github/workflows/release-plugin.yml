@@ -29,8 +29,9 @@ jobs:
 
       - name: "Create release"
         id: create_release
-        uses: softprops/action-gh-release@59c3b4891632ff9a897f99a91d7bc557467a3a22
+        uses: softprops/action-gh-release@v2
         with:
+          generated_release_notes: true
           files: ./plugin/target/*.jar
           tag_name: ${{ github.sha }}
           release_name: Release ${{ github.sha }}
