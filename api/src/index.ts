@@ -116,7 +116,7 @@ app.post("/generateToken/:source", async (c) => {
   }
 });
 
-serve({ ...app, port: env.PORT ?? 3000 }, async (info) => {
+serve({ ...app, port: env.PORT ?? env.API_PORT ?? 3000 }, async (info) => {
   await WranglerDataSource.initialize();
 
   console.log(`Backend listening on http://localhost:${info.port}`);
