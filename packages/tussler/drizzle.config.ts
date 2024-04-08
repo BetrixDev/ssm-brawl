@@ -5,7 +5,7 @@ export default defineConfig({
   driver: "turso",
   schema: "./src/db/schema.ts",
   dbCredentials: {
-    url: env.DATABASE_URL,
-    authToken: env.DATABASE_TOKEN,
+    url: env.TUSSLER_URL,
+    authToken: env.TUSSLER_TOKEN,
   },
 });

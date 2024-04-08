@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "start": "dotenv -- turbo start",
-    "build:api": "turbo build --filter=env --filter=api --filter=wrangler --force",
+    "build:api": "turbo build --filter=env --filter=api --filter=wrangler --filter=tussler --force",
     "start:api": "dotenv -- turbo start --filter=api",
     "dev:api": "dotenv -- turbo dev --filter=api",
     "dev:orchestrator": "dotenv -- turbo dev --filter=orchestrator",

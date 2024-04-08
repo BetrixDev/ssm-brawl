@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { internalProcedure, router } from "../trpc.js";
 import { queryClient } from "../utils/query-client.js";
-import { basicPlayerDataTable, db, eq } from "../db/db.js";
+import { basicPlayerDataTable, db, eq } from "tussler";
 
 export const playerRouter = router({
   getBasicPlayerData: internalProcedure

@@ -1,5 +1,5 @@
 import { initTRPC, TRPCError } from "@trpc/server";
-import { JwtClaims } from "./db/jwt.js";
+import { JwtClaims } from "./jwt.js";
 
 export type TrpcContext = {
   claims: JwtClaims;

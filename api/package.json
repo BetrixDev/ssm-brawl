@@ -5,9 +5,7 @@
   "scripts": {
     "start": "node ./build/index.js",
     "build": "tsc -p tsconfig.build.json",
-    "dev": "tsx watch src/index",
-    "db:push": "drizzle-kit push:sqlite",
-    "db:studio": "drizzle-kit studio"
+    "dev": "tsx watch src/index"
   },
   "dependencies": {
     "@hono/node-server": "^1.8.2",
@@ -16,6 +14,7 @@
     "@tanstack/query-core": "^5.24.2",
     "@trpc/server": "^10.45.1",
     "dotenv-cli": "^7.3.0",
+    "tussler": "workspace:*",
     "drizzle-orm": "^0.29.4",
     "env": "workspace:*",
     "hono": "^4.1.0",

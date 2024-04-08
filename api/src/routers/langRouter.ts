@@ -1,4 +1,4 @@
-import { db } from "../db/db.js";
+import { db } from "tussler";
 import { internalProcedure, router } from "../trpc.js";
 import { queryClient } from "../utils/query-client.js";
 

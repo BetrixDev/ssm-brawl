@@ -1,5 +1,6 @@
 {
   "name": "logger",
+  "type": "module",
   "scripts": {
     "build": "tsc"
   },

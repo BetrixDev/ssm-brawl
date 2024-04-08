@@ -12,7 +12,7 @@ import {
   BackendSource,
   decodeTokenFromHeaders,
   generateBackendToken,
-} from "./db/jwt.js";
+} from "./jwt.js";
 import { WranglerDataSource } from "wrangler";
 import { log } from "./log.js";
 import { middlewareLogger } from "logger";

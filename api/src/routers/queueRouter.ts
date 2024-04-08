@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { internalProcedure, router } from "../trpc.js";
-import { db, queueTable, eq, minigamesTable, inArray } from "../db/db.js";
+import { db, queueTable, eq, minigamesTable, inArray } from "tussler";
 import { TRPCError } from "@trpc/server";
 
 export const queueRouter = router({
