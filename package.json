@@ -7,9 +7,8 @@
     "start:api": "dotenv -- turbo start --filter=api",
     "dev:api": "dotenv -- turbo dev --filter=api",
     "dev:orchestrator": "dotenv -- turbo dev --filter=orchestrator",
-    "build:plugin": "",
-    "db:push": "dotenv -- turbo db:push --filter=api",
-    "db:studio": "dotenv -- turbo db:studio --filter=api",
+    "db:push": "dotenv -- turbo db:push --filter=tussler",
+    "db:studio": "dotenv -- turbo db:studio --filter=tussler",
     "build": "turbo build",
     "dev": "turbo dev",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""

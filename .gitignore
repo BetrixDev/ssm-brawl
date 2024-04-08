@@ -69,3 +69,5 @@ server/whitelist.json
 
 deployments
 /server/crash-reports
+
+*.sqlite

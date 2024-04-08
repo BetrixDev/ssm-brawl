@@ -8,8 +8,7 @@
   },
   "dependencies": {
     "@libsql/client": "^0.5.3",
-    "drizzle-orm": "^0.29.4",
-    "env": "workspace:*"
+    "drizzle-orm": "^0.29.4"
   },
   "devDependencies": {
     "@types/node": "^20.12.5",
