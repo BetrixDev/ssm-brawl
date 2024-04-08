@@ -10,7 +10,7 @@ import { execa, ExecaChildProcess } from "execa";
 import axios from "axios";
 import crypto from "crypto";
 import { pino } from "pino";
-import { LogBody, Logger, middlewareLogger } from "logger";
+import { handleStdIOLog, LogBody, Logger, middlewareLogger } from "logger";
 import chalk from "chalk";
 
 const appLogger = pino(
@@ -194,23 +194,7 @@ async function deployServices(deploymentPath: string) {
     return;
   }
 
-  apiProcess.stdout.on("data", (data: Buffer) => {
-    const logString = data.toString();
-
-    try {
-      handleNewLog({
-        ...JSON.parse(logString),
-        level: "Info",
-        service: "api",
-      });
-    } catch {
-      handleNewLog({
-        level: "Info",
-        service: "api",
-        message: logString,
-      });
-    }
-  });
+  apiProcess.stdout.on("data", handleStdIOLog(log, "api", 1, handleNewLog));
 
   runningProcessed.push({
     id: "api",
@@ -253,23 +237,10 @@ async function deployServices(deploymentPath: string) {
     return;
   }
 
-  serverProcess.stdout.on("data", (data: Buffer) => {
-    const logString = data.toString();
-
-    try {
-      handleNewLog({
-        ...JSON.parse(logString),
-        level: "Info",
-        service: "api",
-      });
-    } catch {
-      handleNewLog({
-        level: "Info",
-        service: "api",
-        message: logString,
-      });
-    }
-  });
+  serverProcess.stdout.on(
+    "data",
+    handleStdIOLog(log, "server", 1, handleNewLog)
+  );
 
   runningProcessed.push({
     id: "server",

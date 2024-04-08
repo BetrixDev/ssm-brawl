@@ -1,4 +1,4 @@
-const LOG_LEVELS = {
+export const LOG_LEVELS = {
   0: "Error",
   1: "Info",
 } as const;
