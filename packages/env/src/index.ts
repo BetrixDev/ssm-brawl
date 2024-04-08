@@ -14,8 +14,8 @@ const envSchema = v.object({
   ORCHESTRATOR_HOST: v.string(),
   WEBHOOK_SECRET: v.string(),
   NODE_ENV: v.optional(v.string(), "development"),
-  AXIOM_DATASET: v.string(),
-  AXIOM_TOKEN: v.string(),
+  AXIOM_DATASET: v.optional(v.string()),
+  AXIOM_TOKEN: v.optional(v.string()),
 });
 
 const env = v.parse(envSchema, process.env);

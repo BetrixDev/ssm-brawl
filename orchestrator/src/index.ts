@@ -15,13 +15,15 @@ import chalk from "chalk";
 
 const appLogger = pino(
   { level: "info" },
-  pino.transport({
-    target: "@axiomhq/pino",
-    options: {
-      dataset: env.AXIOM_DATASET,
-      token: env.AXIOM_TOKEN,
-    },
-  })
+  env.AXIOM_DATASET && env.AXIOM_TOKEN
+    ? pino.transport({
+        target: "@axiomhq/pino",
+        options: {
+          dataset: env.AXIOM_DATASET,
+          token: env.AXIOM_TOKEN,
+        },
+      })
+    : undefined
 );
 
 function handleNewLog(data: LogBody) {
@@ -178,11 +180,14 @@ async function deployServices(deploymentPath: string) {
 
   log.info("Starting api...");
 
-  const apiProcess = execa("pnpm start --filter=api", {
-    cwd: deploymentPath,
-    env: process.env,
-    stdout: "pipe",
-  });
+  const apiProcess = execa(
+    "pnpm start --filter=api --log-prefix=none --log-order=stream",
+    {
+      cwd: deploymentPath,
+      env: process.env,
+      stdout: "pipe",
+    }
+  );
 
   if (apiProcess.stdout === null) {
     log.error("Failed to start API, aborting deployment");
@@ -235,11 +240,14 @@ async function deployServices(deploymentPath: string) {
 
   log.info("Starting the rest of the services...");
 
-  const serverProcess = execa("pnpm start --filter=server", {
-    cwd: deploymentPath,
-    env: process.env,
-    stdout: "pipe",
-  });
+  const serverProcess = execa(
+    "pnpm start --filter=server  --log-prefix=none --log-order=stream",
+    {
+      cwd: deploymentPath,
+      env: process.env,
+      stdout: "pipe",
+    }
+  );
 
   if (serverProcess.stdout === null) {
     log.error("Failed to start server, aborting deployment");
