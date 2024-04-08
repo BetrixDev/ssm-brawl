@@ -181,6 +181,7 @@ async function deployServices(deploymentPath: string) {
   const apiProcess = execa("pnpm start --filter=api", {
     cwd: deploymentPath,
     env: process.env,
+    stdout: "pipe",
   });
 
   if (apiProcess.stdout === null) {
@@ -188,32 +189,21 @@ async function deployServices(deploymentPath: string) {
     return;
   }
 
-  apiProcess.stdout.on("data", (data) => {
-    if (typeof data === "string") {
-      try {
-        handleNewLog({
-          ...JSON.parse(data),
-          level: "Info",
-          service: "api",
-          message: "data",
-          time: Date.now(),
-        });
-      } catch {
-        handleNewLog({
-          level: "Info",
-          service: "api",
-          message: data,
-          time: Date.now(),
-        });
-      }
-    } else {
-      console.log(data);
+  apiProcess.stdout.on("data", (data: Buffer) => {
+    const strippedLog = data.toString().replace("api:start: ", "");
 
+    try {
+      handleNewLog({
+        ...JSON.parse(strippedLog),
+        level: "Info",
+        service: "api",
+        message: "data",
+      });
+    } catch {
       handleNewLog({
         level: "Info",
         service: "api",
-        message: data.toString(),
-        time: Date.now(),
+        message: strippedLog,
       });
     }
   });
@@ -247,6 +237,8 @@ async function deployServices(deploymentPath: string) {
 
   const serverProcess = execa("pnpm start --filter=server", {
     cwd: deploymentPath,
+    env: process.env,
+    stdout: "pipe",
   });
 
   if (serverProcess.stdout === null) {
@@ -254,11 +246,22 @@ async function deployServices(deploymentPath: string) {
     return;
   }
 
-  serverProcess.stdout.on("data", (data) => {
+  serverProcess.stdout.on("data", (data: Buffer) => {
+    const strippedLog = data.toString().replace("server:start: ", "");
+
     try {
-      handleNewLog(JSON.parse(data));
+      handleNewLog({
+        ...JSON.parse(strippedLog),
+        level: "Info",
+        service: "api",
+        message: "data",
+      });
     } catch {
-      log.info(data);
+      handleNewLog({
+        level: "Info",
+        service: "api",
+        message: strippedLog,
+      });
     }
   });
 

@@ -6,8 +6,7 @@ const LOG_LEVELS = {
 export type LogBody = {
   service: string;
   level: (typeof LOG_LEVELS)[keyof typeof LOG_LEVELS];
-  message: string;
-  time: number;
+  message?: string;
 };
 
 export class Logger {
@@ -16,20 +15,35 @@ export class Logger {
     private customHandler?: (payload: LogBody) => void
   ) {}
 
-  info(message: string, meta?: any): void {
-    this.log(message, 1, meta);
+  info(payload: { message: string; meta?: any } | string): void {
+    if (typeof payload === "string") {
+      this.log({ message: payload, level: 1 });
+    } else {
+      this.log({ message: payload.message, level: 1, meta: payload.meta });
+    }
   }
 
-  error(message: string, meta?: any) {
-    this.log(message, 0, meta);
+  error(payload: { message: string; meta?: any } | string) {
+    if (typeof payload === "string") {
+      this.log({ message: payload, level: 0 });
+    } else {
+      this.log({ message: payload.message, level: 0, meta: payload.meta });
+    }
   }
 
-  private log(message: string, level: keyof typeof LOG_LEVELS, meta?: any) {
+  private log({
+    message,
+    meta,
+    level,
+  }: {
+    message: string;
+    meta?: any;
+    level: keyof typeof LOG_LEVELS;
+  }) {
     const base = {
       service: this.service,
       level: LOG_LEVELS[level],
       message,
-      time: Date.now(),
     };
 
     if (this.customHandler !== undefined) {
