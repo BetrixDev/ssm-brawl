@@ -2,7 +2,7 @@
   "name": "env",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

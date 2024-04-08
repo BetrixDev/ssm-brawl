@@ -12,6 +12,10 @@ const envSchema = v.object({
   GITHUB_TOKEN: v.string(),
   ORCHESTRATOR_PORT: v.coerce(v.number(), Number),
   ORCHESTRATOR_HOST: v.string(),
+  WEBHOOK_SECRET: v.string(),
+  NODE_ENV: v.optional(v.string(), "development"),
+  AXIOM_DATASET: v.string(),
+  AXIOM_TOKEN: v.string(),
 });
 
 const env = v.parse(envSchema, process.env);

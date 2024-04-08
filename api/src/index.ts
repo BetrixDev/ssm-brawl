@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { trpcServer } from "@hono/trpc-server";
 import { serve } from "@hono/node-server";
-import { logger } from "hono/logger";
 import { appRouter } from "./routers/router.js";
 import { get } from "lodash-es";
 import { t, TrpcContext } from "./trpc.js";
@@ -15,10 +14,28 @@ import {
   generateBackendToken,
 } from "./db/jwt.js";
 import { WranglerDataSource } from "wrangler";
+import { log } from "./log.js";
 
 const app = new Hono();
 
-app.use(logger());
+app.use(async (c, next) => {
+  const start = Date.now();
+
+  log.info("Incoming request", {
+    method: c.req.method,
+    path: c.req.path,
+    payload: c.req.raw.body,
+  });
+
+  await next();
+
+  log.info("Outgoing response", {
+    method: c.req.method,
+    path: c.req.path,
+    status: c.res.status,
+    elapsed: Date.now() - start,
+  });
+});
 
 app.get("/health", async (c) => {
   c.status(200);

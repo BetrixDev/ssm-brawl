@@ -68,3 +68,4 @@ server/whitelist.json
 /.vscode
 
 deployments
+/server/crash-reports

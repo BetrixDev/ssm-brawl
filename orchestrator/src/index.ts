@@ -7,9 +7,46 @@ import { existsSync, mkdirSync, writeFileSync } from "fs";
 import AdmZip from "adm-zip";
 import pm from "picomatch";
 import { execa, ExecaChildProcess } from "execa";
+import axios from "axios";
+import crypto from "crypto";
+import { pino } from "pino";
+import { LogBody, Logger } from "logger";
+import chalk from "chalk";
 
-let subprocess: ExecaChildProcess<string> | undefined;
+const appLogger = pino(
+  { level: "info" },
+  pino.transport({
+    target: "@axiomhq/pino",
+    options: {
+      dataset: env.AXIOM_DATASET,
+      token: env.AXIOM_TOKEN,
+    },
+  })
+);
 
+function handleNewLog(data: LogBody) {
+  switch (data.level) {
+    case "Error":
+      console.log(chalk.red(JSON.stringify(data)));
+      appLogger.error(data);
+      break;
+
+    case "Info":
+      console.log(JSON.stringify(data));
+      appLogger.info(data);
+      break;
+
+    default:
+      appLogger.info(data);
+      break;
+  }
+}
+
+const log = new Logger("orchestrator", handleNewLog);
+
+let runningProcessed: { id: string; process: ExecaChildProcess<string> }[] = [];
+
+const API_START_TIMEOUT = 15000;
 const DEPLOYMENTS_DIR = path.join(process.cwd(), "..", "deployments");
 
 const app = new Hono();
@@ -63,46 +100,125 @@ async function getLastCommitSha() {
   return response.data.sha;
 }
 
+async function getLatestPluginUrl() {
+  try {
+    const response = await github.rest.repos.getLatestRelease({
+      owner: "BetrixDev",
+      repo: "ssm-brawl",
+    });
+
+    return response.data.assets.find(({ name }) =>
+      pm.isMatch(name, "ssmb*.jar")
+    )?.browser_download_url;
+  } catch {
+    return;
+  }
+}
+
 async function deployServices(deploymentPath: string) {
-  console.log("Installing dependencies...");
+  const pluginUrl = await getLatestPluginUrl();
+
+  log.info("Downloading plugin jar...", { pluginUrl });
+
+  if (!pluginUrl) {
+    log.error("Failed to download plugin jar, aborting deployment");
+    return;
+  }
+
+  log.info(pluginUrl);
+
+  const pluginBuffer = await axios(pluginUrl, { responseType: "arraybuffer" });
+  const pluginPath = path.join(deploymentPath, "server", "plugins", "ssmb.jar");
+
+  writeFileSync(pluginPath, pluginBuffer.data);
+
+  log.info("Installing dependencies...");
 
   await execa("pnpm install", undefined, { cwd: deploymentPath });
 
-  console.log("Building services...");
+  log.info("Building services...");
 
   await execa("pnpm build", { cwd: deploymentPath });
 
-  console.log("Killing old process...");
+  log.info("Killing old process...");
 
-  if (subprocess) {
-    subprocess.kill();
-  }
+  runningProcessed.filter(({ process }) => {
+    process.kill();
+    return false;
+  });
 
-  console.log("Starting services...");
+  log.info("Starting api...");
 
-  subprocess = execa("pnpm start", {
+  const apiProcess = execa("pnpm start --filter=api", {
     cwd: deploymentPath,
     env: process.env,
     stdio: "inherit",
   });
 
-  subprocess.on("close", (code) => {
-    console.log(`Subprocess exited with code ${code}`);
+  if (apiProcess.stdout === null) {
+    log.error("Failed to start API, aborting deployment");
+    return;
+  }
+
+  apiProcess.stdout.on("data", (data) => {
+    handleNewLog(JSON.parse(data));
   });
+
+  runningProcessed.push({
+    id: "api",
+    process: apiProcess,
+  });
+
+  const attemptStart = Date.now();
+  let apiStarted = false;
+
+  while (!apiStarted) {
+    if (Date.now() - attemptStart > API_START_TIMEOUT) {
+      log.error("API failed to start within the timeout, aborting deployment");
+      return;
+    }
+
+    try {
+      const response = await axios("http://localhost:${env.API_PORT}/health");
+
+      if (response.status === 200) {
+        apiStarted = true;
+      }
+    } catch {}
+
+    await new Promise((res) => setTimeout(res, 500));
+  }
+
+  log.info("Starting the rest of the services...");
+
+  runningProcessed.push({
+    id: "server",
+    process: execa("pnpm start --filter=server", {
+      cwd: deploymentPath,
+      stdio: "pipe",
+    }),
+  });
+
+  // runningProcessed.push({
+  //   id: "brawlie",
+  //   process: execa("pnpm start --filter=brawlie", {
+  //     cwd: deploymentPath,
+  //   }),
+  // });
 }
 
 async function onActionFinished() {
-  console.log("Checking for failed or running actions...");
+  log.info("Checking for failed or running actions...");
 
   const isFailedOrRunningActions = await checkForFailedOrRunningActions();
 
   if (isFailedOrRunningActions) {
-    console.log("Failed or running actions found, aborting deployment");
+    log.error("Failed or running actions found, aborting deployment");
     return;
   }
 
-  console.log("No failed or running actions found, proceeding with deployment");
-  console.log("Downloading deployment contents...");
+  log.info("No failed or running actions found, proceeding with deployment");
+  log.info("Downloading deployment contents...");
 
   const deploymentId = await getLastCommitSha();
   const deloymentContentsResponse =
@@ -112,7 +228,7 @@ async function onActionFinished() {
       ref: "main",
     });
 
-  console.log("Unzipping deployment contents...");
+  log.info("Unzipping deployment contents...");
 
   const archive = new AdmZip(
     Buffer.from(deloymentContentsResponse.data as ArrayBuffer)
@@ -164,12 +280,34 @@ async function onActionFinished() {
     writeFileSync(entryPath, entry.getData());
   }
 
-  console.log("Deploying services...");
+  log.info("Deploying services...");
 
   deployServices(deploymentDir);
 }
 
+function verifySignature(req: Request) {
+  try {
+    const signature = crypto
+      .createHmac("sha256", env.WEBHOOK_SECRET)
+      .update(JSON.stringify(req.body))
+      .digest("hex");
+    let trusted = Buffer.from(`sha256=${signature}`, "ascii");
+    let untrusted = Buffer.from(
+      req.headers.get("x-hub-signature-256")!,
+      "ascii"
+    );
+    return crypto.timingSafeEqual(trusted, untrusted);
+  } catch {
+    return false;
+  }
+}
+
 app.post("/webhooks/action-finished", async (c) => {
+  if (env.NODE_ENV === "production" && !verifySignature(c.req.raw)) {
+    c.status(401);
+    return c.json({ message: "Unauthorized" });
+  }
+
   onActionFinished();
 
   c.status(200);
@@ -177,5 +315,5 @@ app.post("/webhooks/action-finished", async (c) => {
 });
 
 serve({ ...app, port: env.ORCHESTRATOR_PORT }, (info) => {
-  console.log(`Orchestrator running on port ${info.port}`);
+  log.info(`Orchestrator running on port ${info.port}`);
 });
