@@ -17,6 +17,7 @@ export function middlewareLogger(log: Logger): MiddlewareHandler {
       method: c.req.method,
       path: c.req.path,
       status: c.res.status,
+      elapsedMs: Date.now() - start,
     });
   };
 }
