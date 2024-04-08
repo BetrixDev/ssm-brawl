@@ -15,27 +15,11 @@ import {
 } from "./db/jwt.js";
 import { WranglerDataSource } from "wrangler";
 import { log } from "./log.js";
+import { middlewareLogger } from "logger";
 
 const app = new Hono();
 
-app.use(async (c, next) => {
-  const start = Date.now();
-
-  log.info("Incoming request", {
-    method: c.req.method,
-    path: c.req.path,
-    payload: c.req.raw.body,
-  });
-
-  await next();
-
-  log.info("Outgoing response", {
-    method: c.req.method,
-    path: c.req.path,
-    status: c.res.status,
-    elapsed: Date.now() - start,
-  });
-});
+app.use(middlewareLogger(log));
 
 app.get("/health", async (c) => {
   c.status(200);

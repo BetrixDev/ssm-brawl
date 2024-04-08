@@ -10,7 +10,7 @@ import { execa, ExecaChildProcess } from "execa";
 import axios from "axios";
 import crypto from "crypto";
 import { pino } from "pino";
-import { LogBody, Logger } from "logger";
+import { LogBody, Logger, middlewareLogger } from "logger";
 import chalk from "chalk";
 
 const appLogger = pino(
@@ -51,6 +51,8 @@ const API_START_TIMEOUT = 15000;
 const DEPLOYMENTS_DIR = path.join(process.cwd(), "..", "deployments");
 
 const app = new Hono();
+
+app.use(middlewareLogger(log));
 
 if (!existsSync(DEPLOYMENTS_DIR)) {
   mkdirSync(DEPLOYMENTS_DIR);
