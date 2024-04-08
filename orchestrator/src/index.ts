@@ -195,20 +195,19 @@ async function deployServices(deploymentPath: string) {
   }
 
   apiProcess.stdout.on("data", (data: Buffer) => {
-    const strippedLog = data.toString().replace("api:start: ", "");
+    const logString = data.toString();
 
     try {
       handleNewLog({
-        ...JSON.parse(strippedLog),
+        ...JSON.parse(logString),
         level: "Info",
         service: "api",
-        message: "data",
       });
     } catch {
       handleNewLog({
         level: "Info",
         service: "api",
-        message: strippedLog,
+        message: logString,
       });
     }
   });
@@ -255,20 +254,19 @@ async function deployServices(deploymentPath: string) {
   }
 
   serverProcess.stdout.on("data", (data: Buffer) => {
-    const strippedLog = data.toString().replace("server:start: ", "");
+    const logString = data.toString();
 
     try {
       handleNewLog({
-        ...JSON.parse(strippedLog),
+        ...JSON.parse(logString),
         level: "Info",
         service: "api",
-        message: "data",
       });
     } catch {
       handleNewLog({
         level: "Info",
         service: "api",
-        message: strippedLog,
+        message: logString,
       });
     }
   });
@@ -318,6 +316,8 @@ async function onActionFinished() {
 
   function shouldIgnoreFile(path: string) {
     return ignoredGlobs.some((glob) =>
+      // Replace periods with a random character when glob is within
+      //  a directory since otherwise matching is not consistent
       pm.isMatch(glob.includes("/") ? path.replace(".", "a") : path, glob)
     );
   }
@@ -380,7 +380,16 @@ app.post("/webhooks/action-finished", async (c) => {
     return c.json({ message: "Unauthorized" });
   }
 
-  onActionFinished();
+  try {
+    onActionFinished();
+  } catch (e) {
+    if (e instanceof Error) {
+      log.error({
+        ...e,
+        message: "Unknown error occured when starting or running deploment",
+      });
+    }
+  }
 
   c.status(200);
   return c.json({ message: "Acknowledged" });
