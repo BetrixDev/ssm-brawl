@@ -25,6 +25,7 @@ const appLogger = pino(
 );
 
 function handleNewLog(data: LogBody) {
+  console.log("new line");
   switch (data.level) {
     case "Error":
       console.log(chalk.red(JSON.stringify(data)));
@@ -100,7 +101,7 @@ async function getLastCommitSha() {
   return response.data.sha;
 }
 
-async function getLatestPluginUrl() {
+async function getLatestPluginAssetId() {
   try {
     const response = await github.rest.repos.getLatestRelease({
       owner: "BetrixDev",
@@ -109,28 +110,54 @@ async function getLatestPluginUrl() {
 
     return response.data.assets.find(({ name }) =>
       pm.isMatch(name, "ssmb*.jar")
-    )?.browser_download_url;
+    )?.id;
   } catch {
     return;
   }
 }
 
 async function deployServices(deploymentPath: string) {
-  const pluginUrl = await getLatestPluginUrl();
+  const pluginAssetId = await getLatestPluginAssetId();
 
-  log.info("Downloading plugin jar...", { pluginUrl });
-
-  if (!pluginUrl) {
-    log.error("Failed to download plugin jar, aborting deployment");
+  if (!pluginAssetId) {
+    log.error(
+      "Failed to download get plugin asset id from release, aborting deployment"
+    );
     return;
   }
 
-  log.info(pluginUrl);
+  try {
+    const pluginBinary = await github.rest.repos.getReleaseAsset({
+      owner: "BetrixDev",
+      repo: "ssm-brawl",
+      asset_id: pluginAssetId!,
+      headers: {
+        Accept: "application/octet-stream",
+      },
+    });
 
-  const pluginBuffer = await axios(pluginUrl, { responseType: "arraybuffer" });
-  const pluginPath = path.join(deploymentPath, "server", "plugins", "ssmb.jar");
+    if (!pluginBinary.data) {
+      log.error("Failed to download plugin jar, aborting deployment");
+      return;
+    }
 
-  writeFileSync(pluginPath, pluginBuffer.data);
+    const pluginsDir = path.join(deploymentPath, "server", "plugins");
+
+    if (!existsSync(pluginsDir)) {
+      mkdirSync(pluginsDir, { recursive: true });
+    }
+
+    const pluginPath = path.join(pluginsDir, "ssmb.jar");
+
+    writeFileSync(
+      pluginPath,
+      Buffer.from(pluginBinary.data as any as ArrayBuffer)
+    );
+  } catch (e) {
+    writeFileSync("error.json", JSON.stringify(e));
+    log.error("Failed to download plugin jar, aborting deployment");
+    return;
+  }
 
   log.info("Installing dependencies...");
 
@@ -152,7 +179,6 @@ async function deployServices(deploymentPath: string) {
   const apiProcess = execa("pnpm start --filter=api", {
     cwd: deploymentPath,
     env: process.env,
-    stdio: "inherit",
   });
 
   if (apiProcess.stdout === null) {
@@ -161,7 +187,33 @@ async function deployServices(deploymentPath: string) {
   }
 
   apiProcess.stdout.on("data", (data) => {
-    handleNewLog(JSON.parse(data));
+    if (typeof data === "string") {
+      try {
+        handleNewLog({
+          ...JSON.parse(data),
+          level: "Info",
+          service: "api",
+          message: "data",
+          time: Date.now(),
+        });
+      } catch {
+        handleNewLog({
+          level: "Info",
+          service: "api",
+          message: data,
+          time: Date.now(),
+        });
+      }
+    } else {
+      console.log(data);
+
+      handleNewLog({
+        level: "Info",
+        service: "api",
+        message: data.toString(),
+        time: Date.now(),
+      });
+    }
   });
 
   runningProcessed.push({
@@ -191,20 +243,27 @@ async function deployServices(deploymentPath: string) {
 
   log.info("Starting the rest of the services...");
 
-  runningProcessed.push({
-    id: "server",
-    process: execa("pnpm start --filter=server", {
-      cwd: deploymentPath,
-      stdio: "pipe",
-    }),
+  const serverProcess = execa("pnpm start --filter=server", {
+    cwd: deploymentPath,
   });
 
-  // runningProcessed.push({
-  //   id: "brawlie",
-  //   process: execa("pnpm start --filter=brawlie", {
-  //     cwd: deploymentPath,
-  //   }),
-  // });
+  if (serverProcess.stdout === null) {
+    log.error("Failed to start server, aborting deployment");
+    return;
+  }
+
+  serverProcess.stdout.on("data", (data) => {
+    try {
+      handleNewLog(JSON.parse(data));
+    } catch {
+      log.info(data);
+    }
+  });
+
+  runningProcessed.push({
+    id: "server",
+    process: serverProcess,
+  });
 }
 
 async function onActionFinished() {
@@ -312,6 +371,11 @@ app.post("/webhooks/action-finished", async (c) => {
 
   c.status(200);
   return c.json({ message: "Acknowledged" });
+});
+
+app.get("/health", (c) => {
+  c.status(200);
+  return c.json({ message: "Service is running" });
 });
 
 serve({ ...app, port: env.ORCHESTRATOR_PORT }, (info) => {
