@@ -7,7 +7,7 @@ export const langRouter = router({
     return queryClient.fetchQuery({
       queryKey: ["lang", "all"],
       queryFn: async () => {
-        const langEntries = await db.query.langTable.findMany();
+        const langEntries = await db.query.lang.findMany();
 
         return langEntries.reduce((prev, curr) => {
           return { ...prev, [curr.id]: curr.text };

@@ -3,14 +3,14 @@ import { internalProcedure, router } from "../trpc.js";
 import {
   db,
   eq,
-  minigamesTable,
+  minigames,
   inArray,
-  basicPlayerDataTable,
-  queueTable,
+  basicPlayerData,
+  queue,
   and,
   gte,
   lte,
-  mapsTable,
+  maps,
   sql,
 } from "tussler";
 import { queryClient } from "../utils/query-client.js";
@@ -31,11 +31,11 @@ export const minigameRouter = router({
     )
     .mutation(async ({ input }) => {
       const [minigame, dbPlayerData] = await db.batch([
-        db.query.minigamesTable.findFirst({
-          where: eq(minigamesTable.id, input.minigameId),
+        db.query.minigames.findFirst({
+          where: eq(minigames.id, input.minigameId),
         }),
-        db.query.basicPlayerDataTable.findMany({
-          where: inArray(basicPlayerDataTable.uuid, input.playerUuids),
+        db.query.basicPlayerData.findMany({
+          where: inArray(basicPlayerData.uuid, input.playerUuids),
           with: {
             selectedKit: {
               with: {
@@ -46,9 +46,7 @@ export const minigameRouter = router({
             },
           },
         }),
-        db
-          .delete(queueTable)
-          .where(inArray(queueTable.playerUuid, input.playerUuids)),
+        db.delete(queue).where(inArray(queue.playerUuid, input.playerUuids)),
       ]);
 
       if (minigame === undefined) {
@@ -84,11 +82,11 @@ export const minigameRouter = router({
           minigame.maxPlayers,
         ],
         queryFn: async () => {
-          return await db.query.mapsTable.findMany({
+          return await db.query.maps.findMany({
             where: and(
-              lte(mapsTable.minPlayers, minigame.minPlayers),
-              gte(mapsTable.maxPlayers, minigame.maxPlayers),
-              eq(mapsTable.role, "game")
+              lte(maps.minPlayers, minigame.minPlayers),
+              gte(maps.maxPlayers, minigame.maxPlayers),
+              eq(maps.role, "game")
             ),
             with: {
               spawnPoints: true,
@@ -177,15 +175,15 @@ export const minigameRouter = router({
       });
 
       const tusslerTask = db.batch([
-        db.update(basicPlayerDataTable).set({
-          totalGamesPlayed: sql`${basicPlayerDataTable.totalGamesPlayed} + 1`,
+        db.update(basicPlayerData).set({
+          totalGamesPlayed: sql`${basicPlayerData.totalGamesPlayed} + 1`,
         }),
         db
-          .update(basicPlayerDataTable)
+          .update(basicPlayerData)
           .set({
-            totalGamesWon: sql`${basicPlayerDataTable.totalGamesWon} + 1`,
+            totalGamesWon: sql`${basicPlayerData.totalGamesWon} + 1`,
           })
-          .where(inArray(basicPlayerDataTable.uuid, input.winningUuids)),
+          .where(inArray(basicPlayerData.uuid, input.winningUuids)),
       ]);
 
       await Promise.all([wranglerTask, tusslerTask]);

@@ -11,7 +11,7 @@ import {
 
 export type MapRole = "game" | "hub";
 
-export const kitsTable = sqliteTable(
+export const kits = sqliteTable(
   "kits",
   {
     id: text("id").primaryKey().notNull(),
@@ -33,7 +33,7 @@ export const kitsTable = sqliteTable(
   })
 );
 
-export const abilitiesTable = sqliteTable(
+export const abilities = sqliteTable(
   "abilities",
   {
     id: text("id").primaryKey().notNull(),
@@ -45,13 +45,13 @@ export const abilitiesTable = sqliteTable(
   })
 );
 
-export const disguisesTable = sqliteTable("disguises", {
+export const disguises = sqliteTable("disguises", {
   id: text("id").primaryKey().notNull(),
   displayEntity: text("display_entity").notNull(),
   hurtSound: text("hurt_sound").notNull(),
 });
 
-export const abilitiesToKitsTable = sqliteTable(
+export const abilitiesToKits = sqliteTable(
   "abilities_to_kits",
   {
     kitId: text("kit_id").notNull(),
@@ -68,7 +68,7 @@ export const abilitiesToKitsTable = sqliteTable(
   })
 );
 
-export const passivesTable = sqliteTable(
+export const passives = sqliteTable(
   "passives",
   {
     id: text("id").primaryKey().notNull(),
@@ -79,7 +79,7 @@ export const passivesTable = sqliteTable(
   })
 );
 
-export const passivesToKitsTable = sqliteTable(
+export const passivesToKits = sqliteTable(
   "passives_to_kits",
   {
     kitId: text("kit_id").notNull(),
@@ -96,7 +96,7 @@ export const passivesToKitsTable = sqliteTable(
   })
 );
 
-export const basicPlayerDataTable = sqliteTable(
+export const basicPlayerData = sqliteTable(
   "basic_player_data",
   {
     uuid: text("uuid", { length: 36 }).primaryKey().notNull(),
@@ -111,7 +111,7 @@ export const basicPlayerDataTable = sqliteTable(
   })
 );
 
-export const ipBansTable = sqliteTable(
+export const ipBans = sqliteTable(
   "ip_bans",
   {
     ip: text("ip").primaryKey().notNull(),
@@ -122,7 +122,7 @@ export const ipBansTable = sqliteTable(
   })
 );
 
-export const minigamesTable = sqliteTable(
+export const minigames = sqliteTable(
   "minigames",
   {
     id: text("id").primaryKey(),
@@ -137,7 +137,7 @@ export const minigamesTable = sqliteTable(
   })
 );
 
-export const queueTable = sqliteTable(
+export const queue = sqliteTable(
   "queue",
   {
     playerUuid: text("player_uuid", { length: 36 }).primaryKey(),
@@ -149,7 +149,7 @@ export const queueTable = sqliteTable(
   })
 );
 
-export const mapsTable = sqliteTable(
+export const maps = sqliteTable(
   "maps",
   {
     id: text("id").primaryKey(),
@@ -167,14 +167,14 @@ export const mapsTable = sqliteTable(
   })
 );
 
-export const mapOriginsTable = sqliteTable("map_origins", {
+export const mapOrigins = sqliteTable("map_origins", {
   mapId: text("map_id").primaryKey(),
   x: real("x").notNull(),
   y: real("y").notNull(),
   z: real("z").notNull(),
 });
 
-export const mapSpawnpointsTable = sqliteTable(
+export const mapSpawnpoints = sqliteTable(
   "map_spawnpoints",
   {
     mapId: text("map_id").notNull(),
@@ -188,95 +188,89 @@ export const mapSpawnpointsTable = sqliteTable(
   })
 );
 
-export const langTable = sqliteTable("lang", {
+export const lang = sqliteTable("lang", {
   id: text("id").notNull().primaryKey(),
   text: text("text").notNull(),
 });
 
-export const kitsRelations = relations(kitsTable, ({ many, one }) => ({
-  abilities: many(abilitiesToKitsTable),
-  passives: many(passivesToKitsTable),
-  disguise: one(disguisesTable, {
-    fields: [kitsTable.disguiseId],
-    references: [disguisesTable.id],
+export const kitsRelations = relations(kits, ({ many, one }) => ({
+  abilities: many(abilitiesToKits),
+  passives: many(passivesToKits),
+  disguise: one(disguises, {
+    fields: [kits.disguiseId],
+    references: [disguises.id],
   }),
 }));
 
-export const abilitiesRelations = relations(abilitiesTable, ({ many }) => ({
-  kits: many(abilitiesToKitsTable),
+export const abilitiesRelations = relations(abilities, ({ many }) => ({
+  kits: many(abilitiesToKits),
 }));
 
-export const passivesRelations = relations(passivesTable, ({ many }) => ({
-  kits: many(passivesToKitsTable),
+export const passivesRelations = relations(passives, ({ many }) => ({
+  kits: many(passivesToKits),
 }));
 
 export const abilitiesToKitsRelations = relations(
-  abilitiesToKitsTable,
+  abilitiesToKits,
   ({ one }) => ({
-    kit: one(kitsTable, {
-      fields: [abilitiesToKitsTable.kitId],
-      references: [kitsTable.id],
+    kit: one(kits, {
+      fields: [abilitiesToKits.kitId],
+      references: [kits.id],
     }),
-    ability: one(abilitiesTable, {
-      fields: [abilitiesToKitsTable.abilityId],
-      references: [abilitiesTable.id],
+    ability: one(abilities, {
+      fields: [abilitiesToKits.abilityId],
+      references: [abilities.id],
     }),
   })
 );
 
-export const passivesToKitsRelations = relations(
-  passivesToKitsTable,
-  ({ one }) => ({
-    kit: one(kitsTable, {
-      fields: [passivesToKitsTable.kitId],
-      references: [kitsTable.id],
-    }),
-    passive: one(passivesTable, {
-      fields: [passivesToKitsTable.passiveId],
-      references: [passivesTable.id],
-    }),
-  })
-);
-
-export const mapsRelations = relations(mapsTable, ({ many, one }) => ({
-  spawnPoints: many(mapSpawnpointsTable),
-  origin: one(mapOriginsTable, {
-    fields: [mapsTable.originId],
-    references: [mapOriginsTable.mapId],
+export const passivesToKitsRelations = relations(passivesToKits, ({ one }) => ({
+  kit: one(kits, {
+    fields: [passivesToKits.kitId],
+    references: [kits.id],
+  }),
+  passive: one(passives, {
+    fields: [passivesToKits.passiveId],
+    references: [passives.id],
   }),
 }));
 
-export const mapSpawnpointsRelations = relations(
-  mapSpawnpointsTable,
-  ({ one }) => ({
-    map: one(mapsTable, {
-      fields: [mapSpawnpointsTable.mapId],
-      references: [mapsTable.id],
-    }),
-  })
-);
-
-export const minigamesRelations = relations(minigamesTable, ({ many }) => ({
-  queueEntries: many(queueTable),
+export const mapsRelations = relations(maps, ({ many, one }) => ({
+  spawnPoints: many(mapSpawnpoints),
+  origin: one(mapOrigins, {
+    fields: [maps.originId],
+    references: [mapOrigins.mapId],
+  }),
 }));
 
-export const queueRelations = relations(queueTable, ({ one }) => ({
-  minigame: one(minigamesTable, {
-    fields: [queueTable.minigameId],
-    references: [minigamesTable.id],
+export const mapSpawnpointsRelations = relations(mapSpawnpoints, ({ one }) => ({
+  map: one(maps, {
+    fields: [mapSpawnpoints.mapId],
+    references: [maps.id],
   }),
-  player: one(basicPlayerDataTable, {
-    fields: [queueTable.playerUuid],
-    references: [basicPlayerDataTable.uuid],
+}));
+
+export const minigamesRelations = relations(minigames, ({ many }) => ({
+  queueEntries: many(queue),
+}));
+
+export const queueRelations = relations(queue, ({ one }) => ({
+  minigame: one(minigames, {
+    fields: [queue.minigameId],
+    references: [minigames.id],
+  }),
+  player: one(basicPlayerData, {
+    fields: [queue.playerUuid],
+    references: [basicPlayerData.uuid],
   }),
 }));
 
 export const basicPlayerDataRelations = relations(
-  basicPlayerDataTable,
+  basicPlayerData,
   ({ one }) => ({
-    selectedKit: one(kitsTable, {
-      fields: [basicPlayerDataTable.selectedKitId],
-      references: [kitsTable.id],
+    selectedKit: one(kits, {
+      fields: [basicPlayerData.selectedKitId],
+      references: [kits.id],
     }),
   })
 );

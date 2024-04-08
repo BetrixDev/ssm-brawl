@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { internalProcedure, router } from "../trpc.js";
 import { queryClient } from "../utils/query-client.js";
-import { basicPlayerDataTable, db, eq } from "tussler";
+import { basicPlayerData, db, eq } from "tussler";
 
 export const playerRouter = router({
   getBasicPlayerData: internalProcedure
@@ -10,13 +10,13 @@ export const playerRouter = router({
       const response = await queryClient.fetchQuery({
         queryKey: ["basicPlayerData", input.playerUuid],
         queryFn: async () => {
-          const playerData = await db.query.basicPlayerDataTable.findFirst({
+          const playerData = await db.query.basicPlayerData.findFirst({
             where: (table, { eq }) => eq(table.uuid, input.playerUuid),
           });
 
           if (playerData === undefined) {
             const [newPlayerData] = await db
-              .insert(basicPlayerDataTable)
+              .insert(basicPlayerData)
               .values([
                 {
                   uuid: input.playerUuid,
@@ -47,7 +47,7 @@ export const playerRouter = router({
       const ipEntry = await queryClient.fetchQuery({
         queryKey: ["ipBans", input.ip],
         queryFn: () => {
-          return db.query.ipBansTable.findFirst({
+          return db.query.ipBans.findFirst({
             where: (table, { eq }) => eq(table.ip, input.ip),
           });
         },
@@ -57,9 +57,9 @@ export const playerRouter = router({
         if (input.playerUuid !== undefined) {
           try {
             await db
-              .update(basicPlayerDataTable)
+              .update(basicPlayerData)
               .set({ isBanned: true })
-              .where(eq(basicPlayerDataTable.uuid, input.playerUuid))
+              .where(eq(basicPlayerData.uuid, input.playerUuid))
               .execute();
           } catch (e) {
             console.log(e);

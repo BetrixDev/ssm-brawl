@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { internalProcedure, router } from "../trpc.js";
-import { db, queueTable, eq, minigamesTable, inArray } from "tussler";
+import { db, queue, eq, minigames, inArray } from "tussler";
 import { TRPCError } from "@trpc/server";
 
 export const queueRouter = router({
@@ -14,12 +14,10 @@ export const queueRouter = router({
     )
     .mutation(async ({ input }) => {
       if (input.force) {
-        await db
-          .delete(queueTable)
-          .where(eq(queueTable.playerUuid, input.playerUuid));
+        await db.delete(queue).where(eq(queue.playerUuid, input.playerUuid));
       } else {
-        const playerInQueue = await db.query.queueTable.findFirst({
-          where: eq(queueTable.playerUuid, input.playerUuid),
+        const playerInQueue = await db.query.queue.findFirst({
+          where: eq(queue.playerUuid, input.playerUuid),
         });
 
         if (playerInQueue !== undefined) {
@@ -27,8 +25,8 @@ export const queueRouter = router({
         }
       }
 
-      const minigameData = await db.query.minigamesTable.findFirst({
-        where: eq(minigamesTable.id, input.minigameId),
+      const minigameData = await db.query.minigames.findFirst({
+        where: eq(minigames.id, input.minigameId),
         with: { queueEntries: true },
       });
 
@@ -67,7 +65,7 @@ export const queueRouter = router({
     .input(z.object({ playerUuids: z.array(z.string()) }))
     .mutation(async ({ input }) => {
       await db
-        .delete(queueTable)
-        .where(inArray(queueTable.playerUuid, input.playerUuids));
+        .delete(queue)
+        .where(inArray(queue.playerUuid, input.playerUuids));
     }),
 });
