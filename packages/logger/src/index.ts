@@ -5,7 +5,7 @@ export function middlewareLogger(log: Logger): MiddlewareHandler {
   return async (c, next) => {
     const start = Date.now();
 
-    log.info("Incoming request", {
+    log.info({
       method: c.req.method,
       path: c.req.path,
       payload: c.req.raw.body,
@@ -13,11 +13,10 @@ export function middlewareLogger(log: Logger): MiddlewareHandler {
 
     await next();
 
-    log.info("Outgoing response", {
+    log.info({
       method: c.req.method,
       path: c.req.path,
       status: c.res.status,
-      elapsed: Date.now() - start,
     });
   };
 }

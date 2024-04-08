@@ -15,51 +15,40 @@ export class Logger {
     private customHandler?: (payload: LogBody) => void
   ) {}
 
-  info(payload: { message: string; meta?: any } | string): void {
+  info(payload: ({ message?: string } & any) | string): void {
     if (typeof payload === "string") {
-      this.log({ message: payload, level: 1 });
+      this.log(1, { message: payload });
     } else {
-      this.log({ message: payload.message, level: 1, meta: payload.meta });
+      this.log(1, payload);
     }
   }
 
-  error(payload: { message: string; meta?: any } | string) {
+  error(payload: ({ message?: string } & any) | string) {
     if (typeof payload === "string") {
-      this.log({ message: payload, level: 0 });
+      this.log(0, { message: payload });
     } else {
-      this.log({ message: payload.message, level: 0, meta: payload.meta });
+      this.log(0, payload);
     }
   }
 
-  private log({
-    message,
-    meta,
-    level,
-  }: {
-    message: string;
-    meta?: any;
-    level: keyof typeof LOG_LEVELS;
-  }) {
-    const base = {
+  private log(
+    level: keyof typeof LOG_LEVELS,
+    data: {
+      message?: string;
+    } & any
+  ) {
+    const logPayload = {
       service: this.service,
       level: LOG_LEVELS[level],
-      message,
+      ...data,
     };
 
     if (this.customHandler !== undefined) {
-      if (meta) {
-        this.customHandler({ ...meta, ...base });
-      } else {
-        this.customHandler(base);
-      }
+      this.customHandler(logPayload);
 
       return;
     }
 
-    if (meta) {
-      console.log(JSON.stringify({ ...meta, ...base }));
-    } else {
-      console.log(JSON.stringify(base));
-    }
+    console.log(JSON.stringify(logPayload));
   }
 }
