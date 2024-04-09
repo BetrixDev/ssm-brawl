@@ -1,4 +1,5 @@
 import { router } from "../trpc.js";
+import { friendshipRouter } from "./friendshipRouter.js";
 import { langRouter } from "./langRouter.js";
 import { minigameRouter } from "./minigameRouter.js";
 import { playerRouter } from "./playerRouter.js";
@@ -9,6 +10,7 @@ export const appRouter = router({
   queue: queueRouter,
   player: playerRouter,
   lang: langRouter,
+  friendship: friendshipRouter,
 });
 
 export type AppRouter = typeof appRouter;

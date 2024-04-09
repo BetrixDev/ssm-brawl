@@ -105,6 +105,11 @@ export const basicPlayerData = sqliteTable(
     totalGamesWon: int("total_games_won").notNull().default(0),
     totalPlaytimeSeconds: int("total_playtime_seconds").notNull().default(0),
     isBanned: int("is_banned", { mode: "boolean" }).notNull().default(false),
+    areFriendRequestsOff: int("are_friend_requests_off", {
+      mode: "boolean",
+    })
+      .default(false)
+      .notNull(),
   },
   (table) => ({
     uuidIdx: index("b_player_uuid_idx").on(table.uuid),
@@ -192,6 +197,19 @@ export const lang = sqliteTable("lang", {
   id: text("id").notNull().primaryKey(),
   text: text("text").notNull(),
 });
+
+export const friendships = sqliteTable(
+  "friendships",
+  {
+    uuid1: text("uuid_1").notNull(),
+    uuid2: text("uuid_2").notNull(),
+  },
+  (table) => ({
+    friendshipsPk: primaryKey({ columns: [table.uuid1, table.uuid2] }),
+    friendshipsUuid1Idx: index("friendships_uuid_1_idx").on(table.uuid1),
+    friendshipsUuid2Idx: index("friendships_uuid_2_idx").on(table.uuid2),
+  })
+);
 
 export const kitsRelations = relations(kits, ({ many, one }) => ({
   abilities: many(abilitiesToKits),
