@@ -4,3 +4,4 @@ packages:
   - "web"
   - "server"
   - "orchestrator"
+  - "observer"

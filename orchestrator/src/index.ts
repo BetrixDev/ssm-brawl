@@ -3,56 +3,20 @@ import { serve } from "@hono/node-server";
 import { Octokit } from "octokit";
 import { env } from "env";
 import path from "path";
-import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "fs";
 import AdmZip from "adm-zip";
 import pm from "picomatch";
-import { execa, ExecaChildProcess } from "execa";
+import { execa } from "execa";
 import axios from "axios";
 import crypto from "crypto";
-import { pino } from "pino";
-import { handleStdIOLog, LogBody, Logger, middlewareLogger } from "logger";
-import chalk from "chalk";
-
-const appLogger = pino(
-  { level: "info" },
-  env.AXIOM_DATASET && env.AXIOM_TOKEN
-    ? pino.transport({
-        target: "@axiomhq/pino",
-        options: {
-          dataset: env.AXIOM_DATASET,
-          token: env.AXIOM_TOKEN,
-        },
-      })
-    : undefined
-);
-
-function handleNewLog(data: LogBody) {
-  console.log("new line");
-  switch (data.level) {
-    case "Error":
-      console.log(chalk.red(JSON.stringify(data)));
-      appLogger.error(data);
-      break;
-
-    case "Info":
-      console.log(JSON.stringify(data));
-      appLogger.info(data);
-      break;
-
-    default:
-      appLogger.info(data);
-      break;
-  }
-}
-
-const log = new Logger("orchestrator", handleNewLog);
-
-let runningProcessed: { id: string; process: ExecaChildProcess<string> }[] = [];
+import { Logger, middlewareLogger } from "logger";
+import { deleteProcessesByName, spawnProcess } from "proc";
 
 const API_START_TIMEOUT = 15000;
 const DEPLOYMENTS_DIR = path.join(process.cwd(), "..", "deployments");
 
 const app = new Hono();
+const log = new Logger("orchestrator");
 
 app.use(middlewareLogger(log));
 
@@ -171,35 +135,28 @@ async function deployServices(deploymentPath: string) {
 
   await execa("pnpm build", { cwd: deploymentPath });
 
-  log.info("Killing old process...");
+  log.info("Killing old processes...");
 
-  runningProcessed.filter(({ process }) => {
-    process.kill();
-    return false;
-  });
+  await deleteProcessesByName("api");
+  await deleteProcessesByName("server");
 
   log.info("Starting api...");
 
-  const apiProcess = execa(
-    "pnpm start --filter=api --log-prefix=none --log-order=stream",
-    {
-      cwd: deploymentPath,
-      env: process.env,
-      stdout: "pipe",
-    }
-  );
-
-  if (apiProcess.stdout === null) {
-    log.error("Failed to start API, aborting deployment");
+  try {
+    await spawnProcess({
+      name: "api",
+      env: process.env as any,
+      cwd: process.cwd(),
+      script: "pnpm start --filter=api --log-prefix=none --log-order=stream",
+      max_memory_restart: "4G",
+    });
+  } catch (e: any) {
+    log.error({
+      message: "Failed to spawn api proccess, aborting deployment",
+      ...e,
+    });
     return;
   }
-
-  apiProcess.stdout.on("data", handleStdIOLog(log, "api", 1, handleNewLog));
-
-  runningProcessed.push({
-    id: "api",
-    process: apiProcess,
-  });
 
   const attemptStart = Date.now();
   let apiStarted = false;
@@ -223,29 +180,31 @@ async function deployServices(deploymentPath: string) {
 
   log.info("Starting the rest of the services...");
 
-  const serverProcess = execa(
-    "pnpm start --filter=server  --log-prefix=none --log-order=stream",
-    {
-      cwd: deploymentPath,
-      env: process.env,
-      stdout: "pipe",
-    }
-  );
-
-  if (serverProcess.stdout === null) {
-    log.error("Failed to start server, aborting deployment");
+  try {
+    await spawnProcess({
+      name: "server",
+      env: process.env as any,
+      cwd: process.cwd(),
+      script: "pnpm start --filter=server --log-prefix=none --log-order=stream",
+      max_memory_restart: "4G",
+    });
+  } catch (e: any) {
+    log.error({
+      message: "Failed to spawn server proccess, aborting deployment",
+      ...e,
+    });
     return;
   }
 
-  serverProcess.stdout.on(
-    "data",
-    handleStdIOLog(log, "server", 1, handleNewLog)
-  );
+  log.info("Deleting previous deployments...");
 
-  runningProcessed.push({
-    id: "server",
-    process: serverProcess,
-  });
+  readdirSync(path.join(deploymentPath, ".."), {
+    withFileTypes: true,
+  })
+    .filter((dirent) => dirent.isDirectory() && deploymentPath !== dirent.path)
+    .forEach((dirent) => {
+      rmSync(dirent.path, { recursive: true, force: true });
+    });
 }
 
 async function onActionFinished() {

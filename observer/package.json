@@ -1,0 +1,25 @@
+{
+  "name": "observer",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./build/index.js",
+    "dev": "tsx ./src/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.6",
+    "@types/node-cron": "^3.0.11",
+    "@types/pidusage": "^2.0.5",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.4"
+  },
+  "dependencies": {
+    "@axiomhq/pino": "1.0.0-rc.3",
+    "env": "workspace:*",
+    "execa": "^8.0.1",
+    "node-cron": "^3.0.3",
+    "pidusage": "^3.0.2",
+    "pino": "^8.20.0",
+    "proc": "workspace:*"
+  }
+}

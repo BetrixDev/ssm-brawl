@@ -6,7 +6,6 @@
     "dev": "tsx src/index.ts"
   },
   "dependencies": {
-    "@axiomhq/pino": "1.0.0-rc.3",
     "@hono/node-server": "^1.8.2",
     "adm-zip": "^0.5.12",
     "axios": "^1.6.8",
@@ -17,7 +16,7 @@
     "logger": "workspace:*",
     "octokit": "^3.2.0",
     "picomatch": "^4.0.2",
-    "pino": "^8.20.0"
+    "proc": "workspace:*"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.5",
