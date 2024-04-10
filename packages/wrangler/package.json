@@ -3,7 +3,7 @@
   "type": "module",
   "dependencies": {
     "env": "workspace:*",
-    "mongodb": "^6.5.0",
+    "mongodb": "^5.2.0",
     "reflect-metadata": "^0.1.13",
     "typeorm": "0.3.20"
   },
