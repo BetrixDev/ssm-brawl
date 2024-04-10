@@ -107,9 +107,10 @@ export const basicPlayerData = sqliteTable(
     isBanned: int("is_banned", { mode: "boolean" }).notNull().default(false),
     areFriendRequestsOff: int("are_friend_requests_off", {
       mode: "boolean",
-    })
-      .default(false)
-      .notNull(),
+    }).default(false),
+    canReceiveRandomMessages: int("can_receive_random_messages", {
+      mode: "boolean",
+    }).default(true),
   },
   (table) => ({
     uuidIdx: index("b_player_uuid_idx").on(table.uuid),
