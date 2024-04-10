@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { HistoricalGame } from "./entities/HistoricalGame.js";
-import { env } from "env";
+import { env } from "env/wrangler";
 
 export const WranglerDataSource = new DataSource({
   type: "mongodb",

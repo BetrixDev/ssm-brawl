@@ -6,7 +6,8 @@
   },
   "dependencies": {
     "dotenv": "^16.4.5",
-    "valibot": "^0.29.0"
+    "valibot": "^0.29.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/node": "^20.11.25",
@@ -15,7 +16,25 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
-    "types": "./src/index.ts",
-    "import": "./build/src/index.js"
+    "./observer": {
+      "types": "./src/observer.ts",
+      "import": "./build/src/observer.js"
+    },
+    "./orchestrator": {
+      "types": "./src/orchestrator.ts",
+      "import": "./build/src/orchestrator.js"
+    },
+    "./api": {
+      "types": "./src/api.ts",
+      "import": "./build/src/api.js"
+    },
+    "./tussler": {
+      "types": "./src/tussler.ts",
+      "import": "./build/src/tussler.js"
+    },
+    "./wrangler": {
+      "types": "./src/wrangler.ts",
+      "import": "./build/src/wrangler.js"
+    }
   }
 }

@@ -7,7 +7,7 @@ import { t, TrpcContext } from "./trpc.js";
 import { renderTrpcPanel } from "trpc-panel";
 import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
-import { env } from "env";
+import { env } from "env/api";
 import {
   BackendSource,
   decodeTokenFromHeaders,
@@ -117,7 +117,7 @@ app.post("/generateToken/:source", async (c) => {
   }
 });
 
-serve({ ...app, port: env.PORT ?? env.API_PORT ?? 3000 }, async (info) => {
+serve({ ...app, port: env.API_PORT }, async (info) => {
   await WranglerDataSource.initialize();
 
   console.log(`Backend listening on http://localhost:${info.port}`);

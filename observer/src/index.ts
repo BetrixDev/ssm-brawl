@@ -1,17 +1,9 @@
 import { execaCommand } from "execa";
-import { env } from "env";
+import { env } from "env/observer";
 import { schedule } from "node-cron";
 import { listRunningProcesses } from "proc";
 import pidusage from "pidusage";
 import { Axiom } from "@axiomhq/js";
-
-if (env.AXIOM_TOKEN === undefined) {
-  throw new Error("AXIOM_TOKEN not defined in env");
-}
-
-if (env.AXIOM_DATASET === undefined) {
-  throw new Error("AXIOM_DATASET not defined in env");
-}
 
 const dataset = env.AXIOM_DATASET;
 

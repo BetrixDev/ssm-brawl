@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { env } from "env";
+import { env } from "env/api";
 import { z } from "zod";
 
 export const BackendSource = z.enum(["plugin", "web", "brawlie"]);
