@@ -22,7 +22,10 @@ import net.ssmb.dtos.queue.RemovePlayerResponse
 import org.bukkit.entity.Player
 
 class ApiService {
-    private val apiToken = System.getenv("API_AUTH_TOKEN")
+    private val apiToken = System.getenv("API_TOKEN_SECRET")
+    private val apiHost = System.getenv("API_HOST")
+    private val apiPort = System.getenv("API_PORT")
+    private val apiProtocol = System.getenv("API_PROTOCOL")
 
     private val client = HttpClient(CIO) {
         install(Logging) {
@@ -33,7 +36,7 @@ class ApiService {
             json()
         }
         defaultRequest {
-            url("http://localhost:3000/api/")
+            url("$apiProtocol://$apiHost:$apiPort/api/")
             bearerAuth(apiToken)
             contentType(ContentType.Application.Json)
         }

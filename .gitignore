@@ -71,3 +71,4 @@ deployments
 /server/crash-reports
 
 *.sqlite
+*.mca
