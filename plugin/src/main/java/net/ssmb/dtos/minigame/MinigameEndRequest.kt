@@ -3,26 +3,28 @@ package net.ssmb.dtos.minigame
 import kotlinx.serialization.Serializable
 
 @Serializable()
-sealed class MinigameEndRequest(
+data class MinigameEndRequest(
     val gameId: String,
     val mapId: String,
     val minigameId: String,
-    val winningUuids: List<String>
+    val winningUuids: List<String>,
+    val players: List<PlayerEntry>
 ) {
     @Serializable()
-    sealed class PlayerEntry(
+    data class PlayerEntry(
         val uuid: String,
         val stocksLeft: Int,
+        val kits: List<KitEntry>
     ) {
         @Serializable()
-        sealed class KitEntry(
+        data class KitEntry(
             val id: String,
             val startTime: Long,
             val endTime: Long,
-            val abilityUsage: List<AbilityUsageEntries>
+            val abilityUsage: List<AbilityUsageEntry>
         ) {
             @Serializable()
-            data class AbilityUsageEntries(
+            data class AbilityUsageEntry(
                 val abilityId: String,
                 val usedAt: Long,
                 val damageDealt: Double?,

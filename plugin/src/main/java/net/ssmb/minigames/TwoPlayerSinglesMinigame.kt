@@ -11,9 +11,10 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.title.Title
 import net.ssmb.SSMB
+import net.ssmb.dtos.minigame.MinigameEndRequest
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.enums.MinigameState
-import net.ssmb.events.BrawlAbilityUse
+import net.ssmb.events.BrawlAbilityUseEvent
 import net.ssmb.events.BrawlDamageEvent
 import net.ssmb.events.BrawlDamageType
 import net.ssmb.events.BrawlRespawnEvent
@@ -40,6 +41,7 @@ class TwoPlayerSinglesMinigame(
     private val plugin = SSMB.instance
     private val minigameState = Atom(MinigameState.LOADING)
     private lateinit var minigameWorld: World
+    private var startedAt = System.currentTimeMillis()
     override val playerKits = hashMapOf<Player, IKit>()
     override val teamsStocks = hashMapOf<List<Player>, Int>()
 
@@ -134,23 +136,70 @@ class TwoPlayerSinglesMinigame(
     }
 
     private fun doMinigameRunning() {
+        startedAt = System.currentTimeMillis()
+
         players.forEach {
             it.walkSpeed = 0.2f
         }
     }
 
     private fun doMinigameEnd() {
+        val endedAt = System.currentTimeMillis()
+
         val winningPlayers = teamsStocks.entries.first { it.value > 0 }.key
-        val losingPlayers = teamsStocks.entries.filter { it.value == 0 }
+        val losingPlayers = teamsStocks.entries.filter { it.value == 0 }.flatMap { it.key }
 
         winningPlayers.forEach {
             it.sendMessage(Component.text("You won!", NamedTextColor.GREEN))
         }
 
         losingPlayers.forEach {
-            it.key.forEach { plr ->
-                plr.sendMessage(Component.text("You lost!", NamedTextColor.RED))
+            it.sendMesage(Component.text("You lost!", NamedTextColor.RED))
+        }
+
+        plugin.launch {
+            delay(5)
+
+            winningPlayers.forEach {
+                it.teleport(plugin.hub.spawnLocation)
             }
+
+            losingPlayers.forEach {
+                it.teleport(plugin.hub.spawnLocation)
+            }
+        }
+
+        plugin.launch {
+            val winningPlayerUuids = winningPlayers.map { it.uniqueId.toString() }
+
+            val allPlayers = winningPlayers.toMutableList()
+            allPlayers.addAll(losingPlayers)
+
+            val playerEntries = allPlayers.map { plr ->
+                val playerKitData = playerKits[plr]!!
+                val stocksLeft = teamsStocks[listOf(plr)] ?: 0
+
+                val abilityUsage = events.filter {
+                    it is RecordedMinigameAbilityUseEvent && it.actor == plr
+                }.map {
+                    val event = it as RecordedMinigameAbilityUseEvent
+                    MinigameEndRequest.PlayerEntry.KitEntry.AbilityUsageEntry(event.abilityId, event.dateRecorded, event.damageDealt)
+                }
+
+                val kitEntry = MinigameEndRequest.PlayerEntry.KitEntry(playerKitData.kitData.id, startedAt, endedAt, abilityUsage)
+
+               MinigameEndRequest.PlayerEntry(plr.uniqueId.toString(), stocksLeft, listOf(kitEntry))
+            }
+
+            val endRequest = MinigameEndRequest(
+                minigameData.gameId,
+                minigameData.map.id,
+                minigameData.minigame.id,
+                winningPlayerUuids,
+                playerEntries
+            )
+
+            plugin.api.minigameEnd(endRequest)
         }
     }
 
@@ -204,7 +253,7 @@ class TwoPlayerSinglesMinigame(
     }
 
     @EventHandler
-    fun onBrawlAbilityUse(event: BrawlAbilityUse) {
+    fun onBrawlAbilityUse(event: BrawlAbilityUseEvent) {
         if (!players.contains(event.player)) return
 
         events.add(RecordedMinigameAbilityUseEvent(System.currentTimeMillis(), event.abilityId, event.damageDealt))
