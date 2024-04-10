@@ -14,12 +14,11 @@
     "typescript": "^5.4.4"
   },
   "dependencies": {
-    "@axiomhq/pino": "1.0.0-rc.3",
+    "@axiomhq/js": "1.0.0-rc.3",
     "env": "workspace:*",
     "execa": "^8.0.1",
     "node-cron": "^3.0.3",
     "pidusage": "^3.0.2",
-    "pino": "^8.20.0",
     "proc": "workspace:*"
   }
 }

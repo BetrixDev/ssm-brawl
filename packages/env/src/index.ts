@@ -16,6 +16,7 @@ const envSchema = v.object({
   NODE_ENV: v.optional(v.string(), "development"),
   AXIOM_DATASET: v.optional(v.string()),
   AXIOM_TOKEN: v.optional(v.string()),
+  AXIOM_ORG_ID: v.optional(v.string()),
 });
 
 const env = v.parse(envSchema, process.env);
