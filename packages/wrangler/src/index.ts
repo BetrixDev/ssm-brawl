@@ -12,10 +12,3 @@ export const WranglerDataSource = new DataSource({
 });
 
 export const wranglerClient = WranglerDataSource.mongoManager;
-
-export * from "./entities/HistoricalGame.js";
-export * from "./models/HistoricalGamePlayer.js";
-export * from "./models/HistoricalGameKit.js";
-export * from "./models/HistoricalGameKitAbilityUse.js";
-export * from "./entities/MessageChannel.js";
-export * from "./models/MessageChannelMessage.js";

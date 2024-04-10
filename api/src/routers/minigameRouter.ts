@@ -16,13 +16,11 @@ import {
 import { queryClient } from "../utils/query-client.js";
 import { useRandomId, useRandomInt } from "../utils/math.js";
 import { TRPCError } from "@trpc/server";
-import {
-  wranglerClient,
-  HistoricalGame,
-  HistoricalGamePlayer,
-  HistoricalGameKit,
-  HistoricalGameKitAbilityUse,
-} from "wrangler";
+import { wranglerClient } from "wrangler";
+import { HistoricalGame } from "wrangler/entities/HistoricalGame.js";
+import { HistoricalGameKit } from "wrangler/models/HistoricalGameKit.js";
+import { HistoricalGamePlayer } from "wrangler/models/HistoricalGamePlayer.js";
+import { HistoricalGameKitAbilityUse } from "wrangler/models/HistoricalGameKitAbilityUse.js";
 
 export const minigameRouter = router({
   start: internalProcedure

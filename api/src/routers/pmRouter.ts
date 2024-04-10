@@ -1,11 +1,9 @@
-import { z } from "zod";
 import { internalProcedure, router } from "../trpc.js";
+import { z } from "zod";
 import { db } from "tussler";
-import {
-  MessageChannelMessage,
-  wranglerClient,
-  MessageChannel,
-} from "wrangler";
+import { wranglerClient } from "wrangler";
+import { MessageChannel } from "wrangler/entities/MessageChannel.js";
+import { MessageChannelMessage } from "wrangler/models/MessageChannelMessage.js";
 
 export const pmRouter = router({
   messagePlayer: internalProcedure
