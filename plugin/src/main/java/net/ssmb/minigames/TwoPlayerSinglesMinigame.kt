@@ -154,7 +154,7 @@ class TwoPlayerSinglesMinigame(
         }
 
         losingPlayers.forEach {
-            it.sendMesage(Component.text("You lost!", NamedTextColor.RED))
+            it.sendMessage(Component.text("You lost!", NamedTextColor.RED))
         }
 
         plugin.launch {
@@ -256,7 +256,7 @@ class TwoPlayerSinglesMinigame(
     fun onBrawlAbilityUse(event: BrawlAbilityUseEvent) {
         if (!players.contains(event.player)) return
 
-        events.add(RecordedMinigameAbilityUseEvent(System.currentTimeMillis(), event.abilityId, event.damageDealt))
+        events.add(RecordedMinigameAbilityUseEvent(System.currentTimeMillis(), event.player, event.abilityId, event.damageDealt))
     }
 
     @EventHandler
