@@ -129,16 +129,26 @@ async function deployServices(deploymentPath: string) {
 
   log.info("Installing dependencies...");
 
-  await execa("pnpm install", undefined, { cwd: deploymentPath });
+  await execa("pnpm install", undefined, {
+    cwd: deploymentPath,
+    stdout: "inherit",
+  });
 
   log.info("Building services...");
 
-  await execa("pnpm build", { cwd: deploymentPath });
+  await execa("pnpm build", { cwd: deploymentPath, stdout: "inherit" });
 
   log.info("Killing old processes...");
 
-  await deleteProcessesByName("api");
-  await deleteProcessesByName("server");
+  try {
+    await deleteProcessesByName("api");
+    await deleteProcessesByName("server");
+  } catch (e: any) {
+    log.error({
+      message: "Failed to kill old processes, aborting deployment",
+      ...e,
+    });
+  }
 
   log.info("Starting api...");
 
@@ -146,11 +156,13 @@ async function deployServices(deploymentPath: string) {
     await spawnProcess({
       name: "api",
       env: process.env as any,
-      cwd: process.cwd(),
-      script: "pnpm start --filter=api --log-prefix=none --log-order=stream",
+      cwd: path.join(deploymentPath, "api"),
+      // script: "pnpm start --filter=api --log-prefix=none --log-order=stream",
+      script: "node ./build/index.js",
       max_memory_restart: "4G",
     });
   } catch (e: any) {
+    console.log(e);
     log.error({
       message: "Failed to spawn api proccess, aborting deployment",
       ...e,
