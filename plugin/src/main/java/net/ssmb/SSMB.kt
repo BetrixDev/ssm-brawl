@@ -26,8 +26,11 @@ class SSMB : SuspendingJavaPlugin() {
         instance = this
 
         api = ApiService()
+        api.initialize()
+
         minigames = MinigameService()
         worlds = WorldService()
+
         lang = LangService()
         lang.initLangService()
 

@@ -5,8 +5,8 @@
 # If you need help with the configuration or have any questions related to Purpur,
 # join us in our Discord guild.
 #
-# Website: https://purpurmc.org 
-# Docs: https://purpurmc.org/docs 
+# Website: https://purpurmc.org
+# Docs: https://purpurmc.org/docs
 
 verbose: false
 settings:
@@ -15,12 +15,12 @@ settings:
     afk-broadcast-away: <yellow><italic>%s is now AFK
     afk-broadcast-back: <yellow><italic>%s is no longer AFK
     afk-broadcast-use-display-name: false
-    afk-tab-list-prefix: '[AFK] '
-    afk-tab-list-suffix: ''
+    afk-tab-list-prefix: "[AFK] "
+    afk-tab-list-suffix: ""
     credits-command-output: <green>%s has been shown the end credits
     demo-command-output: <green>%s has been shown the demo screen
     ping-command-output: <green>%s's ping is %sms
-    ram-command-output: '<green>Ram Usage: <used>/<xmx> (<percent>)'
+    ram-command-output: "<green>Ram Usage: <used>/<xmx> (<percent>)"
     rambar-command-output: <green>Rambar toggled <onoff> for <target>
     tpsbar-command-output: <green>Tpsbar toggled <onoff> for <target>
     dont-run-with-scissors: <red><italic>Don't run with scissors!
@@ -75,7 +75,8 @@ settings:
         low: <gradient:#ff5555:#aa0000><text></gradient>
       tick-interval: 20
     tpsbar:
-      title: <gray>TPS<yellow>:</yellow> <tps> MSPT<yellow>:</yellow> <mspt> Ping<yellow>:</yellow>
+      title:
+        <gray>TPS<yellow>:</yellow> <tps> MSPT<yellow>:</yellow> <mspt> Ping<yellow>:</yellow>
         <ping>ms
       overlay: NOTCHED_20
       fill-mode: MSPT
@@ -89,7 +90,7 @@ settings:
         low: <gradient:#ff5555:#aa0000><text></gradient>
       tick-interval: 20
     compass:
-      title: 'S  ·  ◈  ·  ◈  ·  ◈  ·  SW  ·  ◈  ·  ◈  ·  ◈  ·  W  ·  ◈  ·  ◈  ·  ◈  ·  NW  ·  ◈  ·  ◈  ·  ◈  ·  N  ·  ◈  ·  ◈  ·  ◈  ·  NE  ·  ◈  ·  ◈  ·  ◈  ·  E  ·  ◈  ·  ◈  ·  ◈  ·  SE  ·  ◈  ·  ◈  ·  ◈  ·  S  ·  ◈  ·  ◈  ·  ◈  ·  SW  ·  ◈  ·  ◈  ·  ◈  ·  W  ·  ◈  ·  ◈  ·  ◈  ·  NW  ·  ◈  ·  ◈  ·  ◈  ·  N  ·  ◈  ·  ◈  ·  ◈  ·  NE  ·  ◈  ·  ◈  ·  ◈  ·  E  ·  ◈  ·  ◈  ·  ◈  ·  SE  ·  ◈  ·  ◈  ·  ◈  ·  '
+      title: "S  ·  ◈  ·  ◈  ·  ◈  ·  SW  ·  ◈  ·  ◈  ·  ◈  ·  W  ·  ◈  ·  ◈  ·  ◈  ·  NW  ·  ◈  ·  ◈  ·  ◈  ·  N  ·  ◈  ·  ◈  ·  ◈  ·  NE  ·  ◈  ·  ◈  ·  ◈  ·  E  ·  ◈  ·  ◈  ·  ◈  ·  SE  ·  ◈  ·  ◈  ·  ◈  ·  S  ·  ◈  ·  ◈  ·  ◈  ·  SW  ·  ◈  ·  ◈  ·  ◈  ·  W  ·  ◈  ·  ◈  ·  ◈  ·  NW  ·  ◈  ·  ◈  ·  ◈  ·  N  ·  ◈  ·  ◈  ·  ◈  ·  NE  ·  ◈  ·  ◈  ·  ◈  ·  E  ·  ◈  ·  ◈  ·  ◈  ·  SE  ·  ◈  ·  ◈  ·  ◈  ·  "
       overlay: PROGRESS
       progress-color: BLUE
       percent: 1.0
@@ -99,14 +100,14 @@ settings:
     hide-hidden-players-from-entity-selector: false
     uptime:
       format: <days><hours><minutes><seconds>
-      day: '%02d day, '
-      days: '%02d days, '
-      hour: '%02d hour, '
-      hours: '%02d hours, '
-      minute: '%02d minute, and '
-      minutes: '%02d minutes, and '
-      second: '%02d second'
-      seconds: '%02d seconds'
+      day: "%02d day, "
+      days: "%02d days, "
+      hour: "%02d hour, "
+      hours: "%02d hours, "
+      minute: "%02d minute, and "
+      minutes: "%02d minutes, and "
+      second: "%02d second"
+      seconds: "%02d seconds"
   blocks:
     barrel:
       rows: 3
@@ -125,8 +126,8 @@ settings:
       range: 128
     grindstone:
       ignored-enchants:
-      - minecraft:binding_curse
-      - minecraft:vanishing_curse
+        - minecraft:binding_curse
+        - minecraft:vanishing_curse
       remove-attributes: false
       remove-name-and-lore: false
     cave_vines:
@@ -302,10 +303,10 @@ world-settings:
           distance: 8.0
           damage-amount: 4.0
         valid-ring-blocks:
-        - minecraft:prismarine
-        - minecraft:prismarine_bricks
-        - minecraft:sea_lantern
-        - minecraft:dark_prismarine
+          - minecraft:prismarine
+          - minecraft:prismarine_bricks
+          - minecraft:sea_lantern
+          - minecraft:dark_prismarine
       cauldron:
         fill-chances:
           rain: 0.05000000074505806
@@ -1060,7 +1061,7 @@ world-settings:
         controllable: true
         attributes:
           max_health: 30.0
-        breedable-item: ''
+        breedable-item: ""
         breeding-delay-ticks: 6000
         takes-damage-from-water: false
         always-drop-exp: false
@@ -1074,7 +1075,7 @@ world-settings:
           fire-time: 8
         allow-griefing: false
         attributes:
-          max_health: '20.0'
+          max_health: "20.0"
           attack_damage: 6 + size
         attacked-by-crystal-range: 0.0
         attacked-by-crystal-damage: 1.0
@@ -1300,16 +1301,16 @@ world-settings:
         bypass-mob-griefing: false
         takes-damage-from-water: false
         griefable-blocks:
-        - minecraft:oak_leaves
-        - minecraft:spruce_leaves
-        - minecraft:birch_leaves
-        - minecraft:jungle_leaves
-        - minecraft:acacia_leaves
-        - minecraft:dark_oak_leaves
-        - minecraft:beetroots
-        - minecraft:carrots
-        - minecraft:potatoes
-        - minecraft:wheat
+          - minecraft:oak_leaves
+          - minecraft:spruce_leaves
+          - minecraft:birch_leaves
+          - minecraft:jungle_leaves
+          - minecraft:acacia_leaves
+          - minecraft:dark_oak_leaves
+          - minecraft:beetroots
+          - minecraft:carrots
+          - minecraft:potatoes
+          - minecraft:wheat
         always-drop-exp: false
       hoglin:
         ridable: false
@@ -1624,12 +1625,12 @@ world-settings:
         spawner-name: <reset><white>Monster Spawner
         minimal-level: 1
         spawner-lore:
-        - Spawns a <mob>
+          - Spawns a <mob>
         tools:
-        - minecraft:iron_pickaxe
-        - minecraft:golden_pickaxe
-        - minecraft:diamond_pickaxe
-        - minecraft:netherite_pickaxe
+          - minecraft:iron_pickaxe
+          - minecraft:golden_pickaxe
+          - minecraft:diamond_pickaxe
+          - minecraft:netherite_pickaxe
       elytra:
         damage-per-second: 1
         damage-multiplied-by-speed: 0.0

@@ -3,7 +3,7 @@
 # Join our Discord for support: https://discord.gg/reZw4vQV9H
 # Download new builds at https://ci.pufferfish.host/job/Pufferfish
 info:
-  version: '1.0'
+  version: "1.0"
 enable-suffocation-optimization: true
 # Optimizes entity brains when
 # they're far away from the player
@@ -15,9 +15,9 @@ dab:
   blacklisted-entities: []
 # Options for connecting to Pufferfish/Airplane's online utilities
 web-services:
-  token: ''
+  token: ""
 tps-catchup: true
-sentry-dsn: ''
+sentry-dsn: ""
 enable-books: true
 allow-end-crystal-respawn: true
 inactive-goal-selector-throttle: true

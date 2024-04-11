@@ -1,7 +1,7 @@
 name: ssmb
-version: '${project.version}'
+version: "${project.version}"
 main: net.ssmb.SSMB
-api-version: '1.20'
+api-version: "1.20"
 prefix: SSMB
 commands:
   queue:

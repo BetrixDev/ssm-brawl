@@ -1,6 +1,6 @@
 import axios from "axios";
 import { env } from "env/api";
-import { execa } from "execa";
+import { execa, execaCommand, execaCommandSync } from "execa";
 import { Logger } from "logger";
 
 const log = new Logger("server_starter");
@@ -39,4 +39,15 @@ log.info("Starting server...");
 await execa("java -Xmx8G -jar pufferfish.jar -nogui", {
   stdio: "inherit",
   env: process.env,
+});
+
+serverProcess.on("exit", () => {
+  log.info("Server process exited");
+  process.exit(0);
+});
+
+process.on("beforeExit", () => {
+  try {
+    serverProcess.kill();
+  } catch {}
 });

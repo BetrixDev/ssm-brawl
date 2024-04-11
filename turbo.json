@@ -1,53 +1,32 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
+  "globalDependencies": ["**/.env.*local"],
   "pipeline": {
     "db:push": {
-      "dotEnv": [
-        ".env"
-      ],
-      "env": [
-        "DATABASE_TOKEN",
-        "DATABASE_URL"
-      ]
+      "dotEnv": [".env"],
+      "env": ["DATABASE_TOKEN", "DATABASE_URL"]
     },
     "db:studio": {
       "persistent": true,
       "cache": false
     },
     "build:api": {
-      "outputs": [
-        "./api/build/**",
-        "./packages/env/build/**"
-      ],
-      "inputs": [
-        "./api/**",
-        "./packages/env/**"
-      ]
+      "outputs": ["./api/build/**", "./packages/env/build/**"],
+      "inputs": ["./api/**", "./packages/env/**"]
     },
     "start:api": {
       "persistent": true,
-      "dotEnv": [
-        ".env"
-      ],
+      "dotEnv": [".env"],
       "cache": false
     },
     "start": {
       "persistent": true,
-      "dotEnv": [
-        ".env"
-      ],
+      "dotEnv": [".env"],
       "cache": false
     },
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "./build"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["./build"]
     },
     "dev": {
       "cache": false,

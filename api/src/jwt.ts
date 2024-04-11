@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { env } from "env/api";
 import { z } from "zod";
+import cookies from "cookie";
 
 export const BackendSource = z.enum(["plugin", "web", "brawlie"]);
 export type BackendSource = z.infer<typeof BackendSource>;
@@ -22,26 +23,16 @@ export type JwtClaims = z.infer<typeof JwtClaims>;
 
 export async function decodeTokenFromHeaders(headers: Headers) {
   try {
-    const cookieToken = headers.get("Cookie")?.split(" ")?.at(1);
+    const headerCookies = headers.get("Cookie");
+
+    const cookieToken = cookies.parse(headerCookies ?? "");
     const authToken = headers.get("Authorization")?.split(" ")?.at(1);
 
-    const encodedToken = cookieToken ?? authToken;
+    const encodedToken = cookieToken["token"] ?? authToken;
 
     if (!encodedToken) return;
 
-    const decodedToken = JwtClaims.parse(
-      jwt.verify(encodedToken, env.JWT_PRIVATE_KEY)
-    );
-
-    // explicitly check for source and where the token came from to prevent tomfoolery
-
-    if (decodedToken.source === "user" && cookieToken !== undefined) {
-      return decodedToken;
-    }
-
-    if (decodedToken.source !== "user" && authToken !== undefined) {
-      return decodedToken;
-    }
+    return JwtClaims.parse(jwt.verify(encodedToken, env.JWT_PRIVATE_KEY));
   } catch {
     return;
   }

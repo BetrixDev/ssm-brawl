@@ -4,12 +4,14 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.cookies.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.*
 import net.ssmb.dtos.player.BasicPlayerDataRequest
 import net.ssmb.dtos.player.BasicPlayerDataResponse
@@ -22,7 +24,7 @@ import net.ssmb.dtos.queue.RemovePlayerResponse
 import org.bukkit.entity.Player
 
 class ApiService {
-    private val apiToken = System.getenv("API_TOKEN_SECRET")
+    private val secretToken = System.getenv("API_TOKEN_SECRET")
     private val apiHost = System.getenv("API_HOST")
     private val apiPort = System.getenv("API_PORT")
     private val apiProtocol = System.getenv("API_PROTOCOL")
@@ -30,14 +32,16 @@ class ApiService {
     private val client = HttpClient(CIO) {
         install(Logging) {
             logger = Logger.DEFAULT
-            level = LogLevel.HEADERS
+            level = LogLevel.ALL
         }
         install(ContentNegotiation) {
             json()
         }
+        install(HttpCookies) {
+            storage = AcceptAllCookiesStorage()
+        }
         defaultRequest {
-            url("$apiProtocol://$apiHost:$apiPort/api/")
-            bearerAuth(apiToken)
+            url("$apiProtocol://$apiHost:$apiPort")
             contentType(ContentType.Application.Json)
         }
     }
@@ -46,8 +50,22 @@ class ApiService {
         ignoreUnknownKeys = true
     }
 
+    suspend fun initialize() {
+        val tokenGeneratorResponse = client.post("generateToken/plugin") {
+            headers {
+                append("Secret", secretToken)
+            }
+        }
+
+        SSMB.instance.logger.info(tokenGeneratorResponse.setCookie().toString())
+
+        if (tokenGeneratorResponse.status.value != 200) {
+            throw RuntimeException("Error grabbing token for api")
+        }
+    }
+
     suspend fun queueAddPlayer(player: Player, minigameId: String, force: Boolean?): AddPlayerResponse {
-        val response = client.post("queue.addPlayer") {
+        val response = client.post("api/queue.addPlayer") {
             setBody(AddPlayerRequest(player.identity().uuid().toString(), minigameId, force))
         }
 
@@ -63,7 +81,7 @@ class ApiService {
     }
 
     suspend fun queueRemovePlayers(playerUuids: List<String>): Int {
-        val response = client.post("queue.removePlayer") {
+        val response = client.post("api/queue.removePlayer") {
             setBody(RemovePlayerResponse(playerUuids))
         }
 
@@ -71,7 +89,7 @@ class ApiService {
     }
 
     suspend fun minigameStart(playerUuids: List<String>, minigameId: String): MinigameStartResponse {
-        val response = client.post("minigame.start") {
+        val response = client.post("api/minigame.start") {
             setBody(MinigameStartRequest(playerUuids, minigameId))
         }
 
@@ -82,7 +100,7 @@ class ApiService {
     }
 
     suspend fun minigameEnd(payload: MinigameEndRequest): MinigameEndResponse {
-        val response = client.post("minigame.end") {
+        val response = client.post("api/minigame.end") {
             setBody(payload)
         }
 
@@ -93,13 +111,13 @@ class ApiService {
     }
 
     suspend fun langAllEntries(): Map<String, String> {
-        val response = client.get("lang.getAllEntries")
+        val response = client.get("api/lang.getAllEntries")
 
         return json.decodeFromString(response.bodyAsText())
     }
 
     suspend fun playerBasicData(player: Player): BasicPlayerDataResponse {
-        val response = client.post("player.getBasicPlayerData") {
+        val response = client.post("api/player.getBasicPlayerData") {
             setBody(BasicPlayerDataRequest(player.uniqueId.toString()))
         }
 
@@ -107,7 +125,7 @@ class ApiService {
     }
 
     suspend fun playerIsIpBanned(ip: String, player: Player): IsIpBannedResponse {
-        val response = client.post("player.isIpBanned") {
+        val response = client.post("api/player.isIpBanned") {
             setBody(IsIpBannedRequest(ip, player.uniqueId.toString()))
         }
 

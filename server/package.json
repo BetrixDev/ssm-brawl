@@ -2,7 +2,8 @@
   "name": "server",
   "type": "module",
   "scripts": {
-    "start": "node ./start-server.js"
+    "start": "node ./start-server.js",
+    "dev": "node ./start-server.js"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",

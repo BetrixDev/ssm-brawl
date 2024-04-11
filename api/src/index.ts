@@ -73,6 +73,7 @@ app.all("/api/*", async (c) => {
     routerResponse = await routerProcedure(requestBody);
   } catch (e: unknown) {
     if (e instanceof TRPCError) {
+      log.error(e);
       const statusCode = getHTTPStatusCodeFromError(e);
       c.status(statusCode as any);
     } else {
@@ -89,7 +90,9 @@ app.all("/api/*", async (c) => {
 
 app.get("/panel", async (c) => {
   return c.html(
-    renderTrpcPanel(appRouter, { url: "http://localhost:3000/trpc" })
+    renderTrpcPanel(appRouter, {
+      url: `${env.API_PROTOCOL}:/${env.API_HOST}:${env.API_PORT}/trpc`,
+    })
   );
 });
 
@@ -105,13 +108,10 @@ app.post("/generateToken/:source", async (c) => {
 
     const token = await generateBackendToken(source);
 
-    c.header("Set-Cookie", `token=${token}; HttpOnly`);
+    c.header("Set-Cookie", `token=${token}; path=/`);
 
     c.status(200);
-
-    return c.json({
-      token,
-    });
+    return c.text(token);
   } catch {
     return c.status(400);
   }

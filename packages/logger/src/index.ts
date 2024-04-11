@@ -5,20 +5,39 @@ export function middlewareLogger(log: Logger): MiddlewareHandler {
   return async (c, next) => {
     const start = Date.now();
 
-    log.info({
-      method: c.req.method,
-      path: c.req.path,
-      payload: c.req.raw.body,
-    });
+    try {
+      log.info({
+        method: c.req.method,
+        path: c.req.path,
+        //         requestBody: await c.req.raw.json(),
+      });
+    } catch {
+      log.info({
+        method: c.req.method,
+        path: c.req.path,
+        requestBody: null,
+      });
+    }
 
     await next();
 
-    log.info({
-      method: c.req.method,
-      path: c.req.path,
-      status: c.res.status,
-      elapsedMs: Date.now() - start,
-    });
+    try {
+      log.info({
+        method: c.req.method,
+        path: c.req.path,
+        status: c.res.status,
+        elapsedMs: Date.now() - start,
+        //                responseBody: await c.res.json()
+      });
+    } catch {
+      log.info({
+        method: c.req.method,
+        path: c.req.path,
+        status: c.res.status,
+        elapsedMs: Date.now() - start,
+        responseBody: null,
+      });
+    }
   };
 }
 
