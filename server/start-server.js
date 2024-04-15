@@ -1,7 +1,9 @@
 import axios from "axios";
 import { env } from "env/api";
 import { execa, execaCommand, execaCommandSync } from "execa";
+import { readdirSync, rmSync } from "fs";
 import { Logger } from "logger";
+import pm from "picomatch";
 
 const log = new Logger("server_starter");
 
@@ -9,6 +11,14 @@ const API_CONNECTION_TIMEOUT = 30000;
 
 let isApiConnected = false;
 let timeStarted = Date.now();
+
+log.info("Removing old worlds");
+
+readdirSync(process.cwd()).forEach((dir) => {
+  if (pm("*servers_*")(dir)) {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
 
 log.info("Waiting for API connection...");
 
