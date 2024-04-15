@@ -38,7 +38,7 @@ class SSMB : SuspendingJavaPlugin() {
 
         getCommand("queue")!!.setSuspendingExecutor(QueueCommand())
 
-        server.pluginManager.registerSuspendingEvents(PlayerJoinListener(), this)
+        server.pluginManager.registerEvents(PlayerJoinListener(), this)
         server.pluginManager.registerEvents(InventoryOpenListener(), this)
         server.pluginManager.registerEvents(PlayerPickItemListener(), this)
         server.pluginManager.registerEvents(PlayerDropItemListener(), this)
