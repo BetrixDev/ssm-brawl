@@ -1,7 +1,7 @@
 import { Column, Entity, ObjectId, ObjectIdColumn } from "typeorm";
 import { HistoricalGamePlayer } from "../models/HistoricalGamePlayer.js";
 
-@Entity()
+@Entity("historical_games")
 export class HistoricalGame {
   @ObjectIdColumn()
   gameId: string;

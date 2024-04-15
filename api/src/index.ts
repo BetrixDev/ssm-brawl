@@ -13,7 +13,7 @@ import {
   decodeTokenFromHeaders,
   generateBackendToken,
 } from "./jwt.js";
-import { WranglerDataSource } from "wrangler";
+import { wranglerDataSource } from "wrangler";
 import { log } from "./log.js";
 import { middlewareLogger } from "logger";
 
@@ -118,7 +118,7 @@ app.post("/generateToken/:source", async (c) => {
 });
 
 serve({ ...app, port: env.API_PORT }, async (info) => {
-  await WranglerDataSource.initialize();
+  await wranglerDataSource.initialize();
 
   console.log(`Backend listening on http://localhost:${info.port}`);
 });
