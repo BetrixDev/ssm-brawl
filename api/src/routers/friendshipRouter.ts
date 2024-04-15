@@ -8,14 +8,14 @@ export const friendshipRouter = router({
       z.object({
         inviterUuid: z.string(),
         inviteeUuid: z.string(),
-      })
+      }),
     )
     .query(async ({ input }) => {
       const existingFriendship = await db.query.friendships.findFirst({
         where: (table, { eq, and }) =>
           and(
             eq(table.uuid1, input.inviterUuid),
-            eq(table.uuid2, input.inviteeUuid)
+            eq(table.uuid2, input.inviteeUuid),
           ),
       });
 
@@ -46,7 +46,7 @@ export const friendshipRouter = router({
       z.object({
         inviterUuid: z.string(),
         inviteeUuid: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       await db
@@ -68,7 +68,7 @@ export const friendshipRouter = router({
       z.object({
         player1Uuid: z.string(),
         player2Uuid: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       await db
@@ -77,20 +77,20 @@ export const friendshipRouter = router({
           or(
             and(
               eq(friendships.uuid1, input.player1Uuid),
-              eq(friendships.uuid2, input.player2Uuid)
+              eq(friendships.uuid2, input.player2Uuid),
             ),
             and(
               eq(friendships.uuid1, input.player2Uuid),
-              eq(friendships.uuid2, input.player1Uuid)
-            )
-          )
+              eq(friendships.uuid2, input.player1Uuid),
+            ),
+          ),
         );
     }),
   getPlayersFriends: internalProcedure
     .input(
       z.object({
         playerUuid: z.string(),
-      })
+      }),
     )
     .query(async ({ input }) => {
       return await db.query.friendships.findMany({

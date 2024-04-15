@@ -77,7 +77,7 @@ async function getLatestPluginAssetId() {
     });
 
     return response.data.assets.find(({ name }) =>
-      pm.isMatch(name, "ssmb*.jar")
+      pm.isMatch(name, "ssmb*.jar"),
     )?.id;
   } catch {
     return;
@@ -89,7 +89,7 @@ async function deployServices(deploymentPath: string) {
 
   if (!pluginAssetId) {
     log.error(
-      "Failed to download get plugin asset id from release, aborting deployment"
+      "Failed to download get plugin asset id from release, aborting deployment",
     );
     return;
   }
@@ -119,7 +119,7 @@ async function deployServices(deploymentPath: string) {
 
     writeFileSync(
       pluginPath,
-      Buffer.from(pluginBinary.data as any as ArrayBuffer)
+      Buffer.from(pluginBinary.data as any as ArrayBuffer),
     );
   } catch (e) {
     writeFileSync("error.json", JSON.stringify(e));
@@ -243,7 +243,7 @@ async function onActionFinished() {
   log.info("Unzipping deployment contents...");
 
   const archive = new AdmZip(
-    Buffer.from(deloymentContentsResponse.data as ArrayBuffer)
+    Buffer.from(deloymentContentsResponse.data as ArrayBuffer),
   );
 
   const entries = archive.getEntries();
@@ -260,13 +260,13 @@ async function onActionFinished() {
     return ignoredGlobs.some((glob) =>
       // Replace periods with a random character when glob is within
       //  a directory since otherwise matching is not consistent
-      pm.isMatch(glob.includes("/") ? path.replace(".", "a") : path, glob)
+      pm.isMatch(glob.includes("/") ? path.replace(".", "a") : path, glob),
     );
   }
 
   const deploymentDir = path.join(
     DEPLOYMENTS_DIR,
-    `${Date.now()}-${deploymentId}`
+    `${Date.now()}-${deploymentId}`,
   );
 
   mkdirSync(deploymentDir);
@@ -280,7 +280,7 @@ async function onActionFinished() {
 
     const entryPath = path.join(
       deploymentDir,
-      entry.entryName.split("/").slice(1).join("/")
+      entry.entryName.split("/").slice(1).join("/"),
     );
 
     if (entry.entryName.at(-1) === "/") {
@@ -308,7 +308,7 @@ function verifySignature(req: Request) {
     let trusted = Buffer.from(`sha256=${signature}`, "ascii");
     let untrusted = Buffer.from(
       req.headers.get("x-hub-signature-256")!,
-      "ascii"
+      "ascii",
     );
     return crypto.timingSafeEqual(trusted, untrusted);
   } catch {

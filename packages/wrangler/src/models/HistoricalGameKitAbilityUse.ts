@@ -13,7 +13,7 @@ export class HistoricalGameKitAbilityUse {
   constructor(
     abilityId: string,
     usedAt: number,
-    { damageDealt }: { damageDealt?: number } = {}
+    { damageDealt }: { damageDealt?: number } = {},
   ) {
     this.abilityId = abilityId;
     this.usedAt = usedAt;

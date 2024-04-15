@@ -18,7 +18,7 @@ export class HistoricalGameKit {
     id: string,
     dateFirstUsed: number,
     dateLastUsed: number,
-    abilityUsage: HistoricalGameKitAbilityUse[] = []
+    abilityUsage: HistoricalGameKitAbilityUse[] = [],
   ) {
     this.id = id;
     this.dateFirstUsed = dateFirstUsed;

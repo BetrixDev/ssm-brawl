@@ -12,7 +12,7 @@ export const pmRouter = router({
         authorUuid: z.string(),
         targetUuid: z.string(),
         content: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       let canSendMessage = false;
@@ -21,7 +21,7 @@ export const pmRouter = router({
         where: (table, { eq, and }) =>
           and(
             eq(table.uuid1, input.authorUuid),
-            eq(table.uuid2, input.targetUuid)
+            eq(table.uuid2, input.targetUuid),
           ),
       });
 
@@ -49,7 +49,7 @@ export const pmRouter = router({
 
       const messageEntry = new MessageChannelMessage(
         input.authorUuid,
-        input.content
+        input.content,
       );
 
       const existingChannel = await messageChannelRepo.findOne({
@@ -64,8 +64,8 @@ export const pmRouter = router({
         await messageChannelRepo.insertOne(
           new MessageChannel(
             [input.authorUuid, input.targetUuid],
-            [messageEntry]
-          )
+            [messageEntry],
+          ),
         );
       } else {
         existingChannel.messages.push(messageEntry);
@@ -82,7 +82,7 @@ export const pmRouter = router({
     .input(
       z.object({
         users: z.array(z.string()),
-      })
+      }),
     )
     .query(async ({ input }) => {
       const messageChannel = await wranglerClient

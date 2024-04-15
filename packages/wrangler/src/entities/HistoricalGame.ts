@@ -19,7 +19,7 @@ export class HistoricalGame {
     gameId: string,
     minigameId: string,
     mapId: string,
-    players: HistoricalGamePlayer[]
+    players: HistoricalGamePlayer[],
   ) {
     this.gameId = gameId;
     this.minigameId = minigameId;

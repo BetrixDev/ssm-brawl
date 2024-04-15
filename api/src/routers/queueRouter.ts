@@ -10,7 +10,7 @@ export const queueRouter = router({
         playerUuid: z.string(),
         minigameId: z.string(),
         force: z.boolean().optional(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       if (input.force) {
@@ -46,7 +46,7 @@ export const queueRouter = router({
 
       if (isValidGroupSizeForQueue && isEnoughPlayersInQueue) {
         const queuedPlayers = minigameData.queueEntries.map(
-          (q) => q.playerUuid
+          (q) => q.playerUuid,
         );
 
         return {

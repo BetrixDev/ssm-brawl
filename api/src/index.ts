@@ -42,7 +42,7 @@ app.use(
         resHeaders,
       };
     },
-  })
+  }),
 );
 
 app.all("/api/*", async (c) => {
@@ -92,7 +92,7 @@ app.get("/panel", async (c) => {
   return c.html(
     renderTrpcPanel(appRouter, {
       url: `${env.API_PROTOCOL}:/${env.API_HOST}:${env.API_PORT}/trpc`,
-    })
+    }),
   );
 });
 

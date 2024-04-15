@@ -37,7 +37,7 @@ export class Logger {
     level: keyof typeof LOG_LEVELS,
     data: {
       message?: string;
-    } & any
+    } & any,
   ) {
     const logPayload = {
       service: this.service,

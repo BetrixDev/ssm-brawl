@@ -25,7 +25,7 @@ import { HistoricalGameKitAbilityUse } from "wrangler/models/HistoricalGameKitAb
 export const minigameRouter = router({
   start: internalProcedure
     .input(
-      z.object({ playerUuids: z.array(z.string()), minigameId: z.string() })
+      z.object({ playerUuids: z.array(z.string()), minigameId: z.string() }),
     )
     .mutation(async ({ input }) => {
       const [minigame, dbPlayerData] = await db.batch([
@@ -84,7 +84,7 @@ export const minigameRouter = router({
             where: and(
               lte(maps.minPlayers, minigame.minPlayers),
               gte(maps.maxPlayers, minigame.maxPlayers),
-              eq(maps.role, "game")
+              eq(maps.role, "game"),
             ),
             with: {
               spawnPoints: true,
@@ -133,13 +133,13 @@ export const minigameRouter = router({
                     abilityId: z.string(),
                     usedAt: z.number(),
                     damageDealt: z.number().optional(),
-                  })
+                  }),
                 ),
-              })
+              }),
             ),
-          })
+          }),
         ),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const historicalGameRepository =
@@ -151,14 +151,14 @@ export const minigameRouter = router({
             (a) =>
               new HistoricalGameKitAbilityUse(a.abilityId, a.usedAt, {
                 damageDealt: a.damageDealt,
-              })
+              }),
           );
 
           return new HistoricalGameKit(
             k.id,
             k.startTime,
             k.endTime,
-            abilityUsage
+            abilityUsage,
           );
         });
 
