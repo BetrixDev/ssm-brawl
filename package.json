@@ -5,7 +5,7 @@
     "start": "dotenv -- turbo start",
     "start:server": "dotenv -- turbo start --filter=api --filter=server",
     "dev:server": "dotenv -- turbo dev --filter=api --filter=server",
-    "build:api": "turbo build --filter=env --filter=api --filter=wrangler --filter=tussler --force",
+    "build:api": "turbo build --filter=env --filter=api --filter=wrangler --filter=tussler --filter=proc --force",
     "start:api": "dotenv -- turbo start --filter=api",
     "dev:api": "dotenv -- turbo dev --filter=api",
     "dev:orchestrator": "dotenv -- turbo dev --filter=orchestrator",

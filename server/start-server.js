@@ -1,6 +1,6 @@
 import axios from "axios";
 import { env } from "env/api";
-import { execa, execaCommand, execaCommandSync } from "execa";
+import { execa } from "execa";
 import { readdirSync, rmSync } from "fs";
 import { Logger } from "logger";
 import pm from "picomatch";

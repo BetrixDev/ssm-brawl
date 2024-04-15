@@ -1,8 +1,17 @@
-import { Column, Entity, ObjectId, ObjectIdColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  ObjectId,
+  ObjectIdColumn,
+  PrimaryColumn,
+} from "typeorm";
 import { MessageChannelMessage } from "../models/MessageChannelMessage.js";
 
 @Entity("message_channels")
 export class MessageChannel {
+  @ObjectIdColumn()
+  _id!: string;
+
   @Column()
   users: string[];
 

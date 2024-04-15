@@ -1,12 +1,13 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { JwtClaims } from "./jwt.js";
+import { TRPCPanelMeta } from "trpc-panel";
 
 export type TrpcContext = {
   claims: JwtClaims;
   resHeaders: Headers;
 };
 
-export const t = initTRPC.context<TrpcContext>().create();
+export const t = initTRPC.meta<TRPCPanelMeta>().context<TrpcContext>().create();
 
 export const router = t.router;
 export const procedure = t.procedure;
