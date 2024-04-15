@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BasicPlayerDataResponse(
     val uuid: String,
-    val selectedKidId: String,
+    val selectedKitId: String,
     val totalGamesPlayed: Int,
     val totalGamesWon: Int,
     val totalPlaytimeSeconds: Long,
