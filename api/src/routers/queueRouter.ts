@@ -66,6 +66,10 @@ export const queueRouter = router({
     .mutation(async ({ input }) => {
       await db
         .delete(queue)
-        .where(inArray(queue.playerUuid, input.playerUuids));
+        .where(inArray(queue.playerUuid, input.playerUuids))
+        .execute()
     }),
+    flushQueue: internalProcedure.mutation(async () => {
+      await db.delete(queue).execute()
+    })
 });

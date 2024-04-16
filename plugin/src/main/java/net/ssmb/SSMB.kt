@@ -49,6 +49,7 @@ class SSMB : SuspendingJavaPlugin() {
     }
 
     override suspend fun onDisableAsync() {
+        api.queueFlush()
         worlds.deleteAllLoadedWorlds()
     }
 }

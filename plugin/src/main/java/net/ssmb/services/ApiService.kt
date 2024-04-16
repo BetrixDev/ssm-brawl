@@ -88,6 +88,12 @@ class ApiService {
         return response.status.value
     }
 
+    suspend fun queueFlush(): Int {
+        val response = client.post("api/queue.flush")
+
+        return response.status.value
+    }
+
     suspend fun minigameStart(playerUuids: List<String>, minigameId: String): MinigameStartResponse {
         val response = client.post("api/minigame.start") {
             setBody(MinigameStartRequest(playerUuids, minigameId))
