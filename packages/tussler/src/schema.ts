@@ -96,6 +96,13 @@ export const passivesToKits = sqliteTable(
   }),
 );
 
+export const userCache = sqliteTable("user_cache", {
+  uuid: text("uuid", {length: 36}).primaryKey(),
+  username: text("username").notNull()
+}, (table) => ({
+  userCacheUuidIdx: index("user_cache_uuid_idx").on(table.uuid)
+}))
+
 export const basicPlayerData = sqliteTable(
   "basic_player_data",
   {

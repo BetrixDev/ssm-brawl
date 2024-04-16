@@ -35,6 +35,10 @@
     "./wrangler": {
       "types": "./src/wrangler.ts",
       "import": "./build/src/wrangler.js"
+    },
+    "./brawlie": {
+      "types": "./src/brawlie.ts",
+      "import": "./build/src/brawlie.js"
     }
   }
 }

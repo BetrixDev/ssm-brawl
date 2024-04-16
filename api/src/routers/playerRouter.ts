@@ -2,6 +2,7 @@ import { z } from "zod";
 import { internalProcedure, router } from "../trpc.js";
 import { queryClient } from "../utils/query-client.js";
 import { basicPlayerData, db, eq } from "tussler";
+import { searchPlayerNames } from "../search/player-names.js";
 
 export const playerRouter = router({
   getBasicPlayerData: internalProcedure
@@ -74,5 +75,14 @@ export const playerRouter = router({
           isBanned: false,
         };
       }
+    }),
+  searchPlayers: internalProcedure
+    .input(
+      z.object({
+        query: z.string(),
+      })
+    )
+    .query(({ input }) => {
+      return searchPlayerNames(input.query);
     }),
 });

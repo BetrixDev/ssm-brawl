@@ -19,6 +19,7 @@ import { middlewareLogger } from "logger";
 import { HistoricalGame } from "wrangler/entities/HistoricalGame.js";
 import { HistoricalGamePlayer } from "wrangler/models/HistoricalGamePlayer.js";
 import { HistoricalGameKit } from "wrangler/models/HistoricalGameKit.js";
+import { initPlayerNameEngine } from "./search/player-names.js";
 
 const app = new Hono();
 
@@ -121,22 +122,7 @@ app.post("/generateToken/:source", async (c) => {
 });
 
 serve({ ...app, port: env.API_PORT }, async (info) => {
-  await wranglerDataSource.initialize();
-
-  await wranglerClient.save(
-    HistoricalGame,
-    new HistoricalGame("1782689512", "test_minigame", "campsite", [
-      new HistoricalGamePlayer("84c7083c-3db7-48fc-b3e3-2481401ea88c", 4, [
-        new HistoricalGameKit("creeper", Date.now(), Date.now() + 36000, []),
-        new HistoricalGameKit(
-          "skeleton",
-          Date.now() + 36000,
-          Date.now() + 720000,
-          []
-        ),
-      ]),
-    ])
-  );
+  await Promise.all([wranglerDataSource.initialize(), initPlayerNameEngine()]);
 
   console.log(`Backend listening on http://localhost:${info.port}`);
 });

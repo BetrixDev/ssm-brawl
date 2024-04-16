@@ -5,3 +5,4 @@ packages:
   - "server"
   - "orchestrator"
   - "observer"
+  - "brawlie"
