@@ -6,6 +6,7 @@ import net.ssmb.abilities.constructAbilityFromData
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.events.BrawlDamageEvent
 import net.ssmb.events.BrawlDamageType
+import net.ssmb.extensions.getMetadata
 import net.ssmb.extensions.metadata
 import net.ssmb.minigames.IMinigame
 import net.ssmb.passives.IPassive
@@ -50,6 +51,8 @@ class CreeperKit(
 
         player.metadata {
             set(TaggedKeyDouble("knockback_multiplier"), kitData.knockbackMult)
+            set(TaggedKeyDouble("hitbox_width"), kitData.hitboxWidth)
+            set(TaggedKeyDouble("hitbox_height"), kitData.hitboxHeight)
         }
 
         kitData.abilities.forEach {
@@ -68,6 +71,8 @@ class CreeperKit(
     override fun destroyKit() {
         player.metadata {
             remove(TaggedKeyDouble("knockback_multiplier"))
+            remove(TaggedKeyDouble("hitbox_width"))
+            remove(TaggedKeyDouble("hitbox_height"))
         }
 
         abilities.forEach {
@@ -93,20 +98,21 @@ class CreeperKit(
             !it.key.contains(player)
         }.map {
             it.key
-        }.flatten().map {
-            minigame.playerKits[it]!!
-        }.find {
+        }.flatten().find {
+            val hitboxWidth = it.getMetadata(TaggedKeyDouble("hitbox_width")) ?: 1.0
+            val hitboxHeight = it.getMetadata(TaggedKeyDouble("hitbox_heights")) ?: 1.0
+
             val boundingBox = BoundingBox.of(
-                it.player.location,
-                it.kitData.hitboxWidth,
-                it.kitData.hitboxHeight,
-                it.kitData.hitboxWidth
+                it.location,
+                hitboxWidth,
+                hitboxHeight,
+                hitboxWidth
             )
 
             val rayTraceResult = boundingBox.rayTrace(player.eyeLocation.toVector(), player.location.direction, 4.5)
 
             rayTraceResult != null && rayTraceResult.hitEntity != null
-        }?.player ?: return
+        }?: return
 
         event.isCancelled = true
 
