@@ -14,20 +14,28 @@ class LangService {
         langEntries = api.langAllEntries()
     }
 
-    fun getComponent(key: String, variables: HashMap<String, String>? = null): Component {
-        var rawString = langEntries[key] ?: return Component.text("NO ENTRY EXISTS FOR ID $key")
+    private fun parseLang(rawString: String, variables: HashMap<String, String>? = null): String {
+        var parsedString = rawString
 
         val variablesToReplace = regex.findAll(rawString)
 
         variablesToReplace.forEach {
-            rawString = if (langEntries[it.value] != null) {
-                rawString.replace("{${it.value}}", langEntries[it.value]!!, ignoreCase = true)
+            parsedString = if (langEntries[it.value] != null) {
+                parsedString.replace("{${it.value}}", parseLang(langEntries[it.value]!!, variables), ignoreCase = true)
             } else {
                 val variable = variables!![it.value]!!
-                rawString.replace("{${it.value}}", variable, ignoreCase = true)
+                parsedString.replace("{${it.value}}", variable, ignoreCase = true)
             }
         }
 
-        return MiniMessage.miniMessage().deserialize(rawString)
+        return parsedString
+    }
+
+    fun getComponent(key: String, variables: HashMap<String, String>? = null): Component {
+        val rawString = langEntries[key] ?: "NO ENTRY EXISTS FOR KEY $key"
+
+       val parsedString = parseLang(rawString, variables)
+
+        return MiniMessage.miniMessage().deserialize(parsedString)
     }
 }
