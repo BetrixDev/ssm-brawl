@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node ./build/index.js",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc",
     "dev": "tsx watch src/index.ts"
   },
   "dependencies": {
