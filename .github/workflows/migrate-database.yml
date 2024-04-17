@@ -1,0 +1,33 @@
+name: Migrate Database
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "packages/tussler/**"
+      - ".github/workflows/migrate-database.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run migrations
+        run: pnpm run push-migrations
+        env:
+          TUSSLER_TOKEN: ${{ secrets.TUSSLER_TOKEN }}
+          TUSSLER_URL: ${{ secrets.TUSSLER_URL }}

@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema.js";
 import { createClient } from "@libsql/client";
 
-const client = createClient({
+export const libsqlClient = createClient({
   url: env.TUSSLER_URL,
   syncUrl: env.TUSSLER_SYNC_URL,
   syncInterval: env.TUSSLER_SYNC_INTERVAL,
@@ -11,10 +11,12 @@ const client = createClient({
 });
 
 process.on("beforeExit", async (sig) => {
-  await client.sync();
+  try {
+    await libsqlClient.sync();
+  } catch {}
   process.exit(sig);
 });
 
-export const db = drizzle(client, { schema });
+export const db = drizzle(libsqlClient, { schema });
 export * from "drizzle-orm";
 export * from "./schema.js";

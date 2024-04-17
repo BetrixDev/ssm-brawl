@@ -7,4 +7,5 @@ export default defineConfig({
     url: process.env.TUSSLER_URL!,
     authToken: process.env.TUSSLER_TOKEN!,
   },
+  out: "./migrations",
 });
