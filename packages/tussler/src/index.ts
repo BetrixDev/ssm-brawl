@@ -10,10 +10,10 @@ const client = createClient({
   authToken: env.TUSSLER_TOKEN,
 });
 
-process.on("beforeExit", async (sig) =>{
-  await client.sync()
-  process.exit(sig)
-})
+process.on("beforeExit", async (sig) => {
+  await client.sync();
+  process.exit(sig);
+});
 
 export const db = drizzle(client, { schema });
 export * from "drizzle-orm";

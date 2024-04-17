@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 sealed class MinigameStartResponse {
     data class Success(val value: MinigameStartSuccess) : MinigameStartResponse()
+
     data class Error(val value: MiniGameError) : MinigameStartResponse()
 }
 
@@ -44,7 +45,11 @@ sealed class MinigameStartSuccess(
             @Serializable
             sealed class AbilityEntry(val ability: AbilityData, val abilityToolSlot: Int) {
                 @Serializable
-                data class AbilityData(val id: String, val cooldown: Long, val meta: Map<String, String>?)
+                data class AbilityData(
+                    val id: String,
+                    val cooldown: Long,
+                    val meta: Map<String, String>?
+                )
             }
 
             @Serializable
@@ -54,13 +59,16 @@ sealed class MinigameStartSuccess(
             }
 
             @Serializable
-            data class DisguiseData(val id: String, val displayEntity: String, val hurtSound: String)
+            data class DisguiseData(
+                val id: String,
+                val displayEntity: String,
+                val hurtSound: String
+            )
         }
     }
 
     @Serializable
     sealed class MapData(val id: String, val spawnPoints: List<SpawnPoint>) {
-        @Serializable
-        data class SpawnPoint(val x: Double, val y: Double, val z: Double)
+        @Serializable data class SpawnPoint(val x: Double, val y: Double, val z: Double)
     }
 }

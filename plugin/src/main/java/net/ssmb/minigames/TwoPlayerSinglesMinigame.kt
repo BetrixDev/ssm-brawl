@@ -4,6 +4,7 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import com.github.shynixn.mccoroutine.bukkit.ticks
 import io.papermc.paper.entity.LookAnchor
+import java.time.Duration
 import kotlinx.coroutines.delay
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.sound.Sound
@@ -32,10 +33,9 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.util.Vector
-import java.time.Duration
 
 class TwoPlayerSinglesMinigame(
-    private val players: List<Player>,
+    override val players: List<Player>,
     private val minigameData: MinigameStartSuccess
 ) : IMinigame, Listener {
     private val plugin = SSMB.instance
@@ -43,7 +43,8 @@ class TwoPlayerSinglesMinigame(
     private lateinit var minigameWorld: World
     private var startedAt = System.currentTimeMillis()
     override val playerKits = hashMapOf<Player, IKit>()
-    override val teamsStocks = hashMapOf<List<Player>, Int>()
+    override val teamsStocks = arrayListOf<Pair<ArrayList<Player>, Int>>()
+    private val playersLeftInProgress = listOf<Player>()
 
     private val events = arrayListOf<RecordedMinigameEvent>()
 
@@ -63,6 +64,11 @@ class TwoPlayerSinglesMinigame(
         }
     }
 
+    override fun removePlayer(player: Player) {
+        val playerKit = playerKits[player]
+        playerKit?.destroyKit()
+    }
+
     private fun doMinigameLoading() {
         minigameWorld = plugin.worlds.createSsmbWorld(minigameData.map.id, minigameData.gameId)
 
@@ -74,11 +80,12 @@ class TwoPlayerSinglesMinigame(
             it.walkSpeed = 0.0f
             it.lookAt(minigameWorld.spawnLocation, LookAnchor.EYES)
 
-            val playerData = minigameData.players.find { itt -> itt.uuid == it.uniqueId.toString() }!!
+            val playerData =
+                minigameData.players.find { itt -> itt.uuid == it.uniqueId.toString() }!!
             val kit = constructKitFromData(it, playerData.selectedKit, this)
             kit.initializeKit()
 
-            teamsStocks[listOf(it)] = minigameData.minigame.stocks
+            teamsStocks.add(Pair(arrayListOf(it), minigameData.minigame.stocks))
 
             playerKits[it] = kit
         }
@@ -87,20 +94,21 @@ class TwoPlayerSinglesMinigame(
     }
 
     private fun doMinigameCountdown() {
-        val titleTimes = Title.Times.times(
-            Duration.ofMillis(100),
-            Duration.ofMillis(500),
-            Duration.ofMillis(100)
-        )
+        val titleTimes =
+            Title.Times.times(
+                Duration.ofMillis(100),
+                Duration.ofMillis(500),
+                Duration.ofMillis(100)
+            )
 
         plugin.launch {
             repeat(5) {
-
-                val title = Title.title(
-                    Component.text("Starting in ${5 - it}", NamedTextColor.GOLD),
-                    Component.empty(),
-                    titleTimes
-                )
+                val title =
+                    Title.title(
+                        Component.text("Starting in ${5 - it}", NamedTextColor.GOLD),
+                        Component.empty(),
+                        titleTimes
+                    )
 
                 minigameWorld.showTitle(title)
                 minigameWorld.playSound(
@@ -115,20 +123,16 @@ class TwoPlayerSinglesMinigame(
                 delay(20.ticks)
             }
 
-            val startTitle = Title.title(
-                Component.text("Start!", NamedTextColor.GOLD),
-                Component.empty(),
-                titleTimes
-            )
+            val startTitle =
+                Title.title(
+                    Component.text("Start!", NamedTextColor.GOLD),
+                    Component.empty(),
+                    titleTimes
+                )
 
             minigameWorld.showTitle(startTitle)
             minigameWorld.playSound(
-                Sound.sound(
-                    Key.key("block.note_block.chime"),
-                    Sound.Source.AMBIENT,
-                    1f,
-                    2f
-                )
+                Sound.sound(Key.key("block.note_block.chime"), Sound.Source.AMBIENT, 1f, 2f)
             )
 
             minigameState.set(MinigameState.RUNNING)
@@ -138,73 +142,84 @@ class TwoPlayerSinglesMinigame(
     private fun doMinigameRunning() {
         startedAt = System.currentTimeMillis()
 
-        players.forEach {
-            it.walkSpeed = 0.2f
-        }
+        players.forEach { it.walkSpeed = 0.2f }
     }
 
     private fun doMinigameEnd() {
         val endedAt = System.currentTimeMillis()
 
-        val winningPlayers = teamsStocks.entries.first { it.value > 0 }.key
-        val losingPlayers = teamsStocks.entries.filter { it.value == 0 }.flatMap { it.key }
+        val winningPlayers = teamsStocks.first { it.second > 0 }.first
+        val losingPlayers = teamsStocks.filter { it.second == 0 }.flatMap { it.first }
 
-        winningPlayers.forEach {
-            it.sendMessage(Component.text("You won!", NamedTextColor.GREEN))
-        }
+        winningPlayers.forEach { it.sendMessage(Component.text("You won!", NamedTextColor.GREEN)) }
 
-        losingPlayers.forEach {
-            it.sendMessage(Component.text("You lost!", NamedTextColor.RED))
-        }
+        losingPlayers.forEach { it.sendMessage(Component.text("You lost!", NamedTextColor.RED)) }
 
         plugin.launch {
             delay(5)
 
-            winningPlayers.forEach {
-                it.teleport(plugin.hub.spawnLocation)
-            }
+            winningPlayers.forEach { it.teleport(plugin.hub.spawnLocation) }
 
-            losingPlayers.forEach {
-                it.teleport(plugin.hub.spawnLocation)
-            }
+            losingPlayers.forEach { it.teleport(plugin.hub.spawnLocation) }
         }
 
-        plugin.launch {
-            val winningPlayerUuids = winningPlayers.map { it.uniqueId.toString() }
+        plugin
+            .launch {
+                val winningPlayerUuids = winningPlayers.map { it.uniqueId.toString() }
 
-            val allPlayers = winningPlayers.toMutableList()
-            allPlayers.addAll(losingPlayers)
+                val allPlayers = winningPlayers.toMutableList()
+                allPlayers.addAll(losingPlayers)
 
-            val playerEntries = allPlayers.map { plr ->
-                val playerKitData = playerKits[plr]!!
-                val stocksLeft = teamsStocks[listOf(plr)] ?: 0
+                val playerEntries =
+                    allPlayers.map { plr ->
+                        val playerKitData = playerKits[plr]!!
+                        val stocksLeft = teamsStocks.find { it.first.contains(plr) }?.second ?: 0
+                        val didLeaveInProgress = playersLeftInProgress.contains(plr)
 
-                val abilityUsage = events.filter {
-                    it is RecordedMinigameAbilityUseEvent && it.actor == plr
-                }.map {
-                    val event = it as RecordedMinigameAbilityUseEvent
-                    MinigameEndRequest.PlayerEntry.KitEntry.AbilityUsageEntry(event.abilityId, event.dateRecorded, event.damageDealt)
-                }
+                        val abilityUsage =
+                            events
+                                .filter { it is RecordedMinigameAbilityUseEvent && it.actor == plr }
+                                .map {
+                                    val event = it as RecordedMinigameAbilityUseEvent
+                                    MinigameEndRequest.PlayerEntry.KitEntry.AbilityUsageEntry(
+                                        event.abilityId,
+                                        event.dateRecorded,
+                                        event.damageDealt
+                                    )
+                                }
 
-                val kitEntry = MinigameEndRequest.PlayerEntry.KitEntry(playerKitData.kitData.id, startedAt, endedAt, abilityUsage)
+                        val kitEntry =
+                            MinigameEndRequest.PlayerEntry.KitEntry(
+                                playerKitData.kitData.id,
+                                startedAt,
+                                endedAt,
+                                abilityUsage
+                            )
 
-               MinigameEndRequest.PlayerEntry(plr.uniqueId.toString(), stocksLeft, listOf(kitEntry))
+                        MinigameEndRequest.PlayerEntry(
+                            plr.uniqueId.toString(),
+                            stocksLeft,
+                            didLeaveInProgress,
+                            listOf(kitEntry)
+                        )
+                    }
+
+                val endRequest =
+                    MinigameEndRequest(
+                        minigameData.gameId,
+                        minigameData.map.id,
+                        minigameData.minigame.id,
+                        winningPlayerUuids,
+                        playerEntries
+                    )
+
+                plugin.api.minigameEnd(endRequest)
             }
-
-            val endRequest = MinigameEndRequest(
-                minigameData.gameId,
-                minigameData.map.id,
-                minigameData.minigame.id,
-                winningPlayerUuids,
-                playerEntries
-            )
-
-            plugin.api.minigameEnd(endRequest)
-        }
+            .invokeOnCompletion { plugin.minigames.onMinigameEnd(this) }
     }
 
     private fun checkShouldMinigameEnd() {
-        val teamsWithStocksLeft = teamsStocks.filter { it.value > 0 }
+        val teamsWithStocksLeft = teamsStocks.filter { it.second > 0 }
 
         if (teamsWithStocksLeft.size == 1) {
             minigameState.set(MinigameState.ENDING)
@@ -221,28 +236,40 @@ class TwoPlayerSinglesMinigame(
 
         playerKits[player]!!.destroyKit()
 
+        // TODO: use db coords
         val spectatorSpawnCoords = minigameWorld.spawnLocation.add(Vector(0.0, 35.0, 0.0))
         player.gameMode = GameMode.SPECTATOR
         player.teleport(spectatorSpawnCoords)
 
-        val teamStocks = teamsStocks.entries.find { it.key.contains(player) }!!
-        teamsStocks[teamStocks.key] = teamStocks.value - 1
+        val teamStocks = teamsStocks.find { it.first.contains(player) }!!
 
-        if (teamStocks.value == 0) {
+        // Pairs are immutable, so we create a new pair and override the existing using map
+        teamsStocks.map {
+            if (it.first.contains(player)) {
+                Pair(it.first, it.second - 1)
+            } else {
+                it
+            }
+        }
+
+        if (teamStocks.second == 0) {
             checkShouldMinigameEnd()
 
-            teamStocks.key.forEach {
+            teamStocks.first.forEach {
                 it.sendMessage(Component.text("You are dead!", NamedTextColor.RED))
             }
         } else {
             plugin.launch {
                 repeat(5) {
-                    player.sendMessage(Component.text("You died! You will respawn in ${5 - it} seconds"))
+                    player.sendMessage(
+                        Component.text("You died! You will respawn in ${5 - it} seconds")
+                    )
                     delay(1.ticks)
                 }
 
                 val spawnCoords = minigameData.map.spawnPoints.random()
-                val tpLocation = Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
+                val tpLocation =
+                    Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
                 player.teleport(tpLocation)
 
                 playerKits[player]!!.initializeKit()
@@ -256,7 +283,14 @@ class TwoPlayerSinglesMinigame(
     fun onBrawlAbilityUse(event: BrawlAbilityUseEvent) {
         if (!players.contains(event.player)) return
 
-        events.add(RecordedMinigameAbilityUseEvent(System.currentTimeMillis(), event.player, event.abilityId, event.damageDealt))
+        events.add(
+            RecordedMinigameAbilityUseEvent(
+                System.currentTimeMillis(),
+                event.player,
+                event.abilityId,
+                event.damageDealt
+            )
+        )
     }
 
     @EventHandler

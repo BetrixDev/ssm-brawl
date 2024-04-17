@@ -37,12 +37,15 @@ class SulphurBombAbility(
     override fun initializeAbility() {
         plugin.server.pluginManager.registerEvents(this, plugin)
 
-        playerInv.setItem(abilityEntry.abilityToolSlot, item(Material.IRON_AXE) {
-            displayName(Component.text("Sulphur Bomb"))
-            persistentDataContainer.setData {
-                set(TaggedKeyStr("ability_item_id"), "sulphur_bomb")
+        playerInv.setItem(
+            abilityEntry.abilityToolSlot,
+            item(Material.IRON_AXE) {
+                displayName(Component.text("Sulphur Bomb"))
+                persistentDataContainer.setData {
+                    set(TaggedKeyStr("ability_item_id"), "sulphur_bomb")
+                }
             }
-        })
+        )
     }
 
     override fun destroyAbility() {
@@ -72,14 +75,16 @@ class SulphurBombAbility(
             val projectileSize = 0.65
 
             while (true) {
-                val nearbyEntities = projectile.getNearbyEntities(projectileSize, projectileSize, projectileSize)
+                val nearbyEntities =
+                    projectile.getNearbyEntities(projectileSize, projectileSize, projectileSize)
 
                 nearbyEntities.forEach {
                     if (it !is Player || it == player) {
                         return@forEach
                     }
 
-                    val splashEvent = PotionSplashEvent(projectile, it, null, null, mutableMapOf(it to 1.0))
+                    val splashEvent =
+                        PotionSplashEvent(projectile, it, null, null, mutableMapOf(it to 1.0))
                     splashEvent.callEvent()
                     this.cancel()
                 }
@@ -113,26 +118,19 @@ class SulphurBombAbility(
             target.damage(projDamage, splashedItem)
         }
 
-        player.world.spawnParticle(
-            Particle.EXPLOSION_LARGE,
-            splashedLocation,
-            1
-        )
+        player.world.spawnParticle(Particle.EXPLOSION_LARGE, splashedLocation, 1)
 
-        player.world.playSound(
-            splashedLocation,
-            Sound.ENTITY_GENERIC_EXPLODE,
-            1F,
-            1.5F
-        )
+        player.world.playSound(splashedLocation, Sound.ENTITY_GENERIC_EXPLODE, 1F, 1.5F)
     }
 
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.player != player) return
-        if (event.action != Action.RIGHT_CLICK_AIR || event.action != Action.RIGHT_CLICK_BLOCK) return
+        if (event.action != Action.RIGHT_CLICK_AIR || event.action != Action.RIGHT_CLICK_BLOCK)
+            return
 
-        val itemAbilityId = event.item?.itemMeta?.persistentDataContainer?.get(TaggedKeyStr("ability_item_id"))
+        val itemAbilityId =
+            event.item?.itemMeta?.persistentDataContainer?.get(TaggedKeyStr("ability_item_id"))
         if (itemAbilityId != "sulphur_bomb") return
 
         event.isCancelled = true

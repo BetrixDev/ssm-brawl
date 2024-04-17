@@ -37,14 +37,21 @@ class LightningShieldPassive(private val player: Player) : IPassive, Listener {
         if (event.entity != player) return
         if (event.damager !is LivingEntity) return
 
-        if (event.cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK ||
-            event.cause == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
+        if (
+            event.cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK ||
+                event.cause == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
         ) {
             if (isActive) {
                 event.isCancelled = true
 
                 val damager = event.damager as LivingEntity
-                damager.doKnockback(2.5, 4.0, damager.health, event.entity.location.toVector(), null)
+                damager.doKnockback(
+                    2.5,
+                    4.0,
+                    damager.health,
+                    event.entity.location.toVector(),
+                    null
+                )
                 damager.damage(4.0, event.entity)
 
                 plugin.launch {
@@ -56,8 +63,8 @@ class LightningShieldPassive(private val player: Player) : IPassive, Listener {
             }
         } else if (
             event.cause == EntityDamageEvent.DamageCause.FIRE_TICK ||
-            event.cause == EntityDamageEvent.DamageCause.STARVATION ||
-            event.cause == EntityDamageEvent.DamageCause.POISON
+                event.cause == EntityDamageEvent.DamageCause.STARVATION ||
+                event.cause == EntityDamageEvent.DamageCause.POISON
         ) {
             return
         }

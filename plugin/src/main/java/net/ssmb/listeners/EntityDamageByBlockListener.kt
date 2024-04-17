@@ -20,7 +20,9 @@ class EntityDamageByBlockListener : Listener {
             if (canTakeFallDamage != true) {
                 event.isCancelled = true
             }
-        } else if (event.cause == EntityDamageEvent.DamageCause.SUFFOCATION && event.entity is Player) {
+        } else if (
+            event.cause == EntityDamageEvent.DamageCause.SUFFOCATION && event.entity is Player
+        ) {
             event.isCancelled = true
             event.entity.teleport(plugin.hub.spawnLocation)
         }

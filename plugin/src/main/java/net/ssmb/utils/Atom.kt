@@ -14,16 +14,12 @@ class Atom<T>(initialState: T) {
         val oldValue = state
         state = newState
 
-        subscribers.forEach {
-            it.invoke(newState, oldValue)
-        }
+        subscribers.forEach { it.invoke(newState, oldValue) }
     }
 
     fun subscribe(callback: (newValue: T, oldValue: T) -> Unit): () -> Unit {
         subscribers.add(callback)
 
-        return {
-            subscribers.remove(callback)
-        }
+        return { subscribers.remove(callback) }
     }
 }

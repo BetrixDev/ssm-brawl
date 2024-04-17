@@ -13,10 +13,14 @@
     "db:studio": "cd packages/tussler && dotenv -e ../../.env pnpm db:studio",
     "build": "turbo build",
     "dev": "turbo dev",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format:ts": "prettier --write \"**/*.{ts,tsx}\"",
+    "format:kt": "java -jar ktfmt.jar --kotlinlang-style plugin/**",
+    "format": "pnpm run format:ts && pnpm run format:kt",
+    "prepare": "husky"
   },
   "devDependencies": {
     "dotenv-cli": "^7.3.0",
+    "husky": "^9.0.11",
     "prettier": "^3.1.0",
     "turbo": "latest"
   },

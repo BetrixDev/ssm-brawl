@@ -8,5 +8,6 @@ interface IKit {
     val kitData: MinigameStartSuccess.PlayerData.KitData
 
     fun initializeKit()
+
     fun destroyKit()
 }

@@ -99,18 +99,25 @@ export const passivesToKits = sqliteTable(
 export const basicPlayerData = sqliteTable(
   "basic_player_data",
   {
-    uuid: text("uuid", { length: 36 }).primaryKey().notNull(),
-    selectedKitId: text("selected_kit_id").notNull(),
-    totalGamesPlayed: int("total_games_played").notNull().default(0),
-    totalGamesWon: int("total_games_won").notNull().default(0),
-    totalPlaytimeSeconds: int("total_playtime_seconds").notNull().default(0),
-    isBanned: int("is_banned", { mode: "boolean" }).notNull().default(false),
+    uuid: text("uuid", { length: 36 }).primaryKey(),
+    selectedKitId: text("selected_kit_id").default("creeper").notNull(),
+    totalGamesPlayed: int("total_games_played").default(0).notNull(),
+    totalGamesWon: int("total_games_won").default(0).notNull(),
+    totalPlaytimeSeconds: int("total_playtime_seconds").default(0).notNull(),
+    isBanned: int("is_banned", { mode: "boolean" }).default(false).notNull(),
+    levelExperience: int("level_experience").default(0).notNull(),
+    rankElo: int("rank_elo").default(0).notNull(),
+    rankedMatchesPlayed: int("ranked_matches_played").default(0).notNull(),
     areFriendRequestsOff: int("are_friend_requests_off", {
       mode: "boolean",
-    }).default(false),
+    })
+      .default(false)
+      .notNull(),
     canReceiveRandomMessages: int("can_receive_random_messages", {
       mode: "boolean",
-    }).default(true),
+    })
+      .default(true)
+      .notNull(),
   },
   (table) => ({
     uuidIdx: index("b_player_uuid_idx").on(table.uuid),

@@ -123,6 +123,7 @@ export const minigameRouter = router({
           z.object({
             uuid: z.string(),
             stocksLeft: z.number(),
+            leftInProgress: z.boolean(),
             kits: z.array(
               z.object({
                 id: z.string(),

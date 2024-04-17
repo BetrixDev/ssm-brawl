@@ -10,5 +10,11 @@ class BrawlDamageEvent(
 ) : BrawlEvent()
 
 enum class BrawlDamageType {
-    MELEE, PROJECTILE, FALL, VOID, STARVATION, SPECIAL, UNKNOWN
+    MELEE,
+    PROJECTILE,
+    FALL,
+    VOID,
+    STARVATION,
+    SPECIAL,
+    UNKNOWN
 }

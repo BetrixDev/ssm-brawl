@@ -29,33 +29,25 @@ class ApiService {
     private val apiPort = System.getenv("API_PORT")
     private val apiProtocol = System.getenv("API_PROTOCOL")
 
-    private val client = HttpClient(CIO) {
-        install(Logging) {
-            logger = Logger.DEFAULT
-            level = LogLevel.ALL
-        }
-        install(ContentNegotiation) {
-            json()
-        }
-        install(HttpCookies) {
-            storage = AcceptAllCookiesStorage()
-        }
-        defaultRequest {
-            url("$apiProtocol://$apiHost:$apiPort")
-            contentType(ContentType.Application.Json)
-        }
-    }
-
-    private val json = Json {
-        ignoreUnknownKeys = true
-    }
-
-    suspend fun initialize() {
-        val tokenGeneratorResponse = client.post("generateToken/plugin") {
-            headers {
-                append("Secret", secretToken)
+    private val client =
+        HttpClient(CIO) {
+            install(Logging) {
+                logger = Logger.DEFAULT
+                level = LogLevel.ALL
+            }
+            install(ContentNegotiation) { json() }
+            install(HttpCookies) { storage = AcceptAllCookiesStorage() }
+            defaultRequest {
+                url("$apiProtocol://$apiHost:$apiPort")
+                contentType(ContentType.Application.Json)
             }
         }
+
+    private val json = Json { ignoreUnknownKeys = true }
+
+    suspend fun initialize() {
+        val tokenGeneratorResponse =
+            client.post("generateToken/plugin") { headers { append("Secret", secretToken) } }
 
         SSMB.instance.logger.info(tokenGeneratorResponse.setCookie().toString())
 
@@ -64,14 +56,17 @@ class ApiService {
         }
     }
 
-    suspend fun queueAddPlayer(player: Player, minigameId: String, force: Boolean?): AddPlayerResponse {
-        val response = client.post("api/queue.addPlayer") {
-            setBody(AddPlayerRequest(player.identity().uuid().toString(), minigameId, force))
-        }
+    suspend fun queueAddPlayer(
+        player: Player,
+        minigameId: String,
+        force: Boolean?
+    ): AddPlayerResponse {
+        val response =
+            client.post("api/queue.addPlayer") {
+                setBody(AddPlayerRequest(player.identity().uuid().toString(), minigameId, force))
+            }
 
-        val polymorphicJson = Json {
-            ignoreUnknownKeys = true
-        }
+        val polymorphicJson = Json { ignoreUnknownKeys = true }
 
         return when (response.status.value) {
             200 -> polymorphicJson.decodeFromString(response.bodyAsText())
@@ -81,9 +76,8 @@ class ApiService {
     }
 
     suspend fun queueRemovePlayers(playerUuids: List<String>): Int {
-        val response = client.post("api/queue.removePlayer") {
-            setBody(RemovePlayerResponse(playerUuids))
-        }
+        val response =
+            client.post("api/queue.removePlayer") { setBody(RemovePlayerResponse(playerUuids)) }
 
         return response.status.value
     }
@@ -94,10 +88,14 @@ class ApiService {
         return response.status.value
     }
 
-    suspend fun minigameStart(playerUuids: List<String>, minigameId: String): MinigameStartResponse {
-        val response = client.post("api/minigame.start") {
-            setBody(MinigameStartRequest(playerUuids, minigameId))
-        }
+    suspend fun minigameStart(
+        playerUuids: List<String>,
+        minigameId: String
+    ): MinigameStartResponse {
+        val response =
+            client.post("api/minigame.start") {
+                setBody(MinigameStartRequest(playerUuids, minigameId))
+            }
 
         return when (response.status.value) {
             200 -> MinigameStartResponse.Success(json.decodeFromString(response.bodyAsText()))
@@ -106,9 +104,7 @@ class ApiService {
     }
 
     suspend fun minigameEnd(payload: MinigameEndRequest): MinigameEndResponse {
-        val response = client.post("api/minigame.end") {
-            setBody(payload)
-        }
+        val response = client.post("api/minigame.end") { setBody(payload) }
 
         return when (response.status.value) {
             200 -> MinigameEndResponse.SUCCESS
@@ -123,17 +119,19 @@ class ApiService {
     }
 
     suspend fun playerBasicData(player: Player): BasicPlayerDataResponse {
-        val response = client.post("api/player.getBasicPlayerData") {
-            setBody(BasicPlayerDataRequest(player.uniqueId.toString()))
-        }
+        val response =
+            client.post("api/player.getBasicPlayerData") {
+                setBody(BasicPlayerDataRequest(player.uniqueId.toString()))
+            }
 
         return json.decodeFromString(response.bodyAsText())
     }
 
     suspend fun playerIsIpBanned(ip: String, player: Player): IsIpBannedResponse {
-        val response = client.post("api/player.isIpBanned") {
-            setBody(IsIpBannedRequest(ip, player.uniqueId.toString()))
-        }
+        val response =
+            client.post("api/player.isIpBanned") {
+                setBody(IsIpBannedRequest(ip, player.uniqueId.toString()))
+            }
 
         return json.decodeFromString(response.bodyAsText())
     }

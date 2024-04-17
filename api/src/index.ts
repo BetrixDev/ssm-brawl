@@ -45,7 +45,7 @@ app.use(
         resHeaders,
       };
     },
-  })
+  }),
 );
 
 app.all("/api/*", async (c) => {
@@ -95,7 +95,7 @@ app.get("/panel", async (c) => {
   return c.html(
     renderTrpcPanel(appRouter, {
       url: `${env.API_PROTOCOL}://${env.API_HOST}:${env.API_PORT}/trpc`,
-    })
+    }),
   );
 });
 
@@ -132,10 +132,10 @@ serve({ ...app, port: env.API_PORT }, async (info) => {
           "skeleton",
           Date.now() + 36000,
           Date.now() + 720000,
-          []
+          [],
         ),
       ]),
-    ])
+    ]),
   );
 
   console.log(`Backend listening on http://localhost:${info.port}`);

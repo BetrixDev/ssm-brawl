@@ -20,12 +20,17 @@ class LangService {
         val variablesToReplace = regex.findAll(rawString)
 
         variablesToReplace.forEach {
-            parsedString = if (langEntries[it.value] != null) {
-                parsedString.replace("{${it.value}}", parseLang(langEntries[it.value]!!, variables), ignoreCase = true)
-            } else {
-                val variable = variables!![it.value]!!
-                parsedString.replace("{${it.value}}", variable, ignoreCase = true)
-            }
+            parsedString =
+                if (langEntries[it.value] != null) {
+                    parsedString.replace(
+                        "{${it.value}}",
+                        parseLang(langEntries[it.value]!!, variables),
+                        ignoreCase = true
+                    )
+                } else {
+                    val variable = variables!![it.value]!!
+                    parsedString.replace("{${it.value}}", variable, ignoreCase = true)
+                }
         }
 
         return parsedString
@@ -34,7 +39,7 @@ class LangService {
     fun getComponent(key: String, variables: HashMap<String, String>? = null): Component {
         val rawString = langEntries[key] ?: "NO ENTRY EXISTS FOR KEY $key"
 
-       val parsedString = parseLang(rawString, variables)
+        val parsedString = parseLang(rawString, variables)
 
         return MiniMessage.miniMessage().deserialize(parsedString)
     }

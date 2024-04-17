@@ -1,7 +1,6 @@
 package net.ssmb
 
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
-import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import com.github.shynixn.mccoroutine.bukkit.setSuspendingExecutor
 import net.ssmb.commands.QueueCommand
 import net.ssmb.listeners.*

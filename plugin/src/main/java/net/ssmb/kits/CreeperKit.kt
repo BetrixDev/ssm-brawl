@@ -32,22 +32,17 @@ class CreeperKit(
     override fun initializeKit() {
         playerInv.clear()
 
-        if (kitData.helmetId != null) playerInv.setItem(
-            EquipmentSlot.HEAD,
-            item(Material.getMaterial(kitData.helmetId)!!)
-        )
-        if (kitData.chestplateId != null) playerInv.setItem(
-            EquipmentSlot.CHEST,
-            item(Material.getMaterial(kitData.chestplateId)!!)
-        )
-        if (kitData.leggingsId != null) playerInv.setItem(
-            EquipmentSlot.LEGS,
-            item(Material.getMaterial(kitData.leggingsId)!!)
-        )
-        if (kitData.bootsId != null) playerInv.setItem(
-            EquipmentSlot.FEET,
-            item(Material.getMaterial(kitData.bootsId)!!)
-        )
+        if (kitData.helmetId != null)
+            playerInv.setItem(EquipmentSlot.HEAD, item(Material.getMaterial(kitData.helmetId)!!))
+        if (kitData.chestplateId != null)
+            playerInv.setItem(
+                EquipmentSlot.CHEST,
+                item(Material.getMaterial(kitData.chestplateId)!!)
+            )
+        if (kitData.leggingsId != null)
+            playerInv.setItem(EquipmentSlot.LEGS, item(Material.getMaterial(kitData.leggingsId)!!))
+        if (kitData.bootsId != null)
+            playerInv.setItem(EquipmentSlot.FEET, item(Material.getMaterial(kitData.bootsId)!!))
 
         player.metadata {
             set(TaggedKeyDouble("knockback_multiplier"), kitData.knockbackMult)
@@ -75,13 +70,9 @@ class CreeperKit(
             remove(TaggedKeyDouble("hitbox_height"))
         }
 
-        abilities.forEach {
-            it.destroyAbility()
-        }
+        abilities.forEach { it.destroyAbility() }
 
-        passives.forEach {
-            it.destroyPassive()
-        }
+        passives.forEach { it.destroyPassive() }
     }
 
     @EventHandler
@@ -94,33 +85,31 @@ class CreeperKit(
         // TODO: Ray cast to every player and hit the closest one,
         //  just in case two players are directly in front of the player
 
-        val enemyToAttack = minigame.teamsStocks.asSequence().filter {
-            !it.key.contains(player)
-        }.map {
-            it.key
-        }.flatten().find {
-            val hitboxWidth = it.getMetadata(TaggedKeyDouble("hitbox_width")) ?: 1.0
-            val hitboxHeight = it.getMetadata(TaggedKeyDouble("hitbox_heights")) ?: 1.0
+        val enemyToAttack =
+            minigame.teamsStocks
+                .filter { it.first.contains(player) }
+                .map { it.first }
+                .flatten()
+                .find {
+                    val hitboxWidth = it.getMetadata(TaggedKeyDouble("hitbox_width")) ?: 1.0
+                    val hitboxHeight = it.getMetadata(TaggedKeyDouble("hitbox_heights")) ?: 1.0
 
-            val boundingBox = BoundingBox.of(
-                it.location,
-                hitboxWidth,
-                hitboxHeight,
-                hitboxWidth
-            )
+                    val boundingBox =
+                        BoundingBox.of(it.location, hitboxWidth, hitboxHeight, hitboxWidth)
 
-            val rayTraceResult = boundingBox.rayTrace(player.eyeLocation.toVector(), player.location.direction, 4.5)
+                    val rayTraceResult =
+                        boundingBox.rayTrace(
+                            player.eyeLocation.toVector(),
+                            player.location.direction,
+                            4.5
+                        )
 
-            rayTraceResult != null && rayTraceResult.hitEntity != null
-        }?: return
+                    rayTraceResult != null && rayTraceResult.hitEntity != null
+                } ?: return
 
         event.isCancelled = true
 
-        BrawlDamageEvent(
-            enemyToAttack,
-            player,
-            kitData.meleeDamage,
-            BrawlDamageType.MELEE
-        ).callEvent()
+        BrawlDamageEvent(enemyToAttack, player, kitData.meleeDamage, BrawlDamageType.MELEE)
+            .callEvent()
     }
 }

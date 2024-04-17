@@ -1,4 +1,5 @@
 .github/**
+.husky/**
 plugin/**
 web/**
 orchestrator/**
@@ -6,3 +7,4 @@ orchestrator/**
 README.md
 .dockerignore
 .deployignore
+ktfmt.jar

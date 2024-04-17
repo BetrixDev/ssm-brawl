@@ -2,6 +2,8 @@ package net.ssmb.passives
 
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.ticks
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import net.ssmb.SSMB
@@ -12,14 +14,11 @@ import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
-import kotlin.math.max
-import kotlin.math.min
 
 class HungerPassive(
     private val player: Player,
     passiveData: MinigameStartSuccess.PlayerData.KitData.PassiveEntry.PassiveData
-) :
-    IPassive, Listener {
+) : IPassive, Listener {
     private val plugin = SSMB.instance
     private val secondsToDrain = passiveData.meta?.get("seconds_to_drain")!!.toDouble()
     private val hungerRestoreDelay = passiveData.meta?.get("hunger_restore_delay")!!.toInt()
@@ -31,25 +30,27 @@ class HungerPassive(
     override fun createPassive() {
         plugin.server.pluginManager.registerEvents(this, plugin)
 
-        hungerJob = plugin.launch {
-            while (true) {
-                hungerTicks++
+        hungerJob =
+            plugin.launch {
+                while (true) {
+                    hungerTicks++
 
-                player.saturation = 3f
-                player.exhaustion = 0f
+                    player.saturation = 3f
+                    player.exhaustion = 0f
 
-                if (player.foodLevel <= 0) {
-                    val damageEvent = EntityDamageEvent(player, EntityDamageEvent.DamageCause.STARVATION, 1.0)
-                    damageEvent.callEvent()
+                    if (player.foodLevel <= 0) {
+                        val damageEvent =
+                            EntityDamageEvent(player, EntityDamageEvent.DamageCause.STARVATION, 1.0)
+                        damageEvent.callEvent()
+                    }
+
+                    if ((hungerTicks % 10).toInt() == 0) {
+                        player.foodLevel = max(0, player.foodLevel - 1)
+                    }
+
+                    delay(20.ticks)
                 }
-
-                if ((hungerTicks % 10).toInt() == 0) {
-                    player.foodLevel = max(0, player.foodLevel - 1)
-                }
-
-                delay(20.ticks)
             }
-        }
     }
 
     override fun destroyPassive() {

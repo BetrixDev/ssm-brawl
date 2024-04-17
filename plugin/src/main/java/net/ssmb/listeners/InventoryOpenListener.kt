@@ -5,7 +5,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
 
-
 class InventoryOpenListener : Listener {
     @EventHandler
     fun onInventoryOpen(event: InventoryOpenEvent) {

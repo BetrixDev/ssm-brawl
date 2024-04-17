@@ -1,5 +1,9 @@
 package net.ssmb.enums
 
 enum class MinigameState {
-    LOADING, COUNTDOWN, RUNNING, ENDING, ENDED
+    LOADING,
+    COUNTDOWN,
+    RUNNING,
+    ENDING,
+    ENDED
 }

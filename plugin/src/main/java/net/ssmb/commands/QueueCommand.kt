@@ -35,7 +35,10 @@ class QueueCommand : SuspendingCommandExecutor {
                 if (response.value is AddPlayerSuccess.Added) {
                     //
                 } else if (response.value is AddPlayerSuccess.StartGame) {
-                    plugin.minigames.tryStartMinigame(response.value.playerUuids, response.value.minigameId)
+                    plugin.minigames.tryStartMinigame(
+                        response.value.playerUuids,
+                        response.value.minigameId
+                    )
                 }
             }
         }

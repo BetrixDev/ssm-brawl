@@ -36,12 +36,13 @@ class ExplodeAbility(
     override fun initializeAbility() {
         plugin.server.pluginManager.registerEvents(this, plugin)
 
-        playerInv.setItem(abilityEntry.abilityToolSlot, item(Material.IRON_SHOVEL) {
-            displayName(Component.text("Explode"))
-            persistentDataContainer.setData {
-                set(TaggedKeyStr("ability_item_id"), "explode")
+        playerInv.setItem(
+            abilityEntry.abilityToolSlot,
+            item(Material.IRON_SHOVEL) {
+                displayName(Component.text("Explode"))
+                persistentDataContainer.setData { set(TaggedKeyStr("ability_item_id"), "explode") }
             }
-        })
+        )
     }
 
     override fun destroyAbility() {
@@ -67,7 +68,12 @@ class ExplodeAbility(
                     player.exp = (index + 1) / 30f
 
                     val volume = 0.5f + index / 20
-                    player.world.playSound(player.location, Sound.ENTITY_CREEPER_PRIMED, volume, volume)
+                    player.world.playSound(
+                        player.location,
+                        Sound.ENTITY_CREEPER_PRIMED,
+                        volume,
+                        volume
+                    )
 
                     delay(1.ticks)
                 } else {
@@ -86,7 +92,10 @@ class ExplodeAbility(
                 player.world.spawnParticle(Particle.EXPLOSION_LARGE, player.location, 3)
 
                 player.getLivingEntitiesInRadius(8.0).forEach {
-                    if (it == player || it.getMetadata((TaggedKeyBool("player_can_be_damaged"))) == false) {
+                    if (
+                        it == player ||
+                            it.getMetadata((TaggedKeyBool("player_can_be_damaged"))) == false
+                    ) {
                         return@forEach
                     }
 
@@ -105,9 +114,11 @@ class ExplodeAbility(
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.player != player) return
-        if (event.action != Action.RIGHT_CLICK_AIR || event.action != Action.RIGHT_CLICK_BLOCK) return
+        if (event.action != Action.RIGHT_CLICK_AIR || event.action != Action.RIGHT_CLICK_BLOCK)
+            return
 
-        val itemAbilityId = event.item?.itemMeta?.persistentDataContainer?.get(TaggedKeyStr("ability_item_id"))
+        val itemAbilityId =
+            event.item?.itemMeta?.persistentDataContainer?.get(TaggedKeyStr("ability_item_id"))
         if (itemAbilityId != "explode") return
 
         event.isCancelled = true

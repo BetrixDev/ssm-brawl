@@ -1,5 +1,7 @@
 package net.ssmb.extensions
 
+import kotlin.math.abs
+import kotlin.math.log10
 import net.ssmb.SSMB
 import net.ssmb.utils.*
 import org.bukkit.attribute.Attribute
@@ -9,8 +11,6 @@ import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.util.Vector
-import kotlin.math.abs
-import kotlin.math.log10
 
 class EntityMetadataBuilder(private val entity: Entity) {
     private val metadata = mutableMapOf<String, Any>()
@@ -51,13 +51,9 @@ class EntityMetadataBuilder(private val entity: Entity) {
     fun build() {
         val plugin = SSMB.instance
 
-        metadata.forEach {
-            entity.setMetadata(it.key, FixedMetadataValue(plugin, it.value))
-        }
+        metadata.forEach { entity.setMetadata(it.key, FixedMetadataValue(plugin, it.value)) }
 
-        metadataToRemove.forEach {
-            entity.removeMetadata(it, plugin)
-        }
+        metadataToRemove.forEach { entity.removeMetadata(it, plugin) }
     }
 }
 
@@ -98,7 +94,9 @@ fun Entity.setVelocity(
     yMax: Double,
     groundBoost: Boolean
 ) {
-    if (velocity.x.isNaN() || velocity.y.isNaN() || velocity.z.isNaN() || velocity.length() == 0.0) {
+    if (
+        velocity.x.isNaN() || velocity.y.isNaN() || velocity.z.isNaN() || velocity.length() == 0.0
+    ) {
         return
     }
 
@@ -145,7 +143,8 @@ fun Entity.doKnockback(
             knockback *= kitKnockbackMult
         }
 
-        knockback *= (1 + 0.1 * (this.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value!! - startingHealth))
+        knockback *=
+            (1 + 0.1 * (this.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value!! - startingHealth))
     }
 
     var trajectory: Vector? = null
@@ -163,7 +162,15 @@ fun Entity.doKnockback(
 
     val vel = 0.2 + trajectory!!.length() * 0.8
 
-    this.setVelocity(trajectory, vel, false, 0.0, abs(0.2 * knockback), 0.4 + (0.04 * knockback), true)
+    this.setVelocity(
+        trajectory,
+        vel,
+        false,
+        0.0,
+        abs(0.2 * knockback),
+        0.4 + (0.04 * knockback),
+        true
+    )
 }
 
 fun Entity.getLivingEntitiesInRadius(radius: Double): List<LivingEntity> {

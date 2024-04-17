@@ -6,11 +6,13 @@ import kotlinx.serialization.Serializable
 
 sealed class AddPlayerResponse {
     data class Success(val value: AddPlayerSuccess) : AddPlayerResponse()
+
     data class Error(val value: AddPlayerError) : AddPlayerResponse()
 }
 
 enum class AddPlayerError {
-    ALREADY_IN_QUEUE, UNKNOWN
+    ALREADY_IN_QUEUE,
+    UNKNOWN
 }
 
 @Polymorphic

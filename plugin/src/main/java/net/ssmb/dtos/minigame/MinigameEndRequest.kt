@@ -14,6 +14,7 @@ data class MinigameEndRequest(
     data class PlayerEntry(
         val uuid: String,
         val stocksLeft: Int,
+        val leftInProgress: Boolean,
         val kits: List<KitEntry>
     ) {
         @Serializable()

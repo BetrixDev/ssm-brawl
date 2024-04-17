@@ -9,6 +9,11 @@ data class BasicPlayerDataResponse(
     val totalGamesPlayed: Int,
     val totalGamesWon: Int,
     val totalPlaytimeSeconds: Long,
+    val isBanned: Boolean,
+    val levelExperience: Long,
+    val rankElo: Int,
+    val rankedMatchesPlayed: Int,
+    val areFriendRequestsOff: Boolean,
+    val canRecieveRandomMessages: Boolean,
     val firstTime: Boolean,
-    val isBanned: Boolean
 )

@@ -9,7 +9,7 @@ export const kitsRouter = router({
     .input(
       z.object({
         kitId: z.string(),
-      })
+      }),
     )
     .query(async ({ input }) => {
       const wranglerRes = await queryClient.fetchQuery({
@@ -49,7 +49,7 @@ export const kitsRouter = router({
                     },
                   },
                 },
-              ]
+              ],
             )
             .tryNext(),
       });
