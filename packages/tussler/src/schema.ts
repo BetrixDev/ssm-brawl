@@ -30,7 +30,7 @@ export const kits = sqliteTable(
   },
   (table) => ({
     idIdx: index("kits_id_idx").on(table.id),
-  })
+  }),
 );
 
 export const abilities = sqliteTable(
@@ -42,7 +42,7 @@ export const abilities = sqliteTable(
   },
   (table) => ({
     idIdx: index("abilities_id_idx").on(table.id),
-  })
+  }),
 );
 
 export const disguises = sqliteTable("disguises", {
@@ -65,7 +65,7 @@ export const abilitiesToKits = sqliteTable(
       name: "abilities_to_kits_pk",
       columns: [table.abilityId, table.kitId],
     }),
-  })
+  }),
 );
 
 export const passives = sqliteTable(
@@ -76,7 +76,7 @@ export const passives = sqliteTable(
   },
   (table) => ({
     idIdx: index("passives_id_idx").on(table.id),
-  })
+  }),
 );
 
 export const passivesToKits = sqliteTable(
@@ -93,7 +93,7 @@ export const passivesToKits = sqliteTable(
       name: "passives_to_kits_pk",
       columns: [table.passiveId, table.kitId],
     }),
-  })
+  }),
 );
 
 export const basicPlayerData = sqliteTable(
@@ -121,7 +121,7 @@ export const basicPlayerData = sqliteTable(
   },
   (table) => ({
     uuidIdx: index("b_player_uuid_idx").on(table.uuid),
-  })
+  }),
 );
 
 export const ipBans = sqliteTable(
@@ -132,7 +132,7 @@ export const ipBans = sqliteTable(
   },
   (table) => ({
     ipIdx: index("ip_idx").on(table.ip),
-  })
+  }),
 );
 
 export const minigames = sqliteTable(
@@ -147,7 +147,7 @@ export const minigames = sqliteTable(
   },
   (table) => ({
     idIdx: index("minigames_id_idx").on(table.id),
-  })
+  }),
 );
 
 export const queue = sqliteTable(
@@ -159,7 +159,7 @@ export const queue = sqliteTable(
   (table) => ({
     minigameIdIdx: index("queue_minigame_id_idx").on(table.minigameId),
     playerUuidIdx: index("queue_player_uuid_idx").on(table.playerUuid),
-  })
+  }),
 );
 
 export const maps = sqliteTable(
@@ -177,7 +177,7 @@ export const maps = sqliteTable(
   },
   (table) => ({
     idIdx: index("maps_id_idx").on(table.id),
-  })
+  }),
 );
 
 export const mapOrigins = sqliteTable("map_origins", {
@@ -198,7 +198,7 @@ export const mapSpawnpoints = sqliteTable(
   (table) => ({
     pk: primaryKey({ columns: [table.mapId, table.x, table.y, table.z] }),
     mapIdIdx: index("spawnpoints_map_id_idx").on(table.mapId),
-  })
+  }),
 );
 
 export const lang = sqliteTable("lang", {
@@ -216,7 +216,7 @@ export const friendships = sqliteTable(
     friendshipsPk: primaryKey({ columns: [table.uuid1, table.uuid2] }),
     friendshipsUuid1Idx: index("friendships_uuid_1_idx").on(table.uuid1),
     friendshipsUuid2Idx: index("friendships_uuid_2_idx").on(table.uuid2),
-  })
+  }),
 );
 
 export const kitsRelations = relations(kits, ({ many, one }) => ({
@@ -247,7 +247,7 @@ export const abilitiesToKitsRelations = relations(
       fields: [abilitiesToKits.abilityId],
       references: [abilities.id],
     }),
-  })
+  }),
 );
 
 export const passivesToKitsRelations = relations(passivesToKits, ({ one }) => ({
@@ -298,5 +298,5 @@ export const basicPlayerDataRelations = relations(
       fields: [basicPlayerData.selectedKitId],
       references: [kits.id],
     }),
-  })
+  }),
 );

@@ -1,7 +1,8 @@
 package net.ssmb
 
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
-import com.github.shynixn.mccoroutine.bukkit.setSuspendingExecutor
+import dev.rollczi.litecommands.LiteCommands
+import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
 import net.ssmb.commands.QueueCommand
 import net.ssmb.listeners.*
 import net.ssmb.services.ApiService
@@ -9,6 +10,7 @@ import net.ssmb.services.LangService
 import net.ssmb.services.MinigameService
 import net.ssmb.services.WorldService
 import org.bukkit.World
+import org.bukkit.command.CommandSender
 
 class SSMB : SuspendingJavaPlugin() {
     lateinit var api: ApiService
@@ -16,6 +18,8 @@ class SSMB : SuspendingJavaPlugin() {
     lateinit var minigames: MinigameService
     lateinit var worlds: WorldService
     lateinit var hub: World
+
+    private lateinit var liteCommands: LiteCommands<CommandSender>
 
     companion object {
         lateinit var instance: SSMB
@@ -35,14 +39,15 @@ class SSMB : SuspendingJavaPlugin() {
 
         hub = worlds.createSsmbWorld("blue_forest", "hub_1")
 
-        getCommand("queue")!!.setSuspendingExecutor(QueueCommand())
-
         server.pluginManager.registerEvents(PlayerJoinListener(), this)
         server.pluginManager.registerEvents(InventoryOpenListener(), this)
         server.pluginManager.registerEvents(PlayerPickItemListener(), this)
         server.pluginManager.registerEvents(PlayerDropItemListener(), this)
         server.pluginManager.registerEvents(EntityDamageByBlockListener(), this)
         server.pluginManager.registerEvents(PlayerInteractListener(), this)
+
+        liteCommands =
+            LiteBukkitFactory.builder(server, "ssmb").commandInstance(QueueCommand()).register()
 
         logger.info("STARTED SSMB")
     }
