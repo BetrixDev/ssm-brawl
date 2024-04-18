@@ -1,5 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["./drizzle.config.ts", "./migrator.ts"],
+  "exclude": ["./drizzle.config.ts"],
   "include": ["src"]
 }

@@ -1,7 +1,8 @@
 import { env } from "env/tussler";
-import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema.js";
+import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
+import { migrate } from "drizzle-orm/libsql/migrator";
 
 export const libsqlClient = createClient({
   url: env.TUSSLER_URL,
@@ -20,3 +21,7 @@ process.on("beforeExit", async (sig) => {
 export const db = drizzle(libsqlClient, { schema });
 export * from "drizzle-orm";
 export * from "./schema.js";
+
+export async function runMirations() {
+  await migrate(db, { migrationsFolder: "./migrations" });
+}
