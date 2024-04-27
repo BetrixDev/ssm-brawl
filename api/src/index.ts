@@ -46,7 +46,7 @@ app.use(
         resHeaders,
       };
     },
-  }),
+  })
 );
 
 app.all("/api/*", async (c) => {
@@ -75,6 +75,7 @@ app.all("/api/*", async (c) => {
   try {
     const requestBody = await c.req.json().catch(() => undefined);
     routerResponse = await routerProcedure(requestBody);
+    console.log(routerResponse);
   } catch (e: unknown) {
     if (e instanceof TRPCError) {
       log.error(e);
@@ -96,7 +97,7 @@ app.get("/panel", async (c) => {
   return c.html(
     renderTrpcPanel(appRouter, {
       url: `${env.API_PROTOCOL}://${env.API_HOST}:${env.API_PORT}/trpc`,
-    }),
+    })
   );
 });
 
@@ -123,7 +124,7 @@ app.post("/generateToken/:source", async (c) => {
 
 serve({ ...app, port: env.API_PORT }, async (info) => {
   await wranglerDataSource.initialize();
-  await runMirations();
+  //  await runMirations();
 
   console.log(`Backend listening on http://localhost:${info.port}`);
 });

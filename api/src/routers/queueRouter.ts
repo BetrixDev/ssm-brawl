@@ -10,7 +10,7 @@ export const queueRouter = router({
         playerUuid: z.string(),
         minigameId: z.string(),
         force: z.boolean().optional(),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       if (input.force) {
@@ -37,27 +37,36 @@ export const queueRouter = router({
       const playersInQueue = minigameData.queueEntries.length;
 
       if (minigameData.playersPerTeam % (playersInQueue + 1) !== 0) {
+        return {
+          type: "added",
+          playersInQueue: playersInQueue + 1,
+        };
       }
 
       const isValidGroupSizeForQueue =
-        minigameData.playersPerTeam % (playersInQueue + 1) !== 0;
+        minigameData.playersPerTeam % (playersInQueue + 1) === 0;
       const isEnoughPlayersInQueue =
         playersInQueue + 1 >= minigameData.minPlayers;
 
       if (isValidGroupSizeForQueue && isEnoughPlayersInQueue) {
         const queuedPlayers = minigameData.queueEntries.map(
-          (q) => q.playerUuid,
+          (q) => q.playerUuid
         );
 
         return {
-          action: "start_game",
+          type: "start_game",
           playerUuids: [input.playerUuid, ...queuedPlayers],
           minigameId: minigameData.id,
         };
       }
 
+      await db.insert(queue).values({
+        playerUuid: input.playerUuid,
+        minigameId: input.minigameId,
+      });
+
       return {
-        action: "added",
+        type: "added",
         playersInQueue: playersInQueue + 1,
       };
     }),

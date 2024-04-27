@@ -14,6 +14,6 @@ data class BasicPlayerDataResponse(
     val rankElo: Int,
     val rankedMatchesPlayed: Int,
     val areFriendRequestsOff: Boolean,
-    val canRecieveRandomMessages: Boolean,
+    val canReceiveRandomMessages: Boolean,
     val firstTime: Boolean,
 )

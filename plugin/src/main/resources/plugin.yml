@@ -6,4 +6,4 @@ prefix: SSMB
 commands:
   queue:
     description: "queue command"
-    usage: "/queue mingameId"
+    usage: "/queue <minigameId>"

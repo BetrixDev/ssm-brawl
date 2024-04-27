@@ -1,6 +1,7 @@
 package net.ssmb.listeners
 
 import com.github.shynixn.mccoroutine.bukkit.launch
+import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -11,7 +12,7 @@ class PlayerJoinListener : Listener {
     private val plugin = SSMB.instance
 
     @EventHandler(priority = EventPriority.LOWEST)
-    suspend fun onPlayerJoin(event: PlayerJoinEvent) {
+    fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
 
         plugin.launch {
@@ -34,9 +35,11 @@ class PlayerJoinListener : Listener {
 
             val joinMessage =
                 if (playerData.firstTime) {
-                    plugin.lang.getComponent("chat.player.joinedserver.firsttime")
+                    Component.text("joined first time")
+//                    plugin.lang.getComponent("chat.player.joinedserver.firsttime")
                 } else {
-                    plugin.lang.getComponent("chat.player.joinedserver")
+//                    plugin.lang.getComponent("chat.player.joinedserver")
+                    Component.text("joined")
                 }
 
             plugin.hub.sendMessage(joinMessage)

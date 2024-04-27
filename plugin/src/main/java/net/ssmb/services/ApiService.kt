@@ -66,10 +66,16 @@ class ApiService {
                 setBody(AddPlayerRequest(player.identity().uuid().toString(), minigameId, force))
             }
 
-        val polymorphicJson = Json { ignoreUnknownKeys = true }
+        val polymorphicJson = Json {
+            ignoreUnknownKeys = true
+            classDiscriminator = "type"
+        }
 
         return when (response.status.value) {
-            200 -> polymorphicJson.decodeFromString(response.bodyAsText())
+            200 -> AddPlayerResponse.Success(
+                polymorphicJson.decodeFromString(response.bodyAsText())
+            )
+
             409 -> AddPlayerResponse.Error(AddPlayerError.ALREADY_IN_QUEUE)
             else -> AddPlayerResponse.Error(AddPlayerError.UNKNOWN)
         }
@@ -77,7 +83,7 @@ class ApiService {
 
     suspend fun queueRemovePlayers(playerUuids: List<String>): Int {
         val response =
-            client.post("api/queue.removePlayer") { setBody(RemovePlayerResponse(playerUuids)) }
+            client.post("api/queue.removePlayers") { setBody(RemovePlayerResponse(playerUuids)) }
 
         return response.status.value
     }

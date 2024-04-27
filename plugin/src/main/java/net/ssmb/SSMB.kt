@@ -2,7 +2,7 @@ package net.ssmb
 
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import dev.rollczi.litecommands.LiteCommands
-import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
+import dev.rollczi.litecommands.bukkit.LiteCommandsBukkit
 import net.ssmb.commands.QueueCommand
 import net.ssmb.listeners.*
 import net.ssmb.services.ApiService
@@ -30,6 +30,7 @@ class SSMB : SuspendingJavaPlugin() {
 
         api = ApiService()
         api.initialize()
+        api.queueFlush()
 
         minigames = MinigameService()
         worlds = WorldService()
@@ -47,7 +48,7 @@ class SSMB : SuspendingJavaPlugin() {
         server.pluginManager.registerEvents(PlayerInteractListener(), this)
 
         liteCommands =
-            LiteBukkitFactory.builder(server, "ssmb").commandInstance(QueueCommand()).register()
+            LiteCommandsBukkit.builder("ssmb", this).commands(QueueCommand()).build()
 
         logger.info("STARTED SSMB")
     }

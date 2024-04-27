@@ -21,12 +21,12 @@ sealed class AddPlayerSuccess {
 
     @Serializable
     @SerialName("added")
-    data class Added(val action: String, val playersInQueue: Int) : AddPlayerSuccess()
+    data class Added(val type: String, val playersInQueue: Int) : AddPlayerSuccess()
 
     @Serializable
     @SerialName("start_game")
     sealed class StartGame(
-        val action: String,
+        val type: String,
         val minigameId: String,
         val playerUuids: List<String>,
     ) : AddPlayerSuccess()
