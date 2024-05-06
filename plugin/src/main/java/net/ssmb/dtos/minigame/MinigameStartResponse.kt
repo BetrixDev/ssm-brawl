@@ -16,7 +16,7 @@ enum class MiniGameError {
 sealed class MinigameStartSuccess(
     val gameId: String,
     val minigame: MinigameData,
-    val players: List<PlayerData>,
+    val teams: List<List<PlayerData>>,
     val map: MapData
 ) {
     @Serializable

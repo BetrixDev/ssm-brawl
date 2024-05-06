@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  ObjectId,
-  ObjectIdColumn,
-  PrimaryColumn,
-} from "typeorm";
+import { Column, Entity, ObjectIdColumn } from "typeorm";
 import { MessageChannelMessage } from "../models/MessageChannelMessage.js";
 
 @Entity("message_channels")

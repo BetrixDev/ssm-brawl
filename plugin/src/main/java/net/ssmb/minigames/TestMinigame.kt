@@ -3,14 +3,13 @@ package net.ssmb.minigames
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import com.github.shynixn.mccoroutine.bukkit.ticks
+import io.papermc.paper.entity.LookAnchor
 import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartSuccess
-import net.ssmb.extensions.metadata
 import net.ssmb.kits.IKit
 import net.ssmb.kits.constructKitFromData
-import net.ssmb.utils.TaggedKeyStr
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.World
@@ -21,9 +20,11 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.util.Vector
 
 class TestMinigame(
-    override val players: List<Player>,
+    override val teams: List<List<Player>>,
     private val minigameData: MinigameStartSuccess
 ) : IMinigame, Listener {
+    private val players = teams.flatten()
+    private val playerMinigameData = minigameData.teams.flatten()
     private val plugin = SSMB.instance
     private lateinit var minigameWorld: World
     override val playerKits = hashMapOf<Player, IKit>()
@@ -36,19 +37,24 @@ class TestMinigame(
     override suspend fun initializeMinigame() {
         minigameWorld = plugin.worlds.createSsmbWorld(minigameData.map.id, minigameData.gameId)
 
-        players.forEachIndexed { idx, it ->
-            it.metadata { set(TaggedKeyStr("minigame_id"), minigameData.gameId) }
-
+        teams.forEachIndexed { idx, team ->
             val spawnCoords = minigameData.map.spawnPoints[idx]
             val tpLocation = Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
-            it.teleport(tpLocation)
 
-            val playerData =
-                minigameData.players.find { itt -> itt.uuid == it.uniqueId.toString() }!!
-            val kit = constructKitFromData(it, playerData.selectedKit, this)
-            kit.initializeKit()
+            team.forEach { plr ->
+                plr.teleport(tpLocation)
+                plr.walkSpeed = 0.0f
+                plr.lookAt(minigameWorld.spawnLocation, LookAnchor.EYES)
 
-            playerKits[it] = kit
+                val playerData =
+                    playerMinigameData.find { it -> it.uuid == plr.uniqueId.toString() }!!
+                val kit = constructKitFromData(plr, playerData.selectedKit, this)
+                kit.initializeKit()
+
+                playerKits[plr] = kit
+            }
+
+            teamsStocks.add(Pair(ArrayList(team), minigameData.minigame.stocks))
         }
 
         minigameWorld.sendMessage(Component.text("Testing game has started!"))

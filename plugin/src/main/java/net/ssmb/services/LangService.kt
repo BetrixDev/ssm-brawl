@@ -20,17 +20,9 @@ class LangService {
         val variablesToReplace = regex.findAll(rawString)
 
         variablesToReplace.forEach {
+            val variableKey = it.value.substring(1, it.value.length - 1)
             parsedString =
-                if (langEntries[it.value] != null) {
-                    parsedString.replace(
-                        "{${it.value}}",
-                        parseLang(langEntries[it.value]!!, variables),
-                        ignoreCase = true
-                    )
-                } else {
-                    val variable = variables!![it.value]!!
-                    parsedString.replace("{${it.value}}", variable, ignoreCase = true)
-                }
+                parsedString.replace(it.value, variables?.getOrDefault(variableKey, "") ?: "")
         }
 
         return parsedString

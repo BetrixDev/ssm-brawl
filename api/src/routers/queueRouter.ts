@@ -10,7 +10,7 @@ export const queueRouter = router({
         playerUuid: z.string(),
         minigameId: z.string(),
         force: z.boolean().optional(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       if (input.force) {
@@ -21,7 +21,7 @@ export const queueRouter = router({
         });
 
         if (playerInQueue !== undefined) {
-          throw new TRPCError({ code: "CONFLICT" });
+          throw new TRPCError({ code: "CONFLICT", message: "alreadyInQueue" });
         }
       }
 
@@ -34,41 +34,88 @@ export const queueRouter = router({
         throw new TRPCError({ code: "BAD_REQUEST" });
       }
 
-      const playersInQueue = minigameData.queueEntries.length;
+      const playerParty = await db.query.partyGuests.findFirst({
+        where: (table, { eq }) => eq(table.playerUuid, input.playerUuid),
+        with: { party: { with: { guests: true } } },
+      });
 
-      if (minigameData.playersPerTeam % (playersInQueue + 1) !== 0) {
-        return {
-          type: "added",
-          playersInQueue: playersInQueue + 1,
-        };
+      if (playerParty !== undefined) {
+        const playersInParty = playerParty.party.guests.map(
+          (p) => p.playerUuid,
+        );
+
+        // Eventually we might want to support putting partial parties into a team (3 person party for a 4 person team game)
+        //  but that makes the logic a lot more complicated and more error-prone
+        if (playersInParty.length !== minigameData.playersPerTeam) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "partyCountMismatch",
+          });
+        }
+
+        const playersInPartyInQueue = await db.query.queue.findMany({
+          where: (table, { inArray }) =>
+            inArray(table.playerUuid, playersInParty),
+        });
+
+        if (playersInPartyInQueue.length > 0) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "playersInPartyInQueue",
+          });
+        }
+
+        await db.insert(queue).values(
+          playersInParty.map((playerUuid) => ({
+            dateAdded: Date.now(),
+            minigameId: minigameData.id,
+            playerUuid: playerUuid,
+            partyId: playerParty.partyId,
+          })),
+        );
+      } else {
+        await db.insert(queue).values({
+          dateAdded: Date.now(),
+          minigameId: minigameData.id,
+          playerUuid: input.playerUuid,
+        });
       }
 
-      const isValidGroupSizeForQueue =
-        minigameData.playersPerTeam % (playersInQueue + 1) === 0;
-      const isEnoughPlayersInQueue =
-        playersInQueue + 1 >= minigameData.minPlayers;
+      const playersInQueue = await db.query.queue.findMany({
+        where: (table, { eq }) => eq(table.minigameId, minigameData.id),
+        orderBy: (table, { asc }) => [asc(table.dateAdded)],
+      });
 
-      if (isValidGroupSizeForQueue && isEnoughPlayersInQueue) {
-        const queuedPlayers = minigameData.queueEntries.map(
-          (q) => q.playerUuid
-        );
+      if (
+        playersInQueue.length >
+        minigameData.playersPerTeam * minigameData.amountOfTeams
+      ) {
+        const teams: string[][] = [];
+
+        for (
+          let i = 0;
+          i < minigameData.amountOfTeams;
+          i += minigameData.playersPerTeam
+        ) {
+          const teamSlice = playersInQueue.slice(
+            i,
+            minigameData.playersPerTeam * (i + 1),
+          );
+
+          teams.push(teamSlice.map(({ playerUuid }) => playerUuid));
+        }
 
         return {
           type: "start_game",
-          playerUuids: [input.playerUuid, ...queuedPlayers],
+          playerUuids: teams,
           minigameId: minigameData.id,
         };
+      } else {
+        return {
+          type: "added",
+          playersInQueue: playersInQueue.length,
+        };
       }
-
-      await db.insert(queue).values({
-        playerUuid: input.playerUuid,
-        minigameId: input.minigameId,
-      });
-
-      return {
-        type: "added",
-        playersInQueue: playersInQueue + 1,
-      };
     }),
   removePlayers: internalProcedure
     .input(z.object({ playerUuids: z.array(z.string()) }))

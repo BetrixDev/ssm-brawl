@@ -13,12 +13,9 @@ import {
   decodeTokenFromHeaders,
   generateBackendToken,
 } from "./jwt.js";
-import { wranglerClient, wranglerDataSource } from "wrangler";
+import { wranglerDataSource } from "wrangler";
 import { log } from "./log.js";
 import { middlewareLogger } from "logger";
-import { HistoricalGame } from "wrangler/entities/HistoricalGame.js";
-import { HistoricalGamePlayer } from "wrangler/models/HistoricalGamePlayer.js";
-import { HistoricalGameKit } from "wrangler/models/HistoricalGameKit.js";
 import { runMirations } from "tussler";
 
 const app = new Hono();
@@ -46,7 +43,7 @@ app.use(
         resHeaders,
       };
     },
-  })
+  }),
 );
 
 app.all("/api/*", async (c) => {
@@ -73,16 +70,15 @@ app.all("/api/*", async (c) => {
   let routerResponse: unknown;
 
   try {
-    const requestBody = await c.req.json().catch(() => undefined);
+    const requestBody = (c as any).jsonPayload;
     routerResponse = await routerProcedure(requestBody);
-    console.log(routerResponse);
   } catch (e: unknown) {
+    log.error(e);
+
     if (e instanceof TRPCError) {
-      log.error(e);
       const statusCode = getHTTPStatusCodeFromError(e);
       c.status(statusCode as any);
     } else {
-      console.log(e);
       c.status(500);
     }
 
@@ -97,7 +93,7 @@ app.get("/panel", async (c) => {
   return c.html(
     renderTrpcPanel(appRouter, {
       url: `${env.API_PROTOCOL}://${env.API_HOST}:${env.API_PORT}/trpc`,
-    })
+    }),
   );
 });
 
@@ -124,7 +120,7 @@ app.post("/generateToken/:source", async (c) => {
 
 serve({ ...app, port: env.API_PORT }, async (info) => {
   await wranglerDataSource.initialize();
-  //  await runMirations();
+  await runMirations();
 
   console.log(`Backend listening on http://localhost:${info.port}`);
 });

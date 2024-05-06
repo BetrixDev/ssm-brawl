@@ -19,7 +19,7 @@ class WorldService {
 
         try {
             baseWorldDirectory.copyRecursively(copyDirectory, true)
-//            FileUtils.copyDirectory(baseWorldDirectory, copyDirectory, "**/*", null)
+            //            FileUtils.copyDirectory(baseWorldDirectory, copyDirectory, "**/*", null)
             val uidPath = File("${copyDirectory.path}/uid.dat")
             val sessionPath = File("${copyDirectory.path}/session.dat")
 

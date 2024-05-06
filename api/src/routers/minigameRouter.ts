@@ -25,60 +25,77 @@ import { HistoricalGameKitAbilityUse } from "wrangler/models/HistoricalGameKitAb
 export const minigameRouter = router({
   start: internalProcedure
     .input(
-      z.object({ playerUuids: z.array(z.string()), minigameId: z.string() }),
+      z.object({
+        teams: z.array(z.array(z.string())),
+        minigameId: z.string(),
+      }),
     )
     .mutation(async ({ input }) => {
-      const [minigame, dbPlayerData] = await db.batch([
+      const [minigame] = await db.batch([
         db.query.minigames.findFirst({
           where: eq(minigames.id, input.minigameId),
         }),
-        db.query.basicPlayerData.findMany({
-          where: inArray(basicPlayerData.uuid, input.playerUuids),
-          with: {
-            selectedKit: {
-              with: {
-                abilities: { with: { ability: true } },
-                passives: { with: { passive: true } },
-                disguise: true,
-              },
-            },
-          },
-        }),
-        db.delete(queue).where(inArray(queue.playerUuid, input.playerUuids)),
+        db.delete(queue).where(
+          inArray(
+            queue.playerUuid,
+            input.teams.flatMap((s) => s),
+          ),
+        ),
       ]);
 
       if (minigame === undefined) {
         throw new TRPCError({ code: "BAD_REQUEST" });
       }
 
-      const playerData = dbPlayerData.map((data) => {
-        return {
-          ...data,
-          selectedKit: {
-            ...data.selectedKit,
-            passives: data.selectedKit.passives.map((relation) => {
-              return {
-                ...relation,
-                passive: {
-                  ...relation.passive,
-                  meta: {
-                    ...relation.passive.meta,
-                    ...relation.meta,
+      const teamsPlayerData = await Promise.all(
+        input.teams.map(async (team) => {
+          return await Promise.all(
+            team.map(async (uuid) => {
+              const data = await db.query.basicPlayerData.findFirst({
+                where: (table, { eq }) => eq(table.uuid, uuid),
+                with: {
+                  selectedKit: {
+                    with: {
+                      abilities: { with: { ability: true } },
+                      passives: { with: { passive: true } },
+                      disguise: true,
+                    },
                   },
+                },
+              });
+
+              if (!data) {
+                throw new TRPCError({
+                  code: "BAD_REQUEST",
+                  cause: `Can't find player with uuid ${uuid} in basicPlayerData table`,
+                });
+              }
+
+              return {
+                ...data,
+                selectedKit: {
+                  ...data.selectedKit,
+                  passives: data.selectedKit.passives.map((relation) => {
+                    return {
+                      ...relation,
+                      passive: {
+                        ...relation.passive,
+                        meta: {
+                          ...relation.passive.meta,
+                          ...relation.meta,
+                        },
+                      },
+                    };
+                  }),
                 },
               };
             }),
-          },
-        };
-      });
+          );
+        }),
+      );
 
       const validMaps = await queryClient.fetchQuery({
-        queryKey: [
-          "mapsTable",
-          "game",
-          minigame.minPlayers,
-          minigame.maxPlayers,
-        ],
+        queryKey: ["maps", "game", minigame.minPlayers, minigame.maxPlayers],
         queryFn: async () => {
           return await db.query.maps.findMany({
             where: and(
@@ -98,17 +115,10 @@ export const minigameRouter = router({
 
       let gameId = useRandomId(15);
 
-      // Ensure there are no collisions with game ids even though it's unlikely
-      // while (
-      //   // query for already existing game ids once that table exists
-      // ) {
-      //   gameId = useRandomId(15);
-      // }
-
       return {
         gameId,
         minigame,
-        players: playerData,
+        teams: teamsPlayerData,
         map: validMaps[mapIndex],
       };
     }),
@@ -187,4 +197,19 @@ export const minigameRouter = router({
 
       await Promise.all([wranglerTask, tusslerTask]);
     }),
+  getPlayableGames: internalProcedure.query(async () => {
+    const allMinigames = await db.query.minigames.findMany({
+      where: (table, { eq }) => eq(table.isHidden, false),
+    });
+
+    const minigameLangs = await db.query.lang.findMany({
+      where: (table, { ilike }) => ilike(table.id, "minigame.%.name"),
+    });
+
+    return allMinigames.map((minigame) => {
+      const displayName = minigameLangs.find((m) => m.id.includes(minigame.id));
+
+      return { ...minigame, displayName: displayName ?? minigame.id };
+    });
+  }),
 });

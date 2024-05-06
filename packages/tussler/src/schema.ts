@@ -124,6 +124,17 @@ export const basicPlayerData = sqliteTable(
   }),
 );
 
+export const usercache = sqliteTable(
+  "usercache",
+  {
+    uuid: text("uuid", { length: 36 }).primaryKey(),
+    username: text("username").notNull(),
+  },
+  (table) => ({
+    uuidIdx: index("usercache_player_uuid_idx").on(table.uuid),
+  }),
+);
+
 export const ipBans = sqliteTable(
   "ip_bans",
   {
@@ -142,7 +153,11 @@ export const minigames = sqliteTable(
     minPlayers: integer("min_players").notNull(),
     maxPlayers: integer("max_players").notNull(),
     playersPerTeam: integer("players_per_team").notNull().default(1),
+    amountOfTeams: integer("amount_of_teams").notNull().default(4),
     countdownSeconds: integer("countdown_seconds").notNull().default(5),
+    isHidden: integer("is_hidden", { mode: "boolean" })
+      .notNull()
+      .default(false),
     stocks: integer("stocks").notNull().default(4),
   },
   (table) => ({
@@ -154,6 +169,8 @@ export const queue = sqliteTable(
   "queue",
   {
     playerUuid: text("player_uuid", { length: 36 }).primaryKey(),
+    partyId: text("party_id"),
+    dateAdded: integer("date_added").notNull(),
     minigameId: text("minigame_id").notNull(),
   },
   (table) => ({
@@ -218,6 +235,49 @@ export const friendships = sqliteTable(
     friendshipsUuid2Idx: index("friendships_uuid_2_idx").on(table.uuid2),
   }),
 );
+
+export const parties = sqliteTable("parties", {
+  partyId: text("party_id").primaryKey(),
+  ownerUuid: text("owner_uuid").notNull(),
+});
+
+export const partyGuests = sqliteTable(
+  "party_guests",
+  {
+    playerUuid: text("player_uuid").primaryKey(),
+    partyId: text("party_id").notNull(),
+  },
+  (table) => ({
+    pGuestPartyIdIdx: index("p_guest_party_id_idx").on(table.partyId),
+    pGuestPlayerUuidIdx: index("p_guest_player_uuid_idx").on(table.playerUuid),
+  }),
+);
+
+export const partyInvites = sqliteTable(
+  "party_invites",
+  {
+    partyId: text("party_id").notNull(),
+    inviterUuid: text("inviter_uuid").notNull(),
+    inviteeUuid: text("invitee_uuid").notNull(),
+  },
+  (table) => ({
+    partyInvitePk: primaryKey({
+      name: "party_invite_pk",
+      columns: [table.inviteeUuid, table.inviterUuid, table.partyId],
+    }),
+  }),
+);
+
+export const partiesRelations = relations(parties, ({ many }) => ({
+  guests: many(partyGuests),
+}));
+
+export const partyGuestsRelations = relations(partyGuests, ({ one }) => ({
+  party: one(parties, {
+    fields: [partyGuests.partyId],
+    references: [parties.partyId],
+  }),
+}));
 
 export const kitsRelations = relations(kits, ({ many, one }) => ({
   abilities: many(abilitiesToKits),
@@ -298,5 +358,16 @@ export const basicPlayerDataRelations = relations(
       fields: [basicPlayerData.selectedKitId],
       references: [kits.id],
     }),
+    usercache: one(usercache, {
+      fields: [basicPlayerData.uuid],
+      references: [usercache.uuid],
+    }),
   }),
 );
+
+export const usercacheRelations = relations(usercache, ({ one }) => ({
+  basicPlayerData: one(basicPlayerData, {
+    fields: [usercache.uuid],
+    references: [basicPlayerData.uuid],
+  }),
+}));

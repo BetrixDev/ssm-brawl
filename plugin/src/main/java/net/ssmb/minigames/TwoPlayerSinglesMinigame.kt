@@ -1,5 +1,6 @@
 package net.ssmb.minigames
 
+import br.com.devsrsouza.kotlinbukkitapi.extensions.player
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import com.github.shynixn.mccoroutine.bukkit.ticks
@@ -35,9 +36,11 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.util.Vector
 
 class TwoPlayerSinglesMinigame(
-    override val players: List<Player>,
+    override val teams: List<List<Player>>,
     private val minigameData: MinigameStartSuccess
 ) : IMinigame, Listener {
+    private val players = teams.flatten()
+    private val playerMinigameData = minigameData.teams.flatten()
     private val plugin = SSMB.instance
     private val minigameState = Atom(MinigameState.LOADING)
     private lateinit var minigameWorld: World
@@ -72,22 +75,24 @@ class TwoPlayerSinglesMinigame(
     private fun doMinigameLoading() {
         minigameWorld = plugin.worlds.createSsmbWorld(minigameData.map.id, minigameData.gameId)
 
-        players.forEachIndexed { idx, it ->
+        teams.forEachIndexed { idx, team ->
             val spawnCoords = minigameData.map.spawnPoints[idx]
             val tpLocation = Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
-            it.teleport(tpLocation)
 
-            it.walkSpeed = 0.0f
-            it.lookAt(minigameWorld.spawnLocation, LookAnchor.EYES)
+            team.forEach { plr ->
+                plr.teleport(tpLocation)
+                plr.walkSpeed = 0.0f
+                plr.lookAt(minigameWorld.spawnLocation, LookAnchor.EYES)
 
-            val playerData =
-                minigameData.players.find { itt -> itt.uuid == it.uniqueId.toString() }!!
-            val kit = constructKitFromData(it, playerData.selectedKit, this)
-            kit.initializeKit()
+                val playerData =
+                    playerMinigameData.find { it -> it.uuid == plr.uniqueId.toString() }!!
+                val kit = constructKitFromData(plr, playerData.selectedKit, this)
+                kit.initializeKit()
 
-            teamsStocks.add(Pair(arrayListOf(it), minigameData.minigame.stocks))
+                playerKits[plr] = kit
+            }
 
-            playerKits[it] = kit
+            teamsStocks.add(Pair(ArrayList(team), minigameData.minigame.stocks))
         }
 
         minigameState.set(MinigameState.COUNTDOWN)
@@ -142,7 +147,7 @@ class TwoPlayerSinglesMinigame(
     private fun doMinigameRunning() {
         startedAt = System.currentTimeMillis()
 
-        players.forEach { it.walkSpeed = 0.2f }
+        teams.forEach { team -> team.forEach { plr -> plr.walkSpeed = 0.2f } }
     }
 
     private fun doMinigameEnd() {

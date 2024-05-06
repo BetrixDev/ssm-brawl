@@ -13,10 +13,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.*
-import net.ssmb.dtos.player.BasicPlayerDataRequest
-import net.ssmb.dtos.player.BasicPlayerDataResponse
-import net.ssmb.dtos.player.IsIpBannedRequest
-import net.ssmb.dtos.player.IsIpBannedResponse
+import net.ssmb.dtos.player.*
 import net.ssmb.dtos.queue.AddPlayerError
 import net.ssmb.dtos.queue.AddPlayerRequest
 import net.ssmb.dtos.queue.AddPlayerResponse
@@ -72,10 +69,8 @@ class ApiService {
         }
 
         return when (response.status.value) {
-            200 -> AddPlayerResponse.Success(
-                polymorphicJson.decodeFromString(response.bodyAsText())
-            )
-
+            200 ->
+                AddPlayerResponse.Success(polymorphicJson.decodeFromString(response.bodyAsText()))
             409 -> AddPlayerResponse.Error(AddPlayerError.ALREADY_IN_QUEUE)
             else -> AddPlayerResponse.Error(AddPlayerError.UNKNOWN)
         }
@@ -118,6 +113,12 @@ class ApiService {
         }
     }
 
+    suspend fun minigameGetPlayableGames(): List<PlayableGamesResponseEntry> {
+        val response = client.get("api/minigame.getPlayableGames")
+
+        return json.decodeFromString(response.bodyAsText())
+    }
+
     suspend fun langAllEntries(): Map<String, String> {
         val response = client.get("api/lang.getAllEntries")
 
@@ -140,5 +141,13 @@ class ApiService {
             }
 
         return json.decodeFromString(response.bodyAsText())
+    }
+
+    suspend fun playerUpdatePlayerName(player: Player): Int {
+        val request = UpdatePlayerNameRequest(player.uniqueId.toString(), player.name)
+
+        val response = client.post("api/player.updatePlayerName") { setBody(request) }
+
+        return response.status.value
     }
 }

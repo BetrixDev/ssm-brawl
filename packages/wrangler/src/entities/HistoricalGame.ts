@@ -1,4 +1,4 @@
-import { Column, Entity, ObjectId, ObjectIdColumn } from "typeorm";
+import { Column, Entity, ObjectIdColumn } from "typeorm";
 import { HistoricalGamePlayer } from "../models/HistoricalGamePlayer.js";
 
 @Entity("historical_games")

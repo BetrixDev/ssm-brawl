@@ -8,6 +8,13 @@
       "when": 1713385526881,
       "tag": "0000_reflective_boomerang",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1715026525156,
+      "tag": "0001_nifty_paper_doll",
+      "breakpoints": true
     }
   ]
 }

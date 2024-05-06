@@ -6,16 +6,19 @@ export function middlewareLogger(log: Logger): MiddlewareHandler {
     const start = Date.now();
 
     try {
+      const jsonPayload = await c.req.raw.json();
+      (c as any).jsonPayload = jsonPayload;
+
       log.info({
         method: c.req.method,
         path: c.req.path,
-        //         requestBody: await c.req.raw.json(),
+        payload: jsonPayload,
       });
     } catch {
       log.info({
         method: c.req.method,
         path: c.req.path,
-        requestBody: null,
+        payload: null,
       });
     }
 

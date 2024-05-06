@@ -30,15 +30,20 @@ class PlayerJoinListener : Listener {
                 return@launch
             }
 
+            // Keep track of the player's most current username, so we can use it across different
+            // services
+            plugin.api.playerUpdatePlayerName(player)
+
             player.teleport(plugin.hub.spawnLocation)
             player.foodLevel = 18
 
             val joinMessage =
                 if (playerData.firstTime) {
                     Component.text("joined first time")
-//                    plugin.lang.getComponent("chat.player.joinedserver.firsttime")
+                    //
+                    // plugin.lang.getComponent("chat.player.joinedserver.firsttime")
                 } else {
-//                    plugin.lang.getComponent("chat.player.joinedserver")
+                    //                    plugin.lang.getComponent("chat.player.joinedserver")
                     Component.text("joined")
                 }
 
