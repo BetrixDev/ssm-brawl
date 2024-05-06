@@ -1,33 +1,42 @@
 package net.ssmb.services
 
-import java.util.*
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartResponse
 import net.ssmb.minigames.IMinigame
 import net.ssmb.minigames.constructMinigameFromData
 import org.bukkit.entity.Player
+import java.util.*
 
 class MinigameService {
     private val plugin = SSMB.instance
 
     private val runningMinigames = arrayListOf<IMinigame>()
 
-    suspend fun tryStartMinigame(playerUuids: List<String>, minigameId: String) {
-        val onlinePlayers = mutableListOf<Player>()
+    suspend fun tryStartMinigame(teams: List<List<String>>, minigameId: String) {
+        val onlinePlayers = mutableListOf<MutableList<Player>>()
         val offlinePlayers =
-            playerUuids.filter {
-                val onlinePlayer = plugin.server.getPlayer(UUID.fromString(it))
+            teams.filter { team ->
+                val onlinePlayersInTeam = mutableListOf<Player>()
 
-                if (onlinePlayer != null) {
-                    !onlinePlayers.add(onlinePlayer)
+                val offlinePlayersInTeam = team.filter { plr ->
+                    val onlinePlayer = plugin.server.getPlayer(UUID.fromString(plr))
+
+                    if (onlinePlayer != null) {
+                        !onlinePlayersInTeam.add(onlinePlayer)
+                    }
+
+                    onlinePlayer == null
+
                 }
 
-                onlinePlayer == null
+                onlinePlayers.add(onlinePlayersInTeam)
+
+                offlinePlayersInTeam.isEmpty()
             }
 
         if (offlinePlayers.isNotEmpty()) {
-            onlinePlayers.forEach {
+            onlinePlayers.flatten().forEach {
                 it.sendMessage(
                     Component.text(
                         "Tried to start the game with a player that was offline. You have been placed back into the queue"
@@ -35,14 +44,14 @@ class MinigameService {
                 )
             }
 
-            plugin.api.queueRemovePlayers(offlinePlayers)
+            plugin.api.queueRemovePlayers(offlinePlayers.flatten())
             return
         }
 
-        val startResponse = plugin.api.minigameStart(playerUuids, minigameId)
+        val startResponse = plugin.api.minigameStart(teams, minigameId)
 
         if (startResponse is MinigameStartResponse.Error) {
-            onlinePlayers.forEach {
+            onlinePlayers.flatten().forEach {
                 it.sendMessage(Component.text("An error occurred while trying to start the game."))
             }
         } else if (startResponse is MinigameStartResponse.Success) {
@@ -60,6 +69,6 @@ class MinigameService {
     }
 
     fun isPlayerInMinigame(player: Player): Boolean {
-        return runningMinigames.find { it.players.contains(player) } != null
+        return runningMinigames.find { it.teams.flatten().contains(player) } != null
     }
 }

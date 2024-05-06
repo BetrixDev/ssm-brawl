@@ -28,6 +28,6 @@ sealed class AddPlayerSuccess {
     sealed class StartGame(
         val type: String,
         val minigameId: String,
-        val playerUuids: List<String>,
+        val playerUuids: List<List<String>>,
     ) : AddPlayerSuccess()
 }

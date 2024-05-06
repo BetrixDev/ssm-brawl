@@ -71,6 +71,7 @@ class ApiService {
         return when (response.status.value) {
             200 ->
                 AddPlayerResponse.Success(polymorphicJson.decodeFromString(response.bodyAsText()))
+
             409 -> AddPlayerResponse.Error(AddPlayerError.ALREADY_IN_QUEUE)
             else -> AddPlayerResponse.Error(AddPlayerError.UNKNOWN)
         }
@@ -90,7 +91,7 @@ class ApiService {
     }
 
     suspend fun minigameStart(
-        playerUuids: List<String>,
+        playerUuids: List<List<String>>,
         minigameId: String
     ): MinigameStartResponse {
         val response =
