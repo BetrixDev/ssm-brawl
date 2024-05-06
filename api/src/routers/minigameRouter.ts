@@ -28,7 +28,7 @@ export const minigameRouter = router({
       z.object({
         teams: z.array(z.array(z.string())),
         minigameId: z.string(),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       const [minigame] = await db.batch([
@@ -38,8 +38,8 @@ export const minigameRouter = router({
         db.delete(queue).where(
           inArray(
             queue.playerUuid,
-            input.teams.flatMap((s) => s),
-          ),
+            input.teams.flatMap((s) => s)
+          )
         ),
       ]);
 
@@ -89,9 +89,9 @@ export const minigameRouter = router({
                   }),
                 },
               };
-            }),
+            })
           );
-        }),
+        })
       );
 
       const validMaps = await queryClient.fetchQuery({
@@ -101,7 +101,7 @@ export const minigameRouter = router({
             where: and(
               lte(maps.minPlayers, minigame.minPlayers),
               gte(maps.maxPlayers, minigame.maxPlayers),
-              eq(maps.role, "game"),
+              eq(maps.role, "game")
             ),
             with: {
               spawnPoints: true,
@@ -144,13 +144,13 @@ export const minigameRouter = router({
                     abilityId: z.string(),
                     usedAt: z.number(),
                     damageDealt: z.number().optional(),
-                  }),
+                  })
                 ),
-              }),
+              })
             ),
-          }),
+          })
         ),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       const historicalGameRepository =
@@ -162,14 +162,14 @@ export const minigameRouter = router({
             (a) =>
               new HistoricalGameKitAbilityUse(a.abilityId, a.usedAt, {
                 damageDealt: a.damageDealt,
-              }),
+              })
           );
 
           return new HistoricalGameKit(
             k.id,
             k.startTime,
             k.endTime,
-            abilityUsage,
+            abilityUsage
           );
         });
 
@@ -203,7 +203,7 @@ export const minigameRouter = router({
     });
 
     const minigameLangs = await db.query.lang.findMany({
-      where: (table, { ilike }) => ilike(table.id, "minigame.%.name"),
+      where: (table, { like }) => like(table.id, "minigame.%.name"),
     });
 
     return allMinigames.map((minigame) => {

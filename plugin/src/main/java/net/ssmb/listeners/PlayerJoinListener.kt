@@ -3,6 +3,7 @@ package net.ssmb.listeners
 import com.github.shynixn.mccoroutine.bukkit.launch
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
+import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -35,7 +36,8 @@ class PlayerJoinListener : Listener {
             plugin.api.playerUpdatePlayerName(player)
 
             player.teleport(plugin.hub.spawnLocation)
-            player.foodLevel = 18
+            player.foodLevel = 20
+            player.gameMode = GameMode.SURVIVAL
 
             val joinMessage =
                 if (playerData.firstTime) {

@@ -10,7 +10,7 @@ export const queueRouter = router({
         playerUuid: z.string(),
         minigameId: z.string(),
         force: z.boolean().optional(),
-      }),
+      })
     )
     .mutation(async ({ input }) => {
       if (input.force) {
@@ -41,7 +41,7 @@ export const queueRouter = router({
 
       if (playerParty !== undefined) {
         const playersInParty = playerParty.party.guests.map(
-          (p) => p.playerUuid,
+          (p) => p.playerUuid
         );
 
         // Eventually we might want to support putting partial parties into a team (3 person party for a 4 person team game)
@@ -71,7 +71,7 @@ export const queueRouter = router({
             minigameId: minigameData.id,
             playerUuid: playerUuid,
             partyId: playerParty.partyId,
-          })),
+          }))
         );
       } else {
         await db.insert(queue).values({
@@ -99,7 +99,7 @@ export const queueRouter = router({
         ) {
           const teamSlice = playersInQueue.slice(
             i,
-            minigameData.playersPerTeam * (i + 1),
+            minigameData.playersPerTeam * (i + 1)
           );
 
           teams.push(teamSlice.map(({ playerUuid }) => playerUuid));
