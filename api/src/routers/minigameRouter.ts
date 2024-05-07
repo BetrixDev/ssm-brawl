@@ -200,6 +200,7 @@ export const minigameRouter = router({
   getPlayableGames: internalProcedure.query(async () => {
     const allMinigames = await db.query.minigames.findMany({
       where: (table, { eq }) => eq(table.isHidden, false),
+      with: { queueEntries: true },
     });
 
     const minigameLangs = await db.query.lang.findMany({
@@ -209,7 +210,11 @@ export const minigameRouter = router({
     return allMinigames.map((minigame) => {
       const displayName = minigameLangs.find((m) => m.id.includes(minigame.id));
 
-      return { ...minigame, displayName: displayName ?? minigame.id };
+      return {
+        id: minigame.id,
+        displayName: displayName ?? minigame.id,
+        playersInQueue: minigame.queueEntries.length,
+      };
     });
   }),
 });

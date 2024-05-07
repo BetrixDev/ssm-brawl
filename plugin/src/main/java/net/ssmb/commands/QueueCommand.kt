@@ -34,6 +34,7 @@ class QueueCommand {
                             idx,
                             item(Material.DIAMOND_BLOCK).meta<ItemMeta> {
                                 displayName(Component.text(entry.displayName))
+                                lore(mutableListOf(Component.text("${entry.playersInQueue} players in queue")))
                             }
                         ) {
                             onClick { sender.performCommand("queue ${entry.id}") }
