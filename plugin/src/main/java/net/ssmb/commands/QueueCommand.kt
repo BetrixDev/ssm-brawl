@@ -14,6 +14,7 @@ import net.ssmb.SSMB
 import net.ssmb.dtos.queue.AddPlayerError
 import net.ssmb.dtos.queue.AddPlayerResponse
 import net.ssmb.dtos.queue.AddPlayerSuccess
+import net.ssmb.utils.t
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.meta.ItemMeta
@@ -50,8 +51,8 @@ class QueueCommand {
     fun executeLeave(@Context sender: Player) {
         plugin.launch {
             when (plugin.api.queueRemovePlayers(listOf(sender.uniqueId.toString()))) {
-                200 -> sender.sendMessage(Component.text("left queue"))
-                else -> sender.sendMessage(Component.text("unknown error"))
+                200 -> sender.sendMessage(t("queue.left"))
+                else -> sender.sendMessage(t("unknownError"))
             }
         }
     }
@@ -68,9 +69,7 @@ class QueueCommand {
                     AddPlayerError.UNKNOWN -> sender.sendMessage(Component.text("unknown error"))
                 }
             } else if (response is AddPlayerResponse.Success) {
-                //                val addedMessage = plugin.lang.getComponent("queue.added")
-
-                sender.sendMessage(Component.text("added bitch"))
+                sender.sendMessage(t("queue.added"))
 
                 if (response.value is AddPlayerSuccess.Added) {
                     //

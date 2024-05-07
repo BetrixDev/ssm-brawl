@@ -6,15 +6,14 @@ import dev.rollczi.litecommands.bukkit.LiteCommandsBukkit
 import net.ssmb.commands.QueueCommand
 import net.ssmb.listeners.*
 import net.ssmb.services.ApiService
-import net.ssmb.services.LangService
 import net.ssmb.services.MinigameService
 import net.ssmb.services.WorldService
+import net.ssmb.utils.initLang
 import org.bukkit.World
 import org.bukkit.command.CommandSender
 
 class SSMB : SuspendingJavaPlugin() {
     lateinit var api: ApiService
-    lateinit var lang: LangService
     lateinit var minigames: MinigameService
     lateinit var worlds: WorldService
     lateinit var hub: World
@@ -35,8 +34,7 @@ class SSMB : SuspendingJavaPlugin() {
         minigames = MinigameService()
         worlds = WorldService()
 
-        lang = LangService()
-        lang.initLangService()
+        initLang(this)
 
         hub = worlds.createSsmbWorld("blue_forest", "hub_1")
 

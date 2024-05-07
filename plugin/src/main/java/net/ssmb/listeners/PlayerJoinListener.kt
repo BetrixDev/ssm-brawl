@@ -3,6 +3,7 @@ package net.ssmb.listeners
 import com.github.shynixn.mccoroutine.bukkit.launch
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
+import net.ssmb.utils.t
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -20,14 +21,14 @@ class PlayerJoinListener : Listener {
             val bannedRequest = plugin.api.playerIsIpBanned(player.address.hostName, player)
 
             if (bannedRequest.isBanned) {
-                event.player.kick(plugin.lang.getComponent("gui.kicked.ban"))
+                event.player.kick(t("titleScreen.banned"))
                 return@launch
             }
 
             val playerData = plugin.api.playerBasicData(player)
 
             if (playerData.isBanned) {
-                event.player.kick(plugin.lang.getComponent("gui.kicked.ban"))
+                event.player.kick(t("titleScreen.banned"))
                 return@launch
             }
 
@@ -41,12 +42,9 @@ class PlayerJoinListener : Listener {
 
             val joinMessage =
                 if (playerData.firstTime) {
-                    Component.text("joined first time")
-                    //
-                    // plugin.lang.getComponent("chat.player.joinedserver.firsttime")
+                    t("broadcast.player.joined")
                 } else {
-                    //                    plugin.lang.getComponent("chat.player.joinedserver")
-                    Component.text("joined")
+                    t("broadcast.player.joinedFirstTime")
                 }
 
             plugin.hub.sendMessage(joinMessage)

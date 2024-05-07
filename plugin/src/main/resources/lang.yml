@@ -1,0 +1,17 @@
+# Still up in the air on how we should name translation keys
+# https://lokalise.com/blog/translation-keys-naming-and-organizing/
+
+prefix: "[SSMB]"
+unknownError: "{prefix} An unknown error occurred when attempting to perform your request."
+
+broadcast:
+  player:
+    joined: "{playerName} has joined!"
+    joinedFistTime: "{playerName} has joined for the first time!"
+
+queue:
+  left: "{prefix} You have left the queue for {minigameName}"
+  joined: "{prefix} You have joined the queue for {minigameName}! There are {playersInQueue} players in the queue"
+
+titleScreen:
+  banned: "You are banned from this server"
