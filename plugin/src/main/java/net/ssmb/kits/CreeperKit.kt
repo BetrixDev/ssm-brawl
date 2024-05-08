@@ -1,7 +1,7 @@
 package net.ssmb.kits
 
 import br.com.devsrsouza.kotlinbukkitapi.extensions.item
-import net.ssmb.abilities.IAbility
+import net.ssmb.abilities.SsmbAbility
 import net.ssmb.abilities.constructAbilityFromData
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.events.BrawlDamageEvent
@@ -25,7 +25,7 @@ class CreeperKit(
     override val kitData: MinigameStartSuccess.PlayerData.KitData,
     private val minigame: IMinigame
 ) : IKit {
-    private val abilities = arrayListOf<IAbility>()
+    private val abilities = arrayListOf<SsmbAbility>()
     private val passives = arrayListOf<IPassive>()
     private val playerInv = player.inventory
 

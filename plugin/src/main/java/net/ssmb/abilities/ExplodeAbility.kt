@@ -1,62 +1,29 @@
 package net.ssmb.abilities
 
-import br.com.devsrsouza.kotlinbukkitapi.extensions.item
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.ticks
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.extensions.*
 import net.ssmb.utils.TaggedKeyBool
-import net.ssmb.utils.TaggedKeyStr
-import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
-import org.bukkit.event.HandlerList
-import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
 
 class ExplodeAbility(
     private val player: Player,
-    private val abilityEntry: MinigameStartSuccess.PlayerData.KitData.AbilityEntry
-) : IAbility, Listener {
+    abilityEntry: MinigameStartSuccess.PlayerData.KitData.AbilityEntry
+) : SsmbAbility(player, abilityEntry) {
     private val plugin = SSMB.instance
-    private val playerInv = player.inventory
-    private val abilityCooldown = abilityEntry.ability.cooldown
 
-    private var lastTimeUsed: Long = 0
     private var isExplodeActive = false
 
-    override fun initializeAbility() {
-        plugin.server.pluginManager.registerEvents(this, plugin)
-
-        playerInv.setItem(
-            abilityEntry.abilityToolSlot,
-            item(Material.IRON_SHOVEL) {
-                displayName(Component.text("Explode"))
-                persistentDataContainer.setData { set(TaggedKeyStr("ability_item_id"), "explode") }
-            }
-        )
-    }
-
-    override fun destroyAbility() {
-        HandlerList.unregisterAll(this)
-    }
-
-    private fun tryActivateAbility() {
+    override fun doAbility() {
         val currentTime = System.currentTimeMillis()
-
-        if (lastTimeUsed + abilityCooldown > currentTime) {
-            val timeLeft = ((lastTimeUsed + abilityCooldown) - currentTime) / 1000.0
-            player.sendMessage(Component.text("You have $timeLeft seconds till use again"))
-            return
-        }
 
         plugin.launch {
             player.walkSpeed = 0.05f
@@ -106,24 +73,9 @@ class ExplodeAbility(
                     it.damage(damage, player)
                 }
 
-                lastTimeUsed = System.currentTimeMillis()
+                timeLastUsed = System.currentTimeMillis()
             }
         }
-    }
-
-    @EventHandler
-    fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (event.player != player) return
-        if (event.action != Action.RIGHT_CLICK_AIR || event.action != Action.RIGHT_CLICK_BLOCK)
-            return
-
-        val itemAbilityId =
-            event.item?.itemMeta?.persistentDataContainer?.get(TaggedKeyStr("ability_item_id"))
-        if (itemAbilityId != "explode") return
-
-        event.isCancelled = true
-
-        tryActivateAbility()
     }
 
     @EventHandler

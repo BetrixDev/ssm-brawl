@@ -6,7 +6,7 @@ import org.bukkit.entity.Player
 fun constructAbilityFromData(
     player: Player,
     abilityEntry: MinigameStartSuccess.PlayerData.KitData.AbilityEntry
-): IAbility {
+): SsmbAbility {
     return when (abilityEntry.ability.id) {
         "sulphur_bomb" -> SulphurBombAbility(player, abilityEntry)
         "explode" -> ExplodeAbility(player, abilityEntry)

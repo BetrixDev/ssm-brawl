@@ -25,3 +25,9 @@ shutdown:
   broadcastShutdownStarted: "{prefix} {announcementPrefix} A server shutdown has begun, all queues have been stopped. Shutdown will happen after all ongoing games have ended"
   waitingForMinigames: "{prefix} We have found ongoing minigames, waiting until those finish"
   performingShutdown: "{prefix} Performing shutdown"
+
+ability:
+  cooldownMessage: "You have {secondsLeft} before you can use {abilityName} again"
+  displayName:
+    explode: "Explode"
+    sulphur_bomb: "Sulphur Bomb"

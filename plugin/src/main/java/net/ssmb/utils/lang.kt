@@ -14,7 +14,7 @@ fun initLang(plugin: SSMB) {
     langConfig.load(langFile)
 }
 
-private fun parseLangEntry(langKey: String, variables: HashMap<String, String>? = null): String {
+private fun parseLangEntry(langKey: String, variables: Map<String, String>? = null): String {
     var parsedString = langConfig.getString(langKey) ?: langKey
 
     val variablesToReplace = variablePattern.findAll(langKey)
@@ -33,7 +33,7 @@ private fun parseLangEntry(langKey: String, variables: HashMap<String, String>? 
     return parsedString
 }
 
-fun t(key: String, variables: HashMap<String, String>? = null): Component {
+fun t(key: String, variables: Map<String, String>? = null): Component {
     val parsedString = parseLangEntry(key, variables)
 
     return MiniMessage.miniMessage().deserialize(parsedString)
