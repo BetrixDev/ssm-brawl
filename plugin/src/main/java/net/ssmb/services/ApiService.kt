@@ -150,4 +150,10 @@ class ApiService {
 
         return response.status.value
     }
+
+    suspend fun serverBeginShutdown(): Int {
+        val response = client.post("api/server.beginShutdown")
+
+        return response.status.value
+    }
 }

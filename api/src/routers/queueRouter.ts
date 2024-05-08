@@ -2,6 +2,7 @@ import { z } from "zod";
 import { internalProcedure, router } from "../trpc.js";
 import { db, queue, eq, minigames, inArray } from "tussler";
 import { TRPCError } from "@trpc/server";
+import { kv } from "../kv.js";
 
 export const queueRouter = router({
   addPlayer: internalProcedure
@@ -13,6 +14,12 @@ export const queueRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
+      const isServerShuttingDown = await kv.getItem("isShuttingDown");
+
+      if (isServerShuttingDown) {
+        throw new TRPCError({ code: "CONFLICT", message: "serverShuttingDown" });
+      }
+
       if (input.force) {
         await db.delete(queue).where(eq(queue.playerUuid, input.playerUuid));
       } else {

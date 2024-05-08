@@ -2,7 +2,9 @@
 # https://lokalise.com/blog/translation-keys-naming-and-organizing/
 
 prefix: "[SSMB]"
+announcementPrefix: "[ANNOUNCEMENT]"
 unknownError: "{prefix} An unknown error occurred when attempting to perform your request."
+noPermissionForAction: "{prefix} You don't have permission to perform the specified action"
 
 broadcast:
   player:
@@ -15,3 +17,11 @@ queue:
 
 titleScreen:
   banned: "You are banned from this server"
+
+shutdown:
+  attempting: "{prefix} Attempting to perform shutdown of server"
+  alreadyInProgress: "{prefix} A server shutdown is already in progress"
+  unknownError: "{prefix} An unknown error occurred when attempting to perform server shutdown"
+  broadcastShutdownStarted: "{prefix} {announcementPrefix} A server shutdown has begun, all queues have been stopped. Shutdown will happen after all ongoing games have ended"
+  waitingForMinigames: "{prefix} We have found ongoing minigames, waiting until those finish"
+  performingShutdown: "{prefix} Performing shutdown"

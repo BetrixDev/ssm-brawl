@@ -71,4 +71,8 @@ class MinigameService {
     fun isPlayerInMinigame(player: Player): Boolean {
         return runningMinigames.find { it.teams.flatten().contains(player) } != null
     }
+
+    fun areMinigamesOngoing(): Boolean {
+        return runningMinigames.isNotEmpty()
+    }
 }
