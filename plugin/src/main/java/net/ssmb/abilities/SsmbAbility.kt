@@ -59,7 +59,7 @@ open class SsmbAbility(
 
     open fun destroyAbility() {
         HandlerList.unregisterAll(this)
-        player.inventory.clear()
+        player.inventory.clear(abilityData.abilityToolSlot)
     }
 
     open fun doAbility() {
