@@ -30,6 +30,8 @@ class QueueCommand {
 
             val queueView =
                 menu("Select a Minigame", 4, plugin) {
+                    cancelOnClick = true
+
                     playableGames.forEachIndexed { idx, entry ->
                         slot(
                             idx,
