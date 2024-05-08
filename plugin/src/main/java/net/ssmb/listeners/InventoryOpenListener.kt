@@ -9,7 +9,10 @@ import org.bukkit.event.inventory.InventoryType
 class InventoryOpenListener : Listener {
     @EventHandler
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (event.inventory.type != InventoryType.PLAYER && event.player.gameMode != GameMode.CREATIVE) {
+        if (
+            event.inventory.type != InventoryType.PLAYER &&
+                event.player.gameMode != GameMode.CREATIVE
+        ) {
             event.isCancelled = true
         }
     }

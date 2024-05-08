@@ -12,6 +12,8 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import net.ssmb.SSMB
+import net.ssmb.dtos.maps.GetMapDetailsRequest
+import net.ssmb.dtos.maps.GetMapDetailsResponse
 import net.ssmb.dtos.minigame.*
 import net.ssmb.dtos.player.*
 import net.ssmb.dtos.queue.AddPlayerError
@@ -155,5 +157,16 @@ class ApiService {
         val response = client.post("api/server.beginShutdown")
 
         return response.status.value
+    }
+
+    suspend fun mapGetMapDetails(mapId: String): GetMapDetailsResponse {
+        val response =
+            client.post("api/maps.getMapDetails") { setBody(GetMapDetailsRequest(mapId)) }
+
+        if (response.status.value == 403) {
+            throw RuntimeException("Unable to find map with id $mapId")
+        }
+
+        return json.decodeFromString(response.bodyAsText())
     }
 }
