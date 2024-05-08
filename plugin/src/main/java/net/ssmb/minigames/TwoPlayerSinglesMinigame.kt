@@ -58,7 +58,7 @@ class TwoPlayerSinglesMinigame(
     override suspend fun initializeMinigame() {
         minigameState.subscribe { state, _ ->
             when (state) {
-                MinigameState.LOADING -> doMinigameLoading()
+                MinigameState.LOADING -> plugin.launch { doMinigameLoading() }
                 MinigameState.COUNTDOWN -> doMinigameCountdown()
                 MinigameState.RUNNING -> doMinigameRunning()
                 MinigameState.ENDING -> doMinigameEnd()
@@ -72,7 +72,7 @@ class TwoPlayerSinglesMinigame(
         playerKit?.destroyKit()
     }
 
-    private fun doMinigameLoading() {
+    private suspend fun doMinigameLoading() {
         minigameWorld = plugin.worlds.createSsmbWorld(minigameData.map.id, minigameData.gameId)
 
         teams.forEachIndexed { idx, team ->
