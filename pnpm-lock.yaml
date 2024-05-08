@@ -255,7 +255,7 @@ importers:
         version: 0.1.13
       typeorm:
         specifier: 0.3.20
-        version: 0.3.20(mongodb@5.2.0)(ts-node@10.9.1)
+        version: 0.3.20(mongodb@5.2.0)(ts-node@10.9.1(@types/node@16.11.10)(typescript@5.4.4))
     devDependencies:
       '@types/node':
         specifier: ^16.11.10
@@ -3365,7 +3365,7 @@ snapshots:
       - supports-color
 
   drizzle-orm@0.29.4(@libsql/client@0.5.3):
-    dependencies:
+    optionalDependencies:
       '@libsql/client': 0.5.3
 
   eastasianwidth@0.2.0: {}
@@ -3551,7 +3551,7 @@ snapshots:
       to-regex-range: 5.0.1
 
   follow-redirects@1.15.6(debug@4.3.4):
-    dependencies:
+    optionalDependencies:
       debug: 4.3.4
 
   foreground-child@3.1.1:
@@ -3610,7 +3610,7 @@ snapshots:
       - supports-color
 
   git-node-fs@1.0.0(js-git@0.7.8):
-    dependencies:
+    optionalDependencies:
       js-git: 0.7.8
 
   git-sha1@0.1.2: {}
@@ -4409,7 +4409,7 @@ snapshots:
 
   type@2.7.2: {}
 
-  typeorm@0.3.20(mongodb@5.2.0)(ts-node@10.9.1):
+  typeorm@0.3.20(mongodb@5.2.0)(ts-node@10.9.1(@types/node@16.11.10)(typescript@5.4.4)):
     dependencies:
       '@sqltools/formatter': 1.2.5
       app-root-path: 3.1.0
@@ -4421,13 +4421,14 @@ snapshots:
       dotenv: 16.4.5
       glob: 10.3.12
       mkdirp: 2.1.6
-      mongodb: 5.2.0
       reflect-metadata: 0.2.2
       sha.js: 2.4.11
-      ts-node: 10.9.1(@types/node@16.11.10)(typescript@5.4.4)
       tslib: 2.6.2
       uuid: 9.0.1
       yargs: 17.7.2
+    optionalDependencies:
+      mongodb: 5.2.0
+      ts-node: 10.9.1(@types/node@16.11.10)(typescript@5.4.4)
     transitivePeerDependencies:
       - supports-color
 
