@@ -1,13 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-  real,
-  index,
-  sqliteTable,
-  primaryKey,
-  integer,
-  text,
-  int,
-} from "drizzle-orm/sqlite-core";
+import { real, index, sqliteTable, primaryKey, integer, text, int } from "drizzle-orm/sqlite-core";
 
 export type MapRole = "game" | "hub";
 
@@ -155,9 +147,7 @@ export const minigames = sqliteTable(
     playersPerTeam: integer("players_per_team").notNull().default(1),
     amountOfTeams: integer("amount_of_teams").notNull().default(4),
     countdownSeconds: integer("countdown_seconds").notNull().default(5),
-    isHidden: integer("is_hidden", { mode: "boolean" })
-      .notNull()
-      .default(false),
+    isHidden: integer("is_hidden", { mode: "boolean" }).notNull().default(false),
     stocks: integer("stocks").notNull().default(4),
   },
   (table) => ({
@@ -296,19 +286,16 @@ export const passivesRelations = relations(passives, ({ many }) => ({
   kits: many(passivesToKits),
 }));
 
-export const abilitiesToKitsRelations = relations(
-  abilitiesToKits,
-  ({ one }) => ({
-    kit: one(kits, {
-      fields: [abilitiesToKits.kitId],
-      references: [kits.id],
-    }),
-    ability: one(abilities, {
-      fields: [abilitiesToKits.abilityId],
-      references: [abilities.id],
-    }),
+export const abilitiesToKitsRelations = relations(abilitiesToKits, ({ one }) => ({
+  kit: one(kits, {
+    fields: [abilitiesToKits.kitId],
+    references: [kits.id],
   }),
-);
+  ability: one(abilities, {
+    fields: [abilitiesToKits.abilityId],
+    references: [abilities.id],
+  }),
+}));
 
 export const passivesToKitsRelations = relations(passivesToKits, ({ one }) => ({
   kit: one(kits, {
@@ -351,19 +338,16 @@ export const queueRelations = relations(queue, ({ one }) => ({
   }),
 }));
 
-export const basicPlayerDataRelations = relations(
-  basicPlayerData,
-  ({ one }) => ({
-    selectedKit: one(kits, {
-      fields: [basicPlayerData.selectedKitId],
-      references: [kits.id],
-    }),
-    usercache: one(usercache, {
-      fields: [basicPlayerData.uuid],
-      references: [usercache.uuid],
-    }),
+export const basicPlayerDataRelations = relations(basicPlayerData, ({ one }) => ({
+  selectedKit: one(kits, {
+    fields: [basicPlayerData.selectedKitId],
+    references: [kits.id],
   }),
-);
+  usercache: one(usercache, {
+    fields: [basicPlayerData.uuid],
+    references: [usercache.uuid],
+  }),
+}));
 
 export const usercacheRelations = relations(usercache, ({ one }) => ({
   basicPlayerData: one(basicPlayerData, {

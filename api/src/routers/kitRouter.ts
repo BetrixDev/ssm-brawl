@@ -16,41 +16,38 @@ export const kitsRouter = router({
         queryKey: ["kitPlaytimeMillis", input.kitId],
         queryFn: () =>
           wranglerClient
-            .aggregate<HistoricalGame, { kitPlaytime: number }>(
-              HistoricalGame,
-              [
-                {
-                  $unwind: "$players",
+            .aggregate<HistoricalGame, { kitPlaytime: number }>(HistoricalGame, [
+              {
+                $unwind: "$players",
+              },
+              {
+                $unwind: "$players.kitsUsed",
+              },
+              {
+                $match: {
+                  "players.kitsUsed.id": input.kitId,
                 },
-                {
-                  $unwind: "$players.kitsUsed",
-                },
-                {
-                  $match: {
-                    "players.kitsUsed.id": input.kitId,
+              },
+              {
+                $project: {
+                  _id: 0,
+                  timeElapsed: {
+                    $subtract: [
+                      "$players.kitsUsed.dateLastUsed",
+                      "$players.kitsUsed.dateFirstUsed",
+                    ],
                   },
                 },
-                {
-                  $project: {
-                    _id: 0,
-                    timeElapsed: {
-                      $subtract: [
-                        "$players.kitsUsed.dateLastUsed",
-                        "$players.kitsUsed.dateFirstUsed",
-                      ],
-                    },
+              },
+              {
+                $group: {
+                  _id: 1,
+                  kitPlaytime: {
+                    $sum: "$timeElapsed",
                   },
                 },
-                {
-                  $group: {
-                    _id: 1,
-                    kitPlaytime: {
-                      $sum: "$timeElapsed",
-                    },
-                  },
-                },
-              ],
-            )
+              },
+            ])
             .tryNext(),
       });
 

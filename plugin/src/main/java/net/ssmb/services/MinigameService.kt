@@ -1,12 +1,12 @@
 package net.ssmb.services
 
+import java.util.*
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartResponse
 import net.ssmb.minigames.IMinigame
 import net.ssmb.minigames.constructMinigameFromData
 import org.bukkit.entity.Player
-import java.util.*
 
 class MinigameService {
     private val plugin = SSMB.instance
@@ -19,16 +19,16 @@ class MinigameService {
             teams.filter { team ->
                 val onlinePlayersInTeam = mutableListOf<Player>()
 
-                val offlinePlayersInTeam = team.filter { plr ->
-                    val onlinePlayer = plugin.server.getPlayer(UUID.fromString(plr))
+                val offlinePlayersInTeam =
+                    team.filter { plr ->
+                        val onlinePlayer = plugin.server.getPlayer(UUID.fromString(plr))
 
-                    if (onlinePlayer != null) {
-                        !onlinePlayersInTeam.add(onlinePlayer)
+                        if (onlinePlayer != null) {
+                            !onlinePlayersInTeam.add(onlinePlayer)
+                        }
+
+                        onlinePlayer == null
                     }
-
-                    onlinePlayer == null
-
-                }
 
                 onlinePlayers.add(onlinePlayersInTeam)
 

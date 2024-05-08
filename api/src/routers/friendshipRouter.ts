@@ -8,15 +8,12 @@ export const friendshipRouter = router({
       z.object({
         inviterUuid: z.string(),
         inviteeUuid: z.string(),
-      })
+      }),
     )
     .query(async ({ input }) => {
       const existingFriendship = await db.query.friendships.findFirst({
         where: (table, { eq, and }) =>
-          and(
-            eq(table.uuid1, input.inviterUuid),
-            eq(table.uuid2, input.inviteeUuid)
-          ),
+          and(eq(table.uuid1, input.inviterUuid), eq(table.uuid2, input.inviteeUuid)),
       });
 
       if (existingFriendship !== undefined) {
@@ -46,7 +43,7 @@ export const friendshipRouter = router({
       z.object({
         inviterUuid: z.string(),
         inviteeUuid: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       await db
@@ -68,29 +65,23 @@ export const friendshipRouter = router({
       z.object({
         player1Uuid: z.string(),
         player2Uuid: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       await db
         .delete(friendships)
         .where(
           or(
-            and(
-              eq(friendships.uuid1, input.player1Uuid),
-              eq(friendships.uuid2, input.player2Uuid)
-            ),
-            and(
-              eq(friendships.uuid1, input.player2Uuid),
-              eq(friendships.uuid2, input.player1Uuid)
-            )
-          )
+            and(eq(friendships.uuid1, input.player1Uuid), eq(friendships.uuid2, input.player2Uuid)),
+            and(eq(friendships.uuid1, input.player2Uuid), eq(friendships.uuid2, input.player1Uuid)),
+          ),
         );
     }),
   getPlayersFriends: internalProcedure
     .input(
       z.object({
         playerUuid: z.string(),
-      })
+      }),
     )
     .query(async ({ input }) => {
       return await db.query.friendships.findMany({
@@ -105,10 +96,8 @@ export const friendshipRouter = router({
     .input(
       z.object({
         playerUuid: z.string().describe("Player to check for friendships"),
-        otherPlayers: z
-          .array(z.string())
-          .describe("Array of players to check against"),
-      })
+        otherPlayers: z.array(z.string()).describe("Array of players to check against"),
+      }),
     )
     .query(async ({ input }) => {
       const tusslerResponse = await db.query.friendships.findMany({

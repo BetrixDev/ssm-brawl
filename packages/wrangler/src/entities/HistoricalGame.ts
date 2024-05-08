@@ -15,12 +15,7 @@ export class HistoricalGame {
   @Column(() => HistoricalGamePlayer)
   players: HistoricalGamePlayer[];
 
-  constructor(
-    gameId: string,
-    minigameId: string,
-    mapId: string,
-    players: HistoricalGamePlayer[],
-  ) {
+  constructor(gameId: string, minigameId: string, mapId: string, players: HistoricalGamePlayer[]) {
     this.gameId = gameId;
     this.minigameId = minigameId;
     this.mapId = mapId;

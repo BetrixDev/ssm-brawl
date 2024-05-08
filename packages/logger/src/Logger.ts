@@ -13,8 +13,7 @@ export class Logger {
   constructor(private service: string) {
     // Not using the env package since we don't need strict validation for NODE_ENV here
     const isDevEnvOrNoEnv =
-      process.env.NODE_ENV === "development" ||
-      process.env.NODE_ENV === undefined;
+      process.env.NODE_ENV === "development" || process.env.NODE_ENV === undefined;
   }
 
   info(payload: ({ message?: string } & any) | string): void {

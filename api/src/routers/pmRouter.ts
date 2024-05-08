@@ -19,10 +19,7 @@ export const pmRouter = router({
 
       const friendship = await db.query.friendships.findFirst({
         where: (table, { eq, and }) =>
-          and(
-            eq(table.uuid1, input.authorUuid),
-            eq(table.uuid2, input.targetUuid),
-          ),
+          and(eq(table.uuid1, input.authorUuid), eq(table.uuid2, input.targetUuid)),
       });
 
       if (friendship !== undefined) {
@@ -44,13 +41,9 @@ export const pmRouter = router({
         };
       }
 
-      const messageChannelRepo =
-        wranglerClient.getMongoRepository(MessageChannel);
+      const messageChannelRepo = wranglerClient.getMongoRepository(MessageChannel);
 
-      const messageEntry = new MessageChannelMessage(
-        input.authorUuid,
-        input.content,
-      );
+      const messageEntry = new MessageChannelMessage(input.authorUuid, input.content);
 
       const existingChannel = await messageChannelRepo.findOne({
         where: {
@@ -62,10 +55,7 @@ export const pmRouter = router({
 
       if (!existingChannel) {
         await messageChannelRepo.insertOne(
-          new MessageChannel(
-            [input.authorUuid, input.targetUuid],
-            [messageEntry],
-          ),
+          new MessageChannel([input.authorUuid, input.targetUuid], [messageEntry]),
         );
       } else {
         existingChannel.messages.push(messageEntry);
@@ -85,15 +75,13 @@ export const pmRouter = router({
       }),
     )
     .query(async ({ input }) => {
-      const messageChannel = await wranglerClient
-        .getMongoRepository(MessageChannel)
-        .findOne({
-          where: {
-            users: {
-              $all: input.users,
-            },
+      const messageChannel = await wranglerClient.getMongoRepository(MessageChannel).findOne({
+        where: {
+          users: {
+            $all: input.users,
           },
-        });
+        },
+      });
 
       if (!messageChannel) {
         return {

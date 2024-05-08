@@ -91,10 +91,7 @@ export const playerRouter = router({
       }
 
       const lifetimeWinrate =
-        Math.round(
-          (basicPlayerData.totalGamesWon / basicPlayerData.totalGamesPlayed) *
-            10,
-        ) / 10;
+        Math.round((basicPlayerData.totalGamesWon / basicPlayerData.totalGamesPlayed) * 10) / 10;
 
       return {
         uuid: basicPlayerData.uuid,

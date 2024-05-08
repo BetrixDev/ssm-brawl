@@ -8,15 +8,11 @@ import { renderTrpcPanel } from "trpc-panel";
 import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 import { env } from "env/api";
-import {
-  BackendSource,
-  decodeTokenFromHeaders,
-  generateBackendToken,
-} from "./jwt.js";
+import { BackendSource, decodeTokenFromHeaders, generateBackendToken } from "./jwt.js";
 import { wranglerDataSource } from "wrangler";
 import { log } from "./log.js";
 import { middlewareLogger } from "logger";
-import { runMirations } from "tussler";
+import { db, runMirations } from "tussler";
 
 const app = new Hono();
 

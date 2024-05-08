@@ -10,7 +10,7 @@ export const queueRouter = router({
         playerUuid: z.string(),
         minigameId: z.string(),
         force: z.boolean().optional(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       if (input.force) {
@@ -40,9 +40,7 @@ export const queueRouter = router({
       });
 
       if (playerParty !== undefined) {
-        const playersInParty = playerParty.party.guests.map(
-          (p) => p.playerUuid
-        );
+        const playersInParty = playerParty.party.guests.map((p) => p.playerUuid);
 
         // Eventually we might want to support putting partial parties into a team (3 person party for a 4 person team game)
         //  but that makes the logic a lot more complicated and more error-prone
@@ -54,8 +52,7 @@ export const queueRouter = router({
         }
 
         const playersInPartyInQueue = await db.query.queue.findMany({
-          where: (table, { inArray }) =>
-            inArray(table.playerUuid, playersInParty),
+          where: (table, { inArray }) => inArray(table.playerUuid, playersInParty),
         });
 
         if (playersInPartyInQueue.length > 0) {
@@ -71,7 +68,7 @@ export const queueRouter = router({
             minigameId: minigameData.id,
             playerUuid: playerUuid,
             partyId: playerParty.partyId,
-          }))
+          })),
         );
       } else {
         await db.insert(queue).values({
@@ -86,21 +83,11 @@ export const queueRouter = router({
         orderBy: (table, { asc }) => [asc(table.dateAdded)],
       });
 
-      if (
-        playersInQueue.length >
-        minigameData.playersPerTeam * minigameData.amountOfTeams
-      ) {
+      if (playersInQueue.length > minigameData.playersPerTeam * minigameData.amountOfTeams) {
         const teams: string[][] = [];
 
-        for (
-          let i = 0;
-          i < minigameData.amountOfTeams;
-          i += minigameData.playersPerTeam
-        ) {
-          const teamSlice = playersInQueue.slice(
-            i,
-            minigameData.playersPerTeam * (i + 1)
-          );
+        for (let i = 0; i < minigameData.amountOfTeams; i += minigameData.playersPerTeam) {
+          const teamSlice = playersInQueue.slice(i, minigameData.playersPerTeam * (i + 1));
 
           teams.push(teamSlice.map(({ playerUuid }) => playerUuid));
         }
@@ -120,10 +107,7 @@ export const queueRouter = router({
   removePlayers: internalProcedure
     .input(z.object({ playerUuids: z.array(z.string()) }))
     .mutation(async ({ input }) => {
-      await db
-        .delete(queue)
-        .where(inArray(queue.playerUuid, input.playerUuids))
-        .execute();
+      await db.delete(queue).where(inArray(queue.playerUuid, input.playerUuids)).execute();
     }),
   flushQueue: internalProcedure.mutation(async () => {
     await db.delete(queue).execute();

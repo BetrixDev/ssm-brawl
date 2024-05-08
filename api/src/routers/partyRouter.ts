@@ -9,7 +9,7 @@ export const partyRouter = router({
     .input(
       z.object({
         ownerUuid: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const existingPartiesPlayerIsIn = await db.query.partyGuests.findFirst({
@@ -37,7 +37,7 @@ export const partyRouter = router({
       z.object({
         inviteeUuid: z.string(),
         inviterUuid: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const inviterParty = await db.query.partyGuests.findFirst({
@@ -63,10 +63,7 @@ export const partyRouter = router({
 
       const existingInvite = await db.query.partyInvites.findFirst({
         where: (table, { eq, and }) =>
-          and(
-            eq(table.inviteeUuid, input.inviteeUuid),
-            eq(table.partyId, inviterParty.partyId)
-          ),
+          and(eq(table.inviteeUuid, input.inviteeUuid), eq(table.partyId, inviterParty.partyId)),
       });
 
       if (existingInvite) {
@@ -86,15 +83,12 @@ export const partyRouter = router({
       z.object({
         inviteeUuid: z.string(),
         inviterUuid: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const allPlayerInvites = await db.query.partyInvites.findFirst({
         where: (table, { eq, and }) =>
-          and(
-            eq(table.inviteeUuid, input.inviteeUuid),
-            eq(table.inviterUuid, input.inviterUuid)
-          ),
+          and(eq(table.inviteeUuid, input.inviteeUuid), eq(table.inviterUuid, input.inviterUuid)),
       });
 
       if (!allPlayerInvites) {
@@ -115,18 +109,13 @@ export const partyRouter = router({
 
       if (playerParty.party.ownerUuid === input.playerUuid) {
         await db.batch([
-          db
-            .delete(partyGuests)
-            .where(eq(partyGuests.partyId, playerParty.partyId)),
+          db.delete(partyGuests).where(eq(partyGuests.partyId, playerParty.partyId)),
           db.delete(parties).where(eq(parties.partyId, playerParty.partyId)),
         ]);
 
         return { type: "disband" };
       } else {
-        await db
-          .delete(partyGuests)
-          .where(eq(partyGuests.playerUuid, input.playerUuid))
-          .execute();
+        await db.delete(partyGuests).where(eq(partyGuests.playerUuid, input.playerUuid)).execute();
 
         return { type: "left", playerUuid: input.playerUuid };
       }

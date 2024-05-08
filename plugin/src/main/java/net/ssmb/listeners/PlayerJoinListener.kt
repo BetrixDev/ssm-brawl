@@ -1,7 +1,6 @@
 package net.ssmb.listeners
 
 import com.github.shynixn.mccoroutine.bukkit.launch
-import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import net.ssmb.utils.t
 import org.bukkit.GameMode

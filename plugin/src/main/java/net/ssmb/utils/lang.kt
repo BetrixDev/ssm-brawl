@@ -1,10 +1,10 @@
 package net.ssmb.utils
 
+import java.io.File
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.ssmb.SSMB
 import org.bukkit.configuration.file.YamlConfiguration
-import java.io.File
 
 private val langConfig = YamlConfiguration()
 private val variablePattern = Regex("\\{([^}]*)}")
@@ -26,8 +26,7 @@ private fun parseLangEntry(langKey: String, variables: HashMap<String, String>? 
             parsedString =
                 parsedString.replace(it.value, variables.getOrDefault(variableKey, variableKey))
         } else if (langConfig.getString(variableKey) != null) {
-            parsedString =
-                parsedString.replace(it.value, parseLangEntry(variableKey, variables))
+            parsedString = parsedString.replace(it.value, parseLangEntry(variableKey, variables))
         }
     }
 

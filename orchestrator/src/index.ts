@@ -47,8 +47,7 @@ async function checkForFailedOrRunningActions() {
       workflow_id: workflowId,
     });
 
-    const isLastRunSuccess =
-      runs.data.workflow_runs[0].conclusion === "success";
+    const isLastRunSuccess = runs.data.workflow_runs[0].conclusion === "success";
 
     if (!isLastRunSuccess) {
       return true;
@@ -76,9 +75,7 @@ async function getLatestPluginAssetId() {
       repo: "ssm-brawl",
     });
 
-    return response.data.assets.find(({ name }) =>
-      pm.isMatch(name, "ssmb*.jar"),
-    )?.id;
+    return response.data.assets.find(({ name }) => pm.isMatch(name, "ssmb*.jar"))?.id;
   } catch {
     return;
   }
@@ -88,9 +85,7 @@ async function deployServices(deploymentPath: string) {
   const pluginAssetId = await getLatestPluginAssetId();
 
   if (!pluginAssetId) {
-    log.error(
-      "Failed to download get plugin asset id from release, aborting deployment",
-    );
+    log.error("Failed to download get plugin asset id from release, aborting deployment");
     return;
   }
 
@@ -117,10 +112,7 @@ async function deployServices(deploymentPath: string) {
 
     const pluginPath = path.join(pluginsDir, "ssmb.jar");
 
-    writeFileSync(
-      pluginPath,
-      Buffer.from(pluginBinary.data as any as ArrayBuffer),
-    );
+    writeFileSync(pluginPath, Buffer.from(pluginBinary.data as any as ArrayBuffer));
   } catch (e) {
     writeFileSync("error.json", JSON.stringify(e));
     log.error("Failed to download plugin jar, aborting deployment");
@@ -233,18 +225,15 @@ async function onActionFinished() {
   log.info("Downloading deployment contents...");
 
   const deploymentId = await getLastCommitSha();
-  const deloymentContentsResponse =
-    await github.rest.repos.downloadZipballArchive({
-      owner: "BetrixDev",
-      repo: "ssm-brawl",
-      ref: "main",
-    });
+  const deloymentContentsResponse = await github.rest.repos.downloadZipballArchive({
+    owner: "BetrixDev",
+    repo: "ssm-brawl",
+    ref: "main",
+  });
 
   log.info("Unzipping deployment contents...");
 
-  const archive = new AdmZip(
-    Buffer.from(deloymentContentsResponse.data as ArrayBuffer),
-  );
+  const archive = new AdmZip(Buffer.from(deloymentContentsResponse.data as ArrayBuffer));
 
   const entries = archive.getEntries();
 
@@ -264,10 +253,7 @@ async function onActionFinished() {
     );
   }
 
-  const deploymentDir = path.join(
-    DEPLOYMENTS_DIR,
-    `${Date.now()}-${deploymentId}`,
-  );
+  const deploymentDir = path.join(DEPLOYMENTS_DIR, `${Date.now()}-${deploymentId}`);
 
   mkdirSync(deploymentDir);
 
@@ -278,10 +264,7 @@ async function onActionFinished() {
 
     if (entryNamePath === "") continue;
 
-    const entryPath = path.join(
-      deploymentDir,
-      entry.entryName.split("/").slice(1).join("/"),
-    );
+    const entryPath = path.join(deploymentDir, entry.entryName.split("/").slice(1).join("/"));
 
     if (entry.entryName.at(-1) === "/") {
       try {
@@ -306,10 +289,7 @@ function verifySignature(req: Request) {
       .update(JSON.stringify(req.body))
       .digest("hex");
     let trusted = Buffer.from(`sha256=${signature}`, "ascii");
-    let untrusted = Buffer.from(
-      req.headers.get("x-hub-signature-256")!,
-      "ascii",
-    );
+    let untrusted = Buffer.from(req.headers.get("x-hub-signature-256")!, "ascii");
     return crypto.timingSafeEqual(trusted, untrusted);
   } catch {
     return false;
