@@ -197,18 +197,9 @@ export const minigameRouter = router({
       with: { queueEntries: true },
     });
 
-    const minigameLangs = await db.query.lang.findMany({
-      where: (table, { like }) => like(table.id, "minigame.%.name"),
-    });
-
-    return allMinigames.map((minigame) => {
-      const displayName = minigameLangs.find((m) => m.id.includes(minigame.id));
-
-      return {
-        id: minigame.id,
-        displayName: displayName ?? minigame.id,
-        playersInQueue: minigame.queueEntries.length,
-      };
-    });
+    return allMinigames.map((minigame) => ({
+      id: minigame.id,
+      playersInQueue: minigame.queueEntries.length,
+    }));
   }),
 });

@@ -208,11 +208,6 @@ export const mapSpawnpoints = sqliteTable(
   }),
 );
 
-export const lang = sqliteTable("lang", {
-  id: text("id").notNull().primaryKey(),
-  text: text("text").notNull(),
-});
-
 export const friendships = sqliteTable(
   "friendships",
   {

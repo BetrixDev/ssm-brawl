@@ -15,6 +15,13 @@
       "when": 1715026525156,
       "tag": "0001_nifty_paper_doll",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1715178363579,
+      "tag": "0002_cooing_titanium_man",
+      "breakpoints": true
     }
   ]
 }
