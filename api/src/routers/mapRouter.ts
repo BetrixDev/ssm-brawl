@@ -15,14 +15,16 @@ export const mapRouter = router({
       const mapData = await queryClient.fetchQuery({
         staleTime: 1000 * 60 * 5,
         queryKey: ["getMapDetails", input.mapId],
-        queryFn: () => {
-          return db.query.maps.findFirst({
+        queryFn: async () => {
+          const result = await db.query.maps.findFirst({
             where: (table, { eq }) => eq(table.id, input.mapId),
             with: {
               origin: true,
               spawnPoints: true,
             },
           });
+
+          return result ?? null;
         },
       });
 

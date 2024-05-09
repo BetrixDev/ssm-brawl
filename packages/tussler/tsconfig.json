@@ -8,7 +8,6 @@
     "moduleDetection": "force",
     "isolatedModules": true,
     "strict": true,
-    "noUncheckedIndexedAccess": true,
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
     "outDir": "build",

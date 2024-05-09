@@ -31,6 +31,12 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "test": {
+      "cache": true
+    },
+    "test-coverage": {
+      "cache": true
     }
   }
 }

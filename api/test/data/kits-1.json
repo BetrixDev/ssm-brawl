@@ -1,0 +1,9 @@
+[
+  {
+    "id": "test_kit",
+    "meleeDamage": 10,
+    "armor": 4,
+    "inventoryIcon": "test_icon",
+    "disguiseId": "test_disguise"
+  }
+]

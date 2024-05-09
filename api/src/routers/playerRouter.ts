@@ -77,13 +77,8 @@ export const playerRouter = router({
         where: (table, { eq }) => eq(table.uuid, input.playerUuid),
       });
 
-      const playerUsercache = await queryClient.fetchQuery({
-        queryKey: ["usercache", input.playerUuid],
-        queryFn: async () => {
-          return await db.query.usercache.findFirst({
-            where: (table, { eq }) => eq(table.uuid, input.playerUuid),
-          });
-        },
+      const playerUsercache = await db.query.usercache.findFirst({
+        where: (table, { eq }) => eq(table.uuid, input.playerUuid),
       });
 
       if (!basicPlayerData || !playerUsercache) {
@@ -107,13 +102,8 @@ export const playerRouter = router({
   isIpBanned: internalProcedure
     .input(z.object({ ip: z.string(), playerUuid: z.string().optional() }))
     .query(async ({ input }) => {
-      const ipEntry = await queryClient.fetchQuery({
-        queryKey: ["ipBans", input.ip],
-        queryFn: () => {
-          return db.query.ipBans.findFirst({
-            where: (table, { eq }) => eq(table.ip, input.ip),
-          });
-        },
+      const ipEntry = await db.query.ipBans.findFirst({
+        where: (table, { eq }) => eq(table.ip, input.ip),
       });
 
       if (ipEntry !== undefined && ipEntry.isBanned) {
@@ -127,6 +117,8 @@ export const playerRouter = router({
           } catch (e) {
             console.log(e);
           }
+
+          queryClient.invalidateQueries({ queryKey: ["basicPlayerData", input.playerUuid] });
         }
 
         return {

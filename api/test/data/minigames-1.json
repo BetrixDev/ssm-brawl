@@ -1,0 +1,7 @@
+[
+  {
+    "id": "test_minigame",
+    "minPlayers": 1,
+    "maxPlayers": 10
+  }
+]

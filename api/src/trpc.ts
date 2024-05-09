@@ -21,13 +21,3 @@ export const internalProcedure = t.procedure.use((opts) => {
     ctx: { ...opts.ctx },
   });
 });
-
-export const userProcedure = t.procedure.use((opts) => {
-  if (opts.ctx.claims.source !== "user") {
-    throw new TRPCError({ code: "FORBIDDEN" });
-  }
-
-  return opts.next({
-    ctx: { ...opts.ctx },
-  });
-});
