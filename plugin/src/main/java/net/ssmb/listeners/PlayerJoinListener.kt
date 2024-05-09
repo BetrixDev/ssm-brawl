@@ -4,6 +4,7 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import net.ssmb.SSMB
 import net.ssmb.utils.t
 import org.bukkit.GameMode
+import org.bukkit.attribute.Attribute
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -37,6 +38,7 @@ class PlayerJoinListener : Listener {
 
             player.teleport(plugin.hub.spawnLocation)
             player.foodLevel = 20
+            player.health = player.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 20.0
             player.gameMode = GameMode.SURVIVAL
 
             val joinMessage =

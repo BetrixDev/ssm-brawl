@@ -3,7 +3,8 @@
     "id": "test_map",
     "minPlayers": 1,
     "maxPlayers": 10,
-    "originId": "test_map",
-    "worldBorderRadius": 100
+    "worldBorderRadius": 100,
+    "origin": [],
+    "spawnPoints": []
   }
 ]

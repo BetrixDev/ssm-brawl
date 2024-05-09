@@ -18,10 +18,6 @@ export const mapRouter = router({
         queryFn: async () => {
           const result = await db.query.maps.findFirst({
             where: (table, { eq }) => eq(table.id, input.mapId),
-            with: {
-              origin: true,
-              spawnPoints: true,
-            },
           });
 
           return result ?? null;

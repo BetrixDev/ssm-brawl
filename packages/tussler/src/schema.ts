@@ -3,6 +3,8 @@ import { real, index, sqliteTable, primaryKey, integer, text, int } from "drizzl
 
 export type MapRole = "game" | "hub";
 
+export type Vector3 = { x: number; y: number; z: number };
+
 export const kits = sqliteTable(
   "kits",
   {
@@ -175,7 +177,8 @@ export const maps = sqliteTable(
     id: text("id").primaryKey(),
     minPlayers: integer("min_players").notNull(),
     maxPlayers: integer("max_players").notNull(),
-    originId: text("origin_id").notNull(),
+    origin: text("origin", { mode: "json" }).$type<Vector3>().notNull(),
+    spawnPoints: text("spawn_points", { mode: "json" }).$type<Vector3[]>().notNull(),
     worldBorderRadius: integer("world_border_radius").notNull(),
     role: text("role", { enum: ["game", "hub"] })
       .$type<MapRole>()
@@ -184,27 +187,6 @@ export const maps = sqliteTable(
   },
   (table) => ({
     idIdx: index("maps_id_idx").on(table.id),
-  }),
-);
-
-export const mapOrigins = sqliteTable("map_origins", {
-  mapId: text("map_id").primaryKey(),
-  x: real("x").notNull(),
-  y: real("y").notNull(),
-  z: real("z").notNull(),
-});
-
-export const mapSpawnpoints = sqliteTable(
-  "map_spawnpoints",
-  {
-    mapId: text("map_id").notNull(),
-    x: real("x").notNull(),
-    y: real("y").notNull(),
-    z: real("z").notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.mapId, table.x, table.y, table.z] }),
-    mapIdIdx: index("spawnpoints_map_id_idx").on(table.mapId),
   }),
 );
 
@@ -300,21 +282,6 @@ export const passivesToKitsRelations = relations(passivesToKits, ({ one }) => ({
   passive: one(passives, {
     fields: [passivesToKits.passiveId],
     references: [passives.id],
-  }),
-}));
-
-export const mapsRelations = relations(maps, ({ many, one }) => ({
-  spawnPoints: many(mapSpawnpoints),
-  origin: one(mapOrigins, {
-    fields: [maps.originId],
-    references: [mapOrigins.mapId],
-  }),
-}));
-
-export const mapSpawnpointsRelations = relations(mapSpawnpoints, ({ one }) => ({
-  map: one(maps, {
-    fields: [mapSpawnpoints.mapId],
-    references: [maps.id],
   }),
 }));
 

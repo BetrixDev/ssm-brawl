@@ -11,7 +11,6 @@ suite("Map router testing", () => {
   });
 
   test("getMapDetails should return map details", async () => {
-    await loadTestTableData("mapOrigins-1");
     const testData = await loadTestTableData("maps-1");
     const caller = createInternalCaller();
 
@@ -20,7 +19,6 @@ suite("Map router testing", () => {
     });
 
     expect(result.id).toEqual(testData[0].id);
-    expect(result.origin.mapId).toEqual(testData[0].id);
   });
 
   test("getMapDetails should error on invalid map id", async () => {

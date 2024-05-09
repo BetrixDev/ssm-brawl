@@ -103,10 +103,6 @@ export const minigameRouter = router({
               gte(maps.maxPlayers, minigame.maxPlayers),
               eq(maps.role, "game"),
             ),
-            with: {
-              spawnPoints: true,
-              origin: true,
-            },
           });
         },
       });
