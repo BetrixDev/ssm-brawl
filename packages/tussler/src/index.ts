@@ -1,29 +1,19 @@
 import { env } from "env/tussler";
 import * as schema from "./schema.js";
-import { drizzle } from "drizzle-orm/libsql";
-import { createClient } from "@libsql/client";
+import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
+import { Client, createClient } from "@libsql/client";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 import path from "path";
 import { existsSync, mkdirSync, readFileSync, rmSync } from "fs";
 
-// Ideally we would use in-memory databases for testing, but running migrations isn't
-//  working with them for some reason
 const TEST_DB_BASE_DIR = path.join(process.cwd(), "test_dbs");
 
 if (env.NODE_ENV === "test" && !existsSync(TEST_DB_BASE_DIR)) {
   mkdirSync(TEST_DB_BASE_DIR);
 }
 
-export const libsqlClient = createClient({
-  url:
-    env.NODE_ENV === "test"
-      ? `file:${path.join(process.cwd(), "test_dbs", `${Date.now()}.sqlite`)}`
-      : env.TUSSLER_URL,
-  syncUrl: env.NODE_ENV === "test" ? undefined : env.TUSSLER_SYNC_URL,
-  syncInterval: env.NODE_ENV === "test" ? undefined : env.TUSSLER_SYNC_INTERVAL,
-  authToken: env.NODE_ENV === "test" ? undefined : env.TUSSLER_TOKEN,
-});
+export let libsqlClient: Client;
 
 process.on("beforeExit", async (sig) => {
   try {
@@ -32,9 +22,23 @@ process.on("beforeExit", async (sig) => {
   process.exit(sig);
 });
 
-export const db = drizzle(libsqlClient, { schema });
+export let db: LibSQLDatabase<typeof schema>;
 export * from "drizzle-orm";
 export * from "./schema.js";
+
+export function initTussler(databaseName?: string) {
+  libsqlClient = createClient({
+    url:
+      env.NODE_ENV === "test"
+        ? `file:${path.join(TEST_DB_BASE_DIR, `${Date.now()}-${databaseName}.sqlite`)}`
+        : env.TUSSLER_URL,
+    syncUrl: env.NODE_ENV === "test" ? undefined : env.TUSSLER_SYNC_URL,
+    syncInterval: env.NODE_ENV === "test" ? undefined : env.TUSSLER_SYNC_INTERVAL,
+    authToken: env.NODE_ENV === "test" ? undefined : env.TUSSLER_TOKEN,
+  });
+
+  db = drizzle(libsqlClient, { schema });
+}
 
 export async function runMirations() {
   await migrate(db, {

@@ -2,14 +2,16 @@ import {
   basicPlayerData,
   clearAllTables,
   db,
+  initTussler,
   libsqlClient,
   loadTestTableData,
   runMirations,
 } from "tussler";
-import { beforeAll, expect, suite, test } from "vitest";
+import { beforeEach, expect, suite, test } from "vitest";
 
 suite("Tussler Test Enviroment Validation", () => {
-  beforeAll(async () => {
+  beforeEach(async (ctx) => {
+    initTussler(ctx.task.name);
     await runMirations();
     await clearAllTables();
 

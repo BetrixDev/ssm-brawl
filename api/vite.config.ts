@@ -5,5 +5,6 @@ export default defineConfig({
     coverage: {
       extension: [".ts"],
     },
+    globalSetup: ["./setup-tests.ts"],
   },
 });

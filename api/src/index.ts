@@ -12,7 +12,7 @@ import { BackendSource, decodeTokenFromHeaders, generateBackendToken } from "./j
 import { wranglerDataSource } from "wrangler";
 import { log } from "./log.js";
 import { middlewareLogger } from "logger";
-import { db, runMirations } from "tussler";
+import { db, initTussler, runMirations } from "tussler";
 
 const app = new Hono();
 
@@ -115,6 +115,7 @@ app.post("/generateToken/:source", async (c) => {
 });
 
 serve({ ...app, port: env.API_PORT }, async (info) => {
+  initTussler();
   await wranglerDataSource.initialize();
   await runMirations();
 

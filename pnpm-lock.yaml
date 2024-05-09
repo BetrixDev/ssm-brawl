@@ -89,7 +89,7 @@ importers:
         version: 4.17.12
       '@vitest/coverage-v8':
         specifier: ^1.6.0
-        version: 1.6.0(vitest@1.6.0(@types/node@20.12.7))
+        version: 1.6.0(vitest@1.6.0)
       drizzle-kit:
         specifier: ^0.20.14
         version: 0.20.14
@@ -101,10 +101,10 @@ importers:
         version: 5.4.2
       vite:
         specifier: ^5.2.11
-        version: 5.2.11(@types/node@20.12.7)
+        version: 5.2.11
       vitest:
         specifier: ^1.6.0
-        version: 1.6.0(@types/node@20.12.7)
+        version: 1.6.0
 
   observer:
     dependencies:
@@ -267,7 +267,7 @@ importers:
         version: 0.1.13
       typeorm:
         specifier: 0.3.20
-        version: 0.3.20(mongodb@5.2.0)(ts-node@10.9.1(@types/node@16.11.10)(typescript@5.4.4))
+        version: 0.3.20(mongodb@5.2.0)(ts-node@10.9.1)
     devDependencies:
       '@types/node':
         specifier: ^16.11.10
@@ -2052,8 +2052,8 @@ packages:
     resolution: {integrity: sha512-zHtQzGojZXTwZTHQqra+ETKd4Sn3vgi7uBmlPoXVWZqYvuKmtI0l/VZTjqGmJY9x88GGOaZ9+G9ES8hC4T4X8g==}
     engines: {node: '>= 12'}
 
-  iron-webcrypto@1.1.1:
-    resolution: {integrity: sha512-5xGwQUWHQSy039rFr+5q/zOmj7GP0Ypzvo34Ep+61bPIhaLduEDp/PvLGlU3awD2mzWUR0weN2vJ1mILydFPEg==}
+  iron-webcrypto@1.2.1:
+    resolution: {integrity: sha512-feOM6FaSr6rEABp/eDfVseKyTMDt+KGpeB35SkVn9Tyn0CqvVsY3EwI0v5i8nMHyJnzCIQf7nsy3p41TPkJZhg==}
 
   is-binary-path@2.1.0:
     resolution: {integrity: sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==}
@@ -2511,8 +2511,8 @@ packages:
     resolution: {integrity: sha512-g0VU+y08pKw5M8EZ2rIGiEBaB8wrQMjYGFfW2QVIfyT8V+fq8YFLkvlz4bz5ljvFDJYNFCWT3PWqcRr2FKO81w==}
     engines: {node: '>=10'}
 
-  pkg-types@1.1.0:
-    resolution: {integrity: sha512-/RpmvKdxKf8uILTtoOhAgf30wYbP2Qw+L9p3Rvshx1JZVX+XQNZQFjlbmGHEGIm4CkVPlSn+NXmIM8+9oWQaSA==}
+  pkg-types@1.1.1:
+    resolution: {integrity: sha512-ko14TjmDuQJ14zsotODv7dBlwxKhUKQEhuhmbqo1uCi9BB0Z2alo/wAXg6q1dTR5TyuqYyWhjtfe/Tsh+X28jQ==}
 
   pm2-axon-rpc@0.7.1:
     resolution: {integrity: sha512-FbLvW60w+vEyvMjP/xom2UPhUN/2bVpdtLfKJeYM3gwzYhoTEEChCOICfFzxkxuoEleOlnpjie+n1nue91bDQw==}
@@ -4033,7 +4033,7 @@ snapshots:
     dependencies:
       '@types/node': 20.12.7
 
-  '@vitest/coverage-v8@1.6.0(vitest@1.6.0(@types/node@20.12.7))':
+  '@vitest/coverage-v8@1.6.0(vitest@1.6.0)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -4048,7 +4048,7 @@ snapshots:
       std-env: 3.7.0
       strip-literal: 2.1.0
       test-exclude: 6.0.0
-      vitest: 1.6.0(@types/node@20.12.7)
+      vitest: 1.6.0
     transitivePeerDependencies:
       - supports-color
 
@@ -4460,7 +4460,7 @@ snapshots:
       - supports-color
 
   drizzle-orm@0.29.4(@libsql/client@0.5.3):
-    optionalDependencies:
+    dependencies:
       '@libsql/client': 0.5.3
 
   eastasianwidth@0.2.0: {}
@@ -4676,7 +4676,7 @@ snapshots:
       to-regex-range: 5.0.1
 
   follow-redirects@1.15.6(debug@4.3.4):
-    optionalDependencies:
+    dependencies:
       debug: 4.3.4
 
   foreground-child@3.1.1:
@@ -4739,7 +4739,7 @@ snapshots:
       - supports-color
 
   git-node-fs@1.0.0(js-git@0.7.8):
-    optionalDependencies:
+    dependencies:
       js-git: 0.7.8
 
   git-sha1@0.1.2: {}
@@ -4785,7 +4785,7 @@ snapshots:
       crossws: 0.2.4
       defu: 6.1.4
       destr: 2.0.3
-      iron-webcrypto: 1.1.1
+      iron-webcrypto: 1.2.1
       ohash: 1.1.3
       radix3: 1.1.2
       ufo: 1.5.3
@@ -4865,7 +4865,7 @@ snapshots:
       jsbn: 1.1.0
       sprintf-js: 1.1.3
 
-  iron-webcrypto@1.1.1: {}
+  iron-webcrypto@1.2.1: {}
 
   is-binary-path@2.1.0:
     dependencies:
@@ -5029,7 +5029,7 @@ snapshots:
   local-pkg@0.5.0:
     dependencies:
       mlly: 1.7.0
-      pkg-types: 1.1.0
+      pkg-types: 1.1.1
 
   lodash-es@4.17.21: {}
 
@@ -5144,7 +5144,7 @@ snapshots:
     dependencies:
       acorn: 8.11.3
       pathe: 1.1.2
-      pkg-types: 1.1.0
+      pkg-types: 1.1.1
       ufo: 1.5.3
 
   module-details-from-path@1.0.3: {}
@@ -5327,7 +5327,7 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
-  pkg-types@1.1.0:
+  pkg-types@1.1.1:
     dependencies:
       confbox: 0.1.7
       mlly: 1.7.0
@@ -5760,7 +5760,7 @@ snapshots:
 
   type@2.7.2: {}
 
-  typeorm@0.3.20(mongodb@5.2.0)(ts-node@10.9.1(@types/node@16.11.10)(typescript@5.4.4)):
+  typeorm@0.3.20(mongodb@5.2.0)(ts-node@10.9.1):
     dependencies:
       '@sqltools/formatter': 1.2.5
       app-root-path: 3.1.0
@@ -5772,14 +5772,13 @@ snapshots:
       dotenv: 16.4.5
       glob: 10.3.12
       mkdirp: 2.1.6
+      mongodb: 5.2.0
       reflect-metadata: 0.2.2
       sha.js: 2.4.11
+      ts-node: 10.9.1(@types/node@16.11.10)(typescript@5.4.4)
       tslib: 2.6.2
       uuid: 9.0.1
       yargs: 17.7.2
-    optionalDependencies:
-      mongodb: 5.2.0
-      ts-node: 10.9.1(@types/node@16.11.10)(typescript@5.4.4)
     transitivePeerDependencies:
       - supports-color
 
@@ -5854,13 +5853,13 @@ snapshots:
 
   valibot@0.29.0: {}
 
-  vite-node@1.6.0(@types/node@20.12.7):
+  vite-node@1.6.0:
     dependencies:
       cac: 6.7.14
       debug: 4.3.4
       pathe: 1.1.2
       picocolors: 1.0.0
-      vite: 5.2.11(@types/node@20.12.7)
+      vite: 5.2.11
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -5871,16 +5870,15 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.2.11(@types/node@20.12.7):
+  vite@5.2.11:
     dependencies:
       esbuild: 0.20.2
       postcss: 8.4.38
       rollup: 4.17.2
     optionalDependencies:
-      '@types/node': 20.12.7
       fsevents: 2.3.3
 
-  vitest@1.6.0(@types/node@20.12.7):
+  vitest@1.6.0:
     dependencies:
       '@vitest/expect': 1.6.0
       '@vitest/runner': 1.6.0
@@ -5899,11 +5897,9 @@ snapshots:
       strip-literal: 2.1.0
       tinybench: 2.8.0
       tinypool: 0.8.4
-      vite: 5.2.11(@types/node@20.12.7)
-      vite-node: 1.6.0(@types/node@20.12.7)
+      vite: 5.2.11
+      vite-node: 1.6.0
       why-is-node-running: 2.2.2
-    optionalDependencies:
-      '@types/node': 20.12.7
     transitivePeerDependencies:
       - less
       - lightningcss
