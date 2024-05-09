@@ -8,7 +8,6 @@ import kotlinx.coroutines.delay
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.extensions.doKnockback
-import net.ssmb.extensions.get
 import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.Sound
@@ -22,6 +21,16 @@ class SulphurBombAbility(
     abilityEntry: MinigameStartSuccess.PlayerData.KitData.AbilityEntry
 ) : SsmbAbility(player, abilityEntry) {
     private val plugin = SSMB.instance
+
+    /**
+     * A multiplier added to the base knockback calculation
+     */
+    private val projectileKnockbackModifier = getMetaDouble("projectile_knockback_modifier", 2.5)
+
+    /**
+     * How much damage the projectile will do if it hits an entity
+     */
+    private val projectileDamage = getMetaDouble("projectile_damage", 6.5)
 
     override fun doAbility() {
         timeLastUsed = System.currentTimeMillis()
@@ -66,19 +75,16 @@ class SulphurBombAbility(
         val splashedItem = event.entity
         val splashedLocation = splashedItem.location
 
-        val projKnockbackMultiplier = 2.5
-        val projDamage = 6.5
-
         if (event.hitEntity != null && event.hitEntity is Player && event.hitEntity != player) {
             val target = event.hitEntity as Player
             target.doKnockback(
-                projKnockbackMultiplier,
-                projDamage,
+                projectileKnockbackModifier,
+                projectileDamage,
                 target.health,
-                player.location.toVector(),
+                event.entity.location.toVector(),
                 null
             )
-            target.damage(projDamage, splashedItem)
+            target.damage(projectileDamage, splashedItem)
         }
 
         player.world.spawnParticle(Particle.EXPLOSION_LARGE, splashedLocation, 1)

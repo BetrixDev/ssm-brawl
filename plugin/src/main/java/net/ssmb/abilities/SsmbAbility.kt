@@ -89,4 +89,20 @@ open class SsmbAbility(
             doAbility()
         }
     }
+
+    fun getMetaDouble(key: String): Double? {
+        return abilityData.ability.meta?.get(key)?.toDouble()
+    }
+
+    fun getMetaDouble(key: String, default: Double): Double {
+        return getMetaDouble(key) ?: default
+    }
+
+    fun getMetaInt(key: String): Int? {
+        return abilityData.ability.meta?.get(key)?.toInt()
+    }
+
+    fun getMetaInt(key: String, default: Int): Int {
+        return getMetaInt(key)?: default
+    }
 }
