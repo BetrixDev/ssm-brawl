@@ -4,6 +4,7 @@ import { db } from "tussler";
 import { wranglerClient } from "wrangler";
 import { MessageChannel } from "wrangler/entities/MessageChannel.js";
 import { MessageChannelMessage } from "wrangler/models/MessageChannelMessage.js";
+import { TRPCError } from "@trpc/server";
 
 export const pmRouter = router({
   messagePlayer: internalProcedure
@@ -35,10 +36,7 @@ export const pmRouter = router({
       }
 
       if (!canSendMessage) {
-        return {
-          success: false,
-          message: "gui.pm.error.cannotSendMessage",
-        };
+        throw new TRPCError({ code: "FORBIDDEN" });
       }
 
       const messageChannelRepo = wranglerClient.getMongoRepository(MessageChannel);
@@ -59,8 +57,6 @@ export const pmRouter = router({
         );
       } else {
         existingChannel.messages.push(messageEntry);
-        existingChannel.messages = existingChannel.messages.slice(0, 24);
-
         await messageChannelRepo.save(existingChannel);
       }
 
