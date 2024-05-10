@@ -14,12 +14,6 @@ suite("Tussler Test Enviroment Validation", () => {
     initTussler(ctx.task.name);
     await runMirations();
     await clearAllTables();
-
-    return () => {
-      try {
-        libsqlClient.close();
-      } catch {}
-    };
   });
 
   test("Validate database is cleared", async () => {
