@@ -72,3 +72,4 @@ deployments
 
 *.sqlite
 *.mca
+*test_dbs*

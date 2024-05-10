@@ -100,7 +100,8 @@ app.post("/generateToken/:source", async (c) => {
     const secret = c.req.header("Secret");
 
     if (secret !== env.API_TOKEN_SECRET) {
-      return c.status(403);
+      c.status(403);
+      return c.text("bad token");
     }
 
     const token = await generateBackendToken(source);
@@ -110,14 +111,19 @@ app.post("/generateToken/:source", async (c) => {
     c.status(200);
     return c.text(token);
   } catch {
-    return c.status(400);
+    c.status(400);
+    return c.text("dont");
   }
 });
 
 serve({ ...app, port: env.API_PORT }, async (info) => {
   initTussler();
-  await wranglerDataSource.initialize();
   await runMirations();
 
-  console.log(`Backend listening on http://localhost:${info.port}`);
+  /* c8 ignore next 3 */
+  if (env.NODE_ENV !== "test") {
+    await wranglerDataSource.initialize();
+  }
+
+  log.info(`Backend listening on http://localhost:${info.port}`);
 });

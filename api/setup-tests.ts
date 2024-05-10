@@ -1,3 +1,5 @@
+/* c8 ignore start */
+
 import path from "path";
 import { rmSync, mkdirSync } from "fs";
 
@@ -12,3 +14,5 @@ export function setup() {
     mkdirSync(TEST_DB_PATH);
   } catch {}
 }
+
+/* c8 ignore end */
