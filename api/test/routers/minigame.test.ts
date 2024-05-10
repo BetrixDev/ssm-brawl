@@ -39,7 +39,7 @@ suite("Minigame router tests", async () => {
 
   test("start should error when a player doesn't exist", async () => {
     const minigameTestData = await loadTestTableData("minigames-1");
-    const playerTestData = await loadTestTableData("basicPlayerData-1");
+    await loadTestTableData("basicPlayerData-1");
     await loadTestTableData("passives-1");
     await loadTestTableData("passivesToKits-1");
     await loadTestTableData("kits-1");
@@ -51,5 +51,12 @@ suite("Minigame router tests", async () => {
         teams: [["test_uuid"]],
       });
     }).rejects.toThrow(TRPCError);
+  });
+
+  test("getPlayableGames should not error", async () => {
+    await loadTestTableData("minigames-1");
+    const caller = createInternalCaller();
+
+    await caller.minigame.getPlayableGames();
   });
 });
