@@ -1,5 +1,5 @@
-import { runMirations, clearAllTables, loadTestTableData, initTussler } from "tussler";
-import { beforeEach, expect, suite, test } from "vitest";
+import { runMirations, clearAllTables, loadTestTableData, initTussler, db } from "tussler";
+import { beforeEach, expect, suite, test, vi } from "vitest";
 import { createInternalCaller } from "../test-utils.js";
 import { TRPCError } from "@trpc/server";
 
@@ -58,5 +58,47 @@ suite("Minigame router tests", async () => {
     const caller = createInternalCaller();
 
     await caller.minigame.getPlayableGames();
+  });
+
+  test("end should not error when called", async () => {
+    vi.mock("wrangler", () => {
+      return {
+        wranglerClient: {
+          getRepository: () => ({ save: async () => ({}) }),
+        },
+      };
+    });
+
+    const playerTestData = await loadTestTableData("basicPlayerData-1");
+    const caller = createInternalCaller();
+
+    await caller.minigame.end({
+      gameId: "test_game_id",
+      mapId: "test_map",
+      minigameId: "test_minigame",
+      players: [
+        {
+          kits: [
+            {
+              id: "test_kit",
+              abilityUsage: [{ abilityId: "test_ability", usedAt: Date.now(), damageDealt: 10 }],
+              endTime: Date.now(),
+              startTime: Date.now(),
+            },
+          ],
+          uuid: playerTestData[0].uuid,
+          stocksLeft: 4,
+          leftInProgress: false,
+        },
+      ],
+      winningUuids: [playerTestData[0].uuid],
+    });
+
+    const playerDbResult = await db.query.basicPlayerData.findFirst({
+      where: (table, { eq }) => eq(table.uuid, playerTestData[0].uuid),
+    });
+
+    expect(playerDbResult?.totalGamesPlayed).toEqual(1);
+    expect(playerDbResult?.totalGamesWon).toEqual(1);
   });
 });
