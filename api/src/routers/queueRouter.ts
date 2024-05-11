@@ -20,6 +20,15 @@ export const queueRouter = router({
         throw new TRPCError({ code: "CONFLICT", message: "serverShuttingDown" });
       }
 
+      const minigameData = await db.query.minigames.findFirst({
+        where: eq(minigames.id, input.minigameId),
+        with: { queueEntries: true },
+      });
+
+      if (minigameData === undefined) {
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+
       if (input.force) {
         await db.delete(queue).where(eq(queue.playerUuid, input.playerUuid));
       } else {
@@ -30,15 +39,6 @@ export const queueRouter = router({
         if (playerInQueue !== undefined) {
           throw new TRPCError({ code: "CONFLICT", message: "alreadyInQueue" });
         }
-      }
-
-      const minigameData = await db.query.minigames.findFirst({
-        where: eq(minigames.id, input.minigameId),
-        with: { queueEntries: true },
-      });
-
-      if (minigameData === undefined) {
-        throw new TRPCError({ code: "BAD_REQUEST" });
       }
 
       const playerParty = await db.query.partyGuests.findFirst({

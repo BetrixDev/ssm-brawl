@@ -13,6 +13,7 @@ import { wranglerDataSource } from "wrangler";
 import { log } from "./log.js";
 import { middlewareLogger } from "logger";
 import { db, initTussler, runMirations } from "tussler";
+import { loadDefaultKvValues } from "./kv.js";
 
 const app = new Hono();
 
@@ -119,6 +120,7 @@ app.post("/generateToken/:source", async (c) => {
 serve({ ...app, port: env.API_PORT }, async (info) => {
   initTussler();
   await runMirations();
+  await loadDefaultKvValues();
 
   /* c8 ignore next 3 */
   if (env.NODE_ENV !== "test") {
