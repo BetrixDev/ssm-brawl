@@ -8,7 +8,7 @@
     "build:api": "turbo build --filter=env --filter=api --filter=wrangler --filter=tussler --filter=proc --force",
     "start:api": "dotenv -- turbo start --filter=api",
     "dev:api": "dotenv -- turbo dev --filter=api",
-    "test": "dotenv -- turbo test --filter=api",
+    "test": "turbo test --filter=api",
     "test-coverage": "dotenv -- turbo test-coverage --filter=api",
     "dev:orchestrator": "dotenv -- turbo dev --filter=orchestrator",
     "db:push": "cd packages/tussler && dotenv -e ../../.env pnpm db:push",
