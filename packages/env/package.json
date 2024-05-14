@@ -16,25 +16,9 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
-    "./observer": {
-      "types": "./src/observer.ts",
-      "import": "./build/src/observer.js"
-    },
-    "./orchestrator": {
-      "types": "./src/orchestrator.ts",
-      "import": "./build/src/orchestrator.js"
-    },
-    "./api": {
-      "types": "./src/api.ts",
-      "import": "./build/src/api.js"
-    },
-    "./tussler": {
-      "types": "./src/tussler.ts",
-      "import": "./build/src/tussler.js"
-    },
-    "./wrangler": {
-      "types": "./src/wrangler.ts",
-      "import": "./build/src/wrangler.js"
+    "./*": {
+      "types": "./src/*.ts",
+      "import": "./build/src/*.js"
     }
   }
 }
