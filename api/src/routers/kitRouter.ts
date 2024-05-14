@@ -2,7 +2,7 @@ import { z } from "zod";
 import { wranglerClient } from "wrangler";
 import { HistoricalGame } from "wrangler/entities/HistoricalGame.js";
 import { internalProcedure, router } from "../trpc.js";
-import { queryClient } from "../utils/query-client.js";
+import { queryClient } from "../utils.js";
 
 export const kitsRouter = router({
   getKitPlaytimeMillis: internalProcedure

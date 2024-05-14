@@ -2,7 +2,7 @@ import { z } from "zod";
 import { internalProcedure, router } from "../trpc.js";
 import { db, eq, parties, partyGuests, partyInvites } from "tussler";
 import { TRPCError } from "@trpc/server";
-import { useRandomId } from "../utils/math.js";
+import { useRandomId } from "../utils.js";
 
 export const partyRouter = router({
   createParty: internalProcedure

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { internalProcedure, router } from "../trpc.js";
-import { queryClient } from "../utils/query-client.js";
+import { queryClient } from "../utils.js";
 import { basicPlayerData, db, eq, usercache } from "tussler";
 import { TRPCError } from "@trpc/server";
 

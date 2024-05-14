@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { trpcServer } from "@hono/trpc-server";
 import { serve } from "@hono/node-server";
 import { appRouter } from "./routers/router.js";
-import { get } from "lodash-es";
 import { router, t, TrpcContext } from "./trpc.js";
 import { renderTrpcPanel } from "trpc-panel";
 import { TRPCError } from "@trpc/server";
@@ -14,6 +13,7 @@ import { log } from "./log.js";
 import { middlewareLogger } from "logger";
 import { db, initTussler, runMirations } from "tussler";
 import { loadDefaultKvValues } from "./kv.js";
+import { get } from "./utils.js";
 
 const app = new Hono();
 

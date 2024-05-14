@@ -2,7 +2,7 @@ import { z } from "zod";
 import { internalProcedure, router } from "../trpc.js";
 import { db } from "tussler";
 import { TRPCError } from "@trpc/server";
-import { queryClient } from "../utils/query-client.js";
+import { queryClient } from "../utils.js";
 
 export const mapRouter = router({
   getMapDetails: internalProcedure
