@@ -45,19 +45,28 @@ export const partyRouter = router({
         with: { party: true },
       });
 
-      // TODO: check for invitee already being in a party
-
       if (!inviterParty) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "party.invite.notinparty",
+          message: "notInParty",
+        });
+      }
+
+      const inviteeParty = await db.query.partyGuests.findFirst({
+        where: (table, { eq }) => eq(table.playerUuid, input.inviteeUuid),
+      });
+
+      if (inviteeParty) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "inviteeInParty",
         });
       }
 
       if (inviterParty.party.ownerUuid !== input.inviterUuid) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "party.invite.notowner",
+          message: "notOwner",
         });
       }
 
@@ -69,6 +78,7 @@ export const partyRouter = router({
       if (existingInvite) {
         throw new TRPCError({
           code: "CONFLICT",
+          message: "inviteePendingInvite",
         });
       }
 
