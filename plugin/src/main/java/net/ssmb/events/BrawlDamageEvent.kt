@@ -7,7 +7,9 @@ class BrawlDamageEvent(
     val attacker: LivingEntity,
     val damage: Double,
     val damageType: BrawlDamageType
-) : BrawlEvent()
+) : BrawlEvent() {
+    var knockbackMultiplier: Double = 1.0
+}
 
 enum class BrawlDamageType {
     MELEE,

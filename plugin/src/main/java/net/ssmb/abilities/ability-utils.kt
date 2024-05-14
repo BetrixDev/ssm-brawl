@@ -10,6 +10,7 @@ fun constructAbilityFromData(
     return when (abilityEntry.ability.id) {
         "sulphur_bomb" -> SulphurBombAbility(player, abilityEntry)
         "explode" -> ExplodeAbility(player, abilityEntry)
+        "angry_herd" -> AngryHerdAbility(player, abilityEntry)
         else -> throw RuntimeException("No ability exists for id ${abilityEntry.ability.id}")
     }
 }

@@ -29,5 +29,6 @@ shutdown:
 ability:
   cooldownMessage: "You have {secondsLeft} before you can use {abilityName} again"
   displayName:
+    angry_herd: "Angry Herd"
     explode: "Explode"
     sulphur_bomb: "Sulphur Bomb"
