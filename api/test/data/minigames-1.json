@@ -2,6 +2,13 @@
   {
     "id": "test_minigame",
     "minPlayers": 1,
-    "maxPlayers": 10
+    "maxPlayers": 10,
+    "amountOfTeams": 1
+  },
+  {
+    "id": "triples",
+    "minPlayers": 3,
+    "maxPlayers": 6,
+    "playersPerTeam": 3
   }
 ]

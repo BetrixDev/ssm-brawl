@@ -1,0 +1,14 @@
+[
+  {
+    "partyId": "test_party",
+    "playerUuid": "this_is_a_test"
+  },
+  {
+    "partyId": "test_party",
+    "playerUuid": "another_player"
+  },
+  {
+    "partyId": "test_party",
+    "playerUuid": "player_3"
+  }
+]

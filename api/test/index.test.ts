@@ -70,4 +70,125 @@ suite("Index tests", () => {
 
     expect(response.status).toEqual(400);
   }, 30000);
+
+  test("/trpc/ should reject unauthorized requests", async () => {
+    await import("../src/index.js");
+
+    const response = await fetch(`${API_ENDPOINT}/trpc/health`);
+
+    expect(response.status).toEqual(401);
+  });
+
+  test("/trpc/ should map function when recieving authorized request", async () => {
+    await import("../src/index.js");
+
+    const tokenResponse = await fetch(`${API_ENDPOINT}/generateToken/plugin`, {
+      method: "post",
+      headers: {
+        Secret: env.API_TOKEN_SECRET,
+      },
+    });
+
+    const tokenText = await tokenResponse.text();
+
+    const response = await fetch(`${API_ENDPOINT}/trpc/health`, {
+      headers: {
+        Cookie: `token=${tokenText}`,
+      },
+    });
+
+    expect(response.status).toEqual(200);
+  });
+
+  test("/api/ should reject unauthorized requests", async () => {
+    await import("../src/index.js");
+
+    const response = await fetch(`${API_ENDPOINT}/api/player.getBasicPlayerData`);
+
+    expect(response.status).toEqual(401);
+  });
+
+  test("/api/ should reject requests not from plugin as a source", async () => {
+    await import("../src/index.js");
+
+    const tokenResponse = await fetch(`${API_ENDPOINT}/generateToken/brawlie`, {
+      method: "post",
+      headers: {
+        Secret: env.API_TOKEN_SECRET,
+      },
+    });
+
+    const tokenText = await tokenResponse.text();
+
+    const response = await fetch(`${API_ENDPOINT}/api/health`, {
+      headers: {
+        Cookie: `token=${tokenText}`,
+      },
+    });
+
+    expect(response.status).toEqual(401);
+  });
+
+  test("/api/ should return 404 when bad procedure name is passed in", async () => {
+    await import("../src/index.js");
+
+    const tokenResponse = await fetch(`${API_ENDPOINT}/generateToken/plugin`, {
+      method: "post",
+      headers: {
+        Secret: env.API_TOKEN_SECRET,
+      },
+    });
+
+    const tokenText = await tokenResponse.text();
+
+    const response = await fetch(`${API_ENDPOINT}/api/bad.procedure`, {
+      headers: {
+        Cookie: `token=${tokenText}`,
+      },
+    });
+
+    expect(response.status).toEqual(404);
+  });
+
+  test("/api/ should return 200 when happy", async () => {
+    await import("../src/index.js");
+
+    const tokenResponse = await fetch(`${API_ENDPOINT}/generateToken/plugin`, {
+      method: "post",
+      headers: {
+        Secret: env.API_TOKEN_SECRET,
+      },
+    });
+
+    const tokenText = await tokenResponse.text();
+
+    const response = await fetch(`${API_ENDPOINT}/api/health`, {
+      headers: {
+        Cookie: `token=${tokenText}`,
+      },
+    });
+
+    expect(response.status).toEqual(200);
+  });
+
+  test("/api/ should propagate errors from routers to client", async () => {
+    await import("../src/index.js");
+
+    const tokenResponse = await fetch(`${API_ENDPOINT}/generateToken/plugin`, {
+      method: "post",
+      headers: {
+        Secret: env.API_TOKEN_SECRET,
+      },
+    });
+
+    const tokenText = await tokenResponse.text();
+
+    const response = await fetch(`${API_ENDPOINT}/api/player.getBasicPlayerData`, {
+      headers: {
+        Cookie: `token=${tokenText}`,
+      },
+    });
+
+    expect(response.status).toEqual(400);
+  });
 });

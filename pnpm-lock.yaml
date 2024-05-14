@@ -89,7 +89,7 @@ importers:
         version: 4.17.12
       '@vitest/coverage-v8':
         specifier: ^1.6.0
-        version: 1.6.0(vitest@1.6.0)
+        version: 1.6.0(vitest@1.6.0(@types/node@20.12.7))
       drizzle-kit:
         specifier: ^0.20.14
         version: 0.20.14
@@ -101,10 +101,10 @@ importers:
         version: 5.4.2
       vite:
         specifier: ^5.2.11
-        version: 5.2.11
+        version: 5.2.11(@types/node@20.12.7)
       vitest:
         specifier: ^1.6.0
-        version: 1.6.0
+        version: 1.6.0(@types/node@20.12.7)
 
   observer:
     dependencies:
@@ -267,7 +267,7 @@ importers:
         version: 0.1.13
       typeorm:
         specifier: 0.3.20
-        version: 0.3.20(mongodb@5.2.0)(ts-node@10.9.1)
+        version: 0.3.20(mongodb@5.2.0)(ts-node@10.9.1(@types/node@16.11.10)(typescript@5.4.4))
     devDependencies:
       '@types/node':
         specifier: ^16.11.10
@@ -4033,7 +4033,7 @@ snapshots:
     dependencies:
       '@types/node': 20.12.7
 
-  '@vitest/coverage-v8@1.6.0(vitest@1.6.0)':
+  '@vitest/coverage-v8@1.6.0(vitest@1.6.0(@types/node@20.12.7))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -4048,7 +4048,7 @@ snapshots:
       std-env: 3.7.0
       strip-literal: 2.1.0
       test-exclude: 6.0.0
-      vitest: 1.6.0
+      vitest: 1.6.0(@types/node@20.12.7)
     transitivePeerDependencies:
       - supports-color
 
@@ -4460,7 +4460,7 @@ snapshots:
       - supports-color
 
   drizzle-orm@0.29.4(@libsql/client@0.5.3):
-    dependencies:
+    optionalDependencies:
       '@libsql/client': 0.5.3
 
   eastasianwidth@0.2.0: {}
@@ -4676,7 +4676,7 @@ snapshots:
       to-regex-range: 5.0.1
 
   follow-redirects@1.15.6(debug@4.3.4):
-    dependencies:
+    optionalDependencies:
       debug: 4.3.4
 
   foreground-child@3.1.1:
@@ -4739,7 +4739,7 @@ snapshots:
       - supports-color
 
   git-node-fs@1.0.0(js-git@0.7.8):
-    dependencies:
+    optionalDependencies:
       js-git: 0.7.8
 
   git-sha1@0.1.2: {}
@@ -5760,7 +5760,7 @@ snapshots:
 
   type@2.7.2: {}
 
-  typeorm@0.3.20(mongodb@5.2.0)(ts-node@10.9.1):
+  typeorm@0.3.20(mongodb@5.2.0)(ts-node@10.9.1(@types/node@16.11.10)(typescript@5.4.4)):
     dependencies:
       '@sqltools/formatter': 1.2.5
       app-root-path: 3.1.0
@@ -5772,13 +5772,14 @@ snapshots:
       dotenv: 16.4.5
       glob: 10.3.12
       mkdirp: 2.1.6
-      mongodb: 5.2.0
       reflect-metadata: 0.2.2
       sha.js: 2.4.11
-      ts-node: 10.9.1(@types/node@16.11.10)(typescript@5.4.4)
       tslib: 2.6.2
       uuid: 9.0.1
       yargs: 17.7.2
+    optionalDependencies:
+      mongodb: 5.2.0
+      ts-node: 10.9.1(@types/node@16.11.10)(typescript@5.4.4)
     transitivePeerDependencies:
       - supports-color
 
@@ -5853,13 +5854,13 @@ snapshots:
 
   valibot@0.29.0: {}
 
-  vite-node@1.6.0:
+  vite-node@1.6.0(@types/node@20.12.7):
     dependencies:
       cac: 6.7.14
       debug: 4.3.4
       pathe: 1.1.2
       picocolors: 1.0.0
-      vite: 5.2.11
+      vite: 5.2.11(@types/node@20.12.7)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -5870,15 +5871,16 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.2.11:
+  vite@5.2.11(@types/node@20.12.7):
     dependencies:
       esbuild: 0.20.2
       postcss: 8.4.38
       rollup: 4.17.2
     optionalDependencies:
+      '@types/node': 20.12.7
       fsevents: 2.3.3
 
-  vitest@1.6.0:
+  vitest@1.6.0(@types/node@20.12.7):
     dependencies:
       '@vitest/expect': 1.6.0
       '@vitest/runner': 1.6.0
@@ -5897,9 +5899,11 @@ snapshots:
       strip-literal: 2.1.0
       tinybench: 2.8.0
       tinypool: 0.8.4
-      vite: 5.2.11
-      vite-node: 1.6.0
+      vite: 5.2.11(@types/node@20.12.7)
+      vite-node: 1.6.0(@types/node@20.12.7)
       why-is-node-running: 2.2.2
+    optionalDependencies:
+      '@types/node': 20.12.7
     transitivePeerDependencies:
       - less
       - lightningcss

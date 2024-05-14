@@ -3,7 +3,7 @@ import { trpcServer } from "@hono/trpc-server";
 import { serve } from "@hono/node-server";
 import { appRouter } from "./routers/router.js";
 import { get } from "lodash-es";
-import { t, TrpcContext } from "./trpc.js";
+import { router, t, TrpcContext } from "./trpc.js";
 import { renderTrpcPanel } from "trpc-panel";
 import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
@@ -48,8 +48,8 @@ app.all("/api/*", async (c) => {
 
   // Only the plugin should ever be calling this endpoint
   if (claims === undefined || claims.source !== "plugin") {
-    c.status(403);
-    return c.json({ message: "Forbidden" });
+    c.status(401);
+    return c.json({ message: "Unauthorized" });
   }
 
   const caller = t.createCallerFactory(appRouter)({
@@ -58,18 +58,18 @@ app.all("/api/*", async (c) => {
   });
 
   const paths = c.req.url.split("/").at(-1)!;
-  const routerProcedure = await get(caller, paths);
-
-  if (routerProcedure === undefined) {
-    return c.notFound();
-  }
+  const routerProcedure = get(caller, paths);
 
   let routerResponse: unknown;
 
   try {
     const requestBody = (c as any).jsonPayload;
-    routerResponse = await routerProcedure(requestBody);
+    routerResponse = await (routerProcedure as any)(requestBody);
   } catch (e: unknown) {
+    if (e instanceof TypeError) {
+      return c.notFound();
+    }
+
     log.error(e);
 
     if (e instanceof TRPCError) {

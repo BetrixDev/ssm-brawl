@@ -49,8 +49,6 @@ export const queueRouter = router({
       if (playerParty !== undefined) {
         const playersInParty = playerParty.party.guests.map((p) => p.playerUuid);
 
-        // Eventually we might want to support putting partial parties into a team (3 person party for a 4 person team game)
-        //  but that makes the logic a lot more complicated and more error-prone
         if (playersInParty.length !== minigameData.playersPerTeam) {
           throw new TRPCError({
             code: "CONFLICT",

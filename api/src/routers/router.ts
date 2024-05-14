@@ -1,4 +1,4 @@
-import { router } from "../trpc.js";
+import { internalProcedure, router } from "../trpc.js";
 import { friendshipRouter } from "./friendshipRouter.js";
 import { kitsRouter } from "./kitRouter.js";
 import { mapRouter } from "./mapRouter.js";
@@ -19,6 +19,9 @@ export const appRouter = router({
   parties: partyRouter,
   maps: mapRouter,
   server: serverRouter,
+  health: internalProcedure.query(() => {
+    return { message: "Hello from routers!" };
+  }),
 });
 
 export type AppRouter = typeof appRouter;
