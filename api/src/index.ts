@@ -70,7 +70,7 @@ app.all("/api/*", async (c) => {
       return c.notFound();
     }
 
-    log.error(e);
+    log.error({ ...(e as any), path: c.req.path, body: (c as any).jsonPayload });
 
     if (e instanceof TRPCError) {
       const statusCode = getHTTPStatusCodeFromError(e);
