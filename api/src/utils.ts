@@ -32,3 +32,7 @@ export function get(obj: any, path: string, fallback: any = undefined) {
 
   return results !== undefined && results !== null ? results : fallback;
 }
+
+export function sortStrings(list: string[]) {
+  return list.sort((a, b) => a.localeCompare(b));
+}

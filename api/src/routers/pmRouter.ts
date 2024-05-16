@@ -1,10 +1,8 @@
 import { internalProcedure, router } from "../trpc.js";
 import { z } from "zod";
-import { db } from "tussler";
-import { wranglerClient } from "wrangler";
-import { MessageChannel } from "wrangler/entities/MessageChannel.js";
-import { MessageChannelMessage } from "wrangler/models/MessageChannelMessage.js";
+import { db, messageChannels, messages, messageViewers } from "tussler";
 import { TRPCError } from "@trpc/server";
+import { sortStrings, useRandomId } from "../utils.js";
 
 export const pmRouter = router({
   messagePlayer: internalProcedure
@@ -39,26 +37,39 @@ export const pmRouter = router({
         throw new TRPCError({ code: "FORBIDDEN" });
       }
 
-      const messageChannelRepo = wranglerClient.getMongoRepository(MessageChannel);
+      const sortedUuids = sortStrings([input.authorUuid, input.targetUuid]);
+      const channelId = `pm-${sortedUuids.join("-")}`;
+      const messageId = useRandomId(15);
 
-      const messageEntry = new MessageChannelMessage(input.authorUuid, input.content);
-
-      const existingChannel = await messageChannelRepo.findOne({
-        where: {
-          users: {
-            $all: [input.authorUuid, input.targetUuid],
-          },
-        },
+      const existingChannel = await db.query.messageChannels.findFirst({
+        where: (table, { eq }) => eq(table.id, channelId),
       });
 
       if (!existingChannel) {
-        await messageChannelRepo.insertOne(
-          new MessageChannel([input.authorUuid, input.targetUuid], [messageEntry]),
-        );
-      } else {
-        existingChannel.messages.push(messageEntry);
-        await messageChannelRepo.save(existingChannel);
+        await db.batch([
+          db.insert(messageChannels).values({
+            id: channelId,
+          }),
+          db.insert(messageViewers).values([
+            {
+              channelId,
+              playerUuid: input.authorUuid,
+            },
+            {
+              channelId,
+              playerUuid: input.targetUuid,
+            },
+          ]),
+        ]);
       }
+
+      await db.insert(messages).values({
+        id: messageId,
+        content: input.content,
+        channelId: channelId,
+        authorUuid: input.authorUuid,
+        time: Date.now(),
+      });
 
       return {
         success: true,
@@ -67,23 +78,20 @@ export const pmRouter = router({
   getMessageHistory: internalProcedure
     .input(
       z.object({
-        users: z.array(z.string()),
+        playerUuids: z.array(z.string()),
       }),
     )
     .query(async ({ input }) => {
-      const messageChannel = await wranglerClient.getMongoRepository(MessageChannel).findOne({
-        where: {
-          users: {
-            $all: input.users,
-          },
-        },
+      const sortedUuids = sortStrings(input.playerUuids);
+      const channelId = `pm-${sortedUuids.join("-")}`;
+
+      const messageChannel = await db.query.messageChannels.findFirst({
+        where: (table, { eq }) => eq(table.id, channelId),
+        with: { messages: true },
       });
 
       if (!messageChannel) {
-        return {
-          success: false,
-          message: "gui.pm.error.noMessageHistory",
-        };
+        return [];
       }
 
       return {

@@ -235,6 +235,67 @@ export const partyInvites = sqliteTable(
   }),
 );
 
+export const messages = sqliteTable(
+  "messages",
+  {
+    id: text("id").primaryKey(),
+    channelId: text("channel_id").notNull(),
+    content: text("content").notNull(),
+    authorUuid: text("author_uuid").notNull(),
+    time: int("time").notNull(),
+  },
+  (table) => ({
+    mMessageIdIdx: index("m_message_id_idx").on(table.id),
+    mAuthorUuidIdx: index("m_author_uuid_idx").on(table.authorUuid),
+  }),
+);
+
+export const messageChannels = sqliteTable(
+  "message_channels",
+  {
+    id: text("id").primaryKey(),
+  },
+  (table) => ({
+    mcIdIdx: index("mc_id_idx").on(table.id),
+  }),
+);
+
+export const messageViewers = sqliteTable(
+  "message_viewers",
+  {
+    channelId: text("channel_id").notNull(),
+    playerUuid: text("player_uuid").notNull(),
+  },
+  (table) => ({
+    messageViewerPk: primaryKey({
+      name: "message_viewer_pk",
+      columns: [table.channelId, table.playerUuid],
+    }),
+    mvChannelIdIdx: index("mv_channel_id_idx").on(table.channelId),
+    mvPlayerUuidIdx: index("mv_player_uuid_idx").on(table.playerUuid),
+  }),
+);
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+  channel: one(messageChannels, { fields: [messages.channelId], references: [messageChannels.id] }),
+}));
+
+export const messageChannelsRelations = relations(messageChannels, ({ many }) => ({
+  messages: many(messages),
+  messageViewers: many(messageViewers),
+}));
+
+export const messageViewersRelations = relations(messageViewers, ({ one }) => ({
+  channel: one(messageChannels, {
+    fields: [messageViewers.channelId],
+    references: [messageChannels.id],
+  }),
+  viewer: one(basicPlayerData, {
+    fields: [messageViewers.playerUuid],
+    references: [basicPlayerData.uuid],
+  }),
+}));
+
 export const partiesRelations = relations(parties, ({ many }) => ({
   guests: many(partyGuests),
 }));
