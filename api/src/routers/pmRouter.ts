@@ -87,7 +87,7 @@ export const pmRouter = router({
 
       const messageChannel = await db.query.messageChannels.findFirst({
         where: (table, { eq }) => eq(table.id, channelId),
-        with: { messages: { limit: 25 } },
+        with: { messages: { limit: 25, orderBy: (table, { desc }) => desc(table.time) } },
       });
 
       if (!messageChannel) {
