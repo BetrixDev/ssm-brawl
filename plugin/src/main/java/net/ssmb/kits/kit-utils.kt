@@ -7,7 +7,7 @@ import org.bukkit.entity.Player
 fun constructKitFromData(
     player: Player,
     kitData: MinigameStartSuccess.PlayerData.KitData,
-    minigame: IMinigame
+    minigame: IMinigame?
 ): SsmbKit {
     return when (kitData.id) {
         "creeper" -> CreeperKit(player, kitData, minigame)

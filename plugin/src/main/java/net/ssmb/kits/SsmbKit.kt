@@ -26,7 +26,7 @@ import org.bukkit.util.BoundingBox
 open class SsmbKit(
     private val player: Player,
     private val kitData: MinigameStartSuccess.PlayerData.KitData,
-    private val minigame: IMinigame
+    private val minigame: IMinigame?
 ) : Listener {
     private val plugin = SSMB.instance
     private val playerInv = player.inventory
@@ -86,6 +86,7 @@ open class SsmbKit(
 
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
+        if (minigame == null) return
         if (event.player != player) return
         if (event.action != Action.LEFT_CLICK_AIR || event.action != Action.LEFT_CLICK_BLOCK) return
 

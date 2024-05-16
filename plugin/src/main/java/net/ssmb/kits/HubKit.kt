@@ -7,5 +7,5 @@ import org.bukkit.entity.Player
 class HubKit(
     player: Player,
     kitData: MinigameStartSuccess.PlayerData.KitData,
-    minigame: IMinigame
+    minigame: IMinigame?
 ) : SsmbKit(player, kitData, minigame) {}
