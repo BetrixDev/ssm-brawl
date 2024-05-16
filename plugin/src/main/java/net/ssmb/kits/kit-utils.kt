@@ -8,9 +8,10 @@ fun constructKitFromData(
     player: Player,
     kitData: MinigameStartSuccess.PlayerData.KitData,
     minigame: IMinigame
-): IKit {
+): SsmbKit {
     return when (kitData.id) {
         "creeper" -> CreeperKit(player, kitData, minigame)
+        "hub" -> HubKit(player, kitData, minigame)
         else -> throw RuntimeException("No kit exists for id ${kitData.id}")
     }
 }

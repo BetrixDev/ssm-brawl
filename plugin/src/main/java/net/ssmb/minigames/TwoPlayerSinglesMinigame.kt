@@ -1,6 +1,5 @@
 package net.ssmb.minigames
 
-import br.com.devsrsouza.kotlinbukkitapi.extensions.player
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import com.github.shynixn.mccoroutine.bukkit.ticks
@@ -21,7 +20,7 @@ import net.ssmb.events.BrawlDamageEvent
 import net.ssmb.events.BrawlDamageType
 import net.ssmb.events.BrawlRespawnEvent
 import net.ssmb.extensions.doKnockback
-import net.ssmb.kits.IKit
+import net.ssmb.kits.SsmbKit
 import net.ssmb.kits.constructKitFromData
 import net.ssmb.models.RecordedMinigameAbilityUseEvent
 import net.ssmb.models.RecordedMinigameEvent
@@ -45,7 +44,7 @@ class TwoPlayerSinglesMinigame(
     private val minigameState = Atom(MinigameState.LOADING)
     private lateinit var minigameWorld: World
     private var startedAt = System.currentTimeMillis()
-    override val playerKits = hashMapOf<Player, IKit>()
+    override val playerKits = hashMapOf<Player, SsmbKit>()
     override val teamsStocks = arrayListOf<Pair<ArrayList<Player>, Int>>()
     private val playersLeftInProgress = listOf<Player>()
 

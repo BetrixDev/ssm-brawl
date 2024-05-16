@@ -8,7 +8,7 @@ import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartSuccess
-import net.ssmb.kits.IKit
+import net.ssmb.kits.SsmbKit
 import net.ssmb.kits.constructKitFromData
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -27,7 +27,7 @@ class TestMinigame(
     private val playerMinigameData = minigameData.teams.flatten()
     private val plugin = SSMB.instance
     private lateinit var minigameWorld: World
-    override val playerKits = hashMapOf<Player, IKit>()
+    override val playerKits = hashMapOf<Player, SsmbKit>()
     override val teamsStocks = arrayListOf<Pair<ArrayList<Player>, Int>>()
 
     init {

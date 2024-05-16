@@ -4,7 +4,7 @@ import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.minigames.IMinigame
 import org.bukkit.entity.Player
 
-class CreeperKit(
+class HubKit(
     player: Player,
     kitData: MinigameStartSuccess.PlayerData.KitData,
     minigame: IMinigame

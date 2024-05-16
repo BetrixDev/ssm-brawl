@@ -22,14 +22,10 @@ class SulphurBombAbility(
 ) : SsmbAbility(player, abilityEntry) {
     private val plugin = SSMB.instance
 
-    /**
-     * A multiplier added to the base knockback calculation
-     */
+    /** A multiplier added to the base knockback calculation */
     private val projectileKnockbackModifier = getMetaDouble("projectile_knockback_modifier", 2.5)
 
-    /**
-     * How much damage the projectile will do if it hits an entity
-     */
+    /** How much damage the projectile will do if it hits an entity */
     private val projectileDamage = getMetaDouble("projectile_damage", 6.5)
 
     override fun doAbility() {

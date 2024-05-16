@@ -103,6 +103,6 @@ open class SsmbAbility(
     }
 
     fun getMetaInt(key: String, default: Int): Int {
-        return getMetaInt(key)?: default
+        return getMetaInt(key) ?: default
     }
 }
