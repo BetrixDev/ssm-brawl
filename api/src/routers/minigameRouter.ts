@@ -48,7 +48,7 @@ export const minigameRouter = router({
 
       const teamsPlayerData = await Promise.all(
         input.teams.map(async (team) => {
-          return await Promise.all(
+          const players = await Promise.all(
             team.map(async (uuid) => {
               const data = await db.query.basicPlayerData.findFirst({
                 where: (table, { eq }) => eq(table.uuid, uuid),
@@ -90,6 +90,11 @@ export const minigameRouter = router({
               };
             }),
           );
+
+          return {
+            teamId: useRandomId(15),
+            players: players,
+          };
         }),
       );
 
@@ -126,6 +131,7 @@ export const minigameRouter = router({
         winningUuids: z.array(z.string()),
         players: z.array(
           z.object({
+            teamId: z.string(),
             uuid: z.string(),
             stocksLeft: z.number(),
             leftInProgress: z.boolean(),

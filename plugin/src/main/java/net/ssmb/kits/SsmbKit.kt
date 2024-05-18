@@ -12,6 +12,7 @@ import net.ssmb.extensions.metadata
 import net.ssmb.minigames.IMinigame
 import net.ssmb.passives.IPassive
 import net.ssmb.passives.constructPassiveFromData
+import net.ssmb.utils.TaggedKeyBool
 import net.ssmb.utils.TaggedKeyDouble
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -25,7 +26,7 @@ import org.bukkit.util.BoundingBox
 
 open class SsmbKit(
     private val player: Player,
-    private val kitData: MinigameStartSuccess.PlayerData.KitData,
+    val kitData: MinigameStartSuccess.PlayerData.KitData,
     private val minigame: IMinigame?
 ) : Listener {
     private val plugin = SSMB.instance
@@ -50,9 +51,11 @@ open class SsmbKit(
             playerInv.setItem(EquipmentSlot.FEET, item(Material.getMaterial(kitData.bootsId)!!))
 
         player.metadata {
+
             set(TaggedKeyDouble("knockback_multiplier"), kitData.knockbackMult)
             set(TaggedKeyDouble("hitbox_width"), kitData.hitboxWidth)
             set(TaggedKeyDouble("hitbox_height"), kitData.hitboxHeight)
+            set(TaggedKeyBool("ssmb_entity"), true)
         }
 
         kitData.abilities.forEach {
@@ -75,6 +78,7 @@ open class SsmbKit(
             remove(TaggedKeyDouble("knockback_multiplier"))
             remove(TaggedKeyDouble("hitbox_width"))
             remove(TaggedKeyDouble("hitbox_height"))
+            remove(TaggedKeyBool("ssmb_entity"))
         }
 
         abilities.forEach { it.destroyAbility() }
@@ -96,10 +100,8 @@ open class SsmbKit(
         //  just in case two players are directly in front of the player
 
         val enemyToAttack =
-            minigame.teamsStocks
-                .filter { it.first.contains(player) }
-                .map { it.first }
-                .flatten()
+            player.world.getNearbyLivingEntities(player.location, 4.5)
+                .filter { it.getMetadata(TaggedKeyBool("ssmb_entity")) == true }
                 .find {
                     val hitboxWidth = it.getMetadata(TaggedKeyDouble("hitbox_width")) ?: 1.0
                     val hitboxHeight = it.getMetadata(TaggedKeyDouble("hitbox_heights")) ?: 1.0

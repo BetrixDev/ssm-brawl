@@ -1,12 +1,14 @@
 package net.ssmb.minigames
 
+import net.ssmb.dtos.minigame.BukkitTeamData
 import net.ssmb.kits.SsmbKit
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 interface IMinigame {
-    val teams: List<List<Player>>
+    val teams: List<BukkitTeamData>
     val playerKits: HashMap<Player, SsmbKit>
-    val teamsStocks: ArrayList<Pair<ArrayList<Player>, Int>>
+    val teamsStocks: HashMap<String, Int>
 
     suspend fun initializeMinigame()
 

@@ -7,6 +7,7 @@ import io.papermc.paper.entity.LookAnchor
 import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
+import net.ssmb.dtos.minigame.BukkitTeamData
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.kits.SsmbKit
 import net.ssmb.kits.constructKitFromData
@@ -20,15 +21,15 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.util.Vector
 
 class TestMinigame(
-    override val teams: List<List<Player>>,
+    override val teams: List<BukkitTeamData>,
     private val minigameData: MinigameStartSuccess
 ) : IMinigame, Listener {
-    private val players = teams.flatten()
-    private val playerMinigameData = minigameData.teams.flatten()
+    private val players = teams.map { it.players }.flatten()
+    private val playerMinigameData = minigameData.teams.map { it.players }.flatten()
     private val plugin = SSMB.instance
     private lateinit var minigameWorld: World
     override val playerKits = hashMapOf<Player, SsmbKit>()
-    override val teamsStocks = arrayListOf<Pair<ArrayList<Player>, Int>>()
+    override val teamsStocks = hashMapOf<String, Int>()
 
     init {
         plugin.server.pluginManager.registerSuspendingEvents(this, plugin)
@@ -41,7 +42,7 @@ class TestMinigame(
             val spawnCoords = minigameData.map.spawnPoints[idx]
             val tpLocation = Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
 
-            team.forEach { plr ->
+            team.players.forEach { plr ->
                 plr.teleport(tpLocation)
                 plr.walkSpeed = 0.0f
                 plr.lookAt(minigameWorld.spawnLocation, LookAnchor.EYES)
@@ -54,7 +55,7 @@ class TestMinigame(
                 playerKits[plr] = kit
             }
 
-            teamsStocks.add(Pair(ArrayList(team), minigameData.minigame.stocks))
+            teamsStocks[team.teamId] = minigameData.minigame.stocks
         }
 
         minigameWorld.sendMessage(Component.text("Testing game has started!"))

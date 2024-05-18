@@ -9,6 +9,7 @@ import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.events.BrawlDamageEvent
 import net.ssmb.events.BrawlDamageType
 import net.ssmb.extensions.get
+import net.ssmb.extensions.metadata
 import net.ssmb.utils.TaggedKeyBool
 import net.ssmb.utils.didRandomChanceHit
 import net.ssmb.utils.isOnGround
@@ -78,6 +79,10 @@ class AngryHerdAbility(
                     cow.variant = MushroomCow.Variant.BROWN
                 } else {
                     cow = player.world.spawn(cowLocation, Cow::class.java)
+                }
+
+                cow.metadata {
+                    set(TaggedKeyBool("ssmb_entity"), true)
                 }
 
                 cows.add(cow)
