@@ -12,6 +12,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.title.Title
 import net.ssmb.SSMB
+import net.ssmb.dtos.minigame.BukkitTeamData
 import net.ssmb.dtos.minigame.MinigameEndRequest
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.enums.MinigameState
@@ -35,17 +36,17 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.util.Vector
 
 class TwoPlayerSinglesMinigame(
-    override val teams: List<List<Player>>,
+    override val teams: List<BukkitTeamData>,
     private val minigameData: MinigameStartSuccess
 ) : IMinigame, Listener {
-    private val players = teams.flatten()
-    private val playerMinigameData = minigameData.teams.flatten()
+    private val players = teams.map { it.players }.flatten()
+    private val playerMinigameData = minigameData.teams.map { it.players }.flatten()
     private val plugin = SSMB.instance
     private val minigameState = Atom(MinigameState.LOADING)
     private lateinit var minigameWorld: World
     private var startedAt = System.currentTimeMillis()
     override val playerKits = hashMapOf<Player, SsmbKit>()
-    override val teamsStocks = arrayListOf<Pair<ArrayList<Player>, Int>>()
+    override val teamsStocks = hashMapOf<String, Int>()
     private val playersLeftInProgress = listOf<Player>()
 
     private val events = arrayListOf<RecordedMinigameEvent>()
@@ -78,7 +79,7 @@ class TwoPlayerSinglesMinigame(
             val spawnCoords = minigameData.map.spawnPoints[idx]
             val tpLocation = Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
 
-            team.forEach { plr ->
+            team.players.forEach { plr ->
                 plr.teleport(tpLocation)
                 plr.walkSpeed = 0.0f
                 plr.lookAt(minigameWorld.spawnLocation, LookAnchor.EYES)
@@ -91,7 +92,7 @@ class TwoPlayerSinglesMinigame(
                 playerKits[plr] = kit
             }
 
-            teamsStocks.add(Pair(ArrayList(team), minigameData.minigame.stocks))
+            teamsStocks[team.teamId] = minigameData.minigame.stocks
         }
 
         minigameState.set(MinigameState.COUNTDOWN)
@@ -146,14 +147,22 @@ class TwoPlayerSinglesMinigame(
     private fun doMinigameRunning() {
         startedAt = System.currentTimeMillis()
 
-        teams.forEach { team -> team.forEach { plr -> plr.walkSpeed = 0.2f } }
+        teams.forEach { team -> team.players.forEach { plr -> plr.walkSpeed = 0.2f } }
     }
 
     private fun doMinigameEnd() {
         val endedAt = System.currentTimeMillis()
 
-        val winningPlayers = teamsStocks.first { it.second > 0 }.first
-        val losingPlayers = teamsStocks.filter { it.second == 0 }.flatMap { it.first }
+        val winningTeam = teamsStocks.filter { it.value > 0 }
+        val losingTeams = teamsStocks.filter { it.value == 0 }
+
+        val winningPlayers = winningTeam.keys.map { teamId ->
+            teams.find { team -> team.teamId === teamId }!!
+        }.map { it.players }.flatten()
+
+        val losingPlayers = losingTeams.keys.map { teamId ->
+            teams.find { team -> team.teamId === teamId }!!
+        }.map { it.players }.flatten()
 
         winningPlayers.forEach { it.sendMessage(Component.text("You won!", NamedTextColor.GREEN)) }
 
@@ -176,8 +185,10 @@ class TwoPlayerSinglesMinigame(
 
                 val playerEntries =
                     allPlayers.map { plr ->
+                        val plrTeam = teams.find { it.players.contains(plr) }!!
+
                         val playerKitData = playerKits[plr]!!
-                        val stocksLeft = teamsStocks.find { it.first.contains(plr) }?.second ?: 0
+                        val stocksLeft = teamsStocks[plrTeam.teamId] ?: minigameData.minigame.stocks
                         val didLeaveInProgress = playersLeftInProgress.contains(plr)
 
                         val abilityUsage =
@@ -223,7 +234,7 @@ class TwoPlayerSinglesMinigame(
     }
 
     private fun checkShouldMinigameEnd() {
-        val teamsWithStocksLeft = teamsStocks.filter { it.second > 0 }
+        val teamsWithStocksLeft = teamsStocks.filter { it.value > 0 }
 
         if (teamsWithStocksLeft.size == 1) {
             minigameState.set(MinigameState.ENDING)
@@ -245,21 +256,14 @@ class TwoPlayerSinglesMinigame(
         player.gameMode = GameMode.SPECTATOR
         player.teleport(spectatorSpawnCoords)
 
-        val teamStocks = teamsStocks.find { it.first.contains(player) }!!
+        val playerTeam = teams.find { it.players.contains(player) }!!
 
-        // Pairs are immutable, so we create a new pair and override the existing using map
-        teamsStocks.map {
-            if (it.first.contains(player)) {
-                Pair(it.first, it.second - 1)
-            } else {
-                it
-            }
-        }
+        teamsStocks[playerTeam.teamId] = (teamsStocks[playerTeam.teamId] ?: minigameData.minigame.stocks) - 1
 
-        if (teamStocks.second == 0) {
+        if (teamsStocks[playerTeam.teamId] == 0) {
             checkShouldMinigameEnd()
 
-            teamStocks.first.forEach {
+            playerTeam.players.forEach {
                 it.sendMessage(Component.text("You are dead!", NamedTextColor.RED))
             }
         } else {

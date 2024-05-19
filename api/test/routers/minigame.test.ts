@@ -86,6 +86,7 @@ suite("Minigame router tests", async () => {
               startTime: Date.now(),
             },
           ],
+          teamId: "test_team",
           uuid: playerTestData[0].uuid,
           stocksLeft: 4,
           leftInProgress: false,

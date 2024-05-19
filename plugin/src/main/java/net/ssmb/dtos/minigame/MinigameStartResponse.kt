@@ -1,6 +1,9 @@
 package net.ssmb.dtos.minigame
 
 import kotlinx.serialization.Serializable
+import org.bukkit.entity.Player
+
+data class BukkitTeamData(val teamId: String, val players: ArrayList<Player>)
 
 sealed class MinigameStartResponse {
     data class Success(val value: MinigameStartSuccess) : MinigameStartResponse()
@@ -16,11 +19,14 @@ enum class MiniGameError {
 sealed class MinigameStartSuccess(
     val gameId: String,
     val minigame: MinigameData,
-    val teams: List<List<PlayerData>>,
+    val teams: List<TeamsEntry>,
     val map: MapData
 ) {
     @Serializable
     data class MinigameData(val id: String, val countdownSeconds: Int, val stocks: Int)
+
+    @Serializable
+    data class TeamsEntry(val teamId: String, val players: List<PlayerData>)
 
     @Serializable
     sealed class PlayerData(val uuid: String, val selectedKit: KitData) {
