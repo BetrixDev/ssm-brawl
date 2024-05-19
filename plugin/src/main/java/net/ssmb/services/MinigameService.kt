@@ -1,12 +1,14 @@
 package net.ssmb.services
 
-import java.util.*
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
+import net.ssmb.dtos.minigame.BukkitTeamData
 import net.ssmb.dtos.minigame.MinigameStartResponse
 import net.ssmb.minigames.IMinigame
 import net.ssmb.minigames.constructMinigameFromData
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import java.util.*
 
 class MinigameService {
     private val plugin = SSMB.instance
@@ -56,7 +58,18 @@ class MinigameService {
             }
         } else if (startResponse is MinigameStartResponse.Success) {
             val startData = startResponse.value
-            val minigame = constructMinigameFromData(onlinePlayers, startData)
+
+            val teamData = startData.teams.map { team ->
+                val players = arrayListOf<Player>()
+
+                team.players.forEach { plr ->
+                    players.add(Bukkit.getPlayer(plr.uuid)!!)
+                }
+
+                BukkitTeamData(team.teamId, players)
+            }
+
+            val minigame = constructMinigameFromData(teamData, startData)
 
             minigame.initializeMinigame()
 
@@ -69,7 +82,7 @@ class MinigameService {
     }
 
     fun isPlayerInMinigame(player: Player): Boolean {
-        return runningMinigames.find { it.teams.flatten().contains(player) } != null
+        return runningMinigames.find { it.teams.map { team -> team.players }.flatten().contains(player) } != null
     }
 
     fun areMinigamesOngoing(): Boolean {
