@@ -275,37 +275,9 @@ importers:
 
   server:
     dependencies:
-      axios:
-        specifier: ^1.6.8
-        version: 1.6.8
-      env:
-        specifier: workspace:*
-        version: link:../packages/env
-      execa:
-        specifier: ^8.0.1
-        version: 8.0.1
-      logger:
-        specifier: workspace:*
-        version: link:../packages/logger
-      picomatch:
-        specifier: ^4.0.2
-        version: 4.0.2
-    devDependencies:
-      '@types/node':
-        specifier: ^20.12.7
-        version: 20.12.7
-      '@types/picomatch':
-        specifier: ^2.3.3
-        version: 2.3.3
-      dotenv-cli:
-        specifier: ^7.3.0
-        version: 7.3.0
-      tsx:
-        specifier: ^4.7.1
-        version: 4.7.1
-      typescript:
-        specifier: ^5.4.5
-        version: 5.4.5
+      exec-bin:
+        specifier: ^1.0.0
+        version: 1.0.0
 
 packages:
 
@@ -1831,6 +1803,10 @@ packages:
   eventemitter2@6.4.9:
     resolution: {integrity: sha512-JEPTiaOt9f04oa6NOkc4aH+nVp5I3wEjpHbIPqfgCdD5v5bUzy7xQqwcVO2aDQgOWhI28da57HksMrzK9HlRxg==}
 
+  exec-bin@1.0.0:
+    resolution: {integrity: sha512-p8f8h8b6op2nR7U5rsd+zACUMfsfB+jW8HNIBD2njOQ/gF2WvBfQRo/OU6Q6f/b34WLAyePZcwMJyrDdEjB/fw==}
+    hasBin: true
+
   execa@8.0.1:
     resolution: {integrity: sha512-VyhnebXciFV2DESc+p6B+y0LjSm0krU4OgJN44qFAhBY0TJ+1V61tYD2+wHusZ6F9n5K+vl8k0sTy7PEfV4qpg==}
     engines: {node: '>=16.17'}
@@ -2938,11 +2914,6 @@ packages:
 
   typescript@5.4.4:
     resolution: {integrity: sha512-dGE2Vv8cpVvw28v8HCPqyb08EzbBURxDpuhJvTrusShUfGnhHBafDsLdS1EhhxyL6BJQE+2cT3dDPAv+MQ6oLw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
-  typescript@5.4.5:
-    resolution: {integrity: sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -4617,6 +4588,8 @@ snapshots:
 
   eventemitter2@6.4.9: {}
 
+  exec-bin@1.0.0: {}
+
   execa@8.0.1:
     dependencies:
       cross-spawn: 7.0.3
@@ -5763,8 +5736,6 @@ snapshots:
   typescript@5.4.2: {}
 
   typescript@5.4.4: {}
-
-  typescript@5.4.5: {}
 
   ufo@1.5.3: {}
 

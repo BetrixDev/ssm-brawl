@@ -1,0 +1,103 @@
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"os"
+	"os/exec"
+	"os/signal"
+	"path/filepath"
+	"syscall"
+	"time"
+
+	"github.com/rs/zerolog/log"
+)
+
+const (
+	API_CONNECTION_TIMEOUT = 30 * time.Second
+	POLL_INTERVAL          = 500 * time.Millisecond
+)
+
+var (
+	apiProtocol    = os.Getenv("API_PROTOCOL")
+	apiHost        = os.Getenv("API_HOST")
+	apiPort        = os.Getenv("API_PORT")
+	timeStarted    = time.Now()
+	isApiConnected = false
+)
+
+func main() {
+	log.Print("Removing old worlds")
+
+	cwd, err := os.Getwd()
+
+	if err != nil {
+		panic(err)
+	}
+
+	ssmbWorlds, globErr := filepath.Glob("*servers_*")
+
+	if globErr != nil {
+		panic(globErr)
+	}
+
+	for _, filePath := range ssmbWorlds {
+		if err := os.RemoveAll(filepath.Join(cwd, filePath)); err != nil {
+			panic(err)
+		}
+	}
+
+	log.Print("Waiting for API connection...")
+
+	for !isApiConnected {
+		if time.Since(timeStarted) > API_CONNECTION_TIMEOUT {
+			log.Print("API connection timeout")
+		}
+
+		if checkApiConnection() {
+			isApiConnected = true
+		} else {
+			log.Print("API connection failed, retrying...")
+			time.Sleep(POLL_INTERVAL)
+		}
+	}
+
+	log.Print("API connection established")
+	log.Print("Starting server...")
+
+	cmd := exec.Command("java", "-Xmx8G", "-jar", "pufferfish.jar", "-nogui")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Env = os.Environ()
+
+	go func() {
+		if err := cmd.Wait(); err != nil {
+			log.Print("Server process exited with error")
+		} else {
+			log.Print("Server process exited")
+		}
+		os.Exit(0)
+	}()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
+	<-c
+
+	log.Print("Received termination signal, shutting down...")
+	if err := cmd.Process.Kill(); err != nil {
+		log.Print("Failed to kill server process")
+	}
+}
+
+func checkApiConnection() bool {
+	url := fmt.Sprintf("%s://%s:%s/health", apiProtocol, apiHost, apiPort)
+	resp, err := http.Get(url)
+
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+
+	return resp.StatusCode == http.StatusOK
+}

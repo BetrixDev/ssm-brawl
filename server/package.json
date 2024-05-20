@@ -1,22 +1,11 @@
 {
   "name": "server",
-  "type": "module",
   "scripts": {
-    "start": "node ./start-server.js",
-    "dev": "node ./start-server.js"
-  },
-  "devDependencies": {
-    "@types/node": "^20.12.7",
-    "@types/picomatch": "^2.3.3",
-    "dotenv-cli": "^7.3.0",
-    "tsx": "^4.7.1",
-    "typescript": "^5.4.5"
+    "build": "go build -o build/start-server.exe -ldflags \"-s -w\"",
+    "start": "exec-bin ./build/start-server.exe",
+    "dev": "go run main.go"
   },
   "dependencies": {
-    "axios": "^1.6.8",
-    "env": "workspace:*",
-    "execa": "^8.0.1",
-    "logger": "workspace:*",
-    "picomatch": "^4.0.2"
+    "exec-bin": "^1.0.0"
   }
 }
