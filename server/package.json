@@ -1,11 +1,15 @@
 {
   "name": "server",
   "scripts": {
-    "build": "go build -o build/start-server.exe -ldflags \"-s -w\"",
-    "start": "exec-bin ./build/start-server.exe",
+    "build:win": "cross-env GOOS=windows GOARCH=amd64 go build -o build/start-server.exe -ldflags \"-s -w\"",
+    "build:linux": "cross-env GOOS=linux GOARCH=amd64 go build -o build/start-server -ldflags \"-s -w\"",
+    "start:win": "exec-bin ./build/start-server.exe",
+    "start:linux": "exec-bin ./build/start-server",
+    "start": "go run main.go",
     "dev": "go run main.go"
   },
   "dependencies": {
+    "cross-env": "^7.0.3",
     "exec-bin": "^1.0.0"
   }
 }
