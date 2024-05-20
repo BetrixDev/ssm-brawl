@@ -70,14 +70,7 @@ func main() {
 	cmd.Stderr = os.Stderr
 	cmd.Env = os.Environ()
 
-	go func() {
-		if err := cmd.Wait(); err != nil {
-			log.Print("Server process exited with error")
-		} else {
-			log.Print("Server process exited")
-		}
-		os.Exit(0)
-	}()
+	cmd.Start()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
