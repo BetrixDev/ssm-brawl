@@ -13,14 +13,14 @@ import org.bukkit.entity.Player
 class RegenerationPassive(
     private val player: Player,
     passiveData: MinigameStartSuccess.PlayerData.KitData.PassiveEntry.PassiveData
-) : IPassive {
+) : SsmbPassive(player, passiveData) {
     private val plugin = SSMB.instance
-    private val regenDelayTicks = passiveData.meta?.get("regen_delay_ticks")!!.toInt()
-    private val regenRate = passiveData.meta?.get("regen_rate")!!.toDouble()
+    private val regenDelayTicks = getMetaInt("regen_delay_ticks", 10)
+    private val regenRate = getMetaInt("regen_rate", 20)
 
     private var regenerationJob: Job? = null
 
-    override fun createPassive() {
+    override fun initializePassive() {
         regenerationJob =
             plugin.launch {
                 while (true) {

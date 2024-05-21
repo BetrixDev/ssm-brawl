@@ -6,11 +6,11 @@ import org.bukkit.entity.Player
 fun constructPassiveFromData(
     player: Player,
     passiveEntry: MinigameStartSuccess.PlayerData.KitData.PassiveEntry
-): IPassive {
+): SsmbPassive {
     return when (passiveEntry.passive.id) {
         "hunger" -> HungerPassive(player, passiveEntry.passive)
-        "double_jump" -> DoubleJumpPassive(player)
-        "lightning_shield" -> LightningShieldPassive(player)
+        "double_jump" -> DoubleJumpPassive(player, passiveEntry.passive)
+        "lightning_shield" -> LightningShieldPassive(player, passiveEntry.passive)
         "regeneration" -> RegenerationPassive(player, passiveEntry.passive)
         else -> throw RuntimeException("")
     }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartSuccess
+import net.ssmb.utils.t
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.HandlerList
@@ -18,22 +19,22 @@ import org.bukkit.event.entity.EntityDamageEvent
 class HungerPassive(
     private val player: Player,
     passiveData: MinigameStartSuccess.PlayerData.KitData.PassiveEntry.PassiveData
-) : IPassive, Listener {
+) : SsmbPassive(player, passiveData) {
     private val plugin = SSMB.instance
-    private val secondsToDrain = passiveData.meta?.get("seconds_to_drain")!!.toDouble()
-    private val hungerRestoreDelay = passiveData.meta?.get("hunger_restore_delay")!!.toInt()
+    
+    private val hungerRestoreDelay = getMetaInt("hunger_restore_delay", 250)
 
     private var hungerJob: Job? = null
     private var hungerTicks: Long = 0
     private var lastHungerRestore = System.currentTimeMillis()
 
-    override fun createPassive() {
+    override fun initializePassive() {
         plugin.server.pluginManager.registerEvents(this, plugin)
 
         hungerJob =
             plugin.launch {
                 while (true) {
-                    hungerTicks++
+                    hungerTicks = (hungerTicks + 1) % 10
 
                     player.saturation = 3f
                     player.exhaustion = 0f
@@ -42,20 +43,20 @@ class HungerPassive(
                         val damageEvent =
                             EntityDamageEvent(player, EntityDamageEvent.DamageCause.STARVATION, 1.0)
                         damageEvent.callEvent()
+                        player.sendActionBar(t("passive.hungerNotice"))
                     }
 
-                    if ((hungerTicks % 10).toInt() == 0) {
-                        player.foodLevel = max(0, player.foodLevel - 1)
+                    if (hungerTicks.toInt() == 0) {
+                        player.foodLevel = 0.coerceAtLeast(player.foodLevel - 1)
                     }
 
-                    delay(20.ticks)
+                    delay(1.ticks)
                 }
             }
     }
 
     override fun destroyPassive() {
-        HandlerList.unregisterAll(this)
-
+        super.destroyPassive()
         hungerJob?.cancel()
     }
 

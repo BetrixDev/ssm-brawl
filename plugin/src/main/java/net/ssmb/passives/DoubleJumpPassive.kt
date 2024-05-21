@@ -5,6 +5,7 @@ import com.github.shynixn.mccoroutine.bukkit.ticks
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import net.ssmb.SSMB
+import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.extensions.setVelocity
 import net.ssmb.utils.isOnGround
 import org.bukkit.GameMode
@@ -15,19 +16,22 @@ import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerToggleFlightEvent
 
-class DoubleJumpPassive(private val player: Player) : IPassive, Listener {
+class DoubleJumpPassive(
+    private val player: Player,
+    private val passiveData: MinigameStartSuccess.PlayerData.KitData.PassiveEntry.PassiveData
+) : SsmbPassive(player, passiveData) {
     private val plugin = SSMB.instance
 
     private var canDoubleJump = true
 
-    override fun createPassive() {
-        plugin.server.pluginManager.registerEvents(this, plugin)
+    override fun initializePassive() {
+        super.initializePassive()
         player.allowFlight = true
         canDoubleJump = true
     }
 
     override fun destroyPassive() {
-        HandlerList.unregisterAll(this)
+        super.destroyPassive()
         player.allowFlight = false
         canDoubleJump = false
     }

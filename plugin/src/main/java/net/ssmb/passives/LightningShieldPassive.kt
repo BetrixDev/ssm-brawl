@@ -4,6 +4,7 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.ticks
 import kotlinx.coroutines.delay
 import net.ssmb.SSMB
+import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.extensions.doKnockback
 import org.bukkit.Sound
 import org.bukkit.entity.LivingEntity
@@ -16,18 +17,21 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
-class LightningShieldPassive(private val player: Player) : IPassive, Listener {
+class LightningShieldPassive(
+    private val player: Player,
+    private val passiveData: MinigameStartSuccess.PlayerData.KitData.PassiveEntry.PassiveData
+) : SsmbPassive(player, passiveData) {
     private val plugin = SSMB.instance
 
     private var isActive = false
 
-    override fun createPassive() {
-        plugin.server.pluginManager.registerEvents(this, plugin)
+    override fun initializePassive() {
+        super.initializePassive()
         isActive = false
     }
 
     override fun destroyPassive() {
-        HandlerList.unregisterAll(this)
+        super.destroyPassive()
         isActive = false
     }
 
