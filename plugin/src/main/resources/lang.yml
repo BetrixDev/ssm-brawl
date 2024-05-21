@@ -26,6 +26,11 @@ shutdown:
   waitingForMinigames: "{prefix} We have found ongoing minigames, waiting until those finish"
   performingShutdown: "{prefix} Performing shutdown"
 
+kit:
+  displayName:
+    creeper: "Creeper"
+    cow: "Cow"
+
 ability:
   cooldownMessage: "You have {secondsLeft} before you can use {abilityName} again"
   displayName:
