@@ -4,6 +4,5 @@ enum class MinigameState {
     LOADING,
     COUNTDOWN,
     RUNNING,
-    ENDING,
-    ENDED
+    ENDING
 }
