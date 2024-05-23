@@ -44,6 +44,7 @@ class SSMB : SuspendingJavaPlugin() {
         server.pluginManager.registerEvents(PlayerDropItemListener(), this)
         server.pluginManager.registerEvents(EntityDamageByBlockListener(), this)
         server.pluginManager.registerEvents(PlayerInteractListener(), this)
+        server.pluginManager.registerEvents(BlockBreakListener(), this)
 
         liteCommands = LiteCommandsBukkit.builder("ssmb", this).commands(QueueCommand()).build()
 
