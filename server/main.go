@@ -47,6 +47,24 @@ func main() {
 		}
 	}
 
+	log.Print("Removing extra ssmb plugin jars")
+
+	ssmbPlugins, globErr := filepath.Glob(filepath.Join("plugins", "*ssmb*.jar"))
+
+	if globErr != nil {
+		panic(globErr)
+	}
+
+	for _, filePath := range ssmbPlugins {
+		if filepath.Base(filePath) == "ssmb.jar" {
+			continue
+		}
+
+		if err := os.RemoveAll(filepath.Join(cwd, filePath)); err != nil {
+			panic(err)
+		}
+	}
+
 	log.Print("Waiting for API connection...")
 
 	for !isApiConnected {

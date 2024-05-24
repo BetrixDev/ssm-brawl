@@ -10,7 +10,7 @@ import net.ssmb.events.BrawlDamageType
 import net.ssmb.extensions.getMetadata
 import net.ssmb.extensions.metadata
 import net.ssmb.minigames.IMinigame
-import net.ssmb.passives.IPassive
+import net.ssmb.passives.SsmbPassive
 import net.ssmb.passives.constructPassiveFromData
 import net.ssmb.utils.TaggedKeyBool
 import net.ssmb.utils.TaggedKeyDouble
@@ -33,7 +33,7 @@ open class SsmbKit(
     private val playerInv = player.inventory
 
     private val abilities = arrayListOf<SsmbAbility>()
-    private val passives = arrayListOf<IPassive>()
+    private val passives = arrayListOf<SsmbPassive>()
 
     open fun initializeKit() {
         playerInv.clear()
@@ -66,7 +66,7 @@ open class SsmbKit(
 
         kitData.passives.forEach {
             val passive = constructPassiveFromData(player, it)
-            passive.createPassive()
+            passive.initializePassive()
             passives.add(passive)
         }
 
