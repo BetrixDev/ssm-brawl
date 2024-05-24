@@ -11,7 +11,6 @@
     "test": "turbo test --filter=api",
     "test-coverage": "dotenv -- turbo test-coverage --filter=api",
     "dev:orchestrator": "dotenv -- turbo dev --filter=orchestrator",
-    "db:push": "cd packages/tussler && dotenv -e ../../.env pnpm db:push",
     "db:studio": "cd packages/tussler && dotenv -e ../../.env pnpm db:studio",
     "build": "turbo build",
     "dev": "turbo dev",

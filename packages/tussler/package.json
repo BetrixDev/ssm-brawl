@@ -3,7 +3,6 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "db:push": "drizzle-kit push:sqlite",
     "db:studio": "drizzle-kit studio",
     "generate-migration": "drizzle-kit generate:sqlite"
   },
