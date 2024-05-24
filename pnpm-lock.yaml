@@ -242,8 +242,8 @@ importers:
         specifier: ^20.12.5
         version: 20.12.5
       drizzle-kit:
-        specifier: ^0.20.18
-        version: 0.20.18
+        specifier: ^0.21.4
+        version: 0.21.4
       typescript:
         specifier: ^5.4.4
         version: 5.4.4
@@ -733,10 +733,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@hono/node-server@1.11.0':
-    resolution: {integrity: sha512-TLIJq9TMtD1NEG1mVoqNUn1Ita0qSaB5XboZErjFBcO/GJYXwWY4dVdTi9G0lbxtu0x+hJXDItcLaFHb7rlFTw==}
-    engines: {node: '>=18.14.1'}
-
   '@hono/node-server@1.8.2':
     resolution: {integrity: sha512-h8l2TBLCPHZBUrrkosZ6L5CpBLj6zdESyF4B+zngiCDF7aZFQJ0alVbLx7jn8PCVi9EyoFf8a4hOZFi1tD95EA==}
     engines: {node: '>=18.14.1'}
@@ -747,12 +743,6 @@ packages:
     peerDependencies:
       '@trpc/server': ^10.10.0
       hono: '>=3.*'
-
-  '@hono/zod-validator@0.2.1':
-    resolution: {integrity: sha512-HFoxln7Q6JsE64qz2WBS28SD33UB2alp3aRKmcWnNLDzEL1BLsWfbdX6e1HIiUprHYTIXf5y7ax8eYidKUwyaA==}
-    peerDependencies:
-      hono: '>=3.9.0'
-      zod: ^3.19.1
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -1627,8 +1617,8 @@ packages:
     resolution: {integrity: sha512-0fHv3YIEaUcSVPSGyaaBfOi9bmpajjhbJNdPsRMIUvYdLVxBu9eGjH8mRc3Qk7HVmEidFc/lhG1YyJhoXrn5yA==}
     hasBin: true
 
-  drizzle-kit@0.20.18:
-    resolution: {integrity: sha512-fLTwcnLqtBxGd+51H/dEm9TC0FW6+cIX/RVPyNcitBO77X9+nkogEfMAJebpd/8Yl4KucmePHRYRWWvUlW0rqg==}
+  drizzle-kit@0.21.4:
+    resolution: {integrity: sha512-Nxcc1ONJLRgbhmR+azxjNF9Ly9privNLEIgW53c92whb4xp8jZLH1kMCh/54ci1mTMuYxPdOukqLwJ8wRudNwA==}
     hasBin: true
 
   drizzle-orm@0.29.4:
@@ -1972,10 +1962,6 @@ packages:
 
   hono@4.1.0:
     resolution: {integrity: sha512-9no6DCHb4ijB1tWdFXU6JnrnFgzwVZ1cnIcS1BjAFnMcjbtBTOMsQrDrPH3GXbkNEEEkj8kWqcYBy8Qc0bBkJQ==}
-    engines: {node: '>=16.0.0'}
-
-  hono@4.2.5:
-    resolution: {integrity: sha512-uonJD3i/yy005kQ7bPZRVfG3rejYJwyPqBmPoUGijS4UB/qM+YlrZ7xzSWy+ByDu9buGHUG+f+SKzz03Y6V1Kw==}
     engines: {node: '>=16.0.0'}
 
   html-escaper@2.0.2:
@@ -3456,19 +3442,12 @@ snapshots:
   '@esbuild/win32-x64@0.20.2':
     optional: true
 
-  '@hono/node-server@1.11.0': {}
-
   '@hono/node-server@1.8.2': {}
 
   '@hono/trpc-server@0.1.1(@trpc/server@10.45.1)(hono@4.1.0)':
     dependencies:
       '@trpc/server': 10.45.1
       hono: 4.1.0
-
-  '@hono/zod-validator@0.2.1(hono@4.2.5)(zod@3.22.4)':
-    dependencies:
-      hono: 4.2.5
-      zod: 3.22.4
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -4399,24 +4378,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-kit@0.20.18:
+  drizzle-kit@0.21.4:
     dependencies:
       '@esbuild-kit/esm-loader': 2.6.5
-      '@hono/node-server': 1.11.0
-      '@hono/zod-validator': 0.2.1(hono@4.2.5)(zod@3.22.4)
-      camelcase: 7.0.1
-      chalk: 5.3.0
       commander: 9.5.0
       env-paths: 3.0.0
       esbuild: 0.19.12
       esbuild-register: 3.5.0(esbuild@0.19.12)
       glob: 8.1.0
       hanji: 0.0.5
-      hono: 4.2.5
       json-diff: 0.9.0
-      minimatch: 7.4.6
-      semver: 7.6.0
-      superjson: 2.2.1
       zod: 3.22.4
     transitivePeerDependencies:
       - supports-color
@@ -4782,8 +4753,6 @@ snapshots:
   highlight.js@10.7.3: {}
 
   hono@4.1.0: {}
-
-  hono@4.2.5: {}
 
   html-escaper@2.0.2: {}
 
