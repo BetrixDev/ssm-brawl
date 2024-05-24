@@ -3,7 +3,10 @@ package net.ssmb.services
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.BukkitTeamData
+import net.ssmb.dtos.minigame.MinigameStartRequest
 import net.ssmb.dtos.minigame.MinigameStartResponse
+import net.ssmb.dtos.queue.AddPlayerResponse
+import net.ssmb.dtos.queue.AddPlayerSuccess
 import net.ssmb.minigames.IMinigame
 import net.ssmb.minigames.constructMinigameFromData
 import org.bukkit.Bukkit
@@ -15,14 +18,14 @@ class MinigameService {
 
     private val runningMinigames = arrayListOf<IMinigame>()
 
-    suspend fun tryStartMinigame(teams: List<List<String>>, minigameId: String) {
+    suspend fun tryStartMinigame(teams: List<AddPlayerSuccess.StartGame.TeamEntry>, minigameId: String) {
         val onlinePlayers = mutableListOf<MutableList<Player>>()
         val offlinePlayers =
             teams.filter { team ->
                 val onlinePlayersInTeam = mutableListOf<Player>()
 
                 val offlinePlayersInTeam =
-                    team.filter { plr ->
+                    team.players.filter { plr ->
                         val onlinePlayer = plugin.server.getPlayer(UUID.fromString(plr))
 
                         if (onlinePlayer != null) {
@@ -46,11 +49,17 @@ class MinigameService {
                 )
             }
 
-            plugin.api.queueRemovePlayers(offlinePlayers.flatten())
+            plugin.api.queueRemovePlayers(offlinePlayers.map { it.players }.flatten())
             return
         }
 
-        val startResponse = plugin.api.minigameStart(teams, minigameId)
+        val teamsPayload = arrayListOf<MinigameStartRequest.TeamEntry>()
+
+        teams.forEach {
+            teamsPayload.add(MinigameStartRequest.TeamEntry(it.id, it.players))
+        }
+
+        val startResponse = plugin.api.minigameStart(teamsPayload, minigameId)
 
         if (startResponse is MinigameStartResponse.Error) {
             onlinePlayers.flatten().forEach {

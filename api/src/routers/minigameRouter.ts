@@ -25,21 +25,23 @@ export const minigameRouter = router({
   start: internalProcedure
     .input(
       z.object({
-        teams: z.array(z.array(z.string())),
+        teams: z.array(
+          z.object({
+            id: z.string(),
+            players: z.array(z.string()),
+          }),
+        ),
         minigameId: z.string(),
       }),
     )
     .mutation(async ({ input }) => {
+      const allPlayers = input.teams.map(({ players }) => players).flat();
+
       const [minigame] = await db.batch([
         db.query.minigames.findFirst({
           where: eq(minigames.id, input.minigameId),
         }),
-        db.delete(queue).where(
-          inArray(
-            queue.playerUuid,
-            input.teams.flatMap((s) => s),
-          ),
-        ),
+        db.delete(queue).where(inArray(queue.playerUuid, allPlayers)),
       ]);
 
       if (minigame === undefined) {
@@ -49,7 +51,7 @@ export const minigameRouter = router({
       const teamsPlayerData = await Promise.all(
         input.teams.map(async (team) => {
           const players = await Promise.all(
-            team.map(async (uuid) => {
+            team.players.map(async (uuid) => {
               const data = await db.query.basicPlayerData.findFirst({
                 where: (table, { eq }) => eq(table.uuid, uuid),
                 with: {
@@ -92,7 +94,7 @@ export const minigameRouter = router({
           );
 
           return {
-            teamId: useRandomId(15),
+            teamId: team.id,
             players: players,
           };
         }),

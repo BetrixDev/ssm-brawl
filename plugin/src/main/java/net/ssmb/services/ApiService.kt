@@ -16,10 +16,7 @@ import net.ssmb.dtos.maps.GetMapDetailsRequest
 import net.ssmb.dtos.maps.GetMapDetailsResponse
 import net.ssmb.dtos.minigame.*
 import net.ssmb.dtos.player.*
-import net.ssmb.dtos.queue.AddPlayerError
-import net.ssmb.dtos.queue.AddPlayerRequest
-import net.ssmb.dtos.queue.AddPlayerResponse
-import net.ssmb.dtos.queue.RemovePlayerResponse
+import net.ssmb.dtos.queue.*
 import org.bukkit.entity.Player
 
 class ApiService {
@@ -92,12 +89,12 @@ class ApiService {
     }
 
     suspend fun minigameStart(
-        playerUuids: List<List<String>>,
+        teams: List<MinigameStartRequest.TeamEntry>,
         minigameId: String
     ): MinigameStartResponse {
         val response =
             client.post("api/minigame.start") {
-                setBody(MinigameStartRequest(playerUuids, minigameId))
+                setBody(MinigameStartRequest(teams, minigameId))
             }
 
         return when (response.status.value) {

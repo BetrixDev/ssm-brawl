@@ -25,9 +25,12 @@ sealed class AddPlayerSuccess {
 
     @Serializable
     @SerialName("start_game")
-    sealed class StartGame(
+    data class StartGame(
         val type: String,
         val minigameId: String,
-        val playerUuids: List<List<String>>,
-    ) : AddPlayerSuccess()
+        val teams: List<TeamEntry>,
+    ) : AddPlayerSuccess() {
+        @Serializable
+        data class TeamEntry(val id: String, val players: List<String>)
+    }
 }

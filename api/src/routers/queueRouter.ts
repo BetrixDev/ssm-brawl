@@ -3,6 +3,7 @@ import { internalProcedure, router } from "../trpc.js";
 import { db, queue, eq, minigames, inArray } from "tussler";
 import { TRPCError } from "@trpc/server";
 import { kv } from "../kv.js";
+import { useRandomId } from "../utils.js";
 
 export const queueRouter = router({
   addPlayer: internalProcedure
@@ -88,25 +89,49 @@ export const queueRouter = router({
         orderBy: (table, { asc }) => [asc(table.dateAdded)],
       });
 
-      if (playersInQueue.length > minigameData.playersPerTeam * minigameData.amountOfTeams) {
-        const teams: string[][] = [];
+      const isTeamMinigame = minigameData.playersPerTeam !== 1;
 
-        for (let i = 0; i < minigameData.amountOfTeams; i += minigameData.playersPerTeam) {
-          const teamSlice = playersInQueue.slice(i, minigameData.playersPerTeam * (i + 1));
+      if (isTeamMinigame) {
+        if (playersInQueue.length > minigameData.playersPerTeam * minigameData.amountOfTeams) {
+          const teams: { id: string; players: string[] }[] = [];
 
-          teams.push(teamSlice.map(({ playerUuid }) => playerUuid));
+          for (let i = 0; i < minigameData.amountOfTeams; i += minigameData.playersPerTeam) {
+            const teamSlice = playersInQueue.slice(i, minigameData.playersPerTeam * (i + 1));
+
+            teams.push({
+              id: useRandomId(10),
+              players: teamSlice.map(({ playerUuid }) => playerUuid),
+            });
+          }
+
+          return {
+            type: "start_game",
+            teams: teams,
+            minigameId: minigameData.id,
+          };
+        } else {
+          return {
+            type: "added",
+            playersInQueue: playersInQueue.length,
+          };
         }
-
-        return {
-          type: "start_game",
-          playerUuids: teams,
-          minigameId: minigameData.id,
-        };
       } else {
-        return {
-          type: "added",
-          playersInQueue: playersInQueue.length,
-        };
+        if (playersInQueue.length >= minigameData.minPlayers) {
+          const teams = playersInQueue
+            .slice(0, minigameData.maxPlayers)
+            .map((p) => ({ id: useRandomId(10), players: [p.playerUuid] }));
+
+          return {
+            type: "start_game",
+            teams: teams,
+            minigameId: minigameData.id,
+          };
+        } else {
+          return {
+            type: "added",
+            playersInQueue: playersInQueue.length,
+          };
+        }
       }
     }),
   removePlayers: internalProcedure

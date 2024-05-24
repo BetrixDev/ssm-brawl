@@ -81,7 +81,7 @@ class QueueCommand {
                     //
                 } else if (response.value is AddPlayerSuccess.StartGame) {
                     plugin.minigames.tryStartMinigame(
-                        response.value.playerUuids,
+                        response.value.teams,
                         response.value.minigameId
                     )
                 }
