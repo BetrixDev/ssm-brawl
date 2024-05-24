@@ -156,13 +156,17 @@ class TwoPlayerSinglesMinigame(
         val winningTeam = teamsStocks.filter { it.value > 0 }
         val losingTeams = teamsStocks.filter { it.value == 0 }
 
-        val winningPlayers = winningTeam.keys.map { teamId ->
-            teams.find { team -> team.teamId === teamId }!!
-        }.map { it.players }.flatten()
+        val winningPlayers =
+            winningTeam.keys
+                .map { teamId -> teams.find { team -> team.teamId === teamId }!! }
+                .map { it.players }
+                .flatten()
 
-        val losingPlayers = losingTeams.keys.map { teamId ->
-            teams.find { team -> team.teamId === teamId }!!
-        }.map { it.players }.flatten()
+        val losingPlayers =
+            losingTeams.keys
+                .map { teamId -> teams.find { team -> team.teamId === teamId }!! }
+                .map { it.players }
+                .flatten()
 
         winningPlayers.forEach { it.sendMessage(Component.text("You won!", NamedTextColor.GREEN)) }
 
@@ -258,7 +262,8 @@ class TwoPlayerSinglesMinigame(
 
         val playerTeam = teams.find { it.players.contains(player) }!!
 
-        teamsStocks[playerTeam.teamId] = (teamsStocks[playerTeam.teamId] ?: minigameData.minigame.stocks) - 1
+        teamsStocks[playerTeam.teamId] =
+            (teamsStocks[playerTeam.teamId] ?: minigameData.minigame.stocks) - 1
 
         if (teamsStocks[playerTeam.teamId] == 0) {
             checkShouldMinigameEnd()

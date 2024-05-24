@@ -2,7 +2,6 @@ package net.ssmb.minigames
 
 import net.ssmb.dtos.minigame.BukkitTeamData
 import net.ssmb.kits.SsmbKit
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 interface IMinigame {

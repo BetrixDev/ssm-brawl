@@ -93,9 +93,7 @@ class ApiService {
         minigameId: String
     ): MinigameStartResponse {
         val response =
-            client.post("api/minigame.start") {
-                setBody(MinigameStartRequest(teams, minigameId))
-            }
+            client.post("api/minigame.start") { setBody(MinigameStartRequest(teams, minigameId)) }
 
         return when (response.status.value) {
             200 -> MinigameStartResponse.Success(json.decodeFromString(response.bodyAsText()))

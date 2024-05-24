@@ -8,7 +8,7 @@ private var langData = mapOf<String, String>()
 private val variablePattern = Regex("\\{([^}]*)}")
 
 suspend fun initLang(plugin: SSMB) {
-    langData =  plugin.api.langGetAllEntries()
+    langData = plugin.api.langGetAllEntries()
 }
 
 private fun parseLangEntry(langKey: String, variables: Map<String, String>? = null): String {

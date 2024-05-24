@@ -2,7 +2,6 @@ package net.ssmb.minigames
 
 import net.ssmb.dtos.minigame.BukkitTeamData
 import net.ssmb.dtos.minigame.MinigameStartSuccess
-import org.bukkit.entity.Player
 
 fun constructMinigameFromData(teams: List<BukkitTeamData>, data: MinigameStartSuccess): IMinigame {
     return when (data.minigame.id) {

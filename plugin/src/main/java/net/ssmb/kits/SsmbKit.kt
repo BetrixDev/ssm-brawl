@@ -51,7 +51,6 @@ open class SsmbKit(
             playerInv.setItem(EquipmentSlot.FEET, item(Material.getMaterial(kitData.bootsId)!!))
 
         player.metadata {
-
             set(TaggedKeyDouble("knockback_multiplier"), kitData.knockbackMult)
             set(TaggedKeyDouble("hitbox_width"), kitData.hitboxWidth)
             set(TaggedKeyDouble("hitbox_height"), kitData.hitboxHeight)
@@ -100,7 +99,8 @@ open class SsmbKit(
         //  just in case two players are directly in front of the player
 
         val enemyToAttack =
-            player.world.getNearbyLivingEntities(player.location, 4.5)
+            player.world
+                .getNearbyLivingEntities(player.location, 4.5)
                 .filter { it.getMetadata(TaggedKeyBool("ssmb_entity")) == true }
                 .find {
                     val hitboxWidth = it.getMetadata(TaggedKeyDouble("hitbox_width")) ?: 1.0

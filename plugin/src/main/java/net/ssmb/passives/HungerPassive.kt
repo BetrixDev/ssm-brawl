@@ -11,8 +11,6 @@ import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.utils.t
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
-import org.bukkit.event.HandlerList
-import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 
@@ -21,7 +19,7 @@ class HungerPassive(
     passiveData: MinigameStartSuccess.PlayerData.KitData.PassiveEntry.PassiveData
 ) : SsmbPassive(player, passiveData) {
     private val plugin = SSMB.instance
-    
+
     private val hungerRestoreDelay = getMetaInt("hunger_restore_delay", 250)
 
     private var hungerJob: Job? = null

@@ -9,7 +9,7 @@ import org.bukkit.event.Listener
 open class SsmbPassive(
     private val player: Player,
     private val passiveData: MinigameStartSuccess.PlayerData.KitData.PassiveEntry.PassiveData
-): Listener {
+) : Listener {
     private val plugin = SSMB.instance
 
     open fun initializePassive() {

@@ -1,24 +1,26 @@
 package net.ssmb.services
 
+import java.util.*
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.BukkitTeamData
 import net.ssmb.dtos.minigame.MinigameStartRequest
 import net.ssmb.dtos.minigame.MinigameStartResponse
-import net.ssmb.dtos.queue.AddPlayerResponse
 import net.ssmb.dtos.queue.AddPlayerSuccess
 import net.ssmb.minigames.IMinigame
 import net.ssmb.minigames.constructMinigameFromData
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import java.util.*
 
 class MinigameService {
     private val plugin = SSMB.instance
 
     private val runningMinigames = arrayListOf<IMinigame>()
 
-    suspend fun tryStartMinigame(teams: List<AddPlayerSuccess.StartGame.TeamEntry>, minigameId: String) {
+    suspend fun tryStartMinigame(
+        teams: List<AddPlayerSuccess.StartGame.TeamEntry>,
+        minigameId: String
+    ) {
         val onlinePlayers = mutableListOf<MutableList<Player>>()
         val offlinePlayers =
             teams.filter { team ->
@@ -55,9 +57,7 @@ class MinigameService {
 
         val teamsPayload = arrayListOf<MinigameStartRequest.TeamEntry>()
 
-        teams.forEach {
-            teamsPayload.add(MinigameStartRequest.TeamEntry(it.id, it.players))
-        }
+        teams.forEach { teamsPayload.add(MinigameStartRequest.TeamEntry(it.id, it.players)) }
 
         val startResponse = plugin.api.minigameStart(teamsPayload, minigameId)
 
@@ -68,15 +68,14 @@ class MinigameService {
         } else if (startResponse is MinigameStartResponse.Success) {
             val startData = startResponse.value
 
-            val teamData = startData.teams.map { team ->
-                val players = arrayListOf<Player>()
+            val teamData =
+                startData.teams.map { team ->
+                    val players = arrayListOf<Player>()
 
-                team.players.forEach { plr ->
-                    players.add(Bukkit.getPlayer(plr.uuid)!!)
+                    team.players.forEach { plr -> players.add(Bukkit.getPlayer(plr.uuid)!!) }
+
+                    BukkitTeamData(team.teamId, players)
                 }
-
-                BukkitTeamData(team.teamId, players)
-            }
 
             val minigame = constructMinigameFromData(teamData, startData)
 
@@ -91,7 +90,9 @@ class MinigameService {
     }
 
     fun isPlayerInMinigame(player: Player): Boolean {
-        return runningMinigames.find { it.teams.map { team -> team.players }.flatten().contains(player) } != null
+        return runningMinigames.find {
+            it.teams.map { team -> team.players }.flatten().contains(player)
+        } != null
     }
 
     fun areMinigamesOngoing(): Boolean {

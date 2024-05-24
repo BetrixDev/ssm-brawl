@@ -25,8 +25,7 @@ sealed class MinigameStartSuccess(
     @Serializable
     data class MinigameData(val id: String, val countdownSeconds: Int, val stocks: Int)
 
-    @Serializable
-    data class TeamsEntry(val teamId: String, val players: List<PlayerData>)
+    @Serializable data class TeamsEntry(val teamId: String, val players: List<PlayerData>)
 
     @Serializable
     sealed class PlayerData(val uuid: String, val selectedKit: KitData) {

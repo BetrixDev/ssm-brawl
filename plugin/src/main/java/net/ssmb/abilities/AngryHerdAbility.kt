@@ -81,9 +81,7 @@ class AngryHerdAbility(
                     cow = player.world.spawn(cowLocation, Cow::class.java)
                 }
 
-                cow.metadata {
-                    set(TaggedKeyBool("ssmb_entity"), true)
-                }
+                cow.metadata { set(TaggedKeyBool("ssmb_entity"), true) }
 
                 cows.add(cow)
 
@@ -100,7 +98,7 @@ class AngryHerdAbility(
         }
 
         player.world.playSound(player.location, Sound.ENTITY_COW_AMBIENT, 2f, 0.6f)
-        
+
         herdJob =
             plugin.launch {
                 while (true) {
@@ -138,7 +136,7 @@ class AngryHerdAbility(
                         }
                         if (
                             isOnGround(cow) &&
-                            System.currentTimeMillis() - lastMoveTime[cow]!! >= forceMoveTimeMs
+                                System.currentTimeMillis() - lastMoveTime[cow]!! >= forceMoveTimeMs
                         ) {
                             cow.velocity = cowDirections[cow]!!.clone().add(Vector(0.0, 0.75, 0.0))
                         } else {
@@ -156,7 +154,7 @@ class AngryHerdAbility(
                             }
                             if (
                                 plr.persistentDataContainer.get(TaggedKeyBool("can_take_damage")) ==
-                                false
+                                    false
                             ) {
                                 continue
                             }
@@ -164,7 +162,10 @@ class AngryHerdAbility(
                                 continue
                             }
                             lastDamageTime.putIfAbsent(player, 0L)
-                            if (System.currentTimeMillis() - lastDamageTime[plr]!! < damageCooldownMs) {
+                            if (
+                                System.currentTimeMillis() - lastDamageTime[plr]!! <
+                                    damageCooldownMs
+                            ) {
                                 continue
                             }
                             lastDamageTime[plr] = System.currentTimeMillis()
