@@ -1,3 +1,4 @@
+import { lang } from "tussler";
 import { internalProcedure, router } from "../trpc.js";
 import { friendshipRouter } from "./friendshipRouter.js";
 import { kitsRouter } from "./kitRouter.js";
@@ -8,6 +9,7 @@ import { playerRouter } from "./playerRouter.js";
 import { pmRouter } from "./pmRouter.js";
 import { queueRouter } from "./queueRouter.js";
 import { serverRouter } from "./serverRouter.js";
+import { langRouter } from "./langRouter.js";
 
 export const appRouter = router({
   minigame: minigameRouter,
@@ -19,6 +21,7 @@ export const appRouter = router({
   parties: partyRouter,
   maps: mapRouter,
   server: serverRouter,
+  lang: langRouter,
   health: internalProcedure.query(() => {
     return { message: "Hello from routers!" };
   }),

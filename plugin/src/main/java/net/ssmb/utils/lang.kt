@@ -1,21 +1,18 @@
 package net.ssmb.utils
 
-import java.io.File
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.ssmb.SSMB
-import org.bukkit.configuration.file.YamlConfiguration
 
-private val langConfig = YamlConfiguration()
+private var langData = mapOf<String, String>()
 private val variablePattern = Regex("\\{([^}]*)}")
 
-fun initLang(plugin: SSMB) {
-    val langFile = File(plugin.dataFolder, "lang.yml")
-    langConfig.load(langFile)
+suspend fun initLang(plugin: SSMB) {
+    langData =  plugin.api.langGetAllEntries()
 }
 
 private fun parseLangEntry(langKey: String, variables: Map<String, String>? = null): String {
-    var parsedString = langConfig.getString(langKey) ?: langKey
+    var parsedString = langData[langKey] ?: langKey
 
     val variablesToReplace = variablePattern.findAll(langKey)
 
@@ -25,7 +22,7 @@ private fun parseLangEntry(langKey: String, variables: Map<String, String>? = nu
         if (variables != null && variables[variableKey] != null) {
             parsedString =
                 parsedString.replace(it.value, variables.getOrDefault(variableKey, variableKey))
-        } else if (langConfig.getString(variableKey) != null) {
+        } else if (langData[variableKey] != null) {
             parsedString = parsedString.replace(it.value, parseLangEntry(variableKey, variables))
         }
     }

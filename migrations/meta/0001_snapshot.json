@@ -1,8 +1,6 @@
 {
-  "version": "5",
+  "version": "6",
   "dialect": "sqlite",
-  "id": "8a0a7a85-c3a7-4ccb-aa16-b8f6cbfc4587",
-  "prevId": "c64be14e-1879-41ad-aa4f-dee3f11c1273",
   "tables": {
     "abilities": {
       "name": "abilities",
@@ -941,8 +939,9 @@
   },
   "enums": {},
   "_meta": {
-    "schemas": {},
     "tables": {},
     "columns": {}
-  }
+  },
+  "id": "8a0a7a85-c3a7-4ccb-aa16-b8f6cbfc4587",
+  "prevId": "c64be14e-1879-41ad-aa4f-dee3f11c1273"
 }

@@ -1,8 +1,6 @@
 {
-  "version": "5",
+  "version": "6",
   "dialect": "sqlite",
-  "id": "c64be14e-1879-41ad-aa4f-dee3f11c1273",
-  "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "abilities": {
       "name": "abilities",
@@ -780,8 +778,9 @@
   },
   "enums": {},
   "_meta": {
-    "schemas": {},
     "tables": {},
     "columns": {}
-  }
+  },
+  "id": "c64be14e-1879-41ad-aa4f-dee3f11c1273",
+  "prevId": "00000000-0000-0000-0000-000000000000"
 }

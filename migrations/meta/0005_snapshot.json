@@ -1,6 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
+  "id": "332b016f-a8d3-49bf-8199-19b4c289a3ea",
+  "prevId": "e0116bc8-5deb-4cb8-870e-abda0dc4af09",
   "tables": {
     "abilities": {
       "name": "abilities",
@@ -416,33 +418,19 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "map_origins": {
-      "name": "map_origins",
+    "lang": {
+      "name": "lang",
       "columns": {
-        "map_id": {
-          "name": "map_id",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": false
         },
-        "x": {
-          "name": "x",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "y": {
-          "name": "y",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "z": {
-          "name": "z",
-          "type": "real",
+        "text": {
+          "name": "text",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -451,61 +439,6 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "map_spawnpoints": {
-      "name": "map_spawnpoints",
-      "columns": {
-        "map_id": {
-          "name": "map_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "x": {
-          "name": "x",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "y": {
-          "name": "y",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "z": {
-          "name": "z",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "spawnpoints_map_id_idx": {
-          "name": "spawnpoints_map_id_idx",
-          "columns": [
-            "map_id"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "map_spawnpoints_map_id_x_y_z_pk": {
-          "columns": [
-            "map_id",
-            "x",
-            "y",
-            "z"
-          ],
-          "name": "map_spawnpoints_map_id_x_y_z_pk"
-        }
-      },
       "uniqueConstraints": {}
     },
     "maps": {
@@ -532,8 +465,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "origin_id": {
-          "name": "origin_id",
+        "origin": {
+          "name": "origin",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "spawn_points": {
+          "name": "spawn_points",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -560,6 +500,135 @@
           "name": "maps_id_idx",
           "columns": [
             "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "message_channels": {
+      "name": "message_channels",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "mc_id_idx": {
+          "name": "mc_id_idx",
+          "columns": [
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "message_viewers": {
+      "name": "message_viewers",
+      "columns": {
+        "channel_id": {
+          "name": "channel_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "player_uuid": {
+          "name": "player_uuid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "mv_channel_id_idx": {
+          "name": "mv_channel_id_idx",
+          "columns": [
+            "channel_id"
+          ],
+          "isUnique": false
+        },
+        "mv_player_uuid_idx": {
+          "name": "mv_player_uuid_idx",
+          "columns": [
+            "player_uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "message_viewer_pk": {
+          "columns": [
+            "channel_id",
+            "player_uuid"
+          ],
+          "name": "message_viewer_pk"
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "messages": {
+      "name": "messages",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "channel_id": {
+          "name": "channel_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "author_uuid": {
+          "name": "author_uuid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "time": {
+          "name": "time",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "m_message_id_idx": {
+          "name": "m_message_id_idx",
+          "columns": [
+            "id"
+          ],
+          "isUnique": false
+        },
+        "m_author_uuid_idx": {
+          "name": "m_author_uuid_idx",
+          "columns": [
+            "author_uuid"
           ],
           "isUnique": false
         }
@@ -916,9 +985,8 @@
   },
   "enums": {},
   "_meta": {
+    "schemas": {},
     "tables": {},
     "columns": {}
-  },
-  "id": "b33531fe-f905-446b-becd-4dbbf3e91ed6",
-  "prevId": "8a0a7a85-c3a7-4ccb-aa16-b8f6cbfc4587"
+  }
 }

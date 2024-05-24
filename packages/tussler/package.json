@@ -4,7 +4,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "db:studio": "drizzle-kit studio",
-    "generate-migration": "drizzle-kit generate:sqlite"
+    "generate-migration": "drizzle-kit generate"
   },
   "dependencies": {
     "@libsql/client": "^0.5.3",

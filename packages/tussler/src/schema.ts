@@ -5,6 +5,11 @@ export type MapRole = "game" | "hub";
 
 export type Vector3 = { x: number; y: number; z: number };
 
+export const lang = sqliteTable("lang", {
+  id: text("id").notNull().primaryKey(),
+  text: text("text").notNull(),
+});
+
 export const kits = sqliteTable(
   "kits",
   {

@@ -118,7 +118,7 @@ class ApiService {
         return json.decodeFromString(response.bodyAsText())
     }
 
-    suspend fun langAllEntries(): Map<String, String> {
+    suspend fun langGetAllEntries(): Map<String, String> {
         val response = client.get("api/lang.getAllEntries")
 
         return json.decodeFromString(response.bodyAsText())
