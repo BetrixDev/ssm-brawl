@@ -53,9 +53,13 @@ export const minigameRouter = router({
           const players = await Promise.all(
             team.players.map(async (uuid) => {
               const data = await db.query.basicPlayerData.findFirst({
+                columns: {
+                  uuid: true,
+                },
                 where: (table, { eq }) => eq(table.uuid, uuid),
                 with: {
                   selectedKit: {
+                    columns: { disguiseId: false },
                     with: {
                       abilities: { with: { ability: true } },
                       passives: { with: { passive: true } },
