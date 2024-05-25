@@ -21,29 +21,23 @@ class MinigameService {
         teams: List<AddPlayerSuccess.StartGame.TeamEntry>,
         minigameId: String
     ) {
-        val onlinePlayers = mutableListOf<MutableList<Player>>()
-        val offlinePlayers =
-            teams.filter { team ->
-                val onlinePlayersInTeam = mutableListOf<Player>()
+        val onlinePlayers = arrayListOf<Player>()
+        val offlinePlayers = arrayListOf<Player>()
 
-                val offlinePlayersInTeam =
-                    team.players.filter { plr ->
-                        val onlinePlayer = plugin.server.getPlayer(UUID.fromString(plr))
+        teams.forEach { team ->
+            team.players.forEach { plrUuid ->
+                val player = Bukkit.getPlayer(UUID.fromString(plrUuid))
 
-                        if (onlinePlayer != null) {
-                            !onlinePlayersInTeam.add(onlinePlayer)
-                        }
-
-                        onlinePlayer == null
-                    }
-
-                onlinePlayers.add(onlinePlayersInTeam)
-
-                offlinePlayersInTeam.isEmpty()
+                if (player != null) {
+                    onlinePlayers.add(player)
+                } else {
+                    offlinePlayers.add(Bukkit.getPlayer(UUID.fromString(plrUuid))!!)
+                }
             }
+        }
 
         if (offlinePlayers.isNotEmpty()) {
-            onlinePlayers.flatten().forEach {
+            onlinePlayers.forEach {
                 it.sendMessage(
                     Component.text(
                         "Tried to start the game with a player that was offline. You have been placed back into the queue"
@@ -51,7 +45,7 @@ class MinigameService {
                 )
             }
 
-            plugin.api.queueRemovePlayers(offlinePlayers.map { it.players }.flatten())
+            plugin.api.queueRemovePlayers(offlinePlayers.map { it.uniqueId.toString() })
             return
         }
 
@@ -62,7 +56,7 @@ class MinigameService {
         val startResponse = plugin.api.minigameStart(teamsPayload, minigameId)
 
         if (startResponse is MinigameStartResponse.Error) {
-            onlinePlayers.flatten().forEach {
+            onlinePlayers.forEach {
                 it.sendMessage(Component.text("An error occurred while trying to start the game."))
             }
         } else if (startResponse is MinigameStartResponse.Success) {
