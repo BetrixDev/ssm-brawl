@@ -61,7 +61,7 @@ class DoubleJumpPassive(
                 if (isOnGround(player) || times > 20 * 60) {
                     canDoubleJump = true
                     player.allowFlight = true
-                    this.cancel()
+                    return@launch
                 }
 
                 delay(1.ticks)

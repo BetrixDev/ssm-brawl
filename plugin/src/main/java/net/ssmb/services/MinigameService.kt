@@ -66,7 +66,9 @@ class MinigameService {
                 startData.teams.map { team ->
                     val players = arrayListOf<Player>()
 
-                    team.players.forEach { plr -> players.add(Bukkit.getPlayer(plr.uuid)!!) }
+                    team.players.forEach { plr ->
+                        players.add(Bukkit.getPlayer(UUID.fromString(plr.uuid))!!)
+                    }
 
                     BukkitTeamData(team.teamId, players)
                 }

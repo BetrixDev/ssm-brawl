@@ -28,7 +28,7 @@ open class SsmbAbility(
     open fun canUseAbility(): Boolean {
         val currentTime = System.currentTimeMillis()
 
-        if (timeLastUsed + abilityCooldown > currentTime) {
+        if (currentTime < timeLastUsed + abilityCooldown) {
             val timeLeft = ((timeLastUsed + abilityCooldown) - currentTime) / 1000.0
             player.sendMessage(
                 t(
@@ -68,11 +68,10 @@ open class SsmbAbility(
 
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (
-            event.player != player ||
-                event.action != Action.RIGHT_CLICK_AIR ||
-                event.action != Action.RIGHT_CLICK_BLOCK
-        ) {
+        val didCorrectActionHappen =
+            event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK
+
+        if (event.player != player || !didCorrectActionHappen) {
             return
         }
 

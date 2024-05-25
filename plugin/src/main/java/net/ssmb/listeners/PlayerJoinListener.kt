@@ -36,10 +36,12 @@ class PlayerJoinListener : Listener {
             // services
             plugin.api.playerUpdatePlayerName(player)
 
+            player.walkSpeed = 0.2f
             player.teleport(plugin.hub.spawnLocation)
             player.foodLevel = 20
             player.health = player.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 20.0
             player.gameMode = GameMode.SURVIVAL
+            player.inventory.clear()
 
             val joinMessage =
                 if (playerData.firstTime) {

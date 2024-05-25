@@ -14,6 +14,7 @@ import net.ssmb.kits.constructKitFromData
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -43,8 +44,9 @@ class TestMinigame(
             val tpLocation = Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
 
             team.players.forEach { plr ->
+                plr.foodLevel = 20
+                plr.health = plr.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 20.0
                 plr.teleport(tpLocation)
-                plr.walkSpeed = 0.0f
                 plr.lookAt(minigameWorld.spawnLocation, LookAnchor.EYES)
 
                 val playerData =

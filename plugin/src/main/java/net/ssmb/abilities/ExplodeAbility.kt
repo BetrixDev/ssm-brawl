@@ -25,6 +25,8 @@ class ExplodeAbility(
     override fun doAbility() {
         val currentTime = System.currentTimeMillis()
 
+        isExplodeActive = true
+
         plugin.launch {
             player.walkSpeed = 0.05f
             player.level = 0
@@ -44,7 +46,7 @@ class ExplodeAbility(
 
                     delay(1.ticks)
                 } else {
-                    this.cancel()
+                    return@launch
                 }
             }
 
