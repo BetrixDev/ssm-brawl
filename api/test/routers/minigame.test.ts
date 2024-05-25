@@ -20,7 +20,7 @@ suite("Minigame router tests", async () => {
 
     const result = await caller.minigame.start({
       minigameId: minigameTestData[0].id,
-      teams: [[playerTestData[0].uuid]],
+      teams: [{ id: "test_team_id", players: [playerTestData[0].uuid] }],
     });
 
     expect(result.minigame.id).toEqual(minigameTestData[0].id);
@@ -32,7 +32,7 @@ suite("Minigame router tests", async () => {
     await expect(async () => {
       await caller.minigame.start({
         minigameId: "bad id",
-        teams: [["test_uuid"]],
+        teams: [{ id: "test_team_id", players: ["test_uuid"] }],
       });
     }).rejects.toThrow(TRPCError);
   });
@@ -48,7 +48,7 @@ suite("Minigame router tests", async () => {
     await expect(async () => {
       await caller.minigame.start({
         minigameId: minigameTestData[0].id,
-        teams: [["test_uuid"]],
+        teams: [{ id: "test_team_id", players: ["bad_uuid"] }],
       });
     }).rejects.toThrow(TRPCError);
   });
