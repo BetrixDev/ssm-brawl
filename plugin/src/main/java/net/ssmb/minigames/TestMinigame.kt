@@ -34,6 +34,7 @@ class TestMinigame(
     private lateinit var minigameWorld: World
     override val playerKits = hashMapOf<Player, SsmbKit>()
     override val teamsStocks = hashMapOf<String, Int>()
+    private var isMinigameRunning = true
 
     init {
         plugin.server.pluginManager.registerSuspendingEvents(this, plugin)
@@ -64,6 +65,19 @@ class TestMinigame(
         }
 
         minigameWorld.sendMessage(Component.text("Testing game has started!"))
+
+        plugin.launch {
+            while(isMinigameRunning) {
+                players.forEach { plr ->
+                   if (plr.location.y <= minigameData.map.voidYLevel) {
+                       val deathEvent = PlayerDeathEvent(plr, emptyList(), 0, "Fell out of the world")
+                       deathEvent.callEvent()
+                   }
+                }
+
+                delay(1.ticks)
+            }
+        }
     }
 
     override fun removePlayer(player: Player) {

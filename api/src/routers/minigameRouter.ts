@@ -104,17 +104,12 @@ export const minigameRouter = router({
         }),
       );
 
-      const validMaps = await queryClient.fetchQuery({
-        queryKey: ["maps", "game", minigame.minPlayers, minigame.maxPlayers],
-        queryFn: async () => {
-          return await db.query.maps.findMany({
-            where: and(
-              lte(maps.minPlayers, minigame.minPlayers),
-              gte(maps.maxPlayers, minigame.maxPlayers),
-              eq(maps.role, "game"),
-            ),
-          });
-        },
+      const validMaps = await db.query.maps.findMany({
+        where: and(
+          lte(maps.minPlayers, minigame.minPlayers),
+          gte(maps.maxPlayers, minigame.maxPlayers),
+          eq(maps.role, "game"),
+        ),
       });
 
       const mapIndex = useRandomInt(0, validMaps.length - 1);

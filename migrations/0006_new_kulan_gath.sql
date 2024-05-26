@@ -1,0 +1,1 @@
+ALTER TABLE `maps` ADD `void_y_level` real DEFAULT 0 NOT NULL;
