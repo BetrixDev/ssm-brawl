@@ -11,7 +11,6 @@ import net.ssmb.dtos.minigame.BukkitTeamData
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.kits.SsmbKit
 import net.ssmb.kits.constructKitFromData
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.World
@@ -67,12 +66,13 @@ class TestMinigame(
         minigameWorld.sendMessage(Component.text("Testing game has started!"))
 
         plugin.launch {
-            while(isMinigameRunning) {
+            while (isMinigameRunning) {
                 players.forEach { plr ->
-                   if (plr.location.y <= minigameData.map.voidYLevel) {
-                       val deathEvent = PlayerDeathEvent(plr, emptyList(), 0, "Fell out of the world")
-                       deathEvent.callEvent()
-                   }
+                    if (plr.location.y <= minigameData.map.voidYLevel) {
+                        val deathEvent =
+                            PlayerDeathEvent(plr, emptyList(), 0, "Fell out of the world")
+                        deathEvent.callEvent()
+                    }
                 }
 
                 delay(1.ticks)
@@ -127,9 +127,7 @@ class TestMinigame(
         if (playersLeftInProgress.size == players.size) {
             println("All players have left the game (${minigameData.gameId})! Cleaning up...")
 
-            playerKits.values.forEach {
-                it.destroyKit()
-            }
+            playerKits.values.forEach { it.destroyKit() }
 
             plugin.worlds.deleteSsmbWorld(minigameData.gameId)
         }

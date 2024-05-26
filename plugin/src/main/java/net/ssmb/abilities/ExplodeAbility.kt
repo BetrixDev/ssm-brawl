@@ -2,7 +2,6 @@ package net.ssmb.abilities
 
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.ticks
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartSuccess

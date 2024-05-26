@@ -1,7 +1,6 @@
 package net.ssmb.passives
 
 import com.github.shynixn.mccoroutine.bukkit.launch
-import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.github.shynixn.mccoroutine.bukkit.ticks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -59,20 +58,20 @@ class DoubleJumpPassive(
 
         canDoubleJump = false
 
-       plugin.launch {
-          withContext(Dispatchers.IO) {
-              while (!canDoubleJump) {
-                  println(isOnGround(player))
-                  if (isOnGround(player)) {
-                      canDoubleJump = true
-                      player.allowFlight = true
-                      return@withContext this.cancel()
-                  }
+        plugin.launch {
+            withContext(Dispatchers.IO) {
+                while (!canDoubleJump) {
+                    println(isOnGround(player))
+                    if (isOnGround(player)) {
+                        canDoubleJump = true
+                        player.allowFlight = true
+                        return@withContext this.cancel()
+                    }
 
-                  delay(1.ticks)
-              }
-          }
-       }
+                    delay(1.ticks)
+                }
+            }
+        }
     }
 
     @EventHandler

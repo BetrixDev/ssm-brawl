@@ -73,7 +73,12 @@ data class MinigameStartSuccess(
     }
 
     @Serializable
-    data class MapData(val id: String, val spawnPoints: List<Vector3>, val origin: Vector3, val voidYLevel: Double) {
+    data class MapData(
+        val id: String,
+        val spawnPoints: List<Vector3>,
+        val origin: Vector3,
+        val voidYLevel: Double
+    ) {
         @Serializable data class Vector3(val x: Double, val y: Double, val z: Double)
     }
 }
