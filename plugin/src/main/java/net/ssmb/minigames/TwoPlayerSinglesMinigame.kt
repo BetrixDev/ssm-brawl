@@ -277,13 +277,14 @@ class TwoPlayerSinglesMinigame(
                     player.sendMessage(
                         Component.text("You died! You will respawn in ${5 - it} seconds")
                     )
-                    delay(1.ticks)
+                    delay(20.ticks)
                 }
 
                 val spawnCoords = minigameData.map.spawnPoints.random()
                 val tpLocation =
                     Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
                 player.teleport(tpLocation)
+                player.gameMode = GameMode.SURVIVAL
 
                 playerKits[player]!!.initializeKit()
 
