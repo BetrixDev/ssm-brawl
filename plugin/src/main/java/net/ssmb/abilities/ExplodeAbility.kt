@@ -84,6 +84,7 @@ class ExplodeAbility(
     fun onPlayerToggleSneak(event: PlayerToggleSneakEvent) {
         if (event.player != player || !isExplodeActive) return
 
+        timeLastUsed = System.currentTimeMillis()
         isExplodeActive = false
         player.walkSpeed = 0.2F
         player.level = 0
