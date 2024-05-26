@@ -45,9 +45,9 @@ class PlayerJoinListener : Listener {
 
             val joinMessage =
                 if (playerData.firstTime) {
-                    t("broadcast.player.joined")
-                } else {
                     t("broadcast.player.joinedFirstTime")
+                } else {
+                    t("broadcast.player.joined")
                 }
 
             plugin.hub.sendMessage(joinMessage)
