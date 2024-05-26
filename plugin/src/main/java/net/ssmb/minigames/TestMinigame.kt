@@ -11,6 +11,7 @@ import net.ssmb.dtos.minigame.BukkitTeamData
 import net.ssmb.dtos.minigame.MinigameStartSuccess
 import net.ssmb.kits.SsmbKit
 import net.ssmb.kits.constructKitFromData
+import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.World
@@ -19,6 +20,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.util.Vector
 
 class TestMinigame(
@@ -26,6 +28,7 @@ class TestMinigame(
     private val minigameData: MinigameStartSuccess
 ) : IMinigame, Listener {
     private val players = teams.map { it.players }.flatten()
+    private val playersLeftInProgress = arrayListOf<Player>()
     private val playerMinigameData = minigameData.teams.map { it.players }.flatten()
     private val plugin = SSMB.instance
     private lateinit var minigameWorld: World
@@ -68,7 +71,7 @@ class TestMinigame(
     }
 
     @EventHandler
-    suspend fun onPlayerDeath(event: PlayerDeathEvent) {
+    fun onPlayerDeath(event: PlayerDeathEvent) {
         val player = event.entity
 
         if (!players.contains(player)) return
@@ -92,8 +95,29 @@ class TestMinigame(
             val spawnCoords = minigameData.map.spawnPoints.random()
             val tpLocation = Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
             player.teleport(tpLocation)
+            player.gameMode = GameMode.SURVIVAL
 
             playerKits[player]!!.initializeKit()
+        }
+    }
+
+    @EventHandler
+    fun onPlayerQuit(event: PlayerQuitEvent) {
+        val player = event.player
+
+        if (!players.contains(player)) return
+
+        playerKits[player]!!.destroyKit()
+        playersLeftInProgress.add(player)
+
+        if (playersLeftInProgress.size == players.size) {
+            println("All players have left the game (${minigameData.gameId})! Cleaning up...")
+
+            playerKits.values.forEach {
+                it.destroyKit()
+            }
+
+            plugin.worlds.deleteSsmbWorld(minigameData.gameId)
         }
     }
 }
