@@ -4,3 +4,4 @@ packages:
   - "server"
   - "orchestrator"
   - "observer"
+  - "generators/*"

@@ -1,0 +1,18 @@
+{
+  "name": "meta-extractor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "run-generator": "tsx src/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "case": "^1.6.3",
+    "glob": "^10.4.1",
+    "zod": "^3.22.4"
+  }
+}
