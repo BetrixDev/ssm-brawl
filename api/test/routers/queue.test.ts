@@ -12,13 +12,26 @@ suite("Queue router tests", () => {
     await loadDefaultKvValues();
   });
 
-  test("addPlayer should add a player to the queue", async () => {
+  test("addPlayer should start game when correct conditions are met", async () => {
     const playerTestData = await loadTestTableData("basicPlayerData-1");
     const minigameTestData = await loadTestTableData("minigames-1");
     const caller = createInternalCaller();
 
     const result = await caller.queue.addPlayer({
       minigameId: minigameTestData[0].id,
+      playerUuid: playerTestData[0].uuid,
+    });
+
+    expect(result.type).toEqual("start_game");
+  });
+
+  test("addPlayer should add player to queue when there are more players needed to start game", async () => {
+    const playerTestData = await loadTestTableData("basicPlayerData-1");
+    const minigameTestData = await loadTestTableData("minigames-1");
+    const caller = createInternalCaller();
+
+    const result = await caller.queue.addPlayer({
+      minigameId: minigameTestData[1].id,
       playerUuid: playerTestData[0].uuid,
     });
 

@@ -16,7 +16,7 @@ enum class MiniGameError {
 }
 
 @Serializable
-sealed class MinigameStartSuccess(
+data class MinigameStartSuccess(
     val gameId: String,
     val minigame: MinigameData,
     val teams: List<TeamsEntry>,
@@ -28,27 +28,27 @@ sealed class MinigameStartSuccess(
     @Serializable data class TeamsEntry(val teamId: String, val players: List<PlayerData>)
 
     @Serializable
-    sealed class PlayerData(val uuid: String, val selectedKit: KitData) {
+    data class PlayerData(val uuid: String, val selectedKit: KitData) {
         @Serializable
-        sealed class KitData(
+        data class KitData(
             val id: String,
             val meleeDamage: Double,
             val armor: Double,
             val knockbackMult: Double,
             val inventoryIcon: String,
-            val meta: Map<String, String>?,
-            val abilities: List<AbilityEntry>,
-            val passives: List<PassiveEntry>,
             val helmetId: String?,
             val chestplateId: String?,
             val leggingsId: String?,
             val bootsId: String?,
             val hitboxWidth: Double,
             val hitboxHeight: Double,
+            val meta: Map<String, String>?,
+            val abilities: List<AbilityEntry>,
+            val passives: List<PassiveEntry>,
             val disguise: DisguiseData
         ) {
             @Serializable
-            sealed class AbilityEntry(val ability: AbilityData, val abilityToolSlot: Int) {
+            data class AbilityEntry(val ability: AbilityData, val abilityToolSlot: Int) {
                 @Serializable
                 data class AbilityData(
                     val id: String,
@@ -58,7 +58,7 @@ sealed class MinigameStartSuccess(
             }
 
             @Serializable
-            sealed class PassiveEntry(val passive: PassiveData) {
+            data class PassiveEntry(val passive: PassiveData) {
                 @Serializable
                 data class PassiveData(val id: String, val meta: Map<String, String>?)
             }
@@ -73,7 +73,12 @@ sealed class MinigameStartSuccess(
     }
 
     @Serializable
-    sealed class MapData(val id: String, val spawnPoints: List<SpawnPoint>) {
-        @Serializable data class SpawnPoint(val x: Double, val y: Double, val z: Double)
+    data class MapData(
+        val id: String,
+        val spawnPoints: List<Vector3>,
+        val origin: Vector3,
+        val voidYLevel: Double
+    ) {
+        @Serializable data class Vector3(val x: Double, val y: Double, val z: Double)
     }
 }

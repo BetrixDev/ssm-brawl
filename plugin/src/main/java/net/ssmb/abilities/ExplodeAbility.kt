@@ -2,7 +2,6 @@ package net.ssmb.abilities
 
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.ticks
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import net.ssmb.SSMB
 import net.ssmb.dtos.minigame.MinigameStartSuccess
@@ -25,6 +24,8 @@ class ExplodeAbility(
     override fun doAbility() {
         val currentTime = System.currentTimeMillis()
 
+        isExplodeActive = true
+
         plugin.launch {
             player.walkSpeed = 0.05f
             player.level = 0
@@ -44,7 +45,7 @@ class ExplodeAbility(
 
                     delay(1.ticks)
                 } else {
-                    this.cancel()
+                    return@launch
                 }
             }
 
@@ -82,6 +83,7 @@ class ExplodeAbility(
     fun onPlayerToggleSneak(event: PlayerToggleSneakEvent) {
         if (event.player != player || !isExplodeActive) return
 
+        timeLastUsed = System.currentTimeMillis()
         isExplodeActive = false
         player.walkSpeed = 0.2F
         player.level = 0

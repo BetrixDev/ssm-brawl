@@ -189,6 +189,7 @@ export const maps = sqliteTable(
       .$type<MapRole>()
       .notNull()
       .default("game"),
+    voidYLevel: real("void_y_level").default(0).notNull(),
   },
   (table) => ({
     idIdx: index("maps_id_idx").on(table.id),

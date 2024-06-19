@@ -66,6 +66,8 @@ server/usercache.json
 server/version_history.json
 server/whitelist.json
 /.vscode
+server.properties
+server/servers_*
 
 deployments
 /server/crash-reports

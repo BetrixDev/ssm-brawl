@@ -14,10 +14,12 @@ import net.ssmb.kits.constructKitFromData
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.util.Vector
 
 class TestMinigame(
@@ -25,11 +27,13 @@ class TestMinigame(
     private val minigameData: MinigameStartSuccess
 ) : IMinigame, Listener {
     private val players = teams.map { it.players }.flatten()
+    private val playersLeftInProgress = arrayListOf<Player>()
     private val playerMinigameData = minigameData.teams.map { it.players }.flatten()
     private val plugin = SSMB.instance
     private lateinit var minigameWorld: World
     override val playerKits = hashMapOf<Player, SsmbKit>()
     override val teamsStocks = hashMapOf<String, Int>()
+    private var isMinigameRunning = true
 
     init {
         plugin.server.pluginManager.registerSuspendingEvents(this, plugin)
@@ -43,8 +47,9 @@ class TestMinigame(
             val tpLocation = Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
 
             team.players.forEach { plr ->
+                plr.foodLevel = 20
+                plr.health = plr.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 20.0
                 plr.teleport(tpLocation)
-                plr.walkSpeed = 0.0f
                 plr.lookAt(minigameWorld.spawnLocation, LookAnchor.EYES)
 
                 val playerData =
@@ -59,6 +64,20 @@ class TestMinigame(
         }
 
         minigameWorld.sendMessage(Component.text("Testing game has started!"))
+
+        plugin.launch {
+            while (isMinigameRunning) {
+                players.forEach { plr ->
+                    if (plr.location.y <= minigameData.map.voidYLevel) {
+                        val deathEvent =
+                            PlayerDeathEvent(plr, emptyList(), 0, "Fell out of the world")
+                        deathEvent.callEvent()
+                    }
+                }
+
+                delay(1.ticks)
+            }
+        }
     }
 
     override fun removePlayer(player: Player) {
@@ -66,7 +85,7 @@ class TestMinigame(
     }
 
     @EventHandler
-    suspend fun onPlayerDeath(event: PlayerDeathEvent) {
+    fun onPlayerDeath(event: PlayerDeathEvent) {
         val player = event.entity
 
         if (!players.contains(player)) return
@@ -90,8 +109,27 @@ class TestMinigame(
             val spawnCoords = minigameData.map.spawnPoints.random()
             val tpLocation = Location(minigameWorld, spawnCoords.x, spawnCoords.y, spawnCoords.z)
             player.teleport(tpLocation)
+            player.gameMode = GameMode.SURVIVAL
 
             playerKits[player]!!.initializeKit()
+        }
+    }
+
+    @EventHandler
+    fun onPlayerQuit(event: PlayerQuitEvent) {
+        val player = event.player
+
+        if (!players.contains(player)) return
+
+        playerKits[player]!!.destroyKit()
+        playersLeftInProgress.add(player)
+
+        if (playersLeftInProgress.size == players.size) {
+            println("All players have left the game (${minigameData.gameId})! Cleaning up...")
+
+            playerKits.values.forEach { it.destroyKit() }
+
+            plugin.worlds.deleteSsmbWorld(minigameData.gameId)
         }
     }
 }
