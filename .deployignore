@@ -2,7 +2,6 @@
 .husky/**
 plugin/**
 web/**
-orchestrator/**
 .gitignore
 README.md
 .dockerignore
