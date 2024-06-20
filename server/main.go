@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -10,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/go-github/v62/github"
 	"github.com/rs/zerolog/log"
 )
 
@@ -22,6 +25,7 @@ var (
 	apiProtocol    = os.Getenv("API_PROTOCOL")
 	apiHost        = os.Getenv("API_HOST")
 	apiPort        = os.Getenv("API_PORT")
+	ghAuthToken    = os.Getenv("GITHUB_AUTH_TOKEN")
 	timeStarted    = time.Now()
 	isApiConnected = false
 )
@@ -62,6 +66,40 @@ func main() {
 
 		if err := os.RemoveAll(filepath.Join(cwd, filePath)); err != nil {
 			panic(err)
+		}
+	}
+
+	_, err = os.Stat(filepath.Join("plugins", "ssmb.jar"))
+
+	if os.IsNotExist(err) {
+		log.Print("Downloading most recent production plugin")
+
+		githubClient := github.NewClient(nil).WithAuthToken(ghAuthToken)
+
+		latestRelease, _, err := githubClient.Repositories.GetLatestRelease(context.Background(), "BetrixDev", "ssm-brawl")
+
+		if err != nil {
+			panic(err)
+		}
+
+		for _, releaseAsset := range latestRelease.Assets {
+			if releaseAsset.GetName() == "ssmb.jar" {
+				rc, _, err := githubClient.Repositories.DownloadReleaseAsset(context.Background(), "BetrixDev", "ssm-brawl", releaseAsset.GetID(), http.DefaultClient)
+
+				if err != nil {
+					panic(err)
+				}
+
+				dstPluginFile, err := os.Create(filepath.Join("plugins", "ssmb.jar"))
+
+				if err != nil {
+					panic(err)
+				}
+
+				defer dstPluginFile.Close()
+
+				io.Copy(dstPluginFile, rc)
+			}
 		}
 	}
 
