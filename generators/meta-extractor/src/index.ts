@@ -52,7 +52,7 @@ sourceFiles.forEach((sourcePath) => {
 
       const varName = parsedGroups.data.variableName;
 
-      const dataType = varName.includes("Int")
+      const dataType = parsedGroups.data.metaMethod.includes("Int")
         ? "int"
         : varName.includes("Double")
           ? "double"
