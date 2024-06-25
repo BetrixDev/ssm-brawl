@@ -1,13 +1,13 @@
 import { env } from "env/api";
-import { initTussler, runMirations, clearAllTables } from "tussler";
+import { initTussler, runMigrations, clearAllTables } from "tussler";
 import { beforeEach, expect, suite, test } from "vitest";
 
 suite("Index tests", () => {
   const API_ENDPOINT = `${env.API_PROTOCOL}://${env.API_HOST}:${env.API_PORT}`;
 
-  beforeEach(async (ctx) => {
-    initTussler(ctx.task.name);
-    await runMirations();
+  beforeEach(async () => {
+    initTussler();
+    await runMigrations();
     await clearAllTables();
   });
 
