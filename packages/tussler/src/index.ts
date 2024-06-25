@@ -1,7 +1,7 @@
 import { env } from "env/tussler";
 import * as schema from "./schema.js";
 import { drizzle as postgresDrizzle, PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import { drizzle as pgListDrizzle, PgliteDatabase } from "drizzle-orm/pglite";
+import { drizzle as pgLiteDrizzle, PgliteDatabase } from "drizzle-orm/pglite";
 import { migrate as postgresMigrate } from "drizzle-orm/postgres-js/migrator";
 import { migrate as pgLiteMigrate } from "drizzle-orm/pglite/migrator";
 import { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
@@ -20,7 +20,7 @@ export function initTussler() {
     db = postgresDrizzle(postgresClient);
   } else {
     const pgLite = new PGlite();
-    db = pgListDrizzle(pgLite);
+    db = pgLiteDrizzle(pgLite);
   }
 }
 
