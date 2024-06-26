@@ -234,7 +234,7 @@ export const parties = pgTable("parties", {
   partyId: varchar("party_id").primaryKey(),
   ownerUuid: varchar("owner_uuid")
     .notNull()
-    .references(() => basicPlayerData.uuid),
+    .references(() => basicPlayerData.uuid, { onDelete: "cascade" }),
 });
 
 export const partyGuests = pgTable(

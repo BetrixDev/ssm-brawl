@@ -118,10 +118,7 @@ export const partyRouter = router({
       }
 
       if (playerParty.party.ownerUuid === input.playerUuid) {
-        await Promise.all([
-          db.delete(partyGuests).where(eq(partyGuests.partyId, playerParty.partyId)),
-          db.delete(parties).where(eq(parties.partyId, playerParty.partyId)),
-        ]);
+        await db.delete(parties).where(eq(parties.partyId, playerParty.partyId));
 
         return { type: "disband" };
       } else {
