@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 
 suite("Map router testing", () => {
   beforeEach(async () => {
-    initTussler();
+    await initTussler();
     await runMigrations();
     await clearAllTables();
   });

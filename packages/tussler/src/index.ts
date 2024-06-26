@@ -14,13 +14,14 @@ export let db: PostgresJsDatabase<typeof schema> | PgliteDatabase<typeof schema>
 export * from "drizzle-orm";
 export * from "./schema.js";
 
-export function initTussler() {
+export async function initTussler() {
   if (env.TUSSLER_TYPE === "postgres") {
     const postgresClient = postgres({ host: env.TUSSLER_HOST, password: env.TUSSLER_PASSWORD });
-    db = postgresDrizzle(postgresClient);
+    db = postgresDrizzle(postgresClient, { schema });
   } else {
     const pgLite = new PGlite();
-    db = pgLiteDrizzle(pgLite);
+    await pgLite.waitReady;
+    db = pgLiteDrizzle(pgLite, { schema });
   }
 }
 

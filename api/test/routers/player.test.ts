@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 
 suite("Player router tests", () => {
   beforeEach(async () => {
-    initTussler();
+    await initTussler();
     await runMigrations();
     await clearAllTables();
   });

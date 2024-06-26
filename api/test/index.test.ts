@@ -6,7 +6,7 @@ suite("Index tests", () => {
   const API_ENDPOINT = `${env.API_PROTOCOL}://${env.API_HOST}:${env.API_PORT}`;
 
   beforeEach(async () => {
-    initTussler();
+    await initTussler();
     await runMigrations();
     await clearAllTables();
   });

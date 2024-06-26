@@ -11,7 +11,7 @@ import { beforeEach, expect, suite, test } from "vitest";
 
 suite("Tussler Test Enviroment Validation", () => {
   beforeEach(async () => {
-    initTussler();
+    await initTussler();
     await runMigrations();
     await clearAllTables();
   });

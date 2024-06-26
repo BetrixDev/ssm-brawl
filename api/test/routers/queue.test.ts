@@ -6,7 +6,7 @@ import { TRPCError } from "@trpc/server";
 
 suite("Queue router tests", () => {
   beforeEach(async () => {
-    initTussler();
+    await initTussler();
     await runMigrations();
     await clearAllTables();
     await loadDefaultKvValues();

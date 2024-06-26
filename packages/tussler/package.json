@@ -9,7 +9,7 @@
   "dependencies": {
     "@electric-sql/pglite": "^0.1.5",
     "@libsql/client": "^0.5.3",
-    "drizzle-orm": "0.31.2",
+    "drizzle-orm": "0.30.6",
     "env": "workspace:*",
     "pg": "^8.12.0",
     "pg-mem": "^2.8.1",
@@ -19,7 +19,7 @@
   "devDependencies": {
     "@types/node": "^20.12.5",
     "@types/pg": "^8.11.6",
-    "drizzle-kit": "0.22.0",
+    "drizzle-kit": "0.21.4",
     "typescript": "^5.4.4"
   },
   "main": "./src/index.ts",

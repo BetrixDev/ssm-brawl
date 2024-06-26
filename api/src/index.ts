@@ -118,7 +118,7 @@ app.post("/generateToken/:source", async (c) => {
 });
 
 serve({ ...app, port: env.API_PORT }, async (info) => {
-  initTussler();
+  await initTussler();
   await runMigrations();
   await loadDefaultKvValues();
 

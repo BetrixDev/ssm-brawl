@@ -159,8 +159,8 @@ importers:
         specifier: ^0.5.3
         version: 0.5.3
       drizzle-orm:
-        specifier: 0.31.2
-        version: 0.31.2(@electric-sql/pglite@0.1.5)(@libsql/client@0.5.3)(@types/pg@8.11.6)(pg@8.12.0)(postgres@3.4.4)
+        specifier: 0.30.6
+        version: 0.30.6(@electric-sql/pglite@0.1.5)(@libsql/client@0.5.3)(@types/pg@8.11.6)(pg@8.12.0)(postgres@3.4.4)
       env:
         specifier: workspace:*
         version: link:../env
@@ -184,8 +184,8 @@ importers:
         specifier: ^8.11.6
         version: 8.11.6
       drizzle-kit:
-        specifier: 0.22.0
-        version: 0.22.0
+        specifier: 0.21.4
+        version: 0.21.4
       typescript:
         specifier: ^5.4.4
         version: 5.4.4
@@ -1302,8 +1302,8 @@ packages:
     resolution: {integrity: sha512-0fHv3YIEaUcSVPSGyaaBfOi9bmpajjhbJNdPsRMIUvYdLVxBu9eGjH8mRc3Qk7HVmEidFc/lhG1YyJhoXrn5yA==}
     hasBin: true
 
-  drizzle-kit@0.22.0:
-    resolution: {integrity: sha512-vmkZZ1SOItQJayFHqEYxjxTCfJdKgAa5eQFj7tkIP+j9VtGnPZ1lhucS0tdjmYfJa30n0LlJ3gXXph+hxrGQPA==}
+  drizzle-kit@0.21.4:
+    resolution: {integrity: sha512-Nxcc1ONJLRgbhmR+azxjNF9Ly9privNLEIgW53c92whb4xp8jZLH1kMCh/54ci1mTMuYxPdOukqLwJ8wRudNwA==}
     hasBin: true
 
   drizzle-orm@0.29.4:
@@ -1377,8 +1377,8 @@ packages:
       sqlite3:
         optional: true
 
-  drizzle-orm@0.31.2:
-    resolution: {integrity: sha512-QnenevbnnAzmbNzQwbhklvIYrDE8YER8K7kSrAWQSV1YvFCdSQPzj+jzqRdTSsV2cDqSpQ0NXGyL1G9I43LDLg==}
+  drizzle-orm@0.30.6:
+    resolution: {integrity: sha512-8RgNUmY7J03GRuRgBV5SaJNbYgLVPjdSWNS/bRkIMIHt2TFCA439lJsNpqYX8asyKMqkw8ceBiamUnCIXZIt9w==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=3'
@@ -1388,12 +1388,11 @@ packages:
       '@op-engineering/op-sqlite': '>=2'
       '@opentelemetry/api': ^1.4.1
       '@planetscale/database': '>=1'
-      '@tidbcloud/serverless': '*'
       '@types/better-sqlite3': '*'
       '@types/pg': '*'
       '@types/react': '>=18'
       '@types/sql.js': '*'
-      '@vercel/postgres': '>=0.8.0'
+      '@vercel/postgres': '*'
       '@xata.io/client': '*'
       better-sqlite3: '>=7'
       bun-types: '*'
@@ -1422,8 +1421,6 @@ packages:
       '@opentelemetry/api':
         optional: true
       '@planetscale/database':
-        optional: true
-      '@tidbcloud/serverless':
         optional: true
       '@types/better-sqlite3':
         optional: true
@@ -3678,11 +3675,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-kit@0.22.0:
+  drizzle-kit@0.21.4:
     dependencies:
       '@esbuild-kit/esm-loader': 2.6.5
+      commander: 9.5.0
+      env-paths: 3.0.0
       esbuild: 0.19.12
       esbuild-register: 3.5.0(esbuild@0.19.12)
+      glob: 8.1.0
+      hanji: 0.0.5
+      json-diff: 0.9.0
+      zod: 3.22.4
     transitivePeerDependencies:
       - supports-color
 
@@ -3693,7 +3696,7 @@ snapshots:
       pg: 8.12.0
       postgres: 3.4.4
 
-  drizzle-orm@0.31.2(@electric-sql/pglite@0.1.5)(@libsql/client@0.5.3)(@types/pg@8.11.6)(pg@8.12.0)(postgres@3.4.4):
+  drizzle-orm@0.30.6(@electric-sql/pglite@0.1.5)(@libsql/client@0.5.3)(@types/pg@8.11.6)(pg@8.12.0)(postgres@3.4.4):
     optionalDependencies:
       '@electric-sql/pglite': 0.1.5
       '@libsql/client': 0.5.3
