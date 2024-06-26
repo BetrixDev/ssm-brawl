@@ -64,8 +64,12 @@ export const disguises = pgTable("disguises", {
 export const abilitiesToKits = pgTable(
   "abilities_to_kits",
   {
-    kitId: varchar("kit_id").notNull(),
-    abilityId: varchar("ability_id").notNull(),
+    kitId: varchar("kit_id")
+      .notNull()
+      .references(() => kits.id),
+    abilityId: varchar("ability_id")
+      .notNull()
+      .references(() => abilities.id),
     abilityToolSlot: smallint("ability_tool_slot").notNull(),
   },
   (table) => ({
@@ -92,8 +96,12 @@ export const passives = pgTable(
 export const passivesToKits = pgTable(
   "passives_to_kits",
   {
-    kitId: varchar("kit_id").notNull(),
-    passiveId: varchar("passive_id").notNull(),
+    kitId: varchar("kit_id")
+      .notNull()
+      .references(() => kits.id),
+    passiveId: varchar("passive_id")
+      .notNull()
+      .references(() => passives.id),
     meta: jsonb("meta").$type<Record<string, string>>(),
   },
   (table) => ({
@@ -129,7 +137,9 @@ export const basicPlayerData = pgTable(
 export const usercache = pgTable(
   "usercache",
   {
-    uuid: varchar("uuid", { length: 36 }).primaryKey(),
+    uuid: varchar("uuid", { length: 36 })
+      .primaryKey()
+      .references(() => basicPlayerData.uuid),
     username: varchar("username").notNull(),
   },
   (table) => ({
@@ -168,10 +178,14 @@ export const minigames = pgTable(
 export const queue = pgTable(
   "queue",
   {
-    playerUuid: varchar("player_uuid", { length: 36 }).primaryKey(),
-    partyId: varchar("party_id"),
+    playerUuid: varchar("player_uuid", { length: 36 })
+      .primaryKey()
+      .references(() => basicPlayerData.uuid),
+    partyId: varchar("party_id").references(() => parties.partyId),
     dateAdded: bigint("date_added", { mode: "number" }).notNull(),
-    minigameId: varchar("minigame_id").notNull(),
+    minigameId: varchar("minigame_id")
+      .notNull()
+      .references(() => minigames.id),
   },
   (table) => ({
     minigameIdIdx: index("queue_minigame_id_idx").on(table.minigameId),
@@ -202,8 +216,12 @@ export const maps = pgTable(
 export const friendships = pgTable(
   "friendships",
   {
-    uuid1: varchar("uuid_1").notNull(),
-    uuid2: varchar("uuid_2").notNull(),
+    uuid1: varchar("uuid_1")
+      .notNull()
+      .references(() => basicPlayerData.uuid),
+    uuid2: varchar("uuid_2")
+      .notNull()
+      .references(() => basicPlayerData.uuid),
   },
   (table) => ({
     friendshipsPk: primaryKey({ columns: [table.uuid1, table.uuid2] }),
@@ -214,14 +232,20 @@ export const friendships = pgTable(
 
 export const parties = pgTable("parties", {
   partyId: varchar("party_id").primaryKey(),
-  ownerUuid: varchar("owner_uuid").notNull(),
+  ownerUuid: varchar("owner_uuid")
+    .notNull()
+    .references(() => basicPlayerData.uuid),
 });
 
 export const partyGuests = pgTable(
   "party_guests",
   {
-    playerUuid: varchar("player_uuid").primaryKey(),
-    partyId: varchar("party_id").notNull(),
+    playerUuid: varchar("player_uuid")
+      .primaryKey()
+      .references(() => basicPlayerData.uuid),
+    partyId: varchar("party_id")
+      .notNull()
+      .references(() => parties.partyId),
   },
   (table) => ({
     pGuestPartyIdIdx: index("p_guest_party_id_idx").on(table.partyId),
@@ -232,9 +256,15 @@ export const partyGuests = pgTable(
 export const partyInvites = pgTable(
   "party_invites",
   {
-    partyId: varchar("party_id").notNull(),
-    inviterUuid: varchar("inviter_uuid").notNull(),
-    inviteeUuid: varchar("invitee_uuid").notNull(),
+    partyId: varchar("party_id")
+      .notNull()
+      .references(() => parties.partyId),
+    inviterUuid: varchar("inviter_uuid")
+      .notNull()
+      .references(() => basicPlayerData.uuid),
+    inviteeUuid: varchar("invitee_uuid")
+      .notNull()
+      .references(() => basicPlayerData.uuid),
   },
   (table) => ({
     partyInvitePk: primaryKey({
@@ -248,9 +278,13 @@ export const messages = pgTable(
   "messages",
   {
     id: varchar("id").primaryKey(),
-    channelId: varchar("channel_id").notNull(),
+    channelId: varchar("channel_id")
+      .notNull()
+      .references(() => messageChannels.id),
     content: varchar("content").notNull(),
-    authorUuid: varchar("author_uuid").notNull(),
+    authorUuid: varchar("author_uuid")
+      .notNull()
+      .references(() => basicPlayerData.uuid),
     time: bigint("time", { mode: "number" }).notNull(),
   },
   (table) => ({
@@ -272,8 +306,12 @@ export const messageChannels = pgTable(
 export const messageViewers = pgTable(
   "message_viewers",
   {
-    channelId: varchar("channel_id").notNull(),
-    playerUuid: varchar("player_uuid").notNull(),
+    channelId: varchar("channel_id")
+      .notNull()
+      .references(() => messageChannels.id),
+    playerUuid: varchar("player_uuid")
+      .notNull()
+      .references(() => basicPlayerData.uuid),
   },
   (table) => ({
     messageViewerPk: primaryKey({
