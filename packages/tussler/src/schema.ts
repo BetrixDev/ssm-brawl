@@ -1,61 +1,76 @@
 import { relations } from "drizzle-orm";
-import { real, index, sqliteTable, primaryKey, integer, text, int } from "drizzle-orm/sqlite-core";
+import {
+  real,
+  pgTable,
+  primaryKey,
+  varchar,
+  jsonb,
+  index,
+  bigint,
+  integer,
+  smallint,
+  boolean,
+} from "drizzle-orm/pg-core";
 
 export type MapRole = "game" | "hub";
 
 export type Vector3 = { x: number; y: number; z: number };
 
-export const lang = sqliteTable("lang", {
-  id: text("id").notNull().primaryKey(),
-  text: text("text").notNull(),
+export const lang = pgTable("lang", {
+  id: varchar("id").notNull().primaryKey(),
+  text: varchar("varchar").notNull(),
 });
 
-export const kits = sqliteTable(
+export const kits = pgTable(
   "kits",
   {
-    id: text("id").primaryKey().notNull(),
+    id: varchar("id").primaryKey().notNull(),
     meleeDamage: real("melee_damage").notNull(),
     armor: real("armor").notNull(),
     knockbackMult: real("knockback_mult").default(1.0).notNull(),
-    inventoryIcon: text("inventory_icon").notNull(),
-    disguiseId: text("disguise_id").notNull(),
-    helmetId: text("helmet_id"),
-    chestplateId: text("chestplate_id"),
-    leggingsId: text("leggings_id"),
-    bootsId: text("boots_id"),
+    inventoryIcon: varchar("inventory_icon").notNull(),
+    disguiseId: varchar("disguise_id").notNull(),
+    helmetId: varchar("helmet_id"),
+    chestplateId: varchar("chestplate_id"),
+    leggingsId: varchar("leggings_id"),
+    bootsId: varchar("boots_id"),
     hitboxWidth: real("hitbox_width").notNull().default(0.6),
     hitboxHeight: real("hitbox_height").notNull().default(1.8),
-    meta: text("meta", { mode: "json" }).$type<Record<string, string>>(),
+    meta: jsonb("meta").$type<Record<string, string>>(),
   },
   (table) => ({
     idIdx: index("kits_id_idx").on(table.id),
   }),
 );
 
-export const abilities = sqliteTable(
+export const abilities = pgTable(
   "abilities",
   {
-    id: text("id").primaryKey().notNull(),
-    meta: text("meta", { mode: "json" }),
-    cooldown: int("cooldown").notNull(),
+    id: varchar("id").primaryKey().notNull(),
+    meta: jsonb("meta"),
+    cooldown: integer("cooldown").notNull(),
   },
   (table) => ({
     idIdx: index("abilities_id_idx").on(table.id),
   }),
 );
 
-export const disguises = sqliteTable("disguises", {
-  id: text("id").primaryKey().notNull(),
-  displayEntity: text("display_entity").notNull(),
-  hurtSound: text("hurt_sound").notNull(),
+export const disguises = pgTable("disguises", {
+  id: varchar("id").primaryKey().notNull(),
+  displayEntity: varchar("display_entity").notNull(),
+  hurtSound: varchar("hurt_sound").notNull(),
 });
 
-export const abilitiesToKits = sqliteTable(
+export const abilitiesToKits = pgTable(
   "abilities_to_kits",
   {
-    kitId: text("kit_id").notNull(),
-    abilityId: text("ability_id").notNull(),
-    abilityToolSlot: int("ability_tool_slot").notNull(),
+    kitId: varchar("kit_id")
+      .notNull()
+      .references(() => kits.id),
+    abilityId: varchar("ability_id")
+      .notNull()
+      .references(() => abilities.id),
+    abilityToolSlot: smallint("ability_tool_slot").notNull(),
   },
   (table) => ({
     kitIdIdx: index("atk_kit_id_idx").on(table.kitId),
@@ -67,23 +82,27 @@ export const abilitiesToKits = sqliteTable(
   }),
 );
 
-export const passives = sqliteTable(
+export const passives = pgTable(
   "passives",
   {
-    id: text("id").primaryKey().notNull(),
-    meta: text("meta", { mode: "json" }).$type<Record<string, string>>(),
+    id: varchar("id").primaryKey().notNull(),
+    meta: jsonb("meta").$type<Record<string, string>>(),
   },
   (table) => ({
     idIdx: index("passives_id_idx").on(table.id),
   }),
 );
 
-export const passivesToKits = sqliteTable(
+export const passivesToKits = pgTable(
   "passives_to_kits",
   {
-    kitId: text("kit_id").notNull(),
-    passiveId: text("passive_id").notNull(),
-    meta: text("meta", { mode: "json" }).$type<Record<string, string>>(),
+    kitId: varchar("kit_id")
+      .notNull()
+      .references(() => kits.id),
+    passiveId: varchar("passive_id")
+      .notNull()
+      .references(() => passives.id),
+    meta: jsonb("meta").$type<Record<string, string>>(),
   },
   (table) => ({
     kitIdIdx: index("ptk_kit_id_idx").on(table.kitId),
@@ -95,66 +114,60 @@ export const passivesToKits = sqliteTable(
   }),
 );
 
-export const basicPlayerData = sqliteTable(
+export const basicPlayerData = pgTable(
   "basic_player_data",
   {
-    uuid: text("uuid", { length: 36 }).primaryKey(),
-    selectedKitId: text("selected_kit_id").default("creeper").notNull(),
-    totalGamesPlayed: int("total_games_played").default(0).notNull(),
-    totalGamesWon: int("total_games_won").default(0).notNull(),
-    totalPlaytimeSeconds: int("total_playtime_seconds").default(0).notNull(),
-    isBanned: int("is_banned", { mode: "boolean" }).default(false).notNull(),
-    levelExperience: int("level_experience").default(0).notNull(),
-    rankElo: int("rank_elo").default(0).notNull(),
-    rankedMatchesPlayed: int("ranked_matches_played").default(0).notNull(),
-    areFriendRequestsOff: int("are_friend_requests_off", {
-      mode: "boolean",
-    })
-      .default(false)
-      .notNull(),
-    canReceiveRandomMessages: int("can_receive_random_messages", {
-      mode: "boolean",
-    })
-      .default(true)
-      .notNull(),
+    uuid: varchar("uuid", { length: 36 }).primaryKey(),
+    selectedKitId: varchar("selected_kit_id").default("creeper").notNull(),
+    totalGamesPlayed: bigint("total_games_played", { mode: "number" }).default(0).notNull(),
+    totalGamesWon: bigint("total_games_won", { mode: "number" }).default(0).notNull(),
+    totalPlaytimeSeconds: bigint("total_playtime_seconds", { mode: "number" }).default(0).notNull(),
+    isBanned: boolean("is_banned").default(false).notNull(),
+    levelExperience: bigint("level_experience", { mode: "number" }).default(0).notNull(),
+    rankElo: bigint("rank_elo", { mode: "number" }).default(0).notNull(),
+    rankedMatchesPlayed: bigint("ranked_matches_played", { mode: "number" }).default(0).notNull(),
+    areFriendRequestsOff: boolean("are_friend_requests_off").default(false).notNull(),
+    canReceiveRandomMessages: boolean("can_receive_random_messages").default(true).notNull(),
   },
   (table) => ({
     uuidIdx: index("b_player_uuid_idx").on(table.uuid),
   }),
 );
 
-export const usercache = sqliteTable(
+export const usercache = pgTable(
   "usercache",
   {
-    uuid: text("uuid", { length: 36 }).primaryKey(),
-    username: text("username").notNull(),
+    uuid: varchar("uuid", { length: 36 })
+      .primaryKey()
+      .references(() => basicPlayerData.uuid),
+    username: varchar("username").notNull(),
   },
   (table) => ({
     uuidIdx: index("usercache_player_uuid_idx").on(table.uuid),
   }),
 );
 
-export const ipBans = sqliteTable(
+export const ipBans = pgTable(
   "ip_bans",
   {
-    ip: text("ip").primaryKey().notNull(),
-    isBanned: int("is_banned", { mode: "boolean" }).notNull().default(true),
+    ip: varchar("ip").primaryKey().notNull(),
+    isBanned: boolean("is_banned").notNull().default(true),
   },
   (table) => ({
     ipIdx: index("ip_idx").on(table.ip),
   }),
 );
 
-export const minigames = sqliteTable(
+export const minigames = pgTable(
   "minigames",
   {
-    id: text("id").primaryKey(),
+    id: varchar("id").primaryKey(),
     minPlayers: integer("min_players").notNull(),
     maxPlayers: integer("max_players").notNull(),
     playersPerTeam: integer("players_per_team").notNull().default(1),
     amountOfTeams: integer("amount_of_teams").notNull().default(4),
     countdownSeconds: integer("countdown_seconds").notNull().default(5),
-    isHidden: integer("is_hidden", { mode: "boolean" }).notNull().default(false),
+    isHidden: boolean("is_hidden").notNull().default(false),
     stocks: integer("stocks").notNull().default(4),
   },
   (table) => ({
@@ -162,13 +175,17 @@ export const minigames = sqliteTable(
   }),
 );
 
-export const queue = sqliteTable(
+export const queue = pgTable(
   "queue",
   {
-    playerUuid: text("player_uuid", { length: 36 }).primaryKey(),
-    partyId: text("party_id"),
-    dateAdded: integer("date_added").notNull(),
-    minigameId: text("minigame_id").notNull(),
+    playerUuid: varchar("player_uuid", { length: 36 })
+      .primaryKey()
+      .references(() => basicPlayerData.uuid),
+    partyId: varchar("party_id").references(() => parties.partyId),
+    dateAdded: bigint("date_added", { mode: "number" }).notNull(),
+    minigameId: varchar("minigame_id")
+      .notNull()
+      .references(() => minigames.id),
   },
   (table) => ({
     minigameIdIdx: index("queue_minigame_id_idx").on(table.minigameId),
@@ -176,16 +193,16 @@ export const queue = sqliteTable(
   }),
 );
 
-export const maps = sqliteTable(
+export const maps = pgTable(
   "maps",
   {
-    id: text("id").primaryKey(),
+    id: varchar("id").primaryKey(),
     minPlayers: integer("min_players").notNull(),
     maxPlayers: integer("max_players").notNull(),
-    origin: text("origin", { mode: "json" }).$type<Vector3>().notNull(),
-    spawnPoints: text("spawn_points", { mode: "json" }).$type<Vector3[]>().notNull(),
-    worldBorderRadius: integer("world_border_radius").notNull(),
-    role: text("role", { enum: ["game", "hub"] })
+    origin: jsonb("origin").$type<Vector3>().notNull(),
+    spawnPoints: jsonb("spawn_points").$type<Vector3[]>().notNull(),
+    worldBorderRadius: bigint("world_border_radius", { mode: "number" }).notNull(),
+    role: varchar("role", { enum: ["game", "hub"] })
       .$type<MapRole>()
       .notNull()
       .default("game"),
@@ -196,11 +213,15 @@ export const maps = sqliteTable(
   }),
 );
 
-export const friendships = sqliteTable(
+export const friendships = pgTable(
   "friendships",
   {
-    uuid1: text("uuid_1").notNull(),
-    uuid2: text("uuid_2").notNull(),
+    uuid1: varchar("uuid_1")
+      .notNull()
+      .references(() => basicPlayerData.uuid),
+    uuid2: varchar("uuid_2")
+      .notNull()
+      .references(() => basicPlayerData.uuid),
   },
   (table) => ({
     friendshipsPk: primaryKey({ columns: [table.uuid1, table.uuid2] }),
@@ -209,16 +230,22 @@ export const friendships = sqliteTable(
   }),
 );
 
-export const parties = sqliteTable("parties", {
-  partyId: text("party_id").primaryKey(),
-  ownerUuid: text("owner_uuid").notNull(),
+export const parties = pgTable("parties", {
+  partyId: varchar("party_id").primaryKey(),
+  ownerUuid: varchar("owner_uuid")
+    .notNull()
+    .references(() => basicPlayerData.uuid, { onDelete: "cascade" }),
 });
 
-export const partyGuests = sqliteTable(
+export const partyGuests = pgTable(
   "party_guests",
   {
-    playerUuid: text("player_uuid").primaryKey(),
-    partyId: text("party_id").notNull(),
+    playerUuid: varchar("player_uuid")
+      .primaryKey()
+      .references(() => basicPlayerData.uuid),
+    partyId: varchar("party_id")
+      .notNull()
+      .references(() => parties.partyId),
   },
   (table) => ({
     pGuestPartyIdIdx: index("p_guest_party_id_idx").on(table.partyId),
@@ -226,12 +253,18 @@ export const partyGuests = sqliteTable(
   }),
 );
 
-export const partyInvites = sqliteTable(
+export const partyInvites = pgTable(
   "party_invites",
   {
-    partyId: text("party_id").notNull(),
-    inviterUuid: text("inviter_uuid").notNull(),
-    inviteeUuid: text("invitee_uuid").notNull(),
+    partyId: varchar("party_id")
+      .notNull()
+      .references(() => parties.partyId),
+    inviterUuid: varchar("inviter_uuid")
+      .notNull()
+      .references(() => basicPlayerData.uuid),
+    inviteeUuid: varchar("invitee_uuid")
+      .notNull()
+      .references(() => basicPlayerData.uuid),
   },
   (table) => ({
     partyInvitePk: primaryKey({
@@ -241,14 +274,18 @@ export const partyInvites = sqliteTable(
   }),
 );
 
-export const messages = sqliteTable(
+export const messages = pgTable(
   "messages",
   {
-    id: text("id").primaryKey(),
-    channelId: text("channel_id").notNull(),
-    content: text("content").notNull(),
-    authorUuid: text("author_uuid").notNull(),
-    time: int("time").notNull(),
+    id: varchar("id").primaryKey(),
+    channelId: varchar("channel_id")
+      .notNull()
+      .references(() => messageChannels.id),
+    content: varchar("content").notNull(),
+    authorUuid: varchar("author_uuid")
+      .notNull()
+      .references(() => basicPlayerData.uuid),
+    time: bigint("time", { mode: "number" }).notNull(),
   },
   (table) => ({
     mMessageIdIdx: index("m_message_id_idx").on(table.id),
@@ -256,21 +293,25 @@ export const messages = sqliteTable(
   }),
 );
 
-export const messageChannels = sqliteTable(
+export const messageChannels = pgTable(
   "message_channels",
   {
-    id: text("id").primaryKey(),
+    id: varchar("id").primaryKey(),
   },
   (table) => ({
     mcIdIdx: index("mc_id_idx").on(table.id),
   }),
 );
 
-export const messageViewers = sqliteTable(
+export const messageViewers = pgTable(
   "message_viewers",
   {
-    channelId: text("channel_id").notNull(),
-    playerUuid: text("player_uuid").notNull(),
+    channelId: varchar("channel_id")
+      .notNull()
+      .references(() => messageChannels.id),
+    playerUuid: varchar("player_uuid")
+      .notNull()
+      .references(() => basicPlayerData.uuid),
   },
   (table) => ({
     messageViewerPk: primaryKey({

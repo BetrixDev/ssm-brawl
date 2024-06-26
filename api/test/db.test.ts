@@ -5,14 +5,14 @@ import {
   initTussler,
   libsqlClient,
   loadTestTableData,
-  runMirations,
+  runMigrations,
 } from "tussler";
 import { beforeEach, expect, suite, test } from "vitest";
 
 suite("Tussler Test Enviroment Validation", () => {
-  beforeEach(async (ctx) => {
-    initTussler(ctx.task.name);
-    await runMirations();
+  beforeEach(async () => {
+    await initTussler();
+    await runMigrations();
     await clearAllTables();
   });
 

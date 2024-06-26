@@ -46,7 +46,7 @@ export const pmRouter = router({
       });
 
       if (!existingChannel) {
-        await db.batch([
+        await Promise.all([
           db.insert(messageChannels).values({
             id: channelId,
           }),

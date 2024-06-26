@@ -1,52 +1,40 @@
 import { env } from "env/tussler";
 import * as schema from "./schema.js";
-import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
-import { Client, createClient } from "@libsql/client";
-import { migrate } from "drizzle-orm/libsql/migrator";
+import { drizzle as postgresDrizzle, PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { drizzle as pgLiteDrizzle, PgliteDatabase } from "drizzle-orm/pglite";
+import { migrate as postgresMigrate } from "drizzle-orm/postgres-js/migrator";
+import { migrate as pgLiteMigrate } from "drizzle-orm/pglite/migrator";
 import { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
+import postgres from "postgres";
 import path from "path";
-import { existsSync, mkdirSync, readFileSync } from "fs";
+import { readFileSync } from "fs";
+import { PGlite } from "@electric-sql/pglite";
 
-const TEST_DB_BASE_DIR = path.join(process.cwd(), "test_dbs");
-
-if (env.NODE_ENV === "test" && !existsSync(TEST_DB_BASE_DIR)) {
-  mkdirSync(TEST_DB_BASE_DIR);
-}
-
-export let libsqlClient: Client;
-
-process.on("beforeExit", async (sig) => {
-  try {
-    await libsqlClient.sync();
-  } catch {}
-  process.exit(sig);
-});
-
-export let db: LibSQLDatabase<typeof schema>;
+export let db: PostgresJsDatabase<typeof schema> | PgliteDatabase<typeof schema>;
 export * from "drizzle-orm";
 export * from "./schema.js";
 
-export function initTussler(databaseName?: string) {
-  libsqlClient = createClient({
-    url:
-      env.NODE_ENV === "test"
-        ? `file:${path.join(
-            TEST_DB_BASE_DIR,
-            `${Date.now()}-${databaseName?.replaceAll("/", "") ?? ""}.sqlite`,
-          )}`
-        : env.TUSSLER_URL,
-    syncUrl: env.NODE_ENV === "test" ? undefined : env.TUSSLER_SYNC_URL,
-    syncInterval: env.NODE_ENV === "test" ? undefined : env.TUSSLER_SYNC_INTERVAL,
-    authToken: env.NODE_ENV === "test" ? undefined : env.TUSSLER_TOKEN,
-  });
-
-  db = drizzle(libsqlClient, { schema });
+export async function initTussler() {
+  if (env.TUSSLER_TYPE === "postgres") {
+    const postgresClient = postgres({ host: env.TUSSLER_HOST, password: env.TUSSLER_PASSWORD });
+    db = postgresDrizzle(postgresClient, { schema });
+  } else {
+    const pgLite = new PGlite();
+    await pgLite.waitReady;
+    db = pgLiteDrizzle(pgLite, { schema });
+  }
 }
 
-export async function runMirations() {
-  await migrate(db, {
-    migrationsFolder: path.join(process.cwd(), "..", "migrations"),
-  });
+export async function runMigrations() {
+  if (env.TUSSLER_TYPE === "postgres") {
+    await postgresMigrate(db as PostgresJsDatabase<typeof schema>, {
+      migrationsFolder: path.join(process.cwd(), "..", "migrations"),
+    });
+  } else {
+    await pgLiteMigrate(db as PgliteDatabase<typeof schema>, {
+      migrationsFolder: path.join(process.cwd(), "..", "migrations"),
+    });
+  }
 }
 
 export const schemaTableMappings: Record<string, SQLiteTableWithColumns<any>> = Object.entries(

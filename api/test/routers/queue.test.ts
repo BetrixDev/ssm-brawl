@@ -1,13 +1,13 @@
-import { initTussler, runMirations, clearAllTables, loadTestTableData } from "tussler";
+import { initTussler, runMigrations, clearAllTables, loadTestTableData } from "tussler";
 import { beforeEach, expect, suite, test } from "vitest";
 import { createInternalCaller } from "../test-utils.js";
 import { kv, loadDefaultKvValues } from "../../src/kv.js";
 import { TRPCError } from "@trpc/server";
 
 suite("Queue router tests", () => {
-  beforeEach(async (ctx) => {
-    initTussler(ctx.task.name);
-    await runMirations();
+  beforeEach(async () => {
+    await initTussler();
+    await runMigrations();
     await clearAllTables();
     await loadDefaultKvValues();
   });

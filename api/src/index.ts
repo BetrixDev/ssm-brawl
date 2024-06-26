@@ -11,7 +11,7 @@ import { BackendSource, decodeTokenFromHeaders, generateBackendToken } from "./j
 import { wranglerDataSource } from "wrangler";
 import { log } from "./log.js";
 import { middlewareLogger } from "logger";
-import { db, initTussler, runMirations } from "tussler";
+import { db, initTussler, runMigrations } from "tussler";
 import { loadDefaultKvValues } from "./kv.js";
 import { get } from "./utils.js";
 
@@ -118,8 +118,8 @@ app.post("/generateToken/:source", async (c) => {
 });
 
 serve({ ...app, port: env.API_PORT }, async (info) => {
-  initTussler();
-  await runMirations();
+  await initTussler();
+  await runMigrations();
   await loadDefaultKvValues();
 
   /* c8 ignore next 3 */

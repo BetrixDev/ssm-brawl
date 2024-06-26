@@ -1,30 +1,30 @@
 {
+  "id": "b14c6868-fbdc-44d0-bbf2-c3a1b662a376",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "6",
-  "dialect": "sqlite",
+  "dialect": "postgresql",
   "tables": {
-    "abilities": {
+    "public.abilities": {
       "name": "abilities",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "meta": {
           "name": "meta",
-          "type": "text",
+          "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": false
         },
         "cooldown": {
           "name": "cooldown",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         }
       },
       "indexes": {
@@ -40,29 +40,27 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "abilities_to_kits": {
+    "public.abilities_to_kits": {
       "name": "abilities_to_kits",
+      "schema": "",
       "columns": {
         "kit_id": {
           "name": "kit_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "ability_id": {
           "name": "ability_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "ability_tool_slot": {
           "name": "ability_tool_slot",
-          "type": "integer",
+          "type": "smallint",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         }
       },
       "indexes": {
@@ -84,103 +82,93 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "abilities_to_kits_pk": {
+          "name": "abilities_to_kits_pk",
           "columns": [
             "ability_id",
             "kit_id"
-          ],
-          "name": "abilities_to_kits_pk"
+          ]
         }
       },
       "uniqueConstraints": {}
     },
-    "basic_player_data": {
+    "public.basic_player_data": {
       "name": "basic_player_data",
+      "schema": "",
       "columns": {
         "uuid": {
           "name": "uuid",
-          "type": "text(36)",
+          "type": "varchar(36)",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "selected_kit_id": {
           "name": "selected_kit_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": "'creeper'"
         },
         "total_games_played": {
           "name": "total_games_played",
-          "type": "integer",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 0
         },
         "total_games_won": {
           "name": "total_games_won",
-          "type": "integer",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 0
         },
         "total_playtime_seconds": {
           "name": "total_playtime_seconds",
-          "type": "integer",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 0
         },
         "is_banned": {
           "name": "is_banned",
-          "type": "integer",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": false
         },
         "level_experience": {
           "name": "level_experience",
-          "type": "integer",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 0
         },
         "rank_elo": {
           "name": "rank_elo",
-          "type": "integer",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 0
         },
         "ranked_matches_played": {
           "name": "ranked_matches_played",
-          "type": "integer",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 0
         },
         "are_friend_requests_off": {
           "name": "are_friend_requests_off",
-          "type": "integer",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": false
         },
         "can_receive_random_messages": {
           "name": "can_receive_random_messages",
-          "type": "integer",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": true
         }
       },
@@ -197,29 +185,27 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "disguises": {
+    "public.disguises": {
       "name": "disguises",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "display_entity": {
           "name": "display_entity",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "hurt_sound": {
           "name": "hurt_sound",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         }
       },
       "indexes": {},
@@ -227,22 +213,21 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "friendships": {
+    "public.friendships": {
       "name": "friendships",
+      "schema": "",
       "columns": {
         "uuid_1": {
           "name": "uuid_1",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "uuid_2": {
           "name": "uuid_2",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         }
       },
       "indexes": {
@@ -264,31 +249,30 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "friendships_uuid_1_uuid_2_pk": {
+          "name": "friendships_uuid_1_uuid_2_pk",
           "columns": [
             "uuid_1",
             "uuid_2"
-          ],
-          "name": "friendships_uuid_1_uuid_2_pk"
+          ]
         }
       },
       "uniqueConstraints": {}
     },
-    "ip_bans": {
+    "public.ip_bans": {
       "name": "ip_bans",
+      "schema": "",
       "columns": {
         "ip": {
           "name": "ip",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "is_banned": {
           "name": "is_banned",
-          "type": "integer",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": true
         }
       },
@@ -305,86 +289,76 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "kits": {
+    "public.kits": {
       "name": "kits",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "melee_damage": {
           "name": "melee_damage",
           "type": "real",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "armor": {
           "name": "armor",
           "type": "real",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "knockback_mult": {
           "name": "knockback_mult",
           "type": "real",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 1
         },
         "inventory_icon": {
           "name": "inventory_icon",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "disguise_id": {
           "name": "disguise_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "helmet_id": {
           "name": "helmet_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": false
         },
         "chestplate_id": {
           "name": "chestplate_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": false
         },
         "leggings_id": {
           "name": "leggings_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": false
         },
         "boots_id": {
           "name": "boots_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": false
         },
         "hitbox_width": {
           "name": "hitbox_width",
           "type": "real",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 0.6
         },
         "hitbox_height": {
@@ -392,15 +366,13 @@
           "type": "real",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 1.8
         },
         "meta": {
           "name": "meta",
-          "type": "text",
+          "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": false
         }
       },
       "indexes": {
@@ -416,22 +388,21 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "lang": {
+    "public.lang": {
       "name": "lang",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
-        "text": {
-          "name": "text",
-          "type": "text",
+        "varchar": {
+          "name": "varchar",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         }
       },
       "indexes": {},
@@ -439,143 +410,59 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "map_origins": {
-      "name": "map_origins",
-      "columns": {
-        "map_id": {
-          "name": "map_id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "x": {
-          "name": "x",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "y": {
-          "name": "y",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "z": {
-          "name": "z",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "map_spawnpoints": {
-      "name": "map_spawnpoints",
-      "columns": {
-        "map_id": {
-          "name": "map_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "x": {
-          "name": "x",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "y": {
-          "name": "y",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "z": {
-          "name": "z",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "spawnpoints_map_id_idx": {
-          "name": "spawnpoints_map_id_idx",
-          "columns": [
-            "map_id"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "map_spawnpoints_map_id_x_y_z_pk": {
-          "columns": [
-            "map_id",
-            "x",
-            "y",
-            "z"
-          ],
-          "name": "map_spawnpoints_map_id_x_y_z_pk"
-        }
-      },
-      "uniqueConstraints": {}
-    },
-    "maps": {
+    "public.maps": {
       "name": "maps",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "min_players": {
           "name": "min_players",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "max_players": {
           "name": "max_players",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
-        "origin_id": {
-          "name": "origin_id",
-          "type": "text",
+        "origin": {
+          "name": "origin",
+          "type": "jsonb",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
+        },
+        "spawn_points": {
+          "name": "spawn_points",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
         },
         "world_border_radius": {
           "name": "world_border_radius",
-          "type": "integer",
+          "type": "bigint",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "role": {
           "name": "role",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": "'game'"
+        },
+        "void_y_level": {
+          "name": "void_y_level",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
         }
       },
       "indexes": {
@@ -591,52 +478,185 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "minigames": {
-      "name": "minigames",
+    "public.message_channels": {
+      "name": "message_channels",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "mc_id_idx": {
+          "name": "mc_id_idx",
+          "columns": [
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.message_viewers": {
+      "name": "message_viewers",
+      "schema": "",
+      "columns": {
+        "channel_id": {
+          "name": "channel_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "player_uuid": {
+          "name": "player_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "mv_channel_id_idx": {
+          "name": "mv_channel_id_idx",
+          "columns": [
+            "channel_id"
+          ],
+          "isUnique": false
+        },
+        "mv_player_uuid_idx": {
+          "name": "mv_player_uuid_idx",
+          "columns": [
+            "player_uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "message_viewer_pk": {
+          "name": "message_viewer_pk",
+          "columns": [
+            "channel_id",
+            "player_uuid"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.messages": {
+      "name": "messages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "channel_id": {
+          "name": "channel_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "author_uuid": {
+          "name": "author_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "m_message_id_idx": {
+          "name": "m_message_id_idx",
+          "columns": [
+            "id"
+          ],
+          "isUnique": false
+        },
+        "m_author_uuid_idx": {
+          "name": "m_author_uuid_idx",
+          "columns": [
+            "author_uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.minigames": {
+      "name": "minigames",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
         },
         "min_players": {
           "name": "min_players",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "max_players": {
           "name": "max_players",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "players_per_team": {
           "name": "players_per_team",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 1
+        },
+        "amount_of_teams": {
+          "name": "amount_of_teams",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 4
         },
         "countdown_seconds": {
           "name": "countdown_seconds",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 5
+        },
+        "is_hidden": {
+          "name": "is_hidden",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         },
         "stocks": {
           "name": "stocks",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
           "default": 4
         }
       },
@@ -653,22 +673,117 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "passives": {
+    "public.parties": {
+      "name": "parties",
+      "schema": "",
+      "columns": {
+        "party_id": {
+          "name": "party_id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "owner_uuid": {
+          "name": "owner_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.party_guests": {
+      "name": "party_guests",
+      "schema": "",
+      "columns": {
+        "player_uuid": {
+          "name": "player_uuid",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "party_id": {
+          "name": "party_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "p_guest_party_id_idx": {
+          "name": "p_guest_party_id_idx",
+          "columns": [
+            "party_id"
+          ],
+          "isUnique": false
+        },
+        "p_guest_player_uuid_idx": {
+          "name": "p_guest_player_uuid_idx",
+          "columns": [
+            "player_uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.party_invites": {
+      "name": "party_invites",
+      "schema": "",
+      "columns": {
+        "party_id": {
+          "name": "party_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inviter_uuid": {
+          "name": "inviter_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "invitee_uuid": {
+          "name": "invitee_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "party_invite_pk": {
+          "name": "party_invite_pk",
+          "columns": [
+            "invitee_uuid",
+            "inviter_uuid",
+            "party_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.passives": {
       "name": "passives",
+      "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "meta": {
           "name": "meta",
-          "type": "text",
+          "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": false
         }
       },
       "indexes": {
@@ -684,29 +799,27 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "passives_to_kits": {
+    "public.passives_to_kits": {
       "name": "passives_to_kits",
+      "schema": "",
       "columns": {
         "kit_id": {
           "name": "kit_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "passive_id": {
           "name": "passive_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         },
         "meta": {
           "name": "meta",
-          "type": "text",
+          "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": false
         }
       },
       "indexes": {
@@ -728,31 +841,42 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {
         "passives_to_kits_pk": {
+          "name": "passives_to_kits_pk",
           "columns": [
-            "kit_id",
-            "passive_id"
-          ],
-          "name": "passives_to_kits_pk"
+            "passive_id",
+            "kit_id"
+          ]
         }
       },
       "uniqueConstraints": {}
     },
-    "queue": {
+    "public.queue": {
       "name": "queue",
+      "schema": "",
       "columns": {
         "player_uuid": {
           "name": "player_uuid",
-          "type": "text(36)",
+          "type": "varchar(36)",
           "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
+        },
+        "party_id": {
+          "name": "party_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_added": {
+          "name": "date_added",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
         },
         "minigame_id": {
           "name": "minigame_id",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "notNull": true
         }
       },
       "indexes": {
@@ -774,13 +898,43 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
+    },
+    "public.usercache": {
+      "name": "usercache",
+      "schema": "",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "varchar(36)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "usercache_player_uuid_idx": {
+          "name": "usercache_player_uuid_idx",
+          "columns": [
+            "uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     }
   },
   "enums": {},
+  "schemas": {},
   "_meta": {
-    "tables": {},
-    "columns": {}
-  },
-  "id": "c64be14e-1879-41ad-aa4f-dee3f11c1273",
-  "prevId": "00000000-0000-0000-0000-000000000000"
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
 }

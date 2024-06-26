@@ -17,7 +17,6 @@
     "format:kt": "java -jar ktfmt.jar --kotlinlang-style plugin/src/**",
     "format": "pnpm run format:ts && pnpm run format:kt",
     "generate-migration": "cd packages/tussler && dotenv -e ../../.env pnpm generate-migration",
-    "push-migrations": "cd packages/tussler && dotenv -e ../../.env pnpm push-migrations",
     "extract-meta": "cd generators/meta-extractor && pnpm run-generator"
   },
   "devDependencies": {

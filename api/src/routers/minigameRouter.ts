@@ -37,7 +37,7 @@ export const minigameRouter = router({
     .mutation(async ({ input }) => {
       const allPlayers = input.teams.map(({ players }) => players).flat();
 
-      const [minigame] = await db.batch([
+      const [minigame] = await Promise.all([
         db.query.minigames.findFirst({
           where: eq(minigames.id, input.minigameId),
         }),
@@ -179,7 +179,7 @@ export const minigameRouter = router({
         players: historicalGamePlayers,
       });
 
-      const tusslerTask = db.batch([
+      const tusslerTask = Promise.all([
         db.update(basicPlayerData).set({
           totalGamesPlayed: sql`${basicPlayerData.totalGamesPlayed} + 1`,
         }),

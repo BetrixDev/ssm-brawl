@@ -24,7 +24,7 @@ export const partyRouter = router({
 
       const partyId = useRandomId(15);
 
-      await db.batch([
+      await Promise.all([
         db.insert(parties).values({
           ownerUuid: input.ownerUuid,
           partyId: partyId,
@@ -118,10 +118,7 @@ export const partyRouter = router({
       }
 
       if (playerParty.party.ownerUuid === input.playerUuid) {
-        await db.batch([
-          db.delete(partyGuests).where(eq(partyGuests.partyId, playerParty.partyId)),
-          db.delete(parties).where(eq(parties.partyId, playerParty.partyId)),
-        ]);
+        await db.delete(parties).where(eq(parties.partyId, playerParty.partyId));
 
         return { type: "disband" };
       } else {

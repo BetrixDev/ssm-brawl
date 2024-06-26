@@ -1,12 +1,12 @@
-import { runMirations, clearAllTables, loadTestTableData, initTussler, db } from "tussler";
+import { runMigrations, clearAllTables, loadTestTableData, initTussler, db } from "tussler";
 import { beforeEach, expect, suite, test, vi } from "vitest";
 import { createInternalCaller } from "../test-utils.js";
 import { TRPCError } from "@trpc/server";
 
 suite("Minigame router tests", async () => {
-  beforeEach(async (ctx) => {
-    initTussler(ctx.task.name);
-    await runMirations();
+  beforeEach(async () => {
+    await initTussler();
+    await runMigrations();
     await clearAllTables();
   });
 
