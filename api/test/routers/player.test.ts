@@ -49,6 +49,7 @@ suite("Player router tests", () => {
   });
 
   test("updatePlayerName with existing player", async () => {
+    await loadTestTableData("basicPlayerData-1");
     const testData = await loadTestTableData("usercache-1");
     const caller = createInternalCaller();
     const updatedUsername = "New username";
@@ -66,8 +67,8 @@ suite("Player router tests", () => {
   });
 
   test("getDetailedPlayerData should return player data", async () => {
-    await loadTestTableData("usercache-1");
     const playerDataTestData = await loadTestTableData("basicPlayerData-1");
+    await loadTestTableData("usercache-1");
     const caller = createInternalCaller();
 
     const result = await caller.player.getDetailedPlayerData({

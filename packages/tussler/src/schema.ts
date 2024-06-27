@@ -137,9 +137,7 @@ export const basicPlayerData = pgTable(
 export const usercache = pgTable(
   "usercache",
   {
-    uuid: varchar("uuid", { length: 36 })
-      .primaryKey()
-      .references(() => basicPlayerData.uuid),
+    uuid: varchar("uuid", { length: 36 }).primaryKey(),
     username: varchar("username").notNull(),
   },
   (table) => ({

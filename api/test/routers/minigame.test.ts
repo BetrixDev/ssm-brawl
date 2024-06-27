@@ -14,8 +14,8 @@ suite("Minigame router tests", async () => {
     const minigameTestData = await loadTestTableData("minigames-1");
     const playerTestData = await loadTestTableData("basicPlayerData-1");
     await loadTestTableData("passives-1");
-    await loadTestTableData("passivesToKits-1");
     await loadTestTableData("kits-1");
+    await loadTestTableData("passivesToKits-1");
     const caller = createInternalCaller();
 
     const result = await caller.minigame.start({
@@ -41,8 +41,8 @@ suite("Minigame router tests", async () => {
     const minigameTestData = await loadTestTableData("minigames-1");
     await loadTestTableData("basicPlayerData-1");
     await loadTestTableData("passives-1");
-    await loadTestTableData("passivesToKits-1");
     await loadTestTableData("kits-1");
+    await loadTestTableData("passivesToKits-1");
     const caller = createInternalCaller();
 
     await expect(async () => {

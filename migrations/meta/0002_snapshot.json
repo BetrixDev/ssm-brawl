@@ -1,0 +1,1196 @@
+{
+  "id": "2d72aab9-c75e-40b3-aec5-91c05713959c",
+  "prevId": "fcd070fb-19d2-46b9-923c-ecb952749c2f",
+  "version": "6",
+  "dialect": "postgresql",
+  "tables": {
+    "public.abilities": {
+      "name": "abilities",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cooldown": {
+          "name": "cooldown",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "abilities_id_idx": {
+          "name": "abilities_id_idx",
+          "columns": [
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.abilities_to_kits": {
+      "name": "abilities_to_kits",
+      "schema": "",
+      "columns": {
+        "kit_id": {
+          "name": "kit_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ability_id": {
+          "name": "ability_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ability_tool_slot": {
+          "name": "ability_tool_slot",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "atk_kit_id_idx": {
+          "name": "atk_kit_id_idx",
+          "columns": [
+            "kit_id"
+          ],
+          "isUnique": false
+        },
+        "atk_ability_id_idx": {
+          "name": "atk_ability_id_idx",
+          "columns": [
+            "ability_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "abilities_to_kits_kit_id_kits_id_fk": {
+          "name": "abilities_to_kits_kit_id_kits_id_fk",
+          "tableFrom": "abilities_to_kits",
+          "tableTo": "kits",
+          "columnsFrom": [
+            "kit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "abilities_to_kits_ability_id_abilities_id_fk": {
+          "name": "abilities_to_kits_ability_id_abilities_id_fk",
+          "tableFrom": "abilities_to_kits",
+          "tableTo": "abilities",
+          "columnsFrom": [
+            "ability_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "abilities_to_kits_pk": {
+          "name": "abilities_to_kits_pk",
+          "columns": [
+            "ability_id",
+            "kit_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.basic_player_data": {
+      "name": "basic_player_data",
+      "schema": "",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "varchar(36)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "selected_kit_id": {
+          "name": "selected_kit_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'creeper'"
+        },
+        "total_games_played": {
+          "name": "total_games_played",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "total_games_won": {
+          "name": "total_games_won",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "total_playtime_seconds": {
+          "name": "total_playtime_seconds",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "is_banned": {
+          "name": "is_banned",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "level_experience": {
+          "name": "level_experience",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "rank_elo": {
+          "name": "rank_elo",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "ranked_matches_played": {
+          "name": "ranked_matches_played",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "are_friend_requests_off": {
+          "name": "are_friend_requests_off",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "can_receive_random_messages": {
+          "name": "can_receive_random_messages",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        }
+      },
+      "indexes": {
+        "b_player_uuid_idx": {
+          "name": "b_player_uuid_idx",
+          "columns": [
+            "uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.disguises": {
+      "name": "disguises",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "display_entity": {
+          "name": "display_entity",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hurt_sound": {
+          "name": "hurt_sound",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.friendships": {
+      "name": "friendships",
+      "schema": "",
+      "columns": {
+        "uuid_1": {
+          "name": "uuid_1",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "uuid_2": {
+          "name": "uuid_2",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "friendships_uuid_1_idx": {
+          "name": "friendships_uuid_1_idx",
+          "columns": [
+            "uuid_1"
+          ],
+          "isUnique": false
+        },
+        "friendships_uuid_2_idx": {
+          "name": "friendships_uuid_2_idx",
+          "columns": [
+            "uuid_2"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "friendships_uuid_1_basic_player_data_uuid_fk": {
+          "name": "friendships_uuid_1_basic_player_data_uuid_fk",
+          "tableFrom": "friendships",
+          "tableTo": "basic_player_data",
+          "columnsFrom": [
+            "uuid_1"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "friendships_uuid_2_basic_player_data_uuid_fk": {
+          "name": "friendships_uuid_2_basic_player_data_uuid_fk",
+          "tableFrom": "friendships",
+          "tableTo": "basic_player_data",
+          "columnsFrom": [
+            "uuid_2"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "friendships_uuid_1_uuid_2_pk": {
+          "name": "friendships_uuid_1_uuid_2_pk",
+          "columns": [
+            "uuid_1",
+            "uuid_2"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.ip_bans": {
+      "name": "ip_bans",
+      "schema": "",
+      "columns": {
+        "ip": {
+          "name": "ip",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "is_banned": {
+          "name": "is_banned",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        }
+      },
+      "indexes": {
+        "ip_idx": {
+          "name": "ip_idx",
+          "columns": [
+            "ip"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.kits": {
+      "name": "kits",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "melee_damage": {
+          "name": "melee_damage",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "armor": {
+          "name": "armor",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "knockback_mult": {
+          "name": "knockback_mult",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "inventory_icon": {
+          "name": "inventory_icon",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "disguise_id": {
+          "name": "disguise_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "helmet_id": {
+          "name": "helmet_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "chestplate_id": {
+          "name": "chestplate_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "leggings_id": {
+          "name": "leggings_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "boots_id": {
+          "name": "boots_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hitbox_width": {
+          "name": "hitbox_width",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0.6
+        },
+        "hitbox_height": {
+          "name": "hitbox_height",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1.8
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "kits_id_idx": {
+          "name": "kits_id_idx",
+          "columns": [
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.lang": {
+      "name": "lang",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "varchar": {
+          "name": "varchar",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.maps": {
+      "name": "maps",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "min_players": {
+          "name": "min_players",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "max_players": {
+          "name": "max_players",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "origin": {
+          "name": "origin",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "spawn_points": {
+          "name": "spawn_points",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "world_border_radius": {
+          "name": "world_border_radius",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'game'"
+        },
+        "void_y_level": {
+          "name": "void_y_level",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {
+        "maps_id_idx": {
+          "name": "maps_id_idx",
+          "columns": [
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.message_channels": {
+      "name": "message_channels",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "mc_id_idx": {
+          "name": "mc_id_idx",
+          "columns": [
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.message_viewers": {
+      "name": "message_viewers",
+      "schema": "",
+      "columns": {
+        "channel_id": {
+          "name": "channel_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "player_uuid": {
+          "name": "player_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "mv_channel_id_idx": {
+          "name": "mv_channel_id_idx",
+          "columns": [
+            "channel_id"
+          ],
+          "isUnique": false
+        },
+        "mv_player_uuid_idx": {
+          "name": "mv_player_uuid_idx",
+          "columns": [
+            "player_uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "message_viewers_channel_id_message_channels_id_fk": {
+          "name": "message_viewers_channel_id_message_channels_id_fk",
+          "tableFrom": "message_viewers",
+          "tableTo": "message_channels",
+          "columnsFrom": [
+            "channel_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "message_viewers_player_uuid_basic_player_data_uuid_fk": {
+          "name": "message_viewers_player_uuid_basic_player_data_uuid_fk",
+          "tableFrom": "message_viewers",
+          "tableTo": "basic_player_data",
+          "columnsFrom": [
+            "player_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "message_viewer_pk": {
+          "name": "message_viewer_pk",
+          "columns": [
+            "channel_id",
+            "player_uuid"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.messages": {
+      "name": "messages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "channel_id": {
+          "name": "channel_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "author_uuid": {
+          "name": "author_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time": {
+          "name": "time",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "m_message_id_idx": {
+          "name": "m_message_id_idx",
+          "columns": [
+            "id"
+          ],
+          "isUnique": false
+        },
+        "m_author_uuid_idx": {
+          "name": "m_author_uuid_idx",
+          "columns": [
+            "author_uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "messages_channel_id_message_channels_id_fk": {
+          "name": "messages_channel_id_message_channels_id_fk",
+          "tableFrom": "messages",
+          "tableTo": "message_channels",
+          "columnsFrom": [
+            "channel_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "messages_author_uuid_basic_player_data_uuid_fk": {
+          "name": "messages_author_uuid_basic_player_data_uuid_fk",
+          "tableFrom": "messages",
+          "tableTo": "basic_player_data",
+          "columnsFrom": [
+            "author_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.minigames": {
+      "name": "minigames",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "min_players": {
+          "name": "min_players",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "max_players": {
+          "name": "max_players",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "players_per_team": {
+          "name": "players_per_team",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "amount_of_teams": {
+          "name": "amount_of_teams",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 4
+        },
+        "countdown_seconds": {
+          "name": "countdown_seconds",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 5
+        },
+        "is_hidden": {
+          "name": "is_hidden",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "stocks": {
+          "name": "stocks",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 4
+        }
+      },
+      "indexes": {
+        "minigames_id_idx": {
+          "name": "minigames_id_idx",
+          "columns": [
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.parties": {
+      "name": "parties",
+      "schema": "",
+      "columns": {
+        "party_id": {
+          "name": "party_id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "owner_uuid": {
+          "name": "owner_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "parties_owner_uuid_basic_player_data_uuid_fk": {
+          "name": "parties_owner_uuid_basic_player_data_uuid_fk",
+          "tableFrom": "parties",
+          "tableTo": "basic_player_data",
+          "columnsFrom": [
+            "owner_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.party_guests": {
+      "name": "party_guests",
+      "schema": "",
+      "columns": {
+        "player_uuid": {
+          "name": "player_uuid",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "party_id": {
+          "name": "party_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "p_guest_party_id_idx": {
+          "name": "p_guest_party_id_idx",
+          "columns": [
+            "party_id"
+          ],
+          "isUnique": false
+        },
+        "p_guest_player_uuid_idx": {
+          "name": "p_guest_player_uuid_idx",
+          "columns": [
+            "player_uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "party_guests_player_uuid_basic_player_data_uuid_fk": {
+          "name": "party_guests_player_uuid_basic_player_data_uuid_fk",
+          "tableFrom": "party_guests",
+          "tableTo": "basic_player_data",
+          "columnsFrom": [
+            "player_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "party_guests_party_id_parties_party_id_fk": {
+          "name": "party_guests_party_id_parties_party_id_fk",
+          "tableFrom": "party_guests",
+          "tableTo": "parties",
+          "columnsFrom": [
+            "party_id"
+          ],
+          "columnsTo": [
+            "party_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.party_invites": {
+      "name": "party_invites",
+      "schema": "",
+      "columns": {
+        "party_id": {
+          "name": "party_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inviter_uuid": {
+          "name": "inviter_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "invitee_uuid": {
+          "name": "invitee_uuid",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "party_invites_party_id_parties_party_id_fk": {
+          "name": "party_invites_party_id_parties_party_id_fk",
+          "tableFrom": "party_invites",
+          "tableTo": "parties",
+          "columnsFrom": [
+            "party_id"
+          ],
+          "columnsTo": [
+            "party_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "party_invites_inviter_uuid_basic_player_data_uuid_fk": {
+          "name": "party_invites_inviter_uuid_basic_player_data_uuid_fk",
+          "tableFrom": "party_invites",
+          "tableTo": "basic_player_data",
+          "columnsFrom": [
+            "inviter_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "party_invites_invitee_uuid_basic_player_data_uuid_fk": {
+          "name": "party_invites_invitee_uuid_basic_player_data_uuid_fk",
+          "tableFrom": "party_invites",
+          "tableTo": "basic_player_data",
+          "columnsFrom": [
+            "invitee_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "party_invite_pk": {
+          "name": "party_invite_pk",
+          "columns": [
+            "invitee_uuid",
+            "inviter_uuid",
+            "party_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.passives": {
+      "name": "passives",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "passives_id_idx": {
+          "name": "passives_id_idx",
+          "columns": [
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.passives_to_kits": {
+      "name": "passives_to_kits",
+      "schema": "",
+      "columns": {
+        "kit_id": {
+          "name": "kit_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "passive_id": {
+          "name": "passive_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "meta": {
+          "name": "meta",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "ptk_kit_id_idx": {
+          "name": "ptk_kit_id_idx",
+          "columns": [
+            "kit_id"
+          ],
+          "isUnique": false
+        },
+        "ptk_passive_id_idx": {
+          "name": "ptk_passive_id_idx",
+          "columns": [
+            "passive_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "passives_to_kits_kit_id_kits_id_fk": {
+          "name": "passives_to_kits_kit_id_kits_id_fk",
+          "tableFrom": "passives_to_kits",
+          "tableTo": "kits",
+          "columnsFrom": [
+            "kit_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "passives_to_kits_passive_id_passives_id_fk": {
+          "name": "passives_to_kits_passive_id_passives_id_fk",
+          "tableFrom": "passives_to_kits",
+          "tableTo": "passives",
+          "columnsFrom": [
+            "passive_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "passives_to_kits_pk": {
+          "name": "passives_to_kits_pk",
+          "columns": [
+            "passive_id",
+            "kit_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "public.queue": {
+      "name": "queue",
+      "schema": "",
+      "columns": {
+        "player_uuid": {
+          "name": "player_uuid",
+          "type": "varchar(36)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "party_id": {
+          "name": "party_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_added": {
+          "name": "date_added",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "minigame_id": {
+          "name": "minigame_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "queue_minigame_id_idx": {
+          "name": "queue_minigame_id_idx",
+          "columns": [
+            "minigame_id"
+          ],
+          "isUnique": false
+        },
+        "queue_player_uuid_idx": {
+          "name": "queue_player_uuid_idx",
+          "columns": [
+            "player_uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "queue_player_uuid_basic_player_data_uuid_fk": {
+          "name": "queue_player_uuid_basic_player_data_uuid_fk",
+          "tableFrom": "queue",
+          "tableTo": "basic_player_data",
+          "columnsFrom": [
+            "player_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "queue_party_id_parties_party_id_fk": {
+          "name": "queue_party_id_parties_party_id_fk",
+          "tableFrom": "queue",
+          "tableTo": "parties",
+          "columnsFrom": [
+            "party_id"
+          ],
+          "columnsTo": [
+            "party_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "queue_minigame_id_minigames_id_fk": {
+          "name": "queue_minigame_id_minigames_id_fk",
+          "tableFrom": "queue",
+          "tableTo": "minigames",
+          "columnsFrom": [
+            "minigame_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.usercache": {
+      "name": "usercache",
+      "schema": "",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "varchar(36)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "usercache_player_uuid_idx": {
+          "name": "usercache_player_uuid_idx",
+          "columns": [
+            "uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

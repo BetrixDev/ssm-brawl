@@ -9,5 +9,8 @@
   },
   {
     "uuid": "player_3"
+  },
+  {
+    "uuid": "test_uuid"
   }
 ]
