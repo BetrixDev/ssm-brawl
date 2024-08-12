@@ -11,7 +11,6 @@ import org.bukkit.event.server.ServerLoadEvent
 
 @Service(loadOrder = -1)
 class ServerLoadService(private val plugin: SSMB) : OnStart, Listener {
-
     private val listeners = arrayListOf<OnServerLoad>()
 
     override fun onStart() {

@@ -14,6 +14,7 @@ import kotlinx.serialization.json.Json
 import net.ssmb.SSMB
 import net.ssmb.blockwork.annotations.Service
 import net.ssmb.blockwork.interfaces.OnStart
+import org.bukkit.entity.Player
 
 @Service(loadOrder = -10)
 class ApiService(private val plugin: SSMB) : OnStart {
@@ -51,5 +52,13 @@ class ApiService(private val plugin: SSMB) : OnStart {
                 throw Exception("Failed to generate token.")
             }
         }
+    }
+
+    suspend fun fetchPlayerData(player: Player): PlayerDataRecord {
+        return PlayerDataRecord("creeper")
+    }
+
+    suspend fun savePlayerData(player: Player, data: PlayerDataRecord) {
+        // stuff
     }
 }

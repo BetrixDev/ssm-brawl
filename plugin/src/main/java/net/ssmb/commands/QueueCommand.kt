@@ -2,12 +2,15 @@ package net.ssmb.commands
 
 import br.com.devsrsouza.kotlinbukkitapi.command.arguments.string
 import br.com.devsrsouza.kotlinbukkitapi.command.command
+import com.destroystokyo.paper.utils.PaperPluginLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import net.ssmb.blockwork.annotations.Service
 import net.ssmb.blockwork.interfaces.OnStart
+import net.ssmb.services.AlreadyInQueueException
+import net.ssmb.services.MinigameNotFoundException
 import net.ssmb.services.QueueService
 
 @Service
@@ -18,23 +21,28 @@ class QueueCommand(private val plugin: SSMB, private val queue: QueueService) : 
         plugin.command("queue") {
             aliases = listOf("q")
             permission = "ssmb.commands.queue"
-            tabComplete { listOf(*queue.defaultMinigameQueues, "leave") }
+            tabComplete { listOf("casual", "ranked", "leave") }
 
             executorPlayer {
                 val minigame = string(0)
 
-                withContext(Dispatchers.IO) {
-                    sender.sendMessage(
-                        Component.text("You have been added to the queue for $minigame")
-                    )
+                try {
+                    queue.addPlayerToQueue(sender, minigame)
+                    sender.sendMessage(Component.text("You have been added to the queue for $minigame"))
+                } catch (e: Exception) {
+                    when (e) {
+                        is AlreadyInQueueException -> sender.SendMessage(Component.text("You are already in a queue for ${e.minigame}, please leave that queue before entering a new one"))
+                        is MinigameNotFoundException -> sender.SendMessage(Component.text("No minigame found with id ${e.minigameInput}"))
+                        else -> e.printStackTrace()
+                    }
                 }
+
             }
 
             command("leave") {
                 executor {
-                    withContext(Dispatchers.IO) {
-                        sender.sendMessage(Component.text("You have been removed from the queue."))
-                    }
+                    queue.removePlayerFromQueue(sender)
+                    sender.sendMessage(Component.text("You have been removed from the queues!"))
                 }
             }
         }

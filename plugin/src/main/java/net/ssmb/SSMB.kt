@@ -6,7 +6,6 @@ import net.ssmb.lifecycles.OnPluginDisable
 import org.bukkit.scheduler.BukkitTask
 
 class SSMB : SuspendingJavaPlugin() {
-
     private lateinit var blockworkTickTask: BukkitTask
     private val pluginDisableListeners = arrayListOf<OnPluginDisable>()
 
