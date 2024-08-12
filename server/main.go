@@ -27,7 +27,7 @@ var (
 	apiPort        = os.Getenv("API_PORT")
 	ghAuthToken    = os.Getenv("GITHUB_AUTH_TOKEN")
 	timeStarted    = time.Now()
-	isApiConnected = false
+	isApiConnected = true
 )
 
 func main() {

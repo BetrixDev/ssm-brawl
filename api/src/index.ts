@@ -129,3 +129,39 @@ serve({ ...app, port: env.API_PORT }, async (info) => {
 
   log.info(`Backend listening on http://localhost:${info.port}`);
 });
+
+function equalFrequency(word: string): boolean {
+  let leastCommonOccurence = 0;
+
+  const occurences: Record<string, number> = {};
+
+  const splitWord = word.split("");
+
+  splitWord.forEach((c) => {
+    if (occurences[c] !== undefined) {
+      occurences[c] = 1;
+    } else {
+      occurences[c]++;
+    }
+  });
+
+  Object.entries(occurences).forEach(([key, value]) => {
+    if (value < leastCommonOccurence) {
+      leastCommonOccurence = value;
+    }
+  });
+
+  Object.keys(occurences).forEach((key) => {
+    occurences[key] = occurences[key] - leastCommonOccurence;
+  });
+
+  const totalOccurences = Object.values(occurences).reduce((p, c) => {
+    return c + p;
+  }, 0);
+
+  if ((totalOccurences / Object.values(occurences).length) % leastCommonOccurence !== 0) {
+    return false;
+  }
+
+  return true;
+}

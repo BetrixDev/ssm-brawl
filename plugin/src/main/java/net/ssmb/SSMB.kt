@@ -1,58 +1,44 @@
 package net.ssmb
 
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
-import dev.rollczi.litecommands.LiteCommands
-import dev.rollczi.litecommands.bukkit.LiteCommandsBukkit
-import net.ssmb.commands.QueueCommand
-import net.ssmb.listeners.*
-import net.ssmb.services.ApiService
-import net.ssmb.services.MinigameService
-import net.ssmb.services.WorldService
-import net.ssmb.utils.initLang
-import org.bukkit.World
-import org.bukkit.command.CommandSender
+import net.ssmb.blockwork.Blockwork
+import net.ssmb.lifecycles.OnPluginDisable
+import org.bukkit.scheduler.BukkitTask
 
 class SSMB : SuspendingJavaPlugin() {
-    lateinit var api: ApiService
-    lateinit var minigames: MinigameService
-    lateinit var worlds: WorldService
-    lateinit var hub: World
 
-    private lateinit var liteCommands: LiteCommands<CommandSender>
-
-    companion object {
-        lateinit var instance: SSMB
-    }
+    private lateinit var blockworkTickTask: BukkitTask
+    private val pluginDisableListeners = arrayListOf<OnPluginDisable>()
 
     override suspend fun onEnableAsync() {
-        instance = this
+        Blockwork.init {
+            registerPlugin(this@SSMB)
 
-        api = ApiService()
-        api.initialize()
-        api.queueFlush()
+            addPackage("net.ssmb.services")
+            addPackage("net.ssmb.commands")
+            addPackage("net.ssmb.components")
 
-        minigames = MinigameService()
-        worlds = WorldService()
+            container {
+                register(this@SSMB)
+                register(this@SSMB.logger)
+            }
+        }
 
-        initLang(this)
+        blockworkTickTask =
+            server.scheduler.runTaskTimer(this, Runnable { Blockwork.doTick() }, 0L, 1L)
 
-        hub = worlds.createSsmbWorld("blue_forest", "hub_1")
+        Blockwork.modding.onListenerAdded<OnPluginDisable> { pluginDisableListeners.add(it) }
 
-        server.pluginManager.registerEvents(PlayerJoinListener(), this)
-        server.pluginManager.registerEvents(InventoryOpenListener(), this)
-        server.pluginManager.registerEvents(PlayerPickItemListener(), this)
-        server.pluginManager.registerEvents(PlayerDropItemListener(), this)
-        server.pluginManager.registerEvents(EntityDamageByBlockListener(), this)
-        server.pluginManager.registerEvents(PlayerInteractListener(), this)
-        server.pluginManager.registerEvents(BlockBreakListener(), this)
-
-        liteCommands = LiteCommandsBukkit.builder("ssmb", this).commands(QueueCommand()).build()
+        Blockwork.modding.onListenerRemoved<OnPluginDisable> { pluginDisableListeners.remove(it) }
 
         logger.info("STARTED SSMB")
     }
 
     override suspend fun onDisableAsync() {
-        api.queueFlush()
-        worlds.deleteAllLoadedWorlds()
+        blockworkTickTask.cancel()
+
+        pluginDisableListeners.forEach { it.onPluginDisable() }
+
+        logger.info("STOPPED SSMB")
     }
 }

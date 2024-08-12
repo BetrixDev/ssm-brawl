@@ -1,81 +1,56 @@
 package net.ssmb.services
 
+import com.destroystokyo.paper.utils.PaperPluginLogger
 import java.io.File
-import net.ssmb.SSMB
+import net.ssmb.blockwork.Blockwork
+import net.ssmb.blockwork.annotations.Service
+import net.ssmb.components.worlds.HubWorldComponent
+import net.ssmb.lifecycles.OnPluginDisable
+import net.ssmb.lifecycles.OnServerLoad
 import org.bukkit.Bukkit
-import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.WorldCreator
-import org.codehaus.plexus.util.FileUtils
 
-class WorldService {
-    private val plugin = SSMB.instance
-    private val loadedWorlds = hashMapOf<String, World>()
+@Service
+class WorldService(private val logger: PaperPluginLogger) : OnPluginDisable, OnServerLoad {
+    private val loadedWorlds = arrayListOf<World>()
 
-    suspend fun createSsmbWorld(mapId: String, serverName: String): World {
-        val mapDetails = plugin.api.mapGetMapDetails(mapId)
+    override fun onServerLoad() {
+        logger.info("Attempting to create hub world")
 
-        val baseWorldDirectory = File("ssmb_worlds/$mapId")
-        val copyDirectory = File("servers_$serverName")
+        val existingHubComponents = Blockwork.components.getAllWorldComponents<HubWorldComponent>()
 
-        if (copyDirectory.exists()) {
-            throw RuntimeException("Server already exists with name $serverName")
-        }
+        if (existingHubComponents.isEmpty()) {
+            logger.info("No hub world component found, creating a new one.")
 
-        try {
-            baseWorldDirectory.copyRecursively(copyDirectory, true)
-            //            FileUtils.copyDirectory(baseWorldDirectory, copyDirectory, "**/*", null)
-            val uidPath = File("${copyDirectory.path}/uid.dat")
-            val sessionPath = File("${copyDirectory.path}/session.dat")
+            val baseWorldDirectory = File("ssmb_worlds/blue_forest")
+            val copyWorldDirectory = File("servers_hub")
 
-            if (uidPath.exists()) {
-                uidPath.delete()
-            }
-            if (sessionPath.exists()) {
-                sessionPath.delete()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+            if (copyWorldDirectory.exists()) copyWorldDirectory.deleteRecursively()
+            baseWorldDirectory.copyRecursively(copyWorldDirectory, true)
 
-        val worldCreator = WorldCreator(copyDirectory.path)
-        val world = worldCreator.createWorld() ?: throw Exception("Error loading copied world")
-        world.isAutoSave = false
+            val uidPath = File("${copyWorldDirectory.path}/uid.dat")
+            val sessionPath = File("${copyWorldDirectory.path}/session.dat")
 
-        world.setSpawnLocation(
-            Location(world, mapDetails.origin.x, mapDetails.origin.y, mapDetails.origin.z)
-        )
+            if (uidPath.exists()) uidPath.delete()
+            if (sessionPath.exists()) sessionPath.delete()
 
-        loadedWorlds[serverName] = world
+            val worldCreator = WorldCreator(copyWorldDirectory.path)
+            println("world name ${worldCreator.name()}")
 
-        return world
-    }
-
-    fun deleteSsmbWorld(serverName: String) {
-        val loadedWorld = loadedWorlds[serverName] ?: return
-
-        Bukkit.unloadWorld(loadedWorld, false)
-
-        try {
-            FileUtils.deleteDirectory("servers_$serverName")
-        } catch (e: Exception) {
-            e.printStackTrace()
+            worldCreator.createWorld() ?: throw Exception("Failed to create hub world")
+        } else {
+            logger.info("Hub world has already been created")
         }
     }
 
-    fun deleteAllLoadedWorlds() {
-        val mainWorld = Bukkit.getWorlds()[0]
-
-        loadedWorlds.forEach { (k, v) ->
-            v.players.forEach { it.teleport(mainWorld.spawnLocation) }
-
-            Bukkit.unloadWorld(v, false)
-
-            try {
-                FileUtils.deleteDirectory("servers/$k")
-            } catch (e: Exception) {
-                e.printStackTrace()
+    override fun onPluginDisable() {
+        loadedWorlds.forEach { world ->
+            world.players.forEach { player ->
+                player.teleport(Bukkit.getServer().worlds[0].spawnLocation)
             }
+
+            Bukkit.getServer().unloadWorld(world, false)
         }
     }
 }
