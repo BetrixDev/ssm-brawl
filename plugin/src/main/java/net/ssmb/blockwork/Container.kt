@@ -6,6 +6,7 @@ import net.ssmb.blockwork.Blockwork.Companion.container
 import net.ssmb.blockwork.annotations.Inject
 import net.ssmb.blockwork.annotations.Service
 import net.ssmb.blockwork.interfaces.OnTick
+import kotlin.math.max
 
 class Container {
     @PublishedApi internal val registeredExternalDependencies = hashMapOf<String, Any>()
@@ -48,7 +49,9 @@ class Container {
                 }
             } else {
                 registerService(it.type)
-                loadOrder++
+
+                val dependentServiceLoadOrder = max(registeredServices.find { (_, clazz) -> clazz.name == it.type.name }?.first ?: 1, 1)
+                loadOrder += dependentServiceLoadOrder
             }
         }
 
