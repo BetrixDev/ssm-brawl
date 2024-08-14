@@ -7,6 +7,10 @@ import net.ssmb.blockwork.Blockwork.Companion.container
 import net.ssmb.blockwork.annotations.Inject
 import net.ssmb.blockwork.annotations.Service
 import net.ssmb.blockwork.interfaces.OnTick
+import kotlin.reflect.KParameter
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.javaType
 
 class Container {
     @PublishedApi internal val registeredExternalDependencies = hashMapOf<String, Any>()
@@ -154,5 +158,56 @@ class Container {
         }
 
         return parameters.toTypedArray()
+    }
+
+    // TODO make this function completely replace the getParametersForConstructor one eventually
+    fun resolveParameters(parameters: List<KParameter>, customTypes: Map<String?, Any> = mapOf()): Map<KParameter, Any?> {
+        val parametersMap = hashMapOf<KParameter, Any?>()
+
+        parameters.forEach {
+            val parameterTypeName = it.type.javaClass.name
+            val isService = it.type.hasAnnotation<Service>()
+
+            if (customTypes[parameterTypeName] != null) {
+                parametersMap[it] = customTypes[parameterTypeName]
+            } else if (isService) {
+                val serviceDep =
+                    constructedServices[it.type.javaClass.name]
+                        ?: throw Exception(
+                            "Error when getting parameters for constructor, type \"${parameterTypeName}\" is annotated as a service, but not constructed"
+                        )
+                parametersMap[it] = serviceDep
+            } else {
+                val isCustomInjection = it.hasAnnotation<Inject>()
+
+                if (isCustomInjection) {
+                    val injectData = it.findAnnotation<Inject>()
+
+                    val injectedDep =
+                        registeredExternalDependencies[injectData?.token]
+                            ?: throw Exception(
+                                "Error when getting parameters for constructor, type \"${parameterTypeName}\" has @Inject annotation, but token, \"${injectData?.token}\", was not registered"
+                            )
+
+                    parametersMap[it] = injectedDep
+                } else {
+                    val dep =
+                        registeredExternalDependencies[parameterTypeName]
+                            ?: throw Exception(
+                                "Error when getting parameters for constructor, type \"${parameterTypeName}\", was not registered as an external dependency and is not annotated as a service"
+                            )
+
+                    parametersMap[it] = dep
+                }
+            }
+        }
+
+        if (parametersMap.size != parameters.size) {
+            throw Exception(
+                "Error when getting parameters for constructor, could not resolve every parameter"
+            )
+        }
+
+        return parametersMap
     }
 }

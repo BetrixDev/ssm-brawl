@@ -155,8 +155,8 @@ class ComponentManager : Listener {
         }
     }
 
-    private fun <T : Any> getValidComponents(
-        target: T,
+    private fun getValidComponents(
+        target: Any,
         tag: String,
         components: List<Pair<String, Class<*>>>
     ): List<Pair<String, Class<*>>> {
@@ -169,7 +169,9 @@ class ComponentManager : Listener {
                     companion::class.members.find { m -> m.name == "predicate" }
                         ?: return@filter true
 
-                return@filter predicate.call(companion, target) as Boolean
+                val parameters = Blockwork.container.resolveParameters(predicate.parameters, mapOf(target::class.simpleName to target))
+
+                return@filter predicate.callBy(parameters) as? Boolean ?: false
             }
     }
 }
