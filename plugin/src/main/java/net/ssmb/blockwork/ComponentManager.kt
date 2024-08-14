@@ -8,6 +8,8 @@ import net.ssmb.blockwork.interfaces.OnDestroy
 import org.bukkit.World
 import org.bukkit.entity.Entity
 import org.bukkit.event.Listener
+import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.full.isSuperclassOf
 
 class ComponentManager : Listener {
     private val registeredWorldComponents = arrayListOf<Pair<String, Class<*>>>()
@@ -169,7 +171,8 @@ class ComponentManager : Listener {
                     companion::class.members.find { m -> m.name == "predicate" }
                         ?: return@filter true
 
-                val parameters = Blockwork.container.resolveParameters(predicate.parameters, mapOf(target::class.simpleName to target))
+                val targetDependencyKey = if (target::class.isSuperclassOf(Entity::class)) "Entity" else "World"
+                val parameters = Blockwork.container.resolveParameters(predicate.parameters, mapOf(targetDependencyKey to target))
 
                 return@filter predicate.callBy(parameters) as? Boolean ?: false
             }
