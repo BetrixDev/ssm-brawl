@@ -23,8 +23,6 @@ class HubWorldComponent : WorldComponent(), OnPlayerJoined, OnDestroy {
     override fun onDestroy() {
         val defaultWorld = Bukkit.getServer().worlds.first()
 
-        world.players.forEach {
-            it.teleport(defaultWorld.spawnLocation)
-        }
+        world.players.forEach { it.teleport(defaultWorld.spawnLocation) }
     }
 }

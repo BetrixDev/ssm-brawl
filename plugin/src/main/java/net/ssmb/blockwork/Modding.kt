@@ -10,8 +10,7 @@ class Modding {
     }
 
     inline fun <reified T : Any> onListenerAdded(noinline cb: (obj: T) -> Unit) {
-        @Suppress("UNCHECKED_CAST")
-        onListenerAdded(T::class.java, cb as (Any) -> Unit)
+        @Suppress("UNCHECKED_CAST") onListenerAdded(T::class.java, cb as (Any) -> Unit)
     }
 
     @PublishedApi
@@ -20,8 +19,7 @@ class Modding {
     }
 
     inline fun <reified T : Any> onListenerRemoved(noinline cb: (obj: T) -> Unit) {
-        @Suppress("UNCHECKED_CAST")
-        onListenerRemoved(T::class.java, cb as (Any) -> Unit)
+        @Suppress("UNCHECKED_CAST") onListenerRemoved(T::class.java, cb as (Any) -> Unit)
     }
 
     fun handleListenerAdded(obj: Any) {

@@ -8,7 +8,8 @@ import org.bukkit.entity.Player
 data class QueueRecord(val player: Player, val minigameId: String, val dateAdded: Long)
 
 class AlreadyInQueueException(val minigame: String) : Exception()
-class MinigameNotFoundException(val minigameInput: String): Exception()
+
+class MinigameNotFoundException(val minigameInput: String) : Exception()
 
 @Service
 class QueueService(private val plugin: SSMB, private val minigames: MinigamesService) {
@@ -21,7 +22,8 @@ class QueueService(private val plugin: SSMB, private val minigames: MinigamesSer
             throw AlreadyInQueueException(alreadyInQueue.minigameId)
         }
 
-        val minigameData = minigames.getMinigameData(minigame) ?: throw MinigameNotFoundException(minigame)
+        val minigameData =
+            minigames.getMinigameData(minigame) ?: throw MinigameNotFoundException(minigame)
 
         val queueRecord = QueueRecord(player, minigame, System.currentTimeMillis())
 
@@ -29,9 +31,8 @@ class QueueService(private val plugin: SSMB, private val minigames: MinigamesSer
 
         // Offload checking if we can start a minigame onto a different thread
         plugin.launch {
-            val playersInQueueForMinigame = queue
-                .filter { it.minigameId == minigameData.id }
-                .sortedBy { it.dateAdded }
+            val playersInQueueForMinigame =
+                queue.filter { it.minigameId == minigameData.id }.sortedBy { it.dateAdded }
 
             val playersNeededToStart = minigameData.teams * minigameData.playersPerTeam
 

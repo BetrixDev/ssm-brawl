@@ -33,9 +33,7 @@ object CollectionService {
 
         entry.add(tag)
 
-        entityAddedListeners[tag]?.forEach {
-            it.invoke(entity)
-        }
+        entityAddedListeners[tag]?.forEach { it.invoke(entity) }
     }
 
     fun addTag(world: World, tag: String) {
@@ -54,9 +52,7 @@ object CollectionService {
 
         entry.add(tag)
 
-        worldAddedListeners[tag]?.forEach {
-            it.invoke(world)
-        }
+        worldAddedListeners[tag]?.forEach { it.invoke(world) }
     }
 
     fun removeTag(entity: Entity, tag: String) {
@@ -70,9 +66,7 @@ object CollectionService {
 
         taggedEntities[entity] = arrayListOf(*newEntry.toTypedArray())
 
-        entityRemovedListeners[tag]?.forEach {
-            it.invoke(entity)
-        }
+        entityRemovedListeners[tag]?.forEach { it.invoke(entity) }
     }
 
     fun removeTag(world: World, tag: String) {
@@ -86,9 +80,7 @@ object CollectionService {
 
         taggedWorlds[world] = arrayListOf(*newEntry.toTypedArray())
 
-        worldRemovedListeners[tag]?.forEach {
-            it.invoke(world)
-        }
+        worldRemovedListeners[tag]?.forEach { it.invoke(world) }
     }
 
     fun getTags(entity: Entity): ArrayList<String> {
@@ -120,34 +112,25 @@ object CollectionService {
     fun onEntityTagged(cb: (entity: Entity, tag: String) -> Unit): () -> Unit {
         entityTaggedListeners.add(cb)
 
-        return {
-            entityTaggedListeners.remove(cb)
-        }
+        return { entityTaggedListeners.remove(cb) }
     }
 
     fun onEntityUntagged(cb: (entity: Entity, tag: String) -> Unit): () -> Unit {
         entityUntaggedListeners.add(cb)
 
-        return {
-            entityUntaggedListeners.remove(cb)
-        }
+        return { entityUntaggedListeners.remove(cb) }
     }
-
 
     fun onWorldTagged(cb: (world: World, tag: String) -> Unit): () -> Unit {
         worldTaggedListeners.add(cb)
 
-        return {
-            worldTaggedListeners.remove(cb)
-        }
+        return { worldTaggedListeners.remove(cb) }
     }
 
     fun onWorldUntagged(cb: (world: World, tag: String) -> Unit): () -> Unit {
         worldUntaggedListeners.add(cb)
 
-        return {
-            worldUntaggedListeners.remove(cb)
-        }
+        return { worldUntaggedListeners.remove(cb) }
     }
 
     fun onEntityAdded(tag: String, cb: (entity: Entity) -> Unit): () -> Unit {
@@ -159,9 +142,7 @@ object CollectionService {
             existingListeners.add(cb)
         }
 
-        return {
-            existingListeners?.remove(cb)
-        }
+        return { existingListeners?.remove(cb) }
     }
 
     fun onEntityRemoved(tag: String, cb: (entity: Entity) -> Unit): () -> Unit {
@@ -173,12 +154,10 @@ object CollectionService {
             existingListeners.add(cb)
         }
 
-        return {
-            existingListeners?.remove(cb)
-        }
+        return { existingListeners?.remove(cb) }
     }
 
-    fun onWorldAdded(tag: String, cb: (world: World) -> Unit): () -> Unit  {
+    fun onWorldAdded(tag: String, cb: (world: World) -> Unit): () -> Unit {
         val existingListeners = worldAddedListeners[tag]
 
         if (existingListeners == null) {
@@ -187,9 +166,7 @@ object CollectionService {
             existingListeners.add(cb)
         }
 
-        return {
-            existingListeners?.remove(cb)
-        }
+        return { existingListeners?.remove(cb) }
     }
 
     fun onWorldRemoved(tag: String, cb: (world: World) -> Unit): () -> Unit {
@@ -201,9 +178,7 @@ object CollectionService {
             existingListeners.add(cb)
         }
 
-        return {
-            existingListeners?.remove(cb)
-        }
+        return { existingListeners?.remove(cb) }
     }
 }
 

@@ -21,8 +21,7 @@ class ComponentManager : Listener {
 
     init {
         CollectionService.onEntityTagged { entity, tag ->
-            val validComponents =
-                getValidComponents(entity, tag, registeredEntityComponents)
+            val validComponents = getValidComponents(entity, tag, registeredEntityComponents)
 
             validComponents.map {
                 @Suppress("UNCHECKED_CAST")
@@ -53,12 +52,10 @@ class ComponentManager : Listener {
         }
 
         CollectionService.onWorldTagged { world, tag ->
-            val validComponents =
-                getValidComponents(world, tag, registeredWorldComponents)
+            val validComponents = getValidComponents(world, tag, registeredWorldComponents)
 
             validComponents.map {
-                val instance =
-                    Blockwork.container.constructDependency(it.second) as WorldComponent
+                val instance = Blockwork.container.constructDependency(it.second) as WorldComponent
                 instance.world = world
                 instance.tag = tag
 

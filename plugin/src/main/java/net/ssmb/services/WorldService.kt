@@ -39,7 +39,8 @@ class WorldService(private val logger: PaperPluginLogger) : OnPluginDisable, OnS
             val worldCreator = WorldCreator(copyWorldDirectory.path)
             println("world name ${worldCreator.name()}")
 
-            val hubWorld = worldCreator.createWorld() ?: throw Exception("Failed to create hub world")
+            val hubWorld =
+                worldCreator.createWorld() ?: throw Exception("Failed to create hub world")
 
             hubWorld.addTag("hub")
         } else {
