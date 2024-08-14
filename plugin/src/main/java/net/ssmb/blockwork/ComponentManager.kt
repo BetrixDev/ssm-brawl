@@ -1,21 +1,13 @@
 package net.ssmb.blockwork
 
-import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
 import kotlin.reflect.full.companionObjectInstance
 import net.ssmb.blockwork.annotations.Component
 import net.ssmb.blockwork.components.EntityComponent
 import net.ssmb.blockwork.components.WorldComponent
-import net.ssmb.blockwork.interfaces.AfterUnload
-import net.ssmb.blockwork.interfaces.BeforeUnload
-import net.ssmb.blockwork.interfaces.OnRemoveFromWorld
+import net.ssmb.blockwork.interfaces.OnDestroy
 import org.bukkit.World
 import org.bukkit.entity.Entity
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntitySpawnEvent
-import org.bukkit.event.world.WorldLoadEvent
-import org.bukkit.event.world.WorldUnloadEvent
 
 class ComponentManager : Listener {
     private val registeredWorldComponents = arrayListOf<Pair<String, Class<*>>>()
@@ -26,6 +18,71 @@ class ComponentManager : Listener {
 
     val componentAddedListeners = arrayListOf<Pair<Class<*>, (obj: Any) -> Unit>>()
     val componentRemovedListeners = arrayListOf<Pair<Class<*>, (obj: Any) -> Unit>>()
+
+    init {
+        CollectionService.onEntityTagged { entity, tag ->
+            val validComponents =
+                getValidComponents(entity, tag, registeredEntityComponents)
+
+            validComponents.map {
+                @Suppress("UNCHECKED_CAST")
+                val instance =
+                    Blockwork.container.constructDependency(it.second) as EntityComponent<Entity>
+                instance.entity = entity
+                instance.tag = tag
+
+                constructedEntityComponents.add(Pair(entity, instance))
+                handleComponentAdded(instance)
+                Blockwork.modding.handleListenerAdded(instance)
+                Blockwork.handleLifecycles(it.second, instance)
+            }
+        }
+
+        CollectionService.onEntityUntagged { entity, tag ->
+            constructedEntityComponents.removeAll {
+                val shouldRemove = it.first == entity && it.second.tag == tag
+
+                if (shouldRemove) {
+                    handleComponentRemoved(it.second)
+                    Blockwork.modding.handleListenerRemoved(it.second)
+                    (it.second as? OnDestroy)?.onDestroy()
+                }
+
+                return@removeAll shouldRemove
+            }
+        }
+
+        CollectionService.onWorldTagged { world, tag ->
+            val validComponents =
+                getValidComponents(world, tag, registeredWorldComponents)
+
+            validComponents.map {
+                val instance =
+                    Blockwork.container.constructDependency(it.second) as WorldComponent
+                instance.world = world
+                instance.tag = tag
+
+                constructedWorldComponents.add(Pair(world, instance))
+                handleComponentAdded(instance)
+                Blockwork.modding.handleListenerAdded(instance)
+                Blockwork.handleLifecycles(it.second, instance)
+            }
+        }
+
+        CollectionService.onWorldUntagged { world, tag ->
+            constructedWorldComponents.removeAll {
+                val shouldRemove = it.first == world && it.second.tag == tag
+
+                if (shouldRemove) {
+                    handleComponentRemoved(it.second)
+                    Blockwork.modding.handleListenerRemoved(it.second)
+                    (it.second as? OnDestroy)?.onDestroy()
+                }
+
+                return@removeAll shouldRemove
+            }
+        }
+    }
 
     inline fun <reified T : Any> getAllWorldComponents(): List<T> {
         return constructedWorldComponents
@@ -82,102 +139,6 @@ class ComponentManager : Listener {
             registeredWorldComponents.add(Pair(componentMetadata.tag, clazz))
         } else if (EntityComponent::class.java.isAssignableFrom(clazz)) {
             registeredEntityComponents.add(Pair(componentMetadata.tag, clazz))
-        }
-    }
-
-    @EventHandler
-    fun onWorldLoad(event: WorldLoadEvent) {
-        val tagMetadata = event.world.getMetadata(Tag.World.name)
-        val tagString = if (tagMetadata.size > 0) (tagMetadata.first().asString()) else "default"
-
-        val validComponents = getValidComponents(event.world, tagString, registeredWorldComponents)
-
-        validComponents.map {
-            val instance = Blockwork.container.constructDependency(it.second) as WorldComponent
-            instance.world = event.world
-
-            constructedWorldComponents.add(Pair(event.world, instance))
-            handleComponentAdded(instance)
-            Blockwork.modding.handleListenerAdded(instance)
-            Blockwork.handleLifecycles(it.second, instance)
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    fun onWorldUnloadLowest(event: WorldUnloadEvent) {
-        val attachedComponents = constructedWorldComponents.filter { it.first == event.world }
-
-        attachedComponents.forEach {
-            if (it.second is BeforeUnload) {
-                (it.second as BeforeUnload).onBeforeUnload(event)
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    fun onWorldUnloadHighest(event: WorldUnloadEvent) {
-        val attachedComponents = constructedWorldComponents.filter { it.first == event.world }
-
-        if (!event.isCancelled) {
-            attachedComponents.forEach {
-                if (it.second is AfterUnload) {
-                    (it.second as AfterUnload).onAfterUnload(event)
-                }
-            }
-        }
-
-        constructedWorldComponents.removeAll {
-            val shouldRemove = it.first == event.world
-
-            if (shouldRemove) {
-                handleComponentRemoved(it.second)
-                Blockwork.modding.handleListenerRemoved(it.second)
-            }
-
-            return@removeAll shouldRemove
-        }
-    }
-
-    @EventHandler
-    fun onEntitySpawn(event: EntitySpawnEvent) {
-        val tagMetadata = event.entity.getMetadata(Tag.Entity.name)
-        val tagString = if (tagMetadata.size > 0) (tagMetadata.first().asString()) else "default"
-
-        val validComponents =
-            getValidComponents(event.entity, tagString, registeredEntityComponents)
-
-        validComponents.map {
-            @Suppress("UNCHECKED_CAST")
-            val instance =
-                Blockwork.container.constructDependency(it.second) as EntityComponent<Entity>
-            instance.entity = event.entity
-
-            constructedEntityComponents.add(Pair(event.entity, instance))
-            handleComponentAdded(instance)
-            Blockwork.modding.handleListenerAdded(instance)
-            Blockwork.handleLifecycles(it.second, instance)
-        }
-    }
-
-    @EventHandler
-    fun onEntityRemoveFromWorld(event: EntityRemoveFromWorldEvent) {
-        val attachedComponents = constructedEntityComponents.filter { it.first == event.entity }
-
-        attachedComponents.forEach {
-            if (it.second is OnRemoveFromWorld) {
-                (it.second as OnRemoveFromWorld).onRemoveFromWorld(event)
-            }
-        }
-
-        constructedEntityComponents.removeAll {
-            val shouldRemove = it.first == event.entity
-
-            if (shouldRemove) {
-                handleComponentRemoved(it.second)
-                Blockwork.modding.handleListenerRemoved(it.second)
-            }
-
-            return@removeAll shouldRemove
         }
     }
 

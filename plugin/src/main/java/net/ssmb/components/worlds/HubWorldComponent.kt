@@ -3,18 +3,13 @@ package net.ssmb.components.worlds
 import io.papermc.paper.entity.LookAnchor
 import net.ssmb.blockwork.annotations.Component
 import net.ssmb.blockwork.components.WorldComponent
+import net.ssmb.blockwork.interfaces.OnDestroy
 import net.ssmb.lifecycles.OnPlayerJoined
-import org.bukkit.World
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
-@Component
-class HubWorldComponent : WorldComponent(), OnPlayerJoined {
-    companion object Meta {
-        fun predicate(world: World): Boolean {
-            return world.name.contains("hub")
-        }
-    }
-
+@Component("hub")
+class HubWorldComponent : WorldComponent(), OnPlayerJoined, OnDestroy {
     override fun onPlayerJoined(player: Player) {
         val hubSpawnLocation = world.spawnLocation
         hubSpawnLocation.x = -29.5
@@ -23,5 +18,13 @@ class HubWorldComponent : WorldComponent(), OnPlayerJoined {
 
         player.teleport(hubSpawnLocation)
         player.lookAt(-57.5, 59.0, 1.0, LookAnchor.EYES)
+    }
+
+    override fun onDestroy() {
+        val defaultWorld = Bukkit.getServer().worlds.first()
+
+        world.players.forEach {
+            it.teleport(defaultWorld.spawnLocation)
+        }
     }
 }

@@ -3,6 +3,7 @@ package net.ssmb.services
 import com.destroystokyo.paper.utils.PaperPluginLogger
 import java.io.File
 import net.ssmb.blockwork.Blockwork
+import net.ssmb.blockwork.addTag
 import net.ssmb.blockwork.annotations.Service
 import net.ssmb.components.worlds.HubWorldComponent
 import net.ssmb.lifecycles.OnPluginDisable
@@ -38,7 +39,9 @@ class WorldService(private val logger: PaperPluginLogger) : OnPluginDisable, OnS
             val worldCreator = WorldCreator(copyWorldDirectory.path)
             println("world name ${worldCreator.name()}")
 
-            worldCreator.createWorld() ?: throw Exception("Failed to create hub world")
+            val hubWorld = worldCreator.createWorld() ?: throw Exception("Failed to create hub world")
+
+            hubWorld.addTag("hub")
         } else {
             logger.info("Hub world has already been created")
         }
