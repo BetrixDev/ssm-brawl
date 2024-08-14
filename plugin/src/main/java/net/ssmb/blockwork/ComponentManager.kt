@@ -118,7 +118,7 @@ class ComponentManager : Listener {
         componentAddedListeners.add(Pair(T::class.java, cb as (Any) -> Unit))
 
         // Returning a function that will remove the listener to avoid memory leaks
-        return { componentAddedListeners.removeIf { it.first == T::class.java } }
+        return { componentAddedListeners.removeAll { it.first == T::class.java } }
     }
 
     inline fun <reified T : Any> onComponentRemoved(noinline cb: (T) -> Unit): () -> Unit {
@@ -126,7 +126,7 @@ class ComponentManager : Listener {
         componentRemovedListeners.add(Pair(T::class.java, cb as (Any) -> Unit))
 
         // Returning a function that will remove the listener to avoid memory leaks
-        return { componentRemovedListeners.removeIf { it.first == T::class.java } }
+        return { componentRemovedListeners.removeAll { it.first == T::class.java } }
     }
 
     fun registerComponent(clazz: Class<*>) {
