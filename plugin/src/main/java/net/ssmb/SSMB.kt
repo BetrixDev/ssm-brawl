@@ -9,20 +9,24 @@ import net.ssmb.lifecycles.OnPluginDisable
 import org.bukkit.GameMode
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.scheduler.BukkitTask
 
 class SSMB : SuspendingJavaPlugin() {
     private lateinit var blockworkTickTask: BukkitTask
     private val pluginDisableListeners = arrayListOf<OnPluginDisable>()
 
+    companion object {
+        lateinit var instance: SSMB
+    }
+
     override suspend fun onEnableAsync() {
+        instance = this
+
         Blockwork.init {
             registerPlugin(this@SSMB)
 

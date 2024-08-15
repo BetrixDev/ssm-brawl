@@ -1,6 +1,7 @@
 package net.ssmb.components.worlds
 
 import io.papermc.paper.entity.LookAnchor
+import net.ssmb.blockwork.addTag
 import net.ssmb.blockwork.annotations.Component
 import net.ssmb.blockwork.components.WorldComponent
 import net.ssmb.blockwork.interfaces.OnDestroy
@@ -18,6 +19,7 @@ class HubWorldComponent : WorldComponent(), OnPlayerJoined, OnDestroy {
 
         player.teleport(hubSpawnLocation)
         player.lookAt(-57.5, 59.0, 1.0, LookAnchor.EYES)
+        player.addTag("passive_double_jump")
     }
 
     override fun onDestroy() {

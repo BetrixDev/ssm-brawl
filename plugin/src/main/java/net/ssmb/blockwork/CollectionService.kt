@@ -3,6 +3,9 @@ package net.ssmb.blockwork
 import org.bukkit.World
 import org.bukkit.entity.Entity
 
+// TODO: CollectionService should listen for when entities die or unload and when worlds unload
+//  so we can properly dereference them and allow them to be garbage collected
+
 object CollectionService {
     private val taggedEntities = hashMapOf<Entity, ArrayList<String>>()
     private val taggedWorlds = hashMapOf<World, ArrayList<String>>()
