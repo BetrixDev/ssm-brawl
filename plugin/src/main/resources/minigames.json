@@ -4,7 +4,7 @@
     "teams": 4,
     "playersPerTeam": 1,
     "stocks": 4,
-    "mapBlackList": [],
-    "mapWhiteList": []
+    "mapBlacklist": ["test"],
+    "mapWhitelist": ["test"]
   }
 ]

@@ -18,10 +18,11 @@ import org.bukkit.entity.Player
 
 @Service(loadOrder = -10)
 class ApiService(private val plugin: SSMB) : OnStart {
-    private val secretToken = System.getenv("API_TOKEN_SECRET") ?: ""
-    private val apiHost = System.getenv("API_HOST") ?: "localhost"
-    private val apiPort = System.getenv("API_PORT") ?: "8080"
-    private val apiProtocol = System.getenv("API_PROTOCOL") ?: "http"
+    private val env = System.getenv()
+    private val secretToken = env["API_TOKEN_SECRET"] ?: ""
+    private val apiHost = env["API_HOST"] ?: "localhost"
+    private val apiPort = env["API_PORT"] ?: "8080"
+    private val apiProtocol = env["API_PROTOCOL"] ?: "http"
 
     private val client =
         HttpClient(CIO) {

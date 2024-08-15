@@ -4,11 +4,13 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import java.io.BufferedReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import net.ssmb.SSMB
 import net.ssmb.blockwork.annotations.Service
 import net.ssmb.blockwork.interfaces.OnStart
 
+@Serializable
 data class MinigameDataRecord(
     val id: String,
     val teams: Int,
