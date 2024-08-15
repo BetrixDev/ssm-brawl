@@ -18,40 +18,34 @@ object CollectionService {
     private val worldRemovedListeners = hashMapOf<String, ArrayList<(world: World) -> Unit>>()
 
     fun addTag(entity: Entity, tag: String) {
-        val entry = taggedEntities[entity]
+        var entry = taggedEntities[entity]
 
         if (entry == null) {
-            taggedEntities[entity] = arrayListOf(tag)
-            return
-        }
-
-        val alreadyHasTag = entry.contains(tag)
-
-        if (alreadyHasTag) {
+            entry = arrayListOf(tag)
+            taggedEntities[entity] = entry
+        } else if (entry.contains(tag)) {
             return
         }
 
         entry.add(tag)
 
+        entityTaggedListeners.forEach { it.invoke(entity, tag) }
         entityAddedListeners[tag]?.forEach { it.invoke(entity) }
     }
 
     fun addTag(world: World, tag: String) {
-        val entry = taggedWorlds[world]
+        var entry = taggedWorlds[world]
 
         if (entry == null) {
-            taggedWorlds[world] = arrayListOf(tag)
-            return
-        }
-
-        val alreadyHasTag = entry.contains(tag)
-
-        if (alreadyHasTag) {
+            entry = arrayListOf(tag)
+            taggedWorlds[world] = entry
+        } else if (entry.contains(tag)) {
             return
         }
 
         entry.add(tag)
 
+        worldTaggedListeners.forEach { it.invoke(world, tag) }
         worldAddedListeners[tag]?.forEach { it.invoke(world) }
     }
 
@@ -66,6 +60,7 @@ object CollectionService {
 
         taggedEntities[entity] = arrayListOf(*newEntry.toTypedArray())
 
+        entityUntaggedListeners.forEach { it.invoke(entity, tag) }
         entityRemovedListeners[tag]?.forEach { it.invoke(entity) }
     }
 
@@ -80,6 +75,7 @@ object CollectionService {
 
         taggedWorlds[world] = arrayListOf(*newEntry.toTypedArray())
 
+        worldUntaggedListeners.forEach { it.invoke(world, tag) }
         worldRemovedListeners[tag]?.forEach { it.invoke(world) }
     }
 
