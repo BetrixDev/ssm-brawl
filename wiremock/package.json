@@ -1,0 +1,11 @@
+{
+  "name": "wiremock",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon --exec \"wiremock\""
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "wiremock": "^3.9.1"
+  }
+}

@@ -4,7 +4,8 @@
   "scripts": {
     "start": "dotenv -- turbo start",
     "start:server": "dotenv -- turbo start --filter=api --filter=server",
-    "dev:server": "dotenv -- turbo dev --filter=api --filter=server",
+    "dev:server": "turbo dev --filter=api --filter=server",
+    "dev:server-wire": "dotenv -- turbo dev --filter=wiremock --filter=server",
     "build:api": "turbo build --filter=env --filter=api --filter=wrangler --filter=tussler --force",
     "start:api": "dotenv -- turbo start --filter=api",
     "dev:api": "dotenv -- turbo dev --filter=api",

@@ -1,0 +1,14 @@
+{
+    "request": {
+        "method": "POST",
+        "url": "/generateToken/plugin"
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "Content-Type": "application/json",
+            "Set-Cookie": "token=testing_token; path=/"
+        },
+        "body": "testing_token"
+    }
+}
