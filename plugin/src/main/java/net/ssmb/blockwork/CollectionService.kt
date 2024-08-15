@@ -3,9 +3,6 @@ package net.ssmb.blockwork
 import org.bukkit.World
 import org.bukkit.entity.Entity
 
-// TODO: CollectionService should listen for when entities die or unload and when worlds unload
-//  so we can properly dereference them and allow them to be garbage collected
-
 object CollectionService {
     private val taggedEntities = hashMapOf<Entity, ArrayList<String>>()
     private val taggedWorlds = hashMapOf<World, ArrayList<String>>()
@@ -50,6 +47,28 @@ object CollectionService {
 
         worldTaggedListeners.forEach { it.invoke(world, tag) }
         worldAddedListeners[tag]?.forEach { it.invoke(world) }
+    }
+
+    fun removeTags(entity: Entity) {
+        val entry = taggedEntities[entity] ?: return
+
+        entry.forEach { tag ->
+            entityRemovedListeners[tag]?.forEach { func -> func.invoke(entity) }
+            entityUntaggedListeners.forEach { it.invoke(entity, tag) }
+        }
+
+        taggedEntities.remove(entity)
+    }
+
+    fun removeTags(world: World) {
+        val entry = taggedWorlds[world] ?: return
+
+        entry.forEach { tag ->
+            worldRemovedListeners[tag]?.forEach { func -> func.invoke(world) }
+            worldUntaggedListeners.forEach { it.invoke(world, tag) }
+        }
+
+        taggedWorlds.remove(world)
     }
 
     fun removeTag(entity: Entity, tag: String) {
