@@ -22,10 +22,10 @@ const (
 )
 
 var (
-	apiProtocol    = os.Getenv("API_PROTOCOL")
-	apiHost        = os.Getenv("API_HOST")
-	apiPort        = os.Getenv("API_PORT")
-	ghAuthToken    = os.Getenv("GITHUB_AUTH_TOKEN")
+	apiProtocol    = getEnvVarOrDefault("API_PROTOCOL", "http")
+	apiHost        = getEnvVarOrDefault("API_HOST", "localhost")
+	apiPort        = getEnvVarOrDefault("API_PORT", "8080")
+	ghAuthToken    = getEnvVarOrDefault("GITHUB_AUTH_TOKEN", "")
 	timeStarted    = time.Now()
 	isApiConnected = true
 )
@@ -149,4 +149,14 @@ func checkApiConnection() bool {
 	defer resp.Body.Close()
 
 	return resp.StatusCode == http.StatusOK
+}
+
+func getEnvVarOrDefault(key string, def string) string {
+	value, exists := os.LookupEnv(key)
+
+	if !exists {
+		return def
+	} else {
+		return value
+	}
 }
