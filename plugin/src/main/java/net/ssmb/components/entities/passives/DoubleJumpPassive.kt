@@ -2,8 +2,10 @@ package net.ssmb.components.entities.passives
 
 import br.com.devsrsouza.kotlinbukkitapi.extensions.event
 import br.com.devsrsouza.kotlinbukkitapi.extensions.events
+import br.com.devsrsouza.kotlinbukkitapi.utility.extensions.ticks
 import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import net.ssmb.SSMB
 import net.ssmb.blockwork.annotations.Component
 import net.ssmb.blockwork.components.EntityComponent
@@ -18,6 +20,7 @@ import org.bukkit.event.player.PlayerToggleFlightEvent
 @Component("passive_double_jump")
 class DoubleJumpPassive(private val plugin: SSMB): EntityComponent<Player>(), OnStart, OnDestroy, Listener {
 
+    private var isPassiveActive = true
     private var canDoubleJump = true
     private var job: Job? = null
 
@@ -26,7 +29,7 @@ class DoubleJumpPassive(private val plugin: SSMB): EntityComponent<Player>(), On
 
         plugin.events {
             event<PlayerToggleFlightEvent> {
-                if (player != entity || player.gameMode == GameMode.CREATIVE) {
+                if (player != entity || player.gameMode == GameMode.CREATIVE || !isPassiveActive) {
                     return@event
                 }
 
@@ -40,14 +43,18 @@ class DoubleJumpPassive(private val plugin: SSMB): EntityComponent<Player>(), On
         }
 
         plugin.launch {
-            // TODO: don't use the default isOnGround function cuz exploits
-            if (entity.isOnGround) {
-                entity.allowFlight = true
+            while(isPassiveActive) {
+                // TODO: don't use the default isOnGround function cuz exploits
+                if (entity.isOnGround) {
+                    entity.allowFlight = true
+                }
+                delay(1.ticks)
             }
         }
     }
 
     override fun onDestroy() {
+        isPassiveActive = false
         job?.cancel()
     }
 }

@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerToggleFlightEvent
 import org.bukkit.event.world.WorldUnloadEvent
 import org.bukkit.scheduler.BukkitTask
 
@@ -90,6 +91,12 @@ class SSMB : SuspendingJavaPlugin() {
 
                 world.entities.forEach { entity ->
                     CollectionService.removeTags(entity)
+                }
+            }
+
+            event<PlayerToggleFlightEvent> {
+                if (player.gameMode != GameMode.CREATIVE && !player.hasTag("passive_double_jump")) {
+                    isCancelled = true
                 }
             }
         }
