@@ -2,16 +2,18 @@ package net.ssmb.commands
 
 import br.com.devsrsouza.kotlinbukkitapi.command.arguments.string
 import br.com.devsrsouza.kotlinbukkitapi.command.command
+import br.com.devsrsouza.kotlinbukkitapi.command.fail
 import net.kyori.adventure.text.Component
 import net.ssmb.SSMB
 import net.ssmb.blockwork.annotations.Service
 import net.ssmb.blockwork.interfaces.OnStart
 import net.ssmb.services.AlreadyInQueueException
 import net.ssmb.services.MinigameNotFoundException
+import net.ssmb.services.MinigamesService
 import net.ssmb.services.QueueService
 
 @Service
-class QueueCommand(private val plugin: SSMB, private val queue: QueueService) : OnStart {
+class QueueCommand(private val plugin: SSMB, private val queue: QueueService, private val minigames: MinigamesService) : OnStart {
     override fun onStart() {
         plugin.logger.info("Registering QueueCommand")
 
@@ -49,6 +51,17 @@ class QueueCommand(private val plugin: SSMB, private val queue: QueueService) : 
                 executorPlayer {
                     queue.removePlayerFromQueue(sender)
                     sender.sendMessage(Component.text("You have been removed from the queues!"))
+                }
+            }
+
+            command("test") {
+                executorPlayer {
+                    if (!sender.isOp) {
+                        fail("You must be an operator to use this command")
+                    }
+
+                    sender.sendMessage(Component.text("Starting test minigame..."))
+                    minigames.startNewTestMinigame(listOf(sender))
                 }
             }
         }

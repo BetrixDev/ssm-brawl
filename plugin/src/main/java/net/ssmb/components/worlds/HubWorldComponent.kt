@@ -12,13 +12,7 @@ import org.bukkit.entity.Player
 @Component("hub")
 class HubWorldComponent : WorldComponent(), OnPlayerJoined, OnDestroy {
     override fun onPlayerJoined(player: Player) {
-        val hubSpawnLocation = world.spawnLocation
-        hubSpawnLocation.x = -29.5
-        hubSpawnLocation.y = 58.0
-        hubSpawnLocation.z = 1.5
-
-        player.teleport(hubSpawnLocation)
-        player.lookAt(-57.5, 59.0, 1.0, LookAnchor.EYES)
+        teleportPlayer(player)
         player.addTag("passive_double_jump")
     }
 
@@ -26,5 +20,15 @@ class HubWorldComponent : WorldComponent(), OnPlayerJoined, OnDestroy {
         val defaultWorld = Bukkit.getServer().worlds.first()
 
         world.players.forEach { it.teleport(defaultWorld.spawnLocation) }
+    }
+
+    fun teleportPlayer(player: Player) {
+        val hubSpawnLocation = world.spawnLocation
+        hubSpawnLocation.x = -29.5
+        hubSpawnLocation.y = 58.0
+        hubSpawnLocation.z = 1.5
+
+        player.teleport(hubSpawnLocation)
+        player.lookAt(-57.5, 59.0, 1.0, LookAnchor.EYES)
     }
 }

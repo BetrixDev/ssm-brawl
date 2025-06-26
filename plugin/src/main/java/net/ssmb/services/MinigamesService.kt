@@ -7,9 +7,14 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import net.ssmb.SSMB
+import net.ssmb.blockwork.addTag
 import net.ssmb.blockwork.annotations.Service
 import net.ssmb.blockwork.interfaces.OnStart
+import net.ssmb.utils.NanoId
+import org.bukkit.WorldCreator
 import org.bukkit.entity.Player
+import org.bukkit.metadata.FixedMetadataValue
+import org.bukkit.metadata.MetadataValue
 
 @Serializable
 data class MinigameDataRecord(
@@ -21,10 +26,10 @@ data class MinigameDataRecord(
     val mapWhitelist: List<String>
 )
 
-data class OngoingMinigameDataRecord(val gameId: String)
+data class OngoingMinigameDataRecord(val gameId: String, val players: List<Player>)
 
 @Service
-class MinigamesService(private val plugin: SSMB) : OnStart {
+class MinigamesService(private val plugin: SSMB, private val worlds: WorldService) : OnStart {
     private val minigameDataMap = hashMapOf<String, MinigameDataRecord>()
     private val ongoingMinigamesMap = hashMapOf<String, OngoingMinigameDataRecord>()
 
@@ -52,5 +57,14 @@ class MinigamesService(private val plugin: SSMB) : OnStart {
 
     fun startNewMinigame(minigameId: String, players: List<Player>) {
         val minigameData = getMinigameData(minigameId) ?: throw Exception("No minigame found")
+    }
+
+    fun startNewTestMinigame(players: List<Player>) {
+        val testWorld = worlds.createNewWorld("test", "campsite")
+
+        val testMinigameData = OngoingMinigameDataRecord(NanoId.generate(10), players)
+
+        testWorld.setMetadata("gameId", FixedMetadataValue(plugin, testMinigameData.gameId))
+        testWorld.addTag("minigameTesting")
     }
 }

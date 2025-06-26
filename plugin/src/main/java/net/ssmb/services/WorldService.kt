@@ -24,28 +24,36 @@ class WorldService(private val logger: PaperPluginLogger) : OnPluginDisable, OnS
         if (existingHubComponents.isEmpty()) {
             logger.info("No hub world component found, creating a new one.")
 
-            val baseWorldDirectory = File("ssmb_worlds/blue_forest")
-            val copyWorldDirectory = File("servers_hub")
-
-            if (copyWorldDirectory.exists()) copyWorldDirectory.deleteRecursively()
-            baseWorldDirectory.copyRecursively(copyWorldDirectory, true)
-
-            val uidPath = File("${copyWorldDirectory.path}/uid.dat")
-            val sessionPath = File("${copyWorldDirectory.path}/session.dat")
-
-            if (uidPath.exists()) uidPath.delete()
-            if (sessionPath.exists()) sessionPath.delete()
-
-            val worldCreator = WorldCreator(copyWorldDirectory.path)
-            println("world name ${worldCreator.name()}")
-
-            val hubWorld =
-                worldCreator.createWorld() ?: throw Exception("Failed to create hub world")
+            val hubWorld = createNewWorld("hub", "blue_forest")
 
             hubWorld.addTag("hub")
         } else {
             logger.info("Hub world has already been created")
         }
+    }
+
+    fun createNewWorld(serverName: String, worldId: String): World {
+        val baseWorldDirectory = File("ssmb_worlds/$worldId")
+        val copyWorldDirectory = File("servers_$serverName")
+
+        if (copyWorldDirectory.exists()) copyWorldDirectory.deleteRecursively()
+        baseWorldDirectory.copyRecursively(copyWorldDirectory, true)
+
+        val uidPath = File("${copyWorldDirectory.path}/uid.dat")
+        val sessionPath = File("${copyWorldDirectory.path}/session.dat")
+
+        if (uidPath.exists()) uidPath.delete()
+        if (sessionPath.exists()) sessionPath.delete()
+
+        val worldCreator = WorldCreator(copyWorldDirectory.path)
+        println("world name ${worldCreator.name()}")
+
+        val newWorld =
+            worldCreator.createWorld() ?: throw Exception("Failed to create new world")
+
+        loadedWorlds.add(newWorld)
+
+        return newWorld
     }
 
     override fun onPluginDisable() {
