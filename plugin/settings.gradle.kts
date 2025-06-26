@@ -1,1 +1,1 @@
-rootProject.name = "combat-server"
+rootProject.name = "super-smash-mobs-brawl"

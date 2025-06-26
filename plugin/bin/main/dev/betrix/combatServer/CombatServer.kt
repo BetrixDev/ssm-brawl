@@ -1,15 +1,15 @@
-package dev.betrix.combatServer
+package dev.betrix.superSmashMobsBrawl
 
 import com.github.quillraven.fleks.World
 import com.github.quillraven.fleks.configureWorld
-import dev.betrix.combatServer.components.BelowNameDisplay
-import dev.betrix.combatServer.components.MinecraftPlayer
+import dev.betrix.superSmashMobsBrawl.components.BelowNameDisplay
+import dev.betrix.superSmashMobsBrawl.components.MinecraftPlayer
 import gg.flyte.twilight.event.event
 import net.kyori.adventure.text.Component
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.plugin.java.JavaPlugin
 
-class CombatServer : JavaPlugin() {
+class SuperSmashMobsBrawl : JavaPlugin() {
 
     lateinit var world: World
 
@@ -27,10 +27,10 @@ class CombatServer : JavaPlugin() {
             }
         }
 
-        logger.info("Combat Server started!")
+        logger.info("SSMB started!")
     }
 
     override fun onDisable() {
-        logger.info("Combat Server shutting down")
+        logger.info("SSMB shutting down")
     }
 }

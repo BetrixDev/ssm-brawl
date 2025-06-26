@@ -1,4 +1,4 @@
-package dev.betrix.combatServer.components
+package dev.betrix.superSmashMobsBrawl.components
 
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
