@@ -1,31 +1,29 @@
 {
-  "name": "super-smash-mobs-brawl",
-  "private": true,
-  "scripts": {
-    "start": "dotenv -- turbo start",
-    "start:server": "dotenv -- turbo start --filter=api --filter=server",
-    "dev:server": "dotenv -- turbo dev --filter=api --filter=server",
-    "build:api": "turbo build --filter=env --filter=api --filter=wrangler --filter=tussler --force",
-    "start:api": "dotenv -- turbo start --filter=api",
-    "dev:api": "dotenv -- turbo dev --filter=api",
-    "test": "turbo test --filter=api",
-    "test-coverage": "dotenv -- turbo test-coverage --filter=api",
-    "db:studio": "cd packages/tussler && dotenv -e ../../.env pnpm db:studio",
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "format:ts": "prettier --write \"**/*.{ts,tsx}\"",
-    "format:kt": "java -jar ktfmt.jar --kotlinlang-style plugin/src/**",
-    "format": "pnpm run format:ts && pnpm run format:kt",
-    "generate-migration": "cd packages/tussler && dotenv -e ../../.env pnpm generate-migration",
-    "extract-meta": "cd generators/meta-extractor && pnpm run-generator"
-  },
-  "devDependencies": {
-    "dotenv-cli": "^7.3.0",
-    "prettier": "^3.3.2",
-    "turbo": "^2.0.5"
-  },
-  "packageManager": "pnpm@9.1.0",
-  "engines": {
-    "node": ">=20"
-  }
+	"name": "ssmb",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"scripts": {
+		"check:js": "biome check --write .",
+		"format:kt": "java -jar ktfmt.jar --kotlinlang-style plugin/src/**",
+		"check": "bun run check:js && bun run format:kt",
+		"dev": "turbo dev",
+		"build": "turbo build",
+		"check-types": "turbo check-types",
+		"dev:native": "turbo -F native dev",
+		"dev:web": "turbo -F web dev",
+		"dev:server": "turbo -F server dev",
+		"db:push": "turbo -F server db:push",
+		"db:studio": "turbo -F server db:studio",
+		"db:generate": "turbo -F server db:generate",
+		"db:migrate": "turbo -F server db:migrate"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"turbo": "^2.5.4",
+		"@biomejs/biome": "^2.0.0"
+	},
+	"packageManager": "pnpm@9.1.0"
 }

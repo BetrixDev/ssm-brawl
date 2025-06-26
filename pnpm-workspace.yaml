@@ -1,5 +1,3 @@
 packages:
-  - "api"
-  - "packages/*"
-  - "server"
-  - "generators/*"
+  - "apps/*"
+  - "plugin"

@@ -1,0 +1,46 @@
+Starting org.bukkit.craftbukkit.Main
+2025-05-20T02:24:25.303634Z ServerMain WARN Advanced terminal features are not available in this environment
+[22:24:25 INFO]: [bootstrap] Running Java 21 (OpenJDK 64-Bit Server VM 21.0.1+12-LTS; Eclipse Adoptium Temurin-21.0.1+12) on Windows 11 10.0 (amd64)
+[22:24:25 INFO]: [bootstrap] Loading Paper 1.21.5-77-main@a252581 (2025-05-11T20:34:22Z) for Minecraft 1.21.5
+[22:24:26 INFO]: [PluginInitializerManager] Initializing plugins...
+[22:24:26 INFO]: [PluginRemapper] Remapping plugin 'plugins\natural-commands.jar'...
+[22:24:27 INFO]: [PluginRemapper] Done remapping plugin 'plugins\natural-commands.jar' in 1284ms.
+[22:24:27 INFO]: [PluginInitializerManager] Initialized 1 plugin
+[22:24:27 INFO]: [PluginInitializerManager] Bukkit plugins (1):
+ - natural-commands (0.1.0)
+[22:24:31 INFO]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[22:24:32 INFO]: Loaded 1373 recipes
+[22:24:32 INFO]: Loaded 1484 advancements
+[22:24:32 INFO]: Starting minecraft server version 1.21.5
+[22:24:32 INFO]: Loading properties
+[22:24:32 INFO]: This server is running Paper version 1.21.5-77-main@a252581 (2025-05-11T20:34:22Z) (Implementing API version 1.21.5-R0.1-SNAPSHOT)
+[22:24:32 INFO]: [spark] This server bundles the spark profiler. For more information please visit https://docs.papermc.io/paper/profiling
+[22:24:32 INFO]: Server Ping Player Sample Count: 12
+[22:24:32 INFO]: Using 4 threads for Netty based IO
+[22:24:33 INFO]: [MoonriseCommon] Paper is using 4 worker threads, 1 I/O threads
+[22:24:33 INFO]: [ChunkTaskScheduler] Chunk system is using population gen parallelism: true
+[22:24:33 INFO]: Default game type: SURVIVAL
+[22:24:33 INFO]: Generating keypair
+[22:24:33 INFO]: Starting Minecraft server on *:25565
+[22:24:33 INFO]: Using default channel type
+[22:24:33 INFO]: Paper: Using Java compression from Velocity.
+[22:24:33 INFO]: Paper: Using Java cipher from Velocity.
+[22:24:34 INFO]: [NC] Loading server plugin natural-commands v0.1.0
+[22:24:34 INFO]: Server permissions file permissions.yml is empty, ignoring it
+[22:24:34 INFO]: Preparing level "world"
+[22:24:34 INFO]: Preparing start region for dimension minecraft:overworld
+[22:24:34 INFO]: Preparing spawn area: 0%
+[22:24:34 INFO]: Time elapsed: 464 ms
+[22:24:34 INFO]: Preparing start region for dimension minecraft:the_nether
+[22:24:34 INFO]: Preparing spawn area: 0%
+[22:24:34 INFO]: Time elapsed: 62 ms
+[22:24:34 INFO]: Preparing start region for dimension minecraft:the_end
+[22:24:34 INFO]: Preparing spawn area: 0%
+[22:24:34 INFO]: Time elapsed: 44 ms
+[22:24:34 INFO]: [NC] Enabling natural-commands v0.1.0
+[22:24:34 INFO]: [NC] NaturalCommands enabled
+[22:24:34 INFO]: [spark] Starting background profiler...
+[22:24:35 INFO]: [spark] The async-profiler engine is not supported for your os/arch (windows11/amd64), so the built-in Java engine will be used instead.
+[22:24:35 INFO]: Done preparing level "world" (1.008s)
+[22:24:35 INFO]: Running delayed init tasks
+[22:24:35 INFO]: Done (10.146s)! For help, type "help"

@@ -1,0 +1,6 @@
+# https://openrouter.ai/docs/api-reference/authentication#using-an-api-key
+open_router_token: "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"
+
+# https://openrouter.ai/models
+# google/gemini-2.5-flash-preview
+open_router_model: "google/gemini-2.5-flash-preview"

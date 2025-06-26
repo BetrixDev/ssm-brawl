@@ -1,66 +1,37 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
-  "tasks": {
-    "db:push": {
-      "env": [
-        "DATABASE_TOKEN",
-        "DATABASE_URL"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env"
-      ]
-    },
-    "db:studio": {
-      "persistent": true,
-      "cache": false
-    },
-    "build:api": {
-      "outputs": [
-        "./api/build/**",
-        "./packages/env/build/**"
-      ],
-      "inputs": [
-        "./api/**",
-        "./packages/env/**"
-      ]
-    },
-    "start:api": {
-      "persistent": true,
-      "cache": false,
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env"
-      ]
-    },
-    "start": {
-      "persistent": true,
-      "cache": false,
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env"
-      ]
-    },
-    "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "./build"
-      ]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "test": {
-      "cache": false
-    },
-    "test-coverage": {
-      "cache": false
-    }
-  }
+	"$schema": "https://turbo.build/schema.json",
+	"ui": "tui",
+	"tasks": {
+		"build": {
+			"dependsOn": ["^build"],
+			"inputs": ["$TURBO_DEFAULT$", ".env*"],
+			"outputs": ["dist/**"]
+		},
+		"lint": {
+			"dependsOn": ["^lint"]
+		},
+		"check-types": {
+			"dependsOn": ["^check-types"]
+		},
+		"dev": {
+			"cache": false,
+			"persistent": true
+		},
+		"db:push": {
+			"cache": false,
+			"persistent": true
+		},
+		"db:studio": {
+			"cache": false,
+			"persistent": true
+		},
+		"db:migrate": {
+			"cache": false,
+			"persistent": true
+		},
+		"db:generate": {
+			"cache": false,
+			"persistent": true
+		}
+	}
 }

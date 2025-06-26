@@ -1,0 +1,15 @@
+{
+	"name": "plugin",
+	"scripts": {
+		"dev": "nodemon --exec \"bun run dev.ts\" -e kt --watch src"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@types/node": "^22.15.17",
+		"nodemon": "^3.1.10"
+	},
+	"private": true,
+	"peerDependencies": {
+		"typescript": "^5"
+	}
+}
