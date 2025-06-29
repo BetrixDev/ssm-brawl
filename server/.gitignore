@@ -19,3 +19,5 @@ whitelist.json
 spigot.yml
 libraries
 plugins
+out.log
+server.properties

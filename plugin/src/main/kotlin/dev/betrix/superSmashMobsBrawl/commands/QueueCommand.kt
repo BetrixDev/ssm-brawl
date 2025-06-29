@@ -1,0 +1,119 @@
+package dev.betrix.superSmashMobsBrawl.commands
+
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
+import dev.betrix.superSmashMobsBrawl.components.InQueue
+import dev.betrix.superSmashMobsBrawl.components.MinecraftPlayer
+import dev.betrix.superSmashMobsBrawl.enums.Queue
+import dev.betrix.superSmashMobsBrawl.utils.ONLY_PLAYERS_EXEC_MESSAGE
+import dev.betrix.superSmashMobsBrawl.utils.mm
+import dev.rollczi.litecommands.annotations.argument.Arg
+import dev.rollczi.litecommands.annotations.command.Command
+import dev.rollczi.litecommands.annotations.context.Context
+import dev.rollczi.litecommands.annotations.execute.Execute
+import net.kyori.adventure.text.Component
+import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
+
+@Command(name = "queue")
+class QueueCommand(private val plugin: SuperSmashMobsBrawl) {
+
+    @Execute
+    fun queue(@Context sender: CommandSender) {
+        if (sender !is Player) {
+            sender.sendMessage(ONLY_PLAYERS_EXEC_MESSAGE)
+            return
+        }
+
+        with(plugin.world) {
+            val playerEntity = plugin.playerFamily.find { e -> e[MinecraftPlayer].player == sender }
+
+            if (playerEntity == null) {
+                sender.kick(Component.text("this is odd"))
+                return
+            }
+
+            if (playerEntity has InQueue) {
+                val playerQueueId = playerEntity[InQueue].queueId
+                val queue = Queue.fromId(playerQueueId)
+                
+                if (queue != null) {
+                    sender.sendMessage(
+                        mm("<gold>You are currently in the queue for ${queue.displayName}!</gold>")
+                    )
+                } else {
+                    // Handle case where queue ID doesn't match any known queue
+                    sender.sendMessage(
+                        mm("<red>You are in an unknown queue: $playerQueueId</red>")
+                    )
+                }
+            } else {
+                sender.sendMessage(
+                    mm("<gray>You are not currently in any queue.</gray>")
+                )
+            }
+        }
+    }
+
+    @Execute
+    fun queue(@Context sender: CommandSender, @Arg queue: Queue) {
+        if (sender !is Player) {
+            sender.sendMessage(ONLY_PLAYERS_EXEC_MESSAGE)
+            return
+        }
+
+        with(plugin.world) {
+            val playerEntity = plugin.playerFamily.find { e -> e[MinecraftPlayer].player == sender }
+
+            if (playerEntity == null) {
+                sender.kick(Component.text("this is odd"))
+                return
+            }
+
+            if (playerEntity has InQueue) {
+                val playerQueueId = playerEntity[InQueue].queueId
+                sender.sendMessage(
+                    mm(
+                        "<red>You are currently in a queue for $playerQueueId.<newline>Please leave that queue before joining a new one</red>"
+                    )
+                )
+                return
+            }
+
+            playerEntity.configure { it += InQueue(queue.id) }
+
+            sender.sendMessage(
+                mm("<gold>You have joined the queue for ${queue.displayName}!</gold>")
+            )
+        }
+    }
+
+    @Execute(name = "leave")
+    fun queueLeave(@Context sender: CommandSender) {
+        if (sender !is Player) {
+            sender.sendMessage(ONLY_PLAYERS_EXEC_MESSAGE)
+            return
+        }
+
+        with(plugin.world) {
+            val playerEntity = plugin.playerFamily.find { e -> e[MinecraftPlayer].player == sender }
+
+            if (playerEntity == null) {
+                sender.kick(Component.text("this is odd"))
+                return
+            }
+
+            if (!(playerEntity has InQueue)) {
+                sender.sendMessage(mm("<red>You are not currently in a queue</red>"))
+                return
+            }
+
+            val playerQueueId = playerEntity[InQueue].queueId
+
+            playerEntity.configure { it -= InQueue }
+
+            sender.sendMessage(
+                mm("<gold>You have been removed from the queue for $playerQueueId</gold>")
+            )
+        }
+    }
+}

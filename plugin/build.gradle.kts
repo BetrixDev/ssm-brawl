@@ -16,6 +16,7 @@ repositories {
         name = "sonatype"
     }
     maven("https://repo.flyte.gg/releases")
+    maven { url = uri("https://repo.panda-lang.org/releases") }
 }
 
 dependencies {
@@ -23,6 +24,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.github.quillraven.fleks:Fleks:2.11")
     implementation("gg.flyte:twilight:1.1.19")
+    implementation("dev.rollczi:litecommands-bukkit:3.9.7")
 }
 
 tasks {
@@ -37,6 +39,10 @@ tasks {
 val targetJavaVersion = 21
 kotlin {
     jvmToolchain(targetJavaVersion)
+}
+
+tasks.compileJava {
+    options.compilerArgs.add("-parameters")
 }
 
 tasks.build {
