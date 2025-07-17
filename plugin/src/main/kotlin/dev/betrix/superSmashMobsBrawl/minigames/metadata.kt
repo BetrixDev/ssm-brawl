@@ -1,8 +1,12 @@
 package dev.betrix.superSmashMobsBrawl.minigames
 
+import kotlin.properties.Delegates
+
 data class MinigameMetadata(
     val description: String = "",
     val isHidden: Boolean = false,
+    val playersPerTeam: Int,
+    val amountOfTeams: Int,
     val mapWhitelist: Set<String> = setOf(),
     val mapBlackList: Set<String> = setOf()
 )
@@ -12,6 +16,8 @@ class Minigame {
     var isHidden = false
     private var mapWhiteList = hashSetOf<String>()
     private var mapBlackList = hashSetOf<String>()
+    var playersPerTeam by Delegates.notNull<Int>()
+    var amountOfTeams by Delegates.notNull<Int>()
 
     fun whitelistMap(mapId: String): Minigame {
         if (mapBlackList.contains(mapId)) {
@@ -38,7 +44,9 @@ class Minigame {
             description = description,
             isHidden = isHidden,
             mapBlackList = mapBlackList.toSet(),
-            mapWhitelist = mapWhiteList.toSet()
+            mapWhitelist = mapWhiteList.toSet(),
+            playersPerTeam = playersPerTeam,
+            amountOfTeams = amountOfTeams
         )
     }
 }
