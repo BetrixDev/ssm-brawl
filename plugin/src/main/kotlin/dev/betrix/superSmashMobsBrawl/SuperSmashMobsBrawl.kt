@@ -4,11 +4,15 @@ import com.github.quillraven.fleks.Family
 import com.github.quillraven.fleks.World
 import com.github.quillraven.fleks.configureWorld
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
-import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.QueueArgument
-import dev.betrix.superSmashMobsBrawl.components.BelowNameDisplay
-import dev.betrix.superSmashMobsBrawl.components.MinecraftPlayer
-import dev.betrix.superSmashMobsBrawl.enums.Queue
+import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinitionArgument
+import dev.betrix.superSmashMobsBrawl.components.BelowNameDisplayComponent
+import dev.betrix.superSmashMobsBrawl.components.MinecraftPlayerComponent
+import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.services.QueueService
+import dev.betrix.superSmashMobsBrawl.systems.DoubleJumpSystem
+import dev.betrix.superSmashMobsBrawl.systems.MinigamePreflightSystem
 import dev.betrix.superSmashMobsBrawl.systems.QueueSystem
+import dev.betrix.superSmashMobsBrawl.systems.SulphurBombSystem
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
 import gg.flyte.twilight.Twilight
@@ -24,30 +28,41 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.plugin.java.JavaPlugin
 
 class SuperSmashMobsBrawl : JavaPlugin() {
+    val queueService = QueueService()
 
     lateinit var liteCommands: LiteCommands<CommandSender>
     lateinit var twilight: Twilight
     lateinit var world: World
     lateinit var playerFamily: Family
 
+    companion object {
+        lateinit var instance: SuperSmashMobsBrawl
+    }
+
     override fun onEnable() {
+        instance = this
         twilight = twilight(this)
         world = configureWorld {
             injectables { add(this) }
-            systems { add(QueueSystem()) }
+            systems {
+                add(QueueSystem())
+                add(MinigamePreflightSystem())
+                add(DoubleJumpSystem())
+                add(SulphurBombSystem())
+            }
         }
-        playerFamily = world.family { all(MinecraftPlayer) }
+        playerFamily = world.family { all(MinecraftPlayerComponent) }
         liteCommands =
             LiteBukkitFactory.builder(this)
-                .argument(Queue::class.java, QueueArgument())
+                .argument(MinigameDefinition::class.java, MinigameDefinitionArgument())
                 .commands(QueueCommand(this))
                 .build()
 
         event<PlayerJoinEvent> {
             logger.info("Player joined: ${player.name}")
             world.entity {
-                it += MinecraftPlayer(player)
-                it += BelowNameDisplay(Component.text("Really cool person"))
+                it += MinecraftPlayerComponent(player)
+                it += BelowNameDisplayComponent(Component.text("Really cool person"))
             }
         }
 

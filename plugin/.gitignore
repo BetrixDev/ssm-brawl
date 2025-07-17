@@ -82,4 +82,5 @@ temp/
 
 # Plugin specific
 *.jar
-!gradle/wrapper/gradle-wrapper.jar 
+!gradle/wrapper/gradle-wrapper.jar
+run

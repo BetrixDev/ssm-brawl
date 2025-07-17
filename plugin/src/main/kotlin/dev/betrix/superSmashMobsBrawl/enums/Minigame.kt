@@ -1,19 +1,21 @@
 package dev.betrix.superSmashMobsBrawl.enums
 
-enum class Queue(
+@Deprecated("Use the MinigameRegistry instead of this enum")
+enum class Minigame(
     val id: String,
     val playersPerTeam: Int,
     val totalTeams: Int,
     val displayName: String,
 ) {
-    ONE_ON_ONE_DUALS(id = "1v1", playersPerTeam = 1, totalTeams = 2, displayName = "1v1 Duels");
+    ONE_ON_ONE_DUALS(id = "1v1", playersPerTeam = 1, totalTeams = 2, displayName = "1v1 Duels"),
+    TESTING(id = "test", playersPerTeam = 1, totalTeams = 1, displayName = "Testing Grounds");
 
     companion object {
-        fun fromId(id: String): Queue? {
+        fun fromId(id: String): Minigame? {
             return entries.find { it.id == id }
         }
 
-        fun findClosest(id: String): Queue? {
+        fun findClosest(id: String): Minigame? {
             if (id.isBlank()) return null
 
             // First try exact match

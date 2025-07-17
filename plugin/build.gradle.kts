@@ -25,6 +25,9 @@ dependencies {
     implementation("io.github.quillraven.fleks:Fleks:2.11")
     implementation("gg.flyte:twilight:1.1.19")
     implementation("dev.rollczi:litecommands-bukkit:3.9.7")
+    implementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.22.0")
+    implementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.22.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 }
 
 tasks {
@@ -32,7 +35,7 @@ tasks {
         // Configure the Minecraft version for our task.
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.21")
+        minecraftVersion("1.21.6")
     }
 }
 

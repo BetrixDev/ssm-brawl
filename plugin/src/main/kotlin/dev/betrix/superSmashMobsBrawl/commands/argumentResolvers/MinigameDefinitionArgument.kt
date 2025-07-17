@@ -1,6 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.commands.argumentResolvers
 
-import dev.betrix.superSmashMobsBrawl.enums.Queue
+import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.registries.MinigameRegistry
 import dev.rollczi.litecommands.argument.Argument
 import dev.rollczi.litecommands.argument.parser.ParseResult
 import dev.rollczi.litecommands.argument.resolver.ArgumentResolver
@@ -9,20 +10,20 @@ import dev.rollczi.litecommands.suggestion.SuggestionContext
 import dev.rollczi.litecommands.suggestion.SuggestionResult
 import org.bukkit.command.CommandSender
 
-class QueueArgument : ArgumentResolver<CommandSender, Queue>() {
+class MinigameDefinitionArgument : ArgumentResolver<CommandSender, MinigameDefinition>() {
     override fun parse(
         invocation: Invocation<CommandSender?>?,
-        context: Argument<Queue?>?,
+        context: Argument<MinigameDefinition?>?,
         argument: String?,
-    ): ParseResult<Queue?>? {
-        if (argument == null) {
+    ): ParseResult<MinigameDefinition?>? {
+        if (argument.isNullOrEmpty()) {
             return ParseResult.failure("Queue should not be empty value")
         }
 
-        val queueEntry = Queue.fromId(argument)
+        val minigameDefinition = MinigameRegistry.getDefinition(argument)
 
-        if (queueEntry == null) {
-            val possibleMatch = Queue.findClosest(argument)
+        if (minigameDefinition == null) {
+            val possibleMatch = MinigameRegistry.findClosest(argument)
 
             return if (possibleMatch != null) {
                 ParseResult.failure("Invalid queue id. Did you mean ${possibleMatch.id}?")
@@ -31,14 +32,14 @@ class QueueArgument : ArgumentResolver<CommandSender, Queue>() {
             }
         }
 
-        return ParseResult.success(queueEntry)
+        return ParseResult.success(minigameDefinition)
     }
 
     override fun suggest(
         invocation: Invocation<CommandSender?>?,
-        argument: Argument<Queue?>?,
+        argument: Argument<MinigameDefinition?>?,
         context: SuggestionContext?,
     ): SuggestionResult? {
-        return SuggestionResult.of(Queue.entries.map { it.id })
+        return SuggestionResult.of(MinigameRegistry.getAllDefinitions().map { it.id })
     }
 }

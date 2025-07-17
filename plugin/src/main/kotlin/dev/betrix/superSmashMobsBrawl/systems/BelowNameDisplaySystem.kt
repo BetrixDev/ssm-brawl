@@ -5,14 +5,14 @@ import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 import com.github.quillraven.fleks.World.Companion.inject
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.components.BelowNameDisplay
+import dev.betrix.superSmashMobsBrawl.components.BelowNameDisplayComponent
 
-class BelowNameDisplayUpdater(private val plugin: SuperSmashMobsBrawl = inject()) :
-    IteratingSystem(family { all(BelowNameDisplay) }) {
-    private val lastNameDisplays = hashMapOf<BelowNameDisplay, String>()
+class BelowNameDisplaySystem(private val plugin: SuperSmashMobsBrawl = inject()) :
+    IteratingSystem(family { all(BelowNameDisplayComponent) }) {
+    private val lastNameDisplays = hashMapOf<BelowNameDisplayComponent, String>()
 
     override fun onTickEntity(entity: Entity) {
-        val belowNameDisplay: BelowNameDisplay = entity[BelowNameDisplay]
+        val belowNameDisplay: BelowNameDisplayComponent = entity[BelowNameDisplayComponent]
 
         val last = lastNameDisplays[belowNameDisplay]
 
