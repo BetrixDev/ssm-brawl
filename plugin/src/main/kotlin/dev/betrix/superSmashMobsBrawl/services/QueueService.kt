@@ -3,10 +3,13 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.mapBoth
+import com.github.michaelbull.result.onFailure
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
+import dev.betrix.superSmashMobsBrawl.utils.mm
 import gg.flyte.twilight.scheduler.delay
 import org.bukkit.entity.Player
-import kotlin.math.min
 
 // This will be easy to add party data to in the future if we want
 data class QueueEntry(val player: Player, val minigame: MinigameDefinition) {
@@ -29,11 +32,11 @@ data class QueueEntry(val player: Player, val minigame: MinigameDefinition) {
     }
 }
 
-class QueueService {
+object QueueService {
     private val queue = hashSetOf<QueueEntry>()
 
-    fun addPlayer(player: Player, minigame: MinigameDefinition): Result<QueueEntry, QueueEntry> {
-        val newEntry = QueueEntry(player, minigame)
+    fun addPlayer(player: Player, minigameDefinition: MinigameDefinition): Result<QueueEntry, QueueEntry> {
+        val newEntry = QueueEntry(player, minigameDefinition)
 
         val existingEntry = queue.find { it.player == player }
 
@@ -45,7 +48,7 @@ class QueueService {
 
         // Delay checking for minigameCanStart so that the addPlayer method can return its result and relay the message to the player
         delay(20) {
-            checkMinigameCanStart(minigame)
+            checkMinigameCanStart(minigameDefinition)
         }
 
         return Ok(newEntry)
@@ -66,17 +69,17 @@ class QueueService {
         return queue.find { it.player == player }
     }
 
-    fun getPlayersInQueue(minigame: MinigameDefinition): List<QueueEntry> {
-        return queue.filter { it.minigame.id == minigame.id }
+    fun getPlayersInQueue(minigameDefinition: MinigameDefinition): List<QueueEntry> {
+        return queue.filter { it.minigame.id == minigameDefinition.id }
     }
 
-    private fun getRequiredPlayersForMinigame(minigame: MinigameDefinition): Int {
-        return minigame.metadata.playersPerTeam * minigame.metadata.amountOfTeams
+    private fun getRequiredPlayersForMinigame(minigameDefinition: MinigameDefinition): Int {
+        return minigameDefinition.metadata.playersPerTeam * minigameDefinition.metadata.amountOfTeams
     }
 
-    private fun checkMinigameCanStart(minigame: MinigameDefinition): Unit {
-        val playersInQueue = getPlayersInQueue(minigame)
-        val requiredPlayers = getRequiredPlayersForMinigame(minigame)
+    private fun checkMinigameCanStart(minigameDefinition: MinigameDefinition): Unit {
+        val playersInQueue = getPlayersInQueue(minigameDefinition)
+        val requiredPlayers = getRequiredPlayersForMinigame(minigameDefinition)
 
         if (playersInQueue.size < requiredPlayers) {
             return
@@ -85,11 +88,33 @@ class QueueService {
         val playersToStart = playersInQueue.take(requiredPlayers)
         playersToStart.forEach { queue.remove(it) }
 
-        onMinigameCanStart(minigame, playersToStart)
+        onMinigameCanStart(minigameDefinition, playersToStart)
     }
 
-    private fun onMinigameCanStart(minigame: MinigameDefinition, queuedPlayers: List<QueueEntry>) {
-        // Turn queue entries into teams and then maybe have a minigame service
-        // to create the instance from definition and store that somewhere
+    private fun onMinigameCanStart(minigameDefinition: MinigameDefinition, queuedPlayers: List<QueueEntry>) {
+        val takenQueueEntries = queuedPlayers
+            .chunked(minigameDefinition.metadata.playersPerTeam)
+            .subList(0, minigameDefinition.metadata.amountOfTeams - 1)
+
+        val queuedPlayers = takenQueueEntries.flatten().map { it.player }
+
+        queuedPlayers.forEach { removePlayer(it) }
+
+        val teams = takenQueueEntries.map { chunk -> MinigameTeam(chunk.map { it.player }) }
+
+        MinigameService.initializeMinigameInstance(minigameDefinition, teams).onFailure { err ->
+            when (err) {
+                is MinigameInitError.PlayerAlreadyInMinigame -> {
+                    val playersToAddBackToQueue = queuedPlayers.filter { !err.players.contains(it) }
+
+                    playersToAddBackToQueue.forEach { player ->
+                        player.sendMessage(
+                            mm("<light_gray>There was an error. You have been added back to the queue for ${minigameDefinition.name}</light_gray>")
+                        )
+                        addPlayer(player, minigameDefinition)
+                    }
+                }
+            }
+        }
     }
 }

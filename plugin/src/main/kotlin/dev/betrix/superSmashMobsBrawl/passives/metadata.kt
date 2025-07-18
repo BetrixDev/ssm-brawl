@@ -9,7 +9,7 @@ class PassiveBuilder {
     var description = ""
     var userFacing = false
 
-    fun build(): PassiveMetadata {
+    internal fun build(): PassiveMetadata {
         return PassiveMetadata(
             description = description,
             userFacing = userFacing

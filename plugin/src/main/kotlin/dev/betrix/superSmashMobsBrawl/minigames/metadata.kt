@@ -20,9 +20,7 @@ class Minigame {
     var amountOfTeams by Delegates.notNull<Int>()
 
     fun whitelistMap(mapId: String): Minigame {
-        if (mapBlackList.contains(mapId)) {
-            throw IllegalStateException("Map id of $mapId is already in the map blacklist and cannot be added to the whitelist.")
-        }
+        require(!mapBlackList.contains(mapId)) { "Map id of $mapId is already in the map blacklist and cannot be added to the whitelist." }
 
         mapWhiteList.add(mapId)
 
@@ -30,16 +28,14 @@ class Minigame {
     }
 
     fun blacklistMap(mapId: String): Minigame {
-        if (mapWhiteList.contains(mapId)) {
-            throw IllegalStateException("Map id of $mapId is already in the map whitelist and cannot be added to the blacklist.")
-        }
+        require(!mapWhiteList.contains(mapId)) { "Map id of $mapId is already in the map whitelist and cannot be added to the blacklist." }
 
         mapBlackList.add(mapId)
 
         return this
     }
 
-    fun build(): MinigameMetadata {
+    internal fun build(): MinigameMetadata {
         return MinigameMetadata(
             description = description,
             isHidden = isHidden,

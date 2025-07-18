@@ -28,8 +28,6 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.plugin.java.JavaPlugin
 
 class SuperSmashMobsBrawl : JavaPlugin() {
-    val queueService = QueueService()
-
     lateinit var liteCommands: LiteCommands<CommandSender>
     lateinit var twilight: Twilight
     lateinit var world: World

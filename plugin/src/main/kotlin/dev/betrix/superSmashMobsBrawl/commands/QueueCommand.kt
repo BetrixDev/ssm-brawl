@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.commands
 
 import com.github.michaelbull.result.mapBoth
-import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.services.QueueService
 import dev.betrix.superSmashMobsBrawl.utils.ONLY_PLAYERS_EXEC_MESSAGE
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import dev.rollczi.litecommands.annotations.argument.Arg
@@ -13,7 +13,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 @Command(name = "queue")
-class QueueCommand(private val plugin: SuperSmashMobsBrawl) {
+class QueueCommand() {
 
     @Execute
     fun queue(@Context sender: CommandSender) {
@@ -22,7 +22,7 @@ class QueueCommand(private val plugin: SuperSmashMobsBrawl) {
             return
         }
 
-        val queueEntry = plugin.queueService.getQueueEntry(sender)
+        val queueEntry = QueueService.getQueueEntry(sender)
 
         val playerMessage = when (queueEntry) {
             null -> "<gray>You are not currently in any queue.</gray>"
@@ -39,7 +39,7 @@ class QueueCommand(private val plugin: SuperSmashMobsBrawl) {
             return
         }
 
-        val playerMessage = plugin.queueService.addPlayer(sender, minigame)
+        val playerMessage = QueueService.addPlayer(sender, minigame)
             .mapBoth(
                 success = { mm("<gold>You have joined the queue for ${it.minigame.name}!</gold>") },
                 failure = { mm("<red>You are currently in a queue for ${it.minigame.name}.<newline>Please leave that queue before joining a new one</red>") }
@@ -55,7 +55,7 @@ class QueueCommand(private val plugin: SuperSmashMobsBrawl) {
             return
         }
 
-        val playerMessage = plugin.queueService.removePlayer(sender)
+        val playerMessage = QueueService.removePlayer(sender)
             .mapBoth(
                 success = { mm("<gold>You have been removed from the queue for ${it.minigame.name}</gold>")},
                 failure = { mm("<red>You are not currently in a queue</red>")}

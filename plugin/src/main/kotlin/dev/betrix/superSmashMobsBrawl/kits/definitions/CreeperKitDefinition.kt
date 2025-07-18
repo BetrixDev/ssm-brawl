@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.kits.definitions
 
+import dev.betrix.superSmashMobsBrawl.kits.instances.CreeperKitInstance
 import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
 import dev.betrix.superSmashMobsBrawl.kits.kit
 import org.bukkit.entity.Player
@@ -17,6 +18,6 @@ object CreeperKitDefinition : KitDefinition() {
     }
 
     override fun createInstance(player: Player): KitInstance {
-        TODO("Not yet implemented")
+        return CreeperKitInstance(this, player)
     }
 }

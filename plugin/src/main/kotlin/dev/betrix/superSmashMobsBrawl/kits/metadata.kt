@@ -29,7 +29,9 @@ class Kit {
         return this
     }
 
-    fun build(): KitMetadata {
+    internal fun build(): KitMetadata {
+        require(meleeDamage != 0) { "Melee damage should not be 0" }
+
         return KitMetadata(
             description = description,
             type = type,
