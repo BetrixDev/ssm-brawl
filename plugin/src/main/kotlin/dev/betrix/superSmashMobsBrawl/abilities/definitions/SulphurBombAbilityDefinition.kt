@@ -25,7 +25,7 @@ object SulphurBombAbilityDefinition : AbilityDefinition() {
         hotbarItem = hotbarItemStack
     }
 
-    override fun createInstance(player: Player): AbilityInstance {
+    override fun createInstance(player: Player): SulphurBombAbilityInstance {
         return SulphurBombAbilityInstance(this, player)
     }
 }

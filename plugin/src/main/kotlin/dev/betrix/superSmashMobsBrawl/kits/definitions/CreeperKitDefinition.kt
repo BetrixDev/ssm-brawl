@@ -19,7 +19,7 @@ object CreeperKitDefinition : KitDefinition() {
         ability(SulphurBombAbilityDefinition)
     }
 
-    override fun createInstance(player: Player): KitInstance {
+    override fun createInstance(player: Player): CreeperKitInstance {
         return CreeperKitInstance(this, player)
     }
 }

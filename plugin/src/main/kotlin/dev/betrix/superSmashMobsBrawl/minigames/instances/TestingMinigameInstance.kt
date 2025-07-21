@@ -8,11 +8,7 @@ class TestingMinigameInstance(
     definition: MinigameDefinition,
     teams: List<MinigameTeam>
 ) : MinigameInstance(definition, teams) {
-    override fun preflight(): Result<Unit> {
-        TODO("Not yet implemented")
-    }
-
-    override fun setup() {
+    override fun setup(): Result<Unit> {
         TODO("Not yet implemented")
     }
 

@@ -53,7 +53,7 @@ class SuperSmashMobsBrawl : JavaPlugin() {
         liteCommands =
             LiteBukkitFactory.builder(this)
                 .argument(MinigameDefinition::class.java, MinigameDefinitionArgument())
-                .commands(QueueCommand(this))
+                .commands(QueueCommand())
                 .build()
 
         event<PlayerJoinEvent> {

@@ -24,6 +24,6 @@ abstract class MinigameInstance(
     abstract fun onPlayerLeave(player: Player): Unit
 
     fun isPlayerInMinigame(player: Player): Boolean {
-        return teams.find { it.teams.contains(player) } != null
+        return teams.find { it.players.contains(player) } != null
     }
 }

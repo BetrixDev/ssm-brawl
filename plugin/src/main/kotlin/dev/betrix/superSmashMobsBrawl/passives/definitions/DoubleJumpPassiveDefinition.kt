@@ -14,7 +14,7 @@ object DoubleJumpPassiveDefinition : PassiveDefinition() {
         userFacing = false
     }
 
-    override fun createInstance(player: Player): PassiveInstance {
+    override fun createInstance(player: Player): DoubleJumpInstance {
         return DoubleJumpInstance(this, player)
     }
 }
