@@ -1,11 +1,14 @@
 package dev.betrix.superSmashMobsBrawl.kits
 
+import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
+import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
+
 data class KitMetadata(
     val description: String = "",
     val type: KitType = KitType.DEFAULT,
     val meleeDamage: Int = 0,
-    val passives: List<String>,
-    val abilities: List<String>
+    val passives: List<PassiveDefinition>,
+    val abilities: List<AbilityDefinition>
 )
 
 enum class KitType { DEFAULT }
@@ -14,16 +17,16 @@ class Kit {
     var description = ""
     var type = KitType.DEFAULT
     var meleeDamage = 0
-    val passives = arrayListOf<String>()
-    val abilities = arrayListOf<String>()
+    val passives = arrayListOf<PassiveDefinition>()
+    val abilities = arrayListOf<AbilityDefinition>()
 
-    fun passive(id: String): Kit {
+    fun passive(id: PassiveDefinition): Kit {
         passives.add(id)
 
         return this
     }
 
-    fun ability(id: String): Kit {
+    fun ability(id: AbilityDefinition): Kit {
         abilities.add(id)
 
         return this

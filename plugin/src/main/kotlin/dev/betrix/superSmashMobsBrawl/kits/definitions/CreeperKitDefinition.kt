@@ -1,8 +1,10 @@
 package dev.betrix.superSmashMobsBrawl.kits.definitions
 
+import dev.betrix.superSmashMobsBrawl.abilities.definitions.SulphurBombAbilityDefinition
 import dev.betrix.superSmashMobsBrawl.kits.instances.CreeperKitInstance
 import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
 import dev.betrix.superSmashMobsBrawl.kits.kit
+import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
 import org.bukkit.entity.Player
 
 object CreeperKitDefinition : KitDefinition() {
@@ -12,9 +14,9 @@ object CreeperKitDefinition : KitDefinition() {
     override val metadata = kit {
         description = "OG kit"
 
-        passive("double_jump")
+        passive(DoubleJumpPassiveDefinition)
 
-        ability("sulphur_bomb")
+        ability(SulphurBombAbilityDefinition)
     }
 
     override fun createInstance(player: Player): KitInstance {
