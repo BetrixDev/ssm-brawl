@@ -1,8 +1,10 @@
 package dev.betrix.superSmashMobsBrawl
 
+import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
 import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinitionArgument
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
 import gg.flyte.twilight.Twilight
@@ -27,10 +29,15 @@ class SuperSmashMobsBrawl : JavaPlugin() {
     override fun onEnable() {
         instance = this
         twilight = twilight(this)
+        
+        // Initialize services
+        HotbarService.initialize(this)
+        
         liteCommands =
             LiteBukkitFactory.builder(this)
                 .argument(MinigameDefinition::class.java, MinigameDefinitionArgument())
                 .commands(QueueCommand())
+                .commands(KitCommand())
                 .build()
 
         event<PlayerJoinEvent> {

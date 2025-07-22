@@ -10,7 +10,12 @@ data class AbilityMetadata(
     var hotbarItemSlot: Int
 )
 
-enum class AbilityType { PROJECTILE }
+enum class AbilityType { 
+    PROJECTILE,
+    TELEPORT,
+    SELF_DESTRUCT,
+    STEALTH
+}
 
 class AbilityBuilder {
     var description = ""

@@ -1,6 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.registries
 
 import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
+import dev.betrix.superSmashMobsBrawl.passives.definitions.ExplosiveFeedbackPassiveDefinition
+import dev.betrix.superSmashMobsBrawl.passives.definitions.FallDamageImmunityPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
 
 object PassiveRegistry {
@@ -16,5 +18,7 @@ object PassiveRegistry {
 
     init {
         register(DoubleJumpPassiveDefinition)
+        register(ExplosiveFeedbackPassiveDefinition)
+        register(FallDamageImmunityPassiveDefinition)
     }
 }

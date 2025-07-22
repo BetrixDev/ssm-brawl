@@ -20,14 +20,18 @@ object KitService {
         }
 
         val kitInstance = kitDefinition.createInstance(player)
-
         assignedKits[player] = kitInstance
+        
+        // Setup the kit (which will also setup hotbar items)
+        kitInstance.setup()
 
         return Ok(kitInstance)
     }
 
     fun unassignKit(player: Player): KitInstance? {
-        return assignedKits.remove(player)
+        val kitInstance = assignedKits.remove(player)
+        kitInstance?.teardown()
+        return kitInstance
     }
 
     fun unassignKit(kitInstance: KitInstance) {
@@ -38,5 +42,14 @@ object KitService {
         }
 
         assignedKits.remove(entry)
+        kitInstance.teardown()
+    }
+    
+    fun getKitInstance(player: Player): KitInstance? {
+        return assignedKits[player]
+    }
+    
+    fun hasKit(player: Player): Boolean {
+        return assignedKits.containsKey(player)
     }
 }

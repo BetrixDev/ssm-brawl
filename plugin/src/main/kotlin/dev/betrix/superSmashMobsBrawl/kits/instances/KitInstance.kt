@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.kits.instances
 import dev.betrix.superSmashMobsBrawl.abilities.instances.AbilityInstance
 import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
 import dev.betrix.superSmashMobsBrawl.passives.instances.PassiveInstance
+import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import org.bukkit.entity.Player
 
 open class KitInstance(
@@ -24,9 +25,15 @@ open class KitInstance(
             passiveInstances.add(passiveInstance)
             passiveInstance.setup()
         }
+        
+        // Setup hotbar items for abilities
+        HotbarService.setupHotbarItems(this)
     }
 
     open fun teardown() {
+        // Clear hotbar items first
+        HotbarService.clearHotbarItems(player)
+        
         abilityInstances.forEach {
             it.teardown()
             abilityInstances.remove(it)
