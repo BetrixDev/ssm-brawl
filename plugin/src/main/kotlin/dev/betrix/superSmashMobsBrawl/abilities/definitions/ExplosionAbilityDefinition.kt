@@ -16,10 +16,10 @@ object ExplosionAbilityDefinition : AbilityDefinition() {
     override val metadata = ability {
         description = "Detonate yourself dealing massive damage and knockback to nearby enemies"
         type = AbilityType.SELF_DESTRUCT
-        cooldown = 15
+        cooldown = 8
         hotbarItemSlot = 2
 
-        val hotbarItemStack = ItemStack.of(Material.TNT)
+        val hotbarItemStack = ItemStack.of(Material.IRON_SHOVEL)
         hotbarItemStack.name(name)
 
         hotbarItem = hotbarItemStack
