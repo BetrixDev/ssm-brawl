@@ -6,10 +6,10 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
-import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
 import dev.betrix.superSmashMobsBrawl.maps.campsiteMap
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
+import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.utils.WorldUtils
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import org.bukkit.World
@@ -20,7 +20,6 @@ class TestingMinigameInstance(
     definition: MinigameDefinition,
     teams: List<MinigameTeam>
 ) : MinigameInstance(definition, teams) {
-    private val playerKits = hashMapOf<Player, KitInstance>()
     override lateinit var world: World
 
     private val players: List<Player>
@@ -40,13 +39,16 @@ class TestingMinigameInstance(
                     }
                 }
 
+            // Assign kits to all players
             teams.forEach { team ->
                 team.players.forEach { player ->
-                    playerKits[player] = CreeperKitDefinition.createInstance(player)
+                    KitService.assignKit(player, CreeperKitDefinition)
+                        .onFailure { error ->
+                            // Log error if kit assignment fails
+                            println("Failed to assign kit to ${player.name}: $error")
+                        }
                 }
             }
-
-            playerKits.values.forEach { it.setup() }
 
             return Ok(Unit)
         } catch (e: Exception) {
@@ -55,8 +57,12 @@ class TestingMinigameInstance(
     }
 
     override fun teardown() {
+        // Unassign kits from all players
+        players.forEach { player ->
+            KitService.unassignKit(player)
+        }
+        
         WorldUtils.deleteWorld(world)
-        playerKits.values.forEach { it.teardown() }
 
         // TODO: finish
     }

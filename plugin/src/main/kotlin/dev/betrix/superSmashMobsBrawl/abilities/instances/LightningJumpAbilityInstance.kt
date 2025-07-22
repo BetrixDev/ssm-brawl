@@ -32,14 +32,7 @@ class LightningJumpAbilityInstance(
     }
 
     override fun setup() {
-        event<PlayerInteractEvent> {
-            if (player != this@LightningJumpAbilityInstance.player) return@event
-            if (action != Action.LEFT_CLICK_BLOCK && action != Action.LEFT_CLICK_AIR) return@event
-            if (this@LightningJumpAbilityInstance.player.inventory.itemInMainHand.type != Material.IRON_SWORD) return@event
-
-            isCancelled = true
-            this@LightningJumpAbilityInstance.activate()
-        }
+        // No manual event handling needed - managed by HotbarService
     }
 
     override fun teardown() {

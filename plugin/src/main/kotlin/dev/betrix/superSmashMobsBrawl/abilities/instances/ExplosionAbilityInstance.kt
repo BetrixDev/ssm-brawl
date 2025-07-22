@@ -33,14 +33,7 @@ class ExplosionAbilityInstance(
     }
 
     override fun setup() {
-        event<PlayerInteractEvent> {
-            if (player != this@ExplosionAbilityInstance.player) return@event
-            if (action != Action.LEFT_CLICK_BLOCK && action != Action.LEFT_CLICK_AIR) return@event
-            if (this@ExplosionAbilityInstance.player.inventory.itemInMainHand.type != Material.TNT) return@event
-
-            isCancelled = true
-            this@ExplosionAbilityInstance.activate()
-        }
+        // No manual event handling needed - managed by HotbarService
     }
 
     override fun teardown() {

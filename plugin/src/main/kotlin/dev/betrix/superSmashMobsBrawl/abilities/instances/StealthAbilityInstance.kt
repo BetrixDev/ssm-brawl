@@ -29,14 +29,7 @@ class StealthAbilityInstance(
     }
 
     override fun setup() {
-        event<PlayerInteractEvent> {
-            if (player != this@StealthAbilityInstance.player) return@event
-            if (action != Action.LEFT_CLICK_BLOCK && action != Action.LEFT_CLICK_AIR) return@event
-            if (this@StealthAbilityInstance.player.inventory.itemInMainHand.type != Material.GLASS) return@event
-
-            isCancelled = true
-            this@StealthAbilityInstance.activate()
-        }
+        // No manual event handling needed for activation - managed by HotbarService
         
         // Cancel stealth when attacking or taking damage
         event<EntityDamageByEntityEvent> {
