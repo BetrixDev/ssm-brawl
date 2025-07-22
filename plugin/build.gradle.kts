@@ -22,7 +22,6 @@ repositories {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("io.github.quillraven.fleks:Fleks:2.11")
     implementation("gg.flyte:twilight:1.1.19")
     implementation("dev.rollczi:litecommands-bukkit:3.9.7")
     implementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.22.0")

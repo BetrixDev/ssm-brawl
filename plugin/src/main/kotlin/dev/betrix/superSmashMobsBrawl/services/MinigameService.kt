@@ -3,10 +3,12 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.onFailure
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import org.bukkit.entity.Player
+import kotlin.onFailure
 
 sealed class MinigameInitError {
     data class PlayerAlreadyInMinigame(val players: List<Player>): MinigameInitError()
@@ -29,6 +31,12 @@ object MinigameService {
         inFlightMinigames.add(minigameInstance)
 
         return Ok(minigameInstance)
+    }
+
+    fun handleMinigameSetup(minigameInstance: MinigameInstance) {
+        minigameInstance.setup().onFailure {
+            minigameInstance.teardown()
+        }
     }
 
     fun removeMinigameInstance(minigameInstance: MinigameInstance): Boolean {

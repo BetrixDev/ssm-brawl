@@ -1,0 +1,131 @@
+---
+globs: *.kt
+alwaysApply: false
+---
+
+The Super Smash Mobs Brawl plugin is written in Kotlin using PaperMC's API.
+
+Minecraft Version: 1.21
+JDK Version: 21
+Kotlin Version: 1.9.24
+
+Kotlin Gradle DSL is used for the build script.
+
+Before making any changes, please consider the following:
+
+- Existing Folder Structure
+  - The plugin is organized in a way to make it easy to add new features, please follow the organization of the existing code.
+- Performance and blocking operations
+  - Be mindful of when you write code that could be blocking, if possible refactor the code to be asynchronus.
+  - If you are interacting with a Bukkit API, NEVER do it in async code, this will lead to bugs and crashes.
+
+## Libraries
+
+#### Twilight
+
+Twilight is an API for developers creating plugins for Spigot (or forks like Paper, Purpur, Pufferfish etc.) based Minecraft servers. It contains a wide range of utilities and QOL improvements, from inventories, to schedulers and databases.
+
+Twilight is built using Kotlin, and is recommended for usage with. Many features of Twilight should work with plain Java, though compatibility is not guaranteed.
+
+https://github.com/flytegg/twilight
+
+#### Kotlin-Result
+
+A multiplatform Result monad for modelling success or failure operations.
+
+We have access to the Kotlin-Result library, which is a library that provides a way to handle errors in a more functional way. Please use it where applicable to make code more readable and maintainable.
+
+```kt
+val result: Result<String, Error> = try {
+    // code that could throw an error
+    Ok("Success")
+} catch (e: Exception) {
+    Err(e)
+}
+```
+
+https://github.com/michaelbull/kotlin-result
+
+#### Kyori Adventure
+
+Adventure is a library for server-controllable user interface elements in Minecraft: Java Edition.
+
+Standard will PaperMC, we have the Kyori Adventure library. Use MiniMessages and the `mm()` helper function I created when sending messages to players. Use the other features of the library aswell when applicable.
+
+https://docs.advntr.dev/index.html
+
+#### MCCoroutine
+
+MCCoroutine is a library, which adds extensive support for Kotlin Coroutines for Minecraft Server environments.
+
+Plugins for game servers and proxy servers often need to perform asynchronous operations (e.g. accessing databases) to be scalable for a large amount of players. MCCoroutine brings the full power of Kotlin Coroutines to them by extending the existing APIs with suspendable commands, events and schedules.
+
+Starting a coroutine
+In order to start a coroutine, you can use the provided plugin.launch {} extension method. This is safe to be called anywhere in your plugin except in onDisable where you need to use runBlocking. However, keep in mind to avoid using runblocking anywhere else in any of your plugins.
+
+To enter a coroutine anywhere in your code at any time:
+
+```kt
+import com.github.shynixn.mccoroutine.bukkit.launch
+import org.bukkit.plugin.Plugin
+
+fun foo() {
+    plugin.launch {
+    // This will always be on the minecraft main thread.
+    // If you have been on the minecraft main thread before calling plugin.launch, this scope is entered immediately without any delay.
+    }
+}
+```
+
+In Bukkit, MCCoroutine offers 2 custom dispatchers.
+
+- minecraftDispatcher (Allows to execute coroutines on the main minecraft thread)
+- asyncDispatcher (Allows to execute coroutines on the async minecraft threadpool)
+
+```kt
+fun foo() {
+    plugin.launch {
+        // This will always be on the minecraft main thread.
+        // If you have been on the minecraft main thread before calling plugin.launch, this scope is entered immediately without any delay.
+
+        val result1 = withContext(plugin.minecraftDispatcher) {
+            // Perform operations on the minecraft main thread.
+            "Player is " // Optionally, return a result.
+        }
+
+        // Here we are automatically back on the main thread again.
+
+        // Prefer using Dispatchers.IO instead of asyncDispatcher
+        val result2 = withContext(Dispatchers.IO) {
+            // Perform operations asynchronously.
+            " Max"
+        }
+
+        // Here we are automatically back on the main thread again.
+
+        println(result1 + result2) // Prints 'Player is Max'
+    }
+}
+```
+
+https://shynixn.github.io/MCCoroutine/wiki/site
+
+#### Lite Commands
+
+LiteCommands is a versatile and feature-rich command framework designed to simplify command handling for a wide range of platforms and implementations. Providing a simple and intuitive API, LiteCommands makes it easy to create and manage commands for your Minecraft plugin, mod, or Discord bot.
+
+https://docs.rollczi.dev/documentation/litecommands/getting-started/first-command.html
+
+To create your first command, you need to create a class with the @Command annotation and a method with the @Execute annotation.
+
+```kt
+@Command(name = "hello")
+public class HelloCommand {
+
+    @Execute
+    void hello(@Context CommandSender sender, @Arg String username) {
+        sender.sendMessage("Hello, " + username + "!");
+    }
+
+}
+```

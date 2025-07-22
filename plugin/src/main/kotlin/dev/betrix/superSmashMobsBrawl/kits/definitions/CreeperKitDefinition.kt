@@ -13,6 +13,7 @@ object CreeperKitDefinition : KitDefinition() {
 
     override val metadata = kit {
         description = "OG kit"
+        meleeDamage = 6
 
         passive(DoubleJumpPassiveDefinition)
 

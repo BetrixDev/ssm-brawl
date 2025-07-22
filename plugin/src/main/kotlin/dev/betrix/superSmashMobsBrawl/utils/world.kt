@@ -1,5 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.utils
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.WorldCreator
@@ -60,8 +62,8 @@ object WorldUtils {
      * @param customWorldName Custom name for the new world (will be prefixed with "ssmbworld_")
      * @return Result containing the loaded World or error
      */
-    fun copyAndLoadWorld(sourceWorldName: String, customWorldName: String): Result<World> {
-        return runCatching {
+    fun copyAndLoadWorld(sourceWorldName: String, customWorldName: String): com.github.michaelbull.result.Result<World, Exception> {
+        try {
             val serverFolder = Bukkit.getWorldContainer().toPath()
             val worldsFolder = serverFolder.resolve("worlds")
             val sourceWorldPath = worldsFolder.resolve(sourceWorldName)
@@ -88,8 +90,12 @@ object WorldUtils {
 
             // Load the world with prefixed name
             val worldCreator = WorldCreator(prefixedWorldName)
-            Bukkit.createWorld(worldCreator)
+            val world = Bukkit.createWorld(worldCreator)
                 ?: error("Failed to create world: $prefixedWorldName")
+
+            return Ok(world)
+        } catch (e: Exception) {
+            return Err(e)
         }
     }
 

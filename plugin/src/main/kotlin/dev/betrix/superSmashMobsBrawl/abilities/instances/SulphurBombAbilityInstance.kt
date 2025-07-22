@@ -28,7 +28,7 @@ class SulphurBombAbilityInstance(
     }
 
     override fun setup() {
-        TODO("Not yet implemented")
+//        TODO("Not yet implemented")
     }
 
     override fun teardown() {

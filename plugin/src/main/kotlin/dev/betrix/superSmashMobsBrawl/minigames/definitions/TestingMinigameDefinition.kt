@@ -12,6 +12,8 @@ object TestingMinigameDefinition : MinigameDefinition() {
     override val metadata = minigame {
         description = "A simple testing minigame"
         isHidden = false
+        playersPerTeam = 1
+        amountOfTeams = 1
 
         whitelistMap("campsite")
     }

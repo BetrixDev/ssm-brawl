@@ -5,6 +5,7 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.mapBoth
 import com.github.michaelbull.result.onFailure
+import com.github.michaelbull.result.onSuccess
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.utils.mm
@@ -46,10 +47,7 @@ object QueueService {
 
         queue.add(newEntry)
 
-        // Delay checking for minigameCanStart so that the addPlayer method can return its result and relay the message to the player
-        delay(20) {
-            checkMinigameCanStart(minigameDefinition)
-        }
+        checkMinigameCanStart(minigameDefinition)
 
         return Ok(newEntry)
     }
@@ -92,29 +90,34 @@ object QueueService {
     }
 
     private fun onMinigameCanStart(minigameDefinition: MinigameDefinition, queuedPlayers: List<QueueEntry>) {
-        val takenQueueEntries = queuedPlayers
-            .chunked(minigameDefinition.metadata.playersPerTeam)
-            .subList(0, minigameDefinition.metadata.amountOfTeams - 1)
+        val playersPerTeam = minigameDefinition.metadata.playersPerTeam
+        val amountOfTeams = minigameDefinition.metadata.amountOfTeams
 
-        val queuedPlayers = takenQueueEntries.flatten().map { it.player }
+        // Take only the required number of players for all teams
+        val totalPlayersNeeded = playersPerTeam * amountOfTeams
+        val entriesToUse = queuedPlayers.take(totalPlayersNeeded)
 
-        queuedPlayers.forEach { removePlayer(it) }
+        // Split into teams
+        val teams = entriesToUse.chunked(playersPerTeam).map { chunk -> MinigameTeam(chunk.map { it.player }) }
 
-        val teams = takenQueueEntries.map { chunk -> MinigameTeam(chunk.map { it.player }) }
+        // Remove these players from the queue
+        entriesToUse.forEach { removePlayer(it.player) }
 
-        MinigameService.initializeMinigameInstance(minigameDefinition, teams).onFailure { err ->
-            when (err) {
-                is MinigameInitError.PlayerAlreadyInMinigame -> {
-                    val playersToAddBackToQueue = queuedPlayers.filter { !err.players.contains(it) }
+        MinigameService.initializeMinigameInstance(minigameDefinition, teams)
+            .onFailure { err ->
+                when (err) {
+                    is MinigameInitError.PlayerAlreadyInMinigame -> {
+                        val playersToAddBackToQueue = entriesToUse.map { it.player }.filter { !err.players.contains(it) }
 
-                    playersToAddBackToQueue.forEach { player ->
-                        player.sendMessage(
-                            mm("<light_gray>There was an error. You have been added back to the queue for ${minigameDefinition.name}</light_gray>")
-                        )
-                        addPlayer(player, minigameDefinition)
+                        playersToAddBackToQueue.forEach { player ->
+                            player.sendMessage(
+                                mm("<light_gray>There was an error. You have been added back to the queue for ${minigameDefinition.name}</light_gray>")
+                            )
+                            addPlayer(player, minigameDefinition)
+                        }
                     }
                 }
             }
-        }
+            .onSuccess { MinigameService.handleMinigameSetup(it) }
     }
 }
