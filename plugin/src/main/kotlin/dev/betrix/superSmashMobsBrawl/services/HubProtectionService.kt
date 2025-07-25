@@ -7,12 +7,11 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.entity.EntityTargetEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerPickupArrowEvent
-import org.bukkit.event.player.PlayerPickupItemEvent
 import org.bukkit.event.weather.WeatherChangeEvent
 
 /**
@@ -120,15 +119,12 @@ object HubProtectionService {
         }
         
         // Item pickup protection (prevent accidental pickups)
-        event<PlayerPickupItemEvent> {
-            if (HubService.isInHub(player, player.world)) {
-                isCancelled = true
-            }
-        }
-        
-        event<PlayerPickupArrowEvent> {
-            if (HubService.isInHub(player, player.world)) {
-                isCancelled = true
+        event<EntityPickupItemEvent> {
+            if (entity is Player) {
+                val player = entity as Player
+                if (HubService.isInHub(player, player.world)) {
+                    isCancelled = true
+                }
             }
         }
         
