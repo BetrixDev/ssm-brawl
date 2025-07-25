@@ -8,10 +8,6 @@ import org.bukkit.event.HandlerList
 import org.bukkit.util.Vector
 import java.time.Instant
 
-/**
- * Custom event fired when a player takes damage in a Super Smash Mobs Brawl mini-game.
- * This event allows mini-game instances to handle damage according to their specific rules.
- */
 class SmashDamageEvent(
     val victim: Player,
     val damager: Entity?,
@@ -24,9 +20,6 @@ class SmashDamageEvent(
     
     private var cancelled = false
     
-    /**
-     * The source/cause of the damage
-     */
     enum class DamageSource {
         MELEE_ATTACK,
         ABILITY,
@@ -38,26 +31,15 @@ class SmashDamageEvent(
         OTHER
     }
     
-    // Note: timestamp is already provided by TwilightEvent
-    
-    /**
-     * Get extra data by key with type safety
-     */
     @Suppress("UNCHECKED_CAST")
     inline fun <reified T> getExtraData(key: String): T? {
         return extraData[key] as? T
     }
     
-    /**
-     * Get extra data by key with a default value
-     */
     inline fun <reified T> getExtraData(key: String, default: T): T {
         return getExtraData<T>(key) ?: default
     }
     
-    /**
-     * Check if extra data exists for the given key
-     */
     fun hasExtraData(key: String): Boolean {
         return extraData.containsKey(key)
     }

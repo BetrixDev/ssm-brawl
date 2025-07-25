@@ -7,23 +7,13 @@ import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import org.bukkit.util.Vector
 
-/**
- * Service for handling damage events in Super Smash Mobs Brawl mini-games.
- * Provides a convenient API for firing SmashDamageEvents and managing damage handling.
- */
 object SmashDamageService {
     private lateinit var plugin: Plugin
     
-    /**
-     * Initialize the service with the plugin instance
-     */
     fun initialize(pluginInstance: Plugin) {
         plugin = pluginInstance
     }
     
-    /**
-     * Fire a SmashDamageEvent for a player taking damage
-     */
     fun fireDamageEvent(
         victim: Player,
         damager: Entity? = null,
@@ -47,9 +37,6 @@ object SmashDamageService {
         return event
     }
     
-    /**
-     * Fire a melee attack damage event
-     */
     fun fireMeleeDamageEvent(
         victim: Player,
         damager: Player,
@@ -67,9 +54,6 @@ object SmashDamageService {
         )
     }
     
-    /**
-     * Fire an ability damage event
-     */
     fun fireAbilityDamageEvent(
         victim: Player,
         damager: Player,
@@ -91,9 +75,6 @@ object SmashDamageService {
         )
     }
     
-    /**
-     * Fire a passive damage event
-     */
     fun firePassiveDamageEvent(
         victim: Player,
         damager: Player,
@@ -115,9 +96,6 @@ object SmashDamageService {
         )
     }
     
-    /**
-     * Fire a projectile damage event
-     */
     fun fireProjectileDamageEvent(
         victim: Player,
         damager: Player,
@@ -139,9 +117,6 @@ object SmashDamageService {
         )
     }
     
-    /**
-     * Fire an explosion damage event
-     */
     fun fireExplosionDamageEvent(
         victim: Player,
         damager: Player? = null,
@@ -163,9 +138,6 @@ object SmashDamageService {
         )
     }
     
-    /**
-     * Fire a fall damage event
-     */
     fun fireFallDamageEvent(
         victim: Player,
         damage: Double,
@@ -183,21 +155,11 @@ object SmashDamageService {
         )
     }
     
-    /**
-     * Check if a player is currently in a mini-game
-     */
     fun isPlayerInMinigame(player: Player): Boolean {
-        // This would need to be implemented based on how mini-game instances are tracked
-        // For now, we'll return false as a placeholder
         return false
     }
     
-    /**
-     * Get the current mini-game instance for a player
-     */
     fun getPlayerMinigameInstance(player: Player): MinigameInstance? {
-        // This would need to be implemented based on how mini-game instances are tracked
-        // For now, we'll return null as a placeholder
         return null
     }
 }
