@@ -2,8 +2,6 @@ package dev.betrix.superSmashMobsBrawl
 
 import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
-import dev.betrix.superSmashMobsBrawl.commands.HubCommand
-import dev.betrix.superSmashMobsBrawl.commands.HubTestCommand
 import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinitionArgument
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
@@ -36,6 +34,7 @@ class SuperSmashMobsBrawl : JavaPlugin() {
         // Initialize services
         HotbarService.initialize(this)
         HubService.initialize(this)
+        HubService.setupDefaultHub()
         HubProtectionService.registerEvents()
         
         liteCommands =
@@ -43,8 +42,6 @@ class SuperSmashMobsBrawl : JavaPlugin() {
                 .argument(MinigameDefinition::class.java, MinigameDefinitionArgument())
                 .commands(QueueCommand())
                 .commands(KitCommand())
-                .commands(HubCommand())
-                .commands(HubTestCommand())
                 .build()
 
         // Player join events are now handled by HubService

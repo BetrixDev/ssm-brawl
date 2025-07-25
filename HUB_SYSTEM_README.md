@@ -11,7 +11,7 @@ The hub system provides a centralized lobby area for players to gather, access g
 - **Double Jump Ability**: Players receive a double jump passive ability while in hub worlds
 - **Comprehensive Protection**: Players are protected from damage, block breaking/placing, and other interactions
 - **Multiple Hub Support**: System is designed to support multiple hub worlds in the future
-- **Configurable Settings**: All hub behavior can be customized through configuration
+- **Map-Based Configuration**: Hub configuration is integrated with the existing map system
 
 ### Protection Features
 - **Damage Protection**: Players cannot take damage from any source
@@ -20,52 +20,30 @@ The hub system provides a centralized lobby area for players to gather, access g
 - **Weather Protection**: Hub worlds maintain clear weather
 - **Entity Targeting Protection**: Mobs cannot target players in hub worlds
 
-## Configuration
+## Map Configuration
 
-The hub system uses the main plugin configuration file (`config.yml`). The following settings are available:
+The hub system uses the existing map configuration system. Hub maps are defined using the same DSL as other maps:
 
-```yaml
-hub:
-  # Default hub world name
-  default-world: "blue_forest"
-  
-  # Hub spawn location
-  spawn:
-    x: 0.0
-    y: 100.0
-    z: 0.0
-    yaw: 0.0
-    pitch: 0.0
-  
-  # Enable double jump ability in hubs
-  enable-double-jump: true
-  
-  # Protection settings
-  protection:
-    enabled: true
-    prevent-damage: true
-    prevent-block-break: true
-    prevent-block-place: true
-    prevent-item-pickup: true
-    prevent-weather: true
+```kotlin
+val blueForestHub = defineMap {
+    name = "Blue Forest Hub"
+    id = "blue_forest"
+    description = "The main hub world for players to gather and prepare for matches"
+    voidLevel = 0
+    type = MapType.HUB
+    maxPlayers = null // Hubs don't have player limits
+
+    addCreator("PLACEHOLDER_UUID")
+
+    spawnPoints {
+        at(0.0, 100.0, 0.0)
+    }
+}
 ```
 
-## Commands
-
-### `/hub`
-- **Permission**: `ssmb.hub.use`
-- **Description**: Teleports the player to the default hub world
-- **Usage**: `/hub`
-
-### `/hub list`
-- **Permission**: `ssmb.hub.admin`
-- **Description**: Lists all registered hub worlds
-- **Usage**: `/hub list`
-
-### `/hub info`
-- **Permission**: `ssmb.hub.admin`
-- **Description**: Shows information about the current hub configuration
-- **Usage**: `/hub info`
+### Map Types
+- `MapType.MINIGAME` - For game maps
+- `MapType.HUB` - For hub/lobby maps
 
 ## Architecture
 
@@ -82,46 +60,66 @@ hub:
 - Handles all protection-related events
 - Configurable protection settings
 
-#### HubConfig
-- Manages hub-related configuration settings
-- Provides centralized access to hub configuration
-- Handles default value initialization
+#### MapRegistry
+- Manages all maps including hub maps
+- Provides utility methods for hub map operations
+- Integrates with existing map system
 
 ### Data Classes
 
-#### HubWorld
+#### SsmbMap
 ```kotlin
-data class HubWorld(
+data class SsmbMap(
+    val name: String,
     val id: String,
-    val world: World,
-    val spawnLocation: Location
+    val type: MapType,
+    val maxPlayers: Int?,
+    val description: String,
+    val voidLevel: Int,
+    val creatorUuids: List<String>,
+    val spawnPoints: List<Vector>
 )
 ```
 
 ## Usage Examples
 
 ### Basic Hub Setup
-1. Ensure the `blue_forest` world exists on your server
-2. The hub system will automatically register it on plugin startup
-3. Players will be teleported to the hub when they join
+1. Create a hub map definition in the maps directory
+2. Register the map in MapRegistry
+3. Ensure the world exists on your server
+4. Players will be teleported to the hub when they join
 
-### Adding Multiple Hubs (Future)
+### Adding Multiple Hubs
 ```kotlin
-// Register additional hub worlds
-HubService.registerHubWorld("lobby", HubWorld("lobby", world, spawnLocation))
-HubService.registerHubWorld("vip", HubWorld("vip", vipWorld, vipSpawnLocation))
+// Create additional hub maps
+val lobbyHub = defineMap {
+    name = "Lobby Hub"
+    id = "lobby"
+    description = "A secondary hub for special events"
+    type = MapType.HUB
+    maxPlayers = null
+    
+    addCreator("PLACEHOLDER_UUID")
+    
+    spawnPoints {
+        at(10.0, 64.0, 10.0)
+    }
+}
+
+// Register in MapRegistry
+MapRegistry.register(lobbyHub)
 ```
 
-### Customizing Protection
-```yaml
-# Disable block breaking protection
-hub:
-  protection:
-    prevent-block-break: false
+### Working with Hub Maps
+```kotlin
+// Get all hub maps
+val hubMaps = MapRegistry.getHubMaps()
 
-# Disable double jump
-hub:
-  enable-double-jump: false
+// Get default hub
+val defaultHub = MapRegistry.getDefaultHub()
+
+// Check if a map is a hub
+val isHub = MapRegistry.isHubMap("blue_forest")
 ```
 
 ## Integration with Existing Systems
@@ -132,10 +130,10 @@ The hub system integrates with the existing passive ability system:
 - Automatically manages passive lifecycle (setup/teardown)
 - Prevents conflicts with other passive abilities
 
-### Command System
-- Integrates with the existing LiteCommands framework
-- Follows the same permission and command structure
-- Maintains consistency with other plugin commands
+### Map System
+- Integrates with the existing map definition system
+- Uses the same DSL and builder pattern as other maps
+- Maintains consistency with existing map architecture
 
 ## Error Handling
 

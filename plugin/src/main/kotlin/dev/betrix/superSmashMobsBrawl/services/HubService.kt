@@ -1,9 +1,10 @@
 package dev.betrix.superSmashMobsBrawl.services
 
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.config.HubConfig
+import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.instances.PassiveInstance
+import dev.betrix.superSmashMobsBrawl.registries.MapRegistry
 import gg.flyte.twilight.event.event
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -20,7 +21,6 @@ import org.bukkit.plugin.java.JavaPlugin
  */
 object HubService {
     private lateinit var plugin: JavaPlugin
-    private val hubWorlds = mutableMapOf<String, HubWorld>()
     private val playersInHub = mutableSetOf<Player>()
     private val playerPassives = mutableMapOf<Player, PassiveInstance>()
     
@@ -29,24 +29,23 @@ object HubService {
      */
     fun initialize(plugin: JavaPlugin) {
         this.plugin = plugin
-        HubConfig.initialize(plugin)
-        setupDefaultHub()
         registerEvents()
     }
     
     /**
      * Set up the default blue_forest hub
      */
-    private fun setupDefaultHub() {
-        val worldName = HubConfig.getDefaultWorldName()
-        val world = plugin.server.getWorld(worldName)
-        if (world != null) {
-            val spawnLocation = HubConfig.getSpawnLocation(world)
-            val hubWorld = HubWorld(worldName, world, spawnLocation)
-            hubWorlds[worldName] = hubWorld
-            plugin.logger.info("Hub world '$worldName' registered with spawn at ${spawnLocation.x}, ${spawnLocation.y}, ${spawnLocation.z}")
+    fun setupDefaultHub() {
+        val hubMap = MapRegistry.getDefaultHub()
+        if (hubMap != null) {
+            val world = plugin.server.getWorld(hubMap.id)
+            if (world != null) {
+                plugin.logger.info("Hub world '${hubMap.id}' registered with spawn at ${hubMap.spawnPoints[0].x}, ${hubMap.spawnPoints[0].y}, ${hubMap.spawnPoints[0].z}")
+            } else {
+                plugin.logger.warning("World '${hubMap.id}' not found! Hub system may not work properly.")
+            }
         } else {
-            plugin.logger.warning("World '$worldName' not found! Hub system may not work properly.")
+            plugin.logger.warning("No hub map found! Hub system may not work properly.")
         }
     }
     
@@ -56,9 +55,9 @@ object HubService {
     private fun registerEvents() {
         // Player join event - teleport to hub and give double jump
         event<PlayerJoinEvent> {
-            val hubWorld = getDefaultHub()
-            if (hubWorld != null) {
-                teleportToHub(player, hubWorld)
+            val hubMap = MapRegistry.getDefaultHub()
+            if (hubMap != null) {
+                teleportToHub(player, hubMap)
                 giveHubPassives(player)
             }
         }
@@ -99,21 +98,26 @@ object HubService {
     /**
      * Teleport a player to a specific hub
      */
-    fun teleportToHub(player: Player, hubWorld: HubWorld) {
-        player.teleport(hubWorld.spawnLocation)
-        player.gameMode = GameMode.ADVENTURE
-        player.fallDistance = 0f
-        playersInHub.add(player)
-        giveHubPassives(player)
+    fun teleportToHub(player: Player, hubMap: SsmbMap) {
+        val world = plugin.server.getWorld(hubMap.id)
+        if (world != null && hubMap.spawnPoints.isNotEmpty()) {
+            val spawnPoint = hubMap.spawnPoints[0]
+            val location = Location(world, spawnPoint.x, spawnPoint.y, spawnPoint.z)
+            player.teleport(location)
+            player.gameMode = GameMode.ADVENTURE
+            player.fallDistance = 0f
+            playersInHub.add(player)
+            giveHubPassives(player)
+        }
     }
     
     /**
      * Teleport a player to the default hub
      */
     fun teleportToDefaultHub(player: Player) {
-        val hubWorld = getDefaultHub()
-        if (hubWorld != null) {
-            teleportToHub(player, hubWorld)
+        val hubMap = MapRegistry.getDefaultHub()
+        if (hubMap != null) {
+            teleportToHub(player, hubMap)
         }
     }
     
@@ -121,7 +125,7 @@ object HubService {
      * Check if a player is in a hub world
      */
     fun isInHub(player: Player?, world: World?): Boolean {
-        return world != null && hubWorlds.values.any { it.world == world }
+        return world != null && MapRegistry.isHubMap(world.name)
     }
     
     /**
@@ -134,23 +138,15 @@ object HubService {
     /**
      * Get the default hub world
      */
-    fun getDefaultHub(): HubWorld? {
-        return hubWorlds[HubConfig.getDefaultWorldName()]
+    fun getDefaultHub(): SsmbMap? {
+        return MapRegistry.getDefaultHub()
     }
     
     /**
      * Get all registered hub worlds
      */
-    fun getHubWorlds(): Map<String, HubWorld> {
-        return hubWorlds.toMap()
-    }
-    
-    /**
-     * Register a new hub world
-     */
-    fun registerHubWorld(id: String, hubWorld: HubWorld) {
-        hubWorlds[id] = hubWorld
-        plugin.logger.info("Hub world '$id' registered")
+    fun getHubWorlds(): List<SsmbMap> {
+        return MapRegistry.getHubMaps()
     }
     
     /**
@@ -161,13 +157,11 @@ object HubService {
             return // Already has passives
         }
         
-        // Give double jump passive if enabled
-        if (HubConfig.isDoubleJumpEnabled()) {
-            val doubleJumpPassive = DoubleJumpPassiveDefinition.createInstance(player)
-            doubleJumpPassive.setup()
-            playerPassives[player] = doubleJumpPassive
-            plugin.logger.info("Gave double jump passive to player: ${player.name}")
-        }
+        // Give double jump passive
+        val doubleJumpPassive = DoubleJumpPassiveDefinition.createInstance(player)
+        doubleJumpPassive.setup()
+        playerPassives[player] = doubleJumpPassive
+        plugin.logger.info("Gave double jump passive to player: ${player.name}")
     }
     
     /**
@@ -191,11 +185,3 @@ object HubService {
     }
 }
 
-/**
- * Represents a hub world with its configuration
- */
-data class HubWorld(
-    val id: String,
-    val world: World,
-    val spawnLocation: Location
-)

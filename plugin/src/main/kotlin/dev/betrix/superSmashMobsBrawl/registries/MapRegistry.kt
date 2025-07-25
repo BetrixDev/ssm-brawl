@@ -1,7 +1,9 @@
 package dev.betrix.superSmashMobsBrawl.registries
 
 import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
+import dev.betrix.superSmashMobsBrawl.maps.MapType
 import dev.betrix.superSmashMobsBrawl.maps.campsiteMap
+import dev.betrix.superSmashMobsBrawl.maps.blueForestHub
 
 object MapRegistry {
     private val maps = mutableMapOf<String, SsmbMap>()
@@ -29,7 +31,20 @@ object MapRegistry {
         TODO("Implement this function")
     }
 
+    fun getHubMaps(): List<SsmbMap> {
+        return maps.values.filter { it.type == MapType.HUB }
+    }
+
+    fun getDefaultHub(): SsmbMap? {
+        return maps.values.find { it.type == MapType.HUB }
+    }
+
+    fun isHubMap(mapId: String): Boolean {
+        return maps[mapId]?.type == MapType.HUB
+    }
+
     init {
         register(campsiteMap)
+        register(blueForestHub)
     }
 }

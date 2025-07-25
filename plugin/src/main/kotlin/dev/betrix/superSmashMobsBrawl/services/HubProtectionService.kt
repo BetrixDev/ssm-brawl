@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.services
 
-import dev.betrix.superSmashMobsBrawl.config.HubConfig
 import gg.flyte.twilight.event.event
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
@@ -27,7 +26,7 @@ object HubProtectionService {
     fun registerEvents() {
         // Block protection
         event<BlockBreakEvent> {
-            if (HubService.isInHub(player, block.world) && HubConfig.isBlockBreakProtectionEnabled()) {
+            if (HubService.isInHub(player, block.world)) {
                 if (player.gameMode != GameMode.CREATIVE) {
                     isCancelled = true
                 }
@@ -35,7 +34,7 @@ object HubProtectionService {
         }
         
         event<BlockPlaceEvent> {
-            if (HubService.isInHub(player, block.world) && HubConfig.isBlockPlaceProtectionEnabled()) {
+            if (HubService.isInHub(player, block.world)) {
                 if (player.gameMode != GameMode.CREATIVE) {
                     isCancelled = true
                 }
@@ -48,13 +47,13 @@ object HubProtectionService {
                 // Allow certain interactions but prevent block breaking/placing
                 when (action) {
                     org.bukkit.event.block.Action.LEFT_CLICK_BLOCK -> {
-                        if (player.gameMode != GameMode.CREATIVE && HubConfig.isBlockBreakProtectionEnabled()) {
+                        if (player.gameMode != GameMode.CREATIVE) {
                             isCancelled = true
                         }
                     }
                     org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK -> {
                         // Allow right-click for doors, buttons, etc. but prevent block placement
-                        if (player.gameMode != GameMode.CREATIVE && clickedBlock != null && HubConfig.isBlockPlaceProtectionEnabled()) {
+                        if (player.gameMode != GameMode.CREATIVE && clickedBlock != null) {
                             // Check if it's a block that can be placed
                             val itemInHand = player.inventory.itemInMainHand
                             if (itemInHand.type.isBlock) {
@@ -77,7 +76,7 @@ object HubProtectionService {
         
         // Damage protection (comprehensive)
         event<EntityDamageEvent> {
-            if (entity is Player && HubConfig.isDamageProtectionEnabled()) {
+            if (entity is Player) {
                 val player = entity as Player
                 if (HubService.isInHub(player, player.world)) {
                     isCancelled = true
@@ -86,18 +85,16 @@ object HubProtectionService {
         }
         
         event<EntityDamageByEntityEvent> {
-            if (HubConfig.isDamageProtectionEnabled()) {
-                if (damager is Player) {
-                    val player = damager as Player
-                    if (HubService.isInHub(player, player.world)) {
-                        isCancelled = true
-                    }
+            if (damager is Player) {
+                val player = damager as Player
+                if (HubService.isInHub(player, player.world)) {
+                    isCancelled = true
                 }
-                if (entity is Player) {
-                    val player = entity as Player
-                    if (HubService.isInHub(player, player.world)) {
-                        isCancelled = true
-                    }
+            }
+            if (entity is Player) {
+                val player = entity as Player
+                if (HubService.isInHub(player, player.world)) {
+                    isCancelled = true
                 }
             }
         }
@@ -124,20 +121,20 @@ object HubProtectionService {
         
         // Item pickup protection (prevent accidental pickups)
         event<PlayerPickupItemEvent> {
-            if (HubService.isInHub(player, player.world) && HubConfig.isItemPickupProtectionEnabled()) {
+            if (HubService.isInHub(player, player.world)) {
                 isCancelled = true
             }
         }
         
         event<PlayerPickupArrowEvent> {
-            if (HubService.isInHub(player, player.world) && HubConfig.isItemPickupProtectionEnabled()) {
+            if (HubService.isInHub(player, player.world)) {
                 isCancelled = true
-                }
+            }
         }
         
         // Weather protection (keep hub worlds nice)
         event<WeatherChangeEvent> {
-            if (HubService.isInHub(null, world) && HubConfig.isWeatherProtectionEnabled()) {
+            if (HubService.isInHub(null, world)) {
                 if (toWeatherState()) {
                     isCancelled = true
                 }
