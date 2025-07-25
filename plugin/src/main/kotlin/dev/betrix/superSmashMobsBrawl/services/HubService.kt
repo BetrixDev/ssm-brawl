@@ -36,16 +36,27 @@ object HubService {
      * Set up the default blue_forest hub
      */
     fun setupDefaultHub() {
+        // Validate hub configuration
+        if (!MapRegistry.validateHubConfiguration()) {
+            val defaultHubs = MapRegistry.getDefaultHubs()
+            if (defaultHubs.isEmpty()) {
+                plugin.logger.warning("No default hub found! Hub system may not work properly.")
+            } else {
+                plugin.logger.warning("Multiple default hubs found (${defaultHubs.size})! Only one hub should be marked as default.")
+            }
+            return
+        }
+
         val hubMap = MapRegistry.getDefaultHub()
         if (hubMap != null) {
             val world = plugin.server.getWorld(hubMap.id)
             if (world != null) {
-                plugin.logger.info("Hub world '${hubMap.id}' registered with spawn at ${hubMap.spawnPoints[0].x}, ${hubMap.spawnPoints[0].y}, ${hubMap.spawnPoints[0].z}")
+                plugin.logger.info("Default hub world '${hubMap.id}' registered with spawn at ${hubMap.spawnPoints[0].x}, ${hubMap.spawnPoints[0].y}, ${hubMap.spawnPoints[0].z}")
             } else {
                 plugin.logger.warning("World '${hubMap.id}' not found! Hub system may not work properly.")
             }
         } else {
-            plugin.logger.warning("No hub map found! Hub system may not work properly.")
+            plugin.logger.warning("No default hub map found! Hub system may not work properly.")
         }
     }
     

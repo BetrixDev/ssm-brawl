@@ -36,11 +36,20 @@ object MapRegistry {
     }
 
     fun getDefaultHub(): SsmbMap? {
-        return maps.values.find { it.type == MapType.HUB }
+        return maps.values.find { it.type == MapType.HUB && it.isDefault }
+    }
+
+    fun getDefaultHubs(): List<SsmbMap> {
+        return maps.values.filter { it.type == MapType.HUB && it.isDefault }
     }
 
     fun isHubMap(mapId: String): Boolean {
         return maps[mapId]?.type == MapType.HUB
+    }
+
+    fun validateHubConfiguration(): Boolean {
+        val defaultHubs = getDefaultHubs()
+        return defaultHubs.size == 1
     }
 
     init {

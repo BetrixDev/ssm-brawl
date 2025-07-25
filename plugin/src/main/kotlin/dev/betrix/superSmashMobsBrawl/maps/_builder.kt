@@ -15,7 +15,8 @@ data class SsmbMap(
     val description: String,
     val voidLevel: Int,
     val creatorUuids: List<String>,
-    val spawnPoints: List<Vector>
+    val spawnPoints: List<Vector>,
+    val isDefault: Boolean = false
 )
 
 class MapBuilder {
@@ -25,6 +26,7 @@ class MapBuilder {
     var description = ""
     var type = MapType.MINIGAME
     var voidLevel = 0
+    var isDefault = false
     var creatorUuids = hashSetOf<String>()
     private val spawnPoints = mutableListOf<Vector>()
 
@@ -58,7 +60,8 @@ class MapBuilder {
             maxPlayers = maxPlayers,
             description = description,
             voidLevel = voidLevel,
-            creatorUuids = creatorUuids.toList()
+            creatorUuids = creatorUuids.toList(),
+            isDefault = isDefault
         )
     }
 }

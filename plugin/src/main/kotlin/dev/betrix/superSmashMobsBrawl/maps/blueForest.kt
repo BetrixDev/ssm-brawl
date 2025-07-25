@@ -7,6 +7,7 @@ val blueForestHub = defineMap {
     voidLevel = 0
     type = MapType.HUB
     maxPlayers = null // Hubs don't have player limits
+    isDefault = true
 
     addCreator("PLACEHOLDER_UUID")
 

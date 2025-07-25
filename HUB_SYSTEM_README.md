@@ -32,6 +32,7 @@ val blueForestHub = defineMap {
     voidLevel = 0
     type = MapType.HUB
     maxPlayers = null // Hubs don't have player limits
+    isDefault = true
 
     addCreator("PLACEHOLDER_UUID")
 
@@ -44,6 +45,11 @@ val blueForestHub = defineMap {
 ### Map Types
 - `MapType.MINIGAME` - For game maps
 - `MapType.HUB` - For hub/lobby maps
+
+### Hub Properties
+- `isDefault` - Boolean flag to mark the default hub. Only one hub should be marked as default.
+- `maxPlayers` - Set to `null` for hubs (no player limit)
+- `type` - Must be `MapType.HUB` for hub maps
 
 ## Architecture
 
@@ -77,7 +83,8 @@ data class SsmbMap(
     val description: String,
     val voidLevel: Int,
     val creatorUuids: List<String>,
-    val spawnPoints: List<Vector>
+    val spawnPoints: List<Vector>,
+    val isDefault: Boolean = false
 )
 ```
 
@@ -98,6 +105,7 @@ val lobbyHub = defineMap {
     description = "A secondary hub for special events"
     type = MapType.HUB
     maxPlayers = null
+    isDefault = false // This is not the default hub
     
     addCreator("PLACEHOLDER_UUID")
     
@@ -115,8 +123,11 @@ MapRegistry.register(lobbyHub)
 // Get all hub maps
 val hubMaps = MapRegistry.getHubMaps()
 
-// Get default hub
+// Get default hub (marked with isDefault = true)
 val defaultHub = MapRegistry.getDefaultHub()
+
+// Get all default hubs
+val defaultHubs = MapRegistry.getDefaultHubs()
 
 // Check if a map is a hub
 val isHub = MapRegistry.isHubMap("blue_forest")
