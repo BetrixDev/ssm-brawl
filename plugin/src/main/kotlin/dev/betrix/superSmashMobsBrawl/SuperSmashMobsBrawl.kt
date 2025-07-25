@@ -3,8 +3,10 @@ package dev.betrix.superSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
 import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinitionArgument
+import dev.betrix.superSmashMobsBrawl.handlers.SmashDamageHandler
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
+import dev.betrix.superSmashMobsBrawl.services.SmashDamageService
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
 import gg.flyte.twilight.Twilight
@@ -21,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin
 class SuperSmashMobsBrawl : JavaPlugin() {
     lateinit var liteCommands: LiteCommands<CommandSender>
     lateinit var twilight: Twilight
+    private lateinit var smashDamageHandler: SmashDamageHandler
 
     companion object {
         lateinit var instance: SuperSmashMobsBrawl
@@ -32,6 +35,10 @@ class SuperSmashMobsBrawl : JavaPlugin() {
         
         // Initialize services
         HotbarService.initialize(this)
+        SmashDamageService.initialize(this)
+        
+        // Initialize handlers
+        smashDamageHandler = SmashDamageHandler(this)
         
         liteCommands =
             LiteBukkitFactory.builder(this)
