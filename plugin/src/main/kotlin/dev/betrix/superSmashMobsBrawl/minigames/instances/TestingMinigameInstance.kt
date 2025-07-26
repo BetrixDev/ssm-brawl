@@ -15,6 +15,8 @@ import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import org.bukkit.World
 import org.bukkit.entity.Player
 import java.util.UUID
+import gg.flyte.twilight.extension.feed
+import gg.flyte.twilight.extension.heal
 
 class TestingMinigameInstance(
     definition: MinigameDefinition,
@@ -35,6 +37,8 @@ class TestingMinigameInstance(
                     this@TestingMinigameInstance.world = world
 
                     players.forEach { player ->
+                        player.feed()
+                        player.heal()
                         player.teleport(createLocation(world, campsiteMap.spawnPoints[0]))
                     }
                 }
@@ -67,7 +71,7 @@ class TestingMinigameInstance(
         // TODO: finish
     }
 
-    override fun onPlayerLeave(player: Player) {
-        TODO("Not yet implemented")
+    override fun onPlayerLeave(player: Player): Result<Unit, String> {
+        return Ok(Unit)
     }
 }

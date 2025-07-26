@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.UUID
+import dev.betrix.superSmashMobsBrawl.utils.createLocation
 
 /**
  * Service responsible for managing hub worlds and player hub interactions
@@ -108,8 +109,7 @@ object HubService {
     fun teleportToHub(player: Player, world: World, hubMap: SsmbMap) {
         if (hubMap.spawnPoints.isNotEmpty()) {
             val spawnPoint = hubMap.spawnPoints[0]
-            val location = Location(world, spawnPoint.x, spawnPoint.y, spawnPoint.z)
-            player.teleport(location)
+            player.teleport(createLocation(world, spawnPoint))
             player.gameMode = GameMode.ADVENTURE
             player.fallDistance = 0f
             playersInHub.add(player)

@@ -11,6 +11,6 @@ val blueForestHub = defineMap {
     addCreator("PLACEHOLDER_UUID")
 
     spawnPoints {
-        at(-29.5, 58.0, 1.5)
+        at(-29.5, 58.0, 1.5, 90f, 0f)
     }
 }
