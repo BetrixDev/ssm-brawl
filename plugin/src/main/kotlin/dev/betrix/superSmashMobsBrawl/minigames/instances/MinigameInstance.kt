@@ -19,7 +19,7 @@ abstract class MinigameInstance(
 
     open fun teardown(): Unit {}
 
-    abstract fun onPlayerLeave(player: Player): Result<Unit, String>
+abstract fun onPlayerLeave(player: Player): Result<Unit, String>
 
     fun isPlayerInMinigame(player: Player): Boolean {
         return teams.find { it.players.contains(player) } != null

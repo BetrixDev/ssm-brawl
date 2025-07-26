@@ -2,6 +2,7 @@ package dev.betrix.superSmashMobsBrawl
 
 import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
+import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
 import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinitionArgument
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
@@ -41,6 +42,7 @@ class SuperSmashMobsBrawl : JavaPlugin() {
                 .argument(MinigameDefinition::class.java, MinigameDefinitionArgument())
                 .commands(QueueCommand())
                 .commands(KitCommand())
+                .commands(LeaveCommand())
                 .build()
 
         // Player join events are now handled by HubService

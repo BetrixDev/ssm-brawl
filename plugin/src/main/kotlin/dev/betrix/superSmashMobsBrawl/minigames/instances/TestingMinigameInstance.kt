@@ -66,12 +66,24 @@ class TestingMinigameInstance(
             KitService.unassignKit(player)
         }
         
-        WorldUtils.deleteWorld(world)
-
-        // TODO: finish
+        WorldUtils.deleteWorldAsync(world)
     }
 
     override fun onPlayerLeave(player: Player): Result<Unit, String> {
+        KitService.unassignKit(player)
+
+        if (shouldEndMinigame()) {
+            teardown()
+        }
+
         return Ok(Unit)
+    }
+
+    private fun shouldEndMinigame(): Boolean {
+        if (players.size == 0) {
+            return true
+        }
+
+        return false
     }
 }

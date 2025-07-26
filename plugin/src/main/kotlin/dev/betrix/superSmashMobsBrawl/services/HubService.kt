@@ -66,6 +66,7 @@ object HubService {
                 return@event
             }
 
+            player.inventory.clear()
             teleportToHub(player, defaultHubWorld.first, defaultHubWorld.second)
             giveHubPassives(player)
         }
@@ -83,6 +84,7 @@ object HubService {
             
             if (!fromHub && toHub) {
                 // Player entering hub
+                player.inventory.clear()
                 playersInHub.add(player)
                 giveHubPassives(player)
             } else if (fromHub && !toHub) {
@@ -105,7 +107,7 @@ object HubService {
     
     /**
      * Teleport a player to a specific hub
-     */
+    */
     fun teleportToHub(player: Player, world: World, hubMap: SsmbMap) {
         if (hubMap.spawnPoints.isNotEmpty()) {
             val spawnPoint = hubMap.spawnPoints[0]
@@ -113,7 +115,6 @@ object HubService {
             player.gameMode = GameMode.ADVENTURE
             player.fallDistance = 0f
             playersInHub.add(player)
-            giveHubPassives(player)
         }
     }
     

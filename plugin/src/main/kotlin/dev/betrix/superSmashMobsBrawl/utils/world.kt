@@ -267,7 +267,7 @@ object WorldUtils {
      * @param world The World object to delete
      * @param callback Callback with Result<Unit>
      */
-    fun deleteWorldAsync(world: World, callback: (Result<Unit>) -> Unit) {
+    fun deleteWorldAsync(world: World, callback: (Result<Unit>) -> Unit = {}) {
         deleteWorldAsync(world.name, callback)
     }
 
