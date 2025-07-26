@@ -1,6 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.services
 
-import dev.betrix.superSmashMobsBrawl.extensions.isDoor
+import dev.betrix.superSmashMobsBrawl.extensions.isHubInteractable
 import gg.flyte.twilight.event.event
 import org.bukkit.GameMode
 import org.bukkit.Material
@@ -53,11 +53,11 @@ object HubProtectionService {
                         }
                     }
                     org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK -> {
-                        // Allow right-click for doors, buttons, etc. but prevent block placement
-                        if (player.gameMode != GameMode.CREATIVE && clickedBlock != null && clickedBlock?.type?.isDoor() == true) {
-                            // Check if it's a block that can be placed
-                            val itemInHand = player.inventory.itemInMainHand
-                            if (itemInHand.type.isBlock) {
+                        // Only allow interactions with specific hub-interactable blocks (doors, buttons, levers, pressure plates)
+                        // Cancel all other block interactions to prevent opening chests, crafting tables, etc.
+                        if (player.gameMode != GameMode.CREATIVE) {
+                            val clickedBlockType = clickedBlock?.type
+                            if (clickedBlockType == null || !clickedBlockType.isHubInteractable()) {
                                 isCancelled = true
                             }
                         }
