@@ -16,18 +16,16 @@ class KitCommand {
     fun creeperKit(@Context player: Player) {
         // First, unassign any existing kit
         KitService.unassignKit(player)
-        
+
         // Assign the Creeper kit
         KitService.assignKit(player, CreeperKitDefinition)
             .onSuccess {
                 player.sendMessage("§aYou have been given the Creeper kit!")
                 player.sendMessage("§7Use the items in your hotbar to activate abilities.")
             }
-            .onFailure { error ->
-                player.sendMessage("§cFailed to assign kit: $error")
-            }
+            .onFailure { error -> player.sendMessage("§cFailed to assign kit: $error") }
     }
-    
+
     @Execute(name = "clear")
     fun clearKit(@Context player: Player) {
         val removedKit = KitService.unassignKit(player)

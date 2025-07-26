@@ -1,9 +1,9 @@
 package dev.betrix.superSmashMobsBrawl.registries
 
-import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import dev.betrix.superSmashMobsBrawl.maps.MapType
-import dev.betrix.superSmashMobsBrawl.maps.campsiteMap
+import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import dev.betrix.superSmashMobsBrawl.maps.blueForestHub
+import dev.betrix.superSmashMobsBrawl.maps.campsiteMap
 
 object MapRegistry {
     private val maps = mutableMapOf<String, SsmbMap>()
@@ -18,10 +18,16 @@ object MapRegistry {
         if (id.isBlank()) return null
 
         // First try exact match
-        getDefinition(id)?.let { return it }
+        getDefinition(id)?.let {
+            return it
+        }
 
         // Then try case-insensitive match
-        maps.values.find { it.id.equals(id, ignoreCase = true) }?.let { return it }
+        maps.values
+            .find { it.id.equals(id, ignoreCase = true) }
+            ?.let {
+                return it
+            }
 
         // Finally try partial match (contains)
         return maps.values.find { it.id.contains(id, ignoreCase = true) }

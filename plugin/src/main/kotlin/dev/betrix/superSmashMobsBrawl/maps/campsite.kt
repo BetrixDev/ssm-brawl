@@ -10,7 +10,5 @@ val campsiteMap = defineMap {
 
     addCreator("PLACEHOLDER_UUID")
 
-    spawnPoints {
-        at(13.0, 106.0, 33.0)
-    }
+    spawnPoints { at(13.0, 106.0, 33.0) }
 }

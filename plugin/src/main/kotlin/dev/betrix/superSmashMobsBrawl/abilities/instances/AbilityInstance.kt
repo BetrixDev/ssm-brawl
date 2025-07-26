@@ -3,10 +3,7 @@ package dev.betrix.superSmashMobsBrawl.abilities.instances
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
 import org.bukkit.entity.Player
 
-abstract class AbilityInstance(
-    val definition: AbilityDefinition,
-    val player: Player
-) {
+abstract class AbilityInstance(val definition: AbilityDefinition, val player: Player) {
     private var lastUsed: Long = 0
 
     abstract fun setup(): Unit

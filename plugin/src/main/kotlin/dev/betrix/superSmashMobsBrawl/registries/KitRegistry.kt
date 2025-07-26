@@ -1,4 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.registries
+
 import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
 

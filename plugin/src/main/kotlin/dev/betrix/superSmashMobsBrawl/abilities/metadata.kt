@@ -7,14 +7,14 @@ data class AbilityMetadata(
     val type: AbilityType = AbilityType.PROJECTILE,
     val cooldown: Int = 0,
     val hotbarItem: ItemStack,
-    var hotbarItemSlot: Int
+    var hotbarItemSlot: Int,
 )
 
-enum class AbilityType { 
+enum class AbilityType {
     PROJECTILE,
     TELEPORT,
     SELF_DESTRUCT,
-    STEALTH
+    STEALTH,
 }
 
 class AbilityBuilder {
@@ -26,7 +26,9 @@ class AbilityBuilder {
 
     fun build(): AbilityMetadata {
         if (!::hotbarItem.isInitialized) {
-            throw IllegalStateException("Hotbar item not set! Please set it to the variable hotbarItem in your ability metadata builder.")
+            throw IllegalStateException(
+                "Hotbar item not set! Please set it to the variable hotbarItem in your ability metadata builder."
+            )
         }
 
         return AbilityMetadata(
@@ -34,7 +36,7 @@ class AbilityBuilder {
             type = type,
             cooldown = cooldown,
             hotbarItem = hotbarItem,
-            hotbarItemSlot = hotbarItemSlot
+            hotbarItemSlot = hotbarItemSlot,
         )
     }
 }

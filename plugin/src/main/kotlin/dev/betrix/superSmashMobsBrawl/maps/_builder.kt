@@ -4,14 +4,10 @@ import org.bukkit.util.Vector
 
 enum class MapType {
     MINIGAME,
-    HUB
+    HUB,
 }
 
-data class SpawnPoint(
-    val position: Vector,
-    val yaw: Float? = null,
-    val pitch: Float? = null,
-)
+data class SpawnPoint(val position: Vector, val yaw: Float? = null, val pitch: Float? = null)
 
 data class SsmbMap(
     val name: String,
@@ -21,7 +17,7 @@ data class SsmbMap(
     val description: String,
     val voidLevel: Int,
     val creatorUuids: List<String>,
-    val spawnPoints: List<SpawnPoint>
+    val spawnPoints: List<SpawnPoint>,
 )
 
 class MapBuilder {
@@ -65,7 +61,7 @@ class MapBuilder {
             maxPlayers = maxPlayers,
             description = description,
             voidLevel = voidLevel,
-            creatorUuids = creatorUuids.toList()
+            creatorUuids = creatorUuids.toList(),
         )
     }
 }

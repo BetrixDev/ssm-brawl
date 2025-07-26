@@ -1,12 +1,10 @@
 package dev.betrix.superSmashMobsBrawl.extensions
 
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
-import org.bukkit.util.Vector
 import kotlin.math.abs
 import kotlin.math.log10
-
+import org.bukkit.entity.Entity
+import org.bukkit.entity.Projectile
+import org.bukkit.util.Vector
 
 fun Entity.setVelocity(strength: Double, yAdd: Double, yMax: Double, groundBoost: Boolean) {
     setVelocity(this.location.direction, strength, false, 0.0, yAdd, yMax, groundBoost)
@@ -19,7 +17,7 @@ fun Entity.setVelocity(
     yBase: Double,
     yAdd: Double,
     yMax: Double,
-    groundBoost: Boolean
+    groundBoost: Boolean,
 ) {
     if (
         velocity.x.isNaN() || velocity.y.isNaN() || velocity.z.isNaN() || velocity.length() == 0.0
@@ -54,23 +52,24 @@ fun Entity.doKnockback(
     damage: Double,
     startingHealth: Double,
     origin: Vector?,
-    projectile: Projectile?
+    projectile: Projectile?,
 ) {
     this.velocity = Vector(0.0, 0.0, 0.0)
     var knockback = damage.coerceAtLeast(2.0)
     knockback = log10(knockback)
     knockback *= multiplier
 
-//    if (this is Player) {
-//        val kitKnockbackMult = this.getMetadata(TaggedKeyDouble("knockback_multiplier"))
+    //    if (this is Player) {
+    //        val kitKnockbackMult = this.getMetadata(TaggedKeyDouble("knockback_multiplier"))
 
-//        if (kitKnockbackMult != null) {
-//            knockback *= kitKnockbackMult
-//        }
+    //        if (kitKnockbackMult != null) {
+    //            knockback *= kitKnockbackMult
+    //        }
 
-//        knockback *=
-//            (1 + 0.1 * (this.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value!! - startingHealth))
-//    }
+    //        knockback *=
+    //            (1 + 0.1 * (this.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value!! -
+    // startingHealth))
+    //    }
 
     var trajectory: Vector? = null
     if (origin != null) {
@@ -94,6 +93,6 @@ fun Entity.doKnockback(
         0.0,
         abs(0.2 * knockback),
         0.4 + (0.04 * knockback),
-        true
+        true,
     )
 }

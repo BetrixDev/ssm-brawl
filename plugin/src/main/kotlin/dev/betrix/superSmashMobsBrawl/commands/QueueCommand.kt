@@ -24,10 +24,12 @@ class QueueCommand() {
 
         val queueEntry = QueueService.getQueueEntry(sender)
 
-        val playerMessage = when (queueEntry) {
-            null -> "<gray>You are not currently in any queue.</gray>"
-            else -> "<gold>You are currently in the queue for ${queueEntry.minigame.name}!</gold>"
-        }
+        val playerMessage =
+            when (queueEntry) {
+                null -> "<gray>You are not currently in any queue.</gray>"
+                else ->
+                    "<gold>You are currently in the queue for ${queueEntry.minigame.name}!</gold>"
+            }
 
         sender.sendMessage(playerMessage)
     }
@@ -39,11 +41,18 @@ class QueueCommand() {
             return
         }
 
-        val playerMessage = QueueService.addPlayer(sender, minigame)
-            .mapBoth(
-                success = { mm("<gold>You have joined the queue for ${it.minigame.name}!</gold>") },
-                failure = { mm("<red>You are currently in a queue for ${it.minigame.name}.<newline>Please leave that queue before joining a new one</red>") }
-            )
+        val playerMessage =
+            QueueService.addPlayer(sender, minigame)
+                .mapBoth(
+                    success = {
+                        mm("<gold>You have joined the queue for ${it.minigame.name}!</gold>")
+                    },
+                    failure = {
+                        mm(
+                            "<red>You are currently in a queue for ${it.minigame.name}.<newline>Please leave that queue before joining a new one</red>"
+                        )
+                    },
+                )
 
         sender.sendMessage(playerMessage)
     }
@@ -55,11 +64,16 @@ class QueueCommand() {
             return
         }
 
-        val playerMessage = QueueService.removePlayer(sender)
-            .mapBoth(
-                success = { mm("<gold>You have been removed from the queue for ${it.minigame.name}</gold>")},
-                failure = { mm("<red>You are not currently in a queue</red>")}
-            )
+        val playerMessage =
+            QueueService.removePlayer(sender)
+                .mapBoth(
+                    success = {
+                        mm(
+                            "<gold>You have been removed from the queue for ${it.minigame.name}</gold>"
+                        )
+                    },
+                    failure = { mm("<red>You are not currently in a queue</red>") },
+                )
 
         sender.sendMessage(playerMessage)
     }

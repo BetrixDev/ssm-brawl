@@ -18,10 +18,16 @@ object MinigameRegistry {
         if (id.isBlank()) return null
 
         // First try exact match
-        getDefinition(id)?.let { return it }
+        getDefinition(id)?.let {
+            return it
+        }
 
         // Then try case-insensitive match
-        definitions.values.find { it.id.equals(id, ignoreCase = true) }?.let { return it }
+        definitions.values
+            .find { it.id.equals(id, ignoreCase = true) }
+            ?.let {
+                return it
+            }
 
         // Finally try partial match (contains)
         return definitions.values.find { it.id.contains(id, ignoreCase = true) }

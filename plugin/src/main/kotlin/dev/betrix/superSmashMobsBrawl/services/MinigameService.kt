@@ -5,14 +5,13 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
-import com.github.michaelbull.result.mapBoth
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import org.bukkit.entity.Player
 
 sealed class MinigameInitError {
-    data class PlayerAlreadyInMinigame(val players: List<Player>): MinigameInitError()
+    data class PlayerAlreadyInMinigame(val players: List<Player>) : MinigameInitError()
 }
 
 enum class MinigameLeaveError {
@@ -25,10 +24,14 @@ enum class MinigameLeaveError {
 object MinigameService {
     private val inFlightMinigames = arrayListOf<MinigameInstance>()
 
-    fun initializeMinigameInstance(minigameDefinition: MinigameDefinition, teams: List<MinigameTeam>): Result<MinigameInstance, MinigameInitError> {
-        val playersInAMinigame = teams
-            .map { team -> team.players.filter { player -> isPlayerInMinigame(player) } }
-            .flatten()
+    fun initializeMinigameInstance(
+        minigameDefinition: MinigameDefinition,
+        teams: List<MinigameTeam>,
+    ): Result<MinigameInstance, MinigameInitError> {
+        val playersInAMinigame =
+            teams
+                .map { team -> team.players.filter { player -> isPlayerInMinigame(player) } }
+                .flatten()
 
         if (!playersInAMinigame.isEmpty()) {
             return Err(MinigameInitError.PlayerAlreadyInMinigame(playersInAMinigame))
@@ -42,9 +45,7 @@ object MinigameService {
     }
 
     fun handleMinigameSetup(minigameInstance: MinigameInstance) {
-        minigameInstance.setup().onFailure {
-            minigameInstance.teardown()
-        }
+        minigameInstance.setup().onFailure { minigameInstance.teardown() }
     }
 
     fun removeMinigameInstance(minigameInstance: MinigameInstance): Boolean {
@@ -60,11 +61,12 @@ object MinigameService {
     }
 
     fun handlePlayerLeave(player: Player): Result<Unit, MinigameLeaveError> {
-        val minigameInstance = getMinigameForPlayer(player)
-            ?: return Err(MinigameLeaveError.PlayerNotInMinigame)
+        val minigameInstance =
+            getMinigameForPlayer(player) ?: return Err(MinigameLeaveError.PlayerNotInMinigame)
 
         return try {
-            minigameInstance.onPlayerLeave(player)
+            minigameInstance
+                .onPlayerLeave(player)
                 .onSuccess {
                     // Try to move player back to hub
                     val hubResult = HubService.tryTeleportToDefaultHub(player)
@@ -75,7 +77,7 @@ object MinigameService {
                 .onFailure {
                     return Err(MinigameLeaveError.NotAllowedToLeave)
                 }
-            
+
             return Ok(Unit)
         } catch (e: Exception) {
             Err(MinigameLeaveError.Unknown)

@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.abilities.instances
 
-import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.utils.isOnGround
@@ -14,10 +13,8 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.PotionSplashEvent
 import org.bukkit.inventory.ItemStack
 
-class SulphurBombAbilityInstance(
-    definition: AbilityDefinition,
-    player: Player
-) : AbilityInstance(definition, player) {
+class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) :
+    AbilityInstance(definition, player) {
     private val knockbackModifier = 2.5
     private val explosionRadius = 3.0
     private val projectileSpeed = 1.55
@@ -28,7 +25,7 @@ class SulphurBombAbilityInstance(
     }
 
     override fun setup() {
-//        TODO("Not yet implemented")
+        //        TODO("Not yet implemented")
     }
 
     override fun teardown() {
@@ -67,24 +64,20 @@ class SulphurBombAbilityInstance(
 
     private fun trackProjectile(projectile: ThrownPotion) {
         repeatingTask(1) {
-            val nearbyEntities = projectile.getNearbyEntities(
-                projectileCollisionSize,
-                projectileCollisionSize,
-                projectileCollisionSize
-            )
+            val nearbyEntities =
+                projectile.getNearbyEntities(
+                    projectileCollisionSize,
+                    projectileCollisionSize,
+                    projectileCollisionSize,
+                )
 
             nearbyEntities.forEach { entity ->
                 if (entity !is Player || entity == player) {
                     return@forEach
                 }
 
-                val splashEvent = PotionSplashEvent(
-                    projectile,
-                    entity,
-                    null,
-                    null,
-                    mutableMapOf(entity to 1.0)
-                )
+                val splashEvent =
+                    PotionSplashEvent(projectile, entity, null, null, mutableMapOf(entity to 1.0))
                 splashEvent.callEvent()
                 this.cancel()
             }
@@ -104,7 +97,9 @@ class SulphurBombAbilityInstance(
         event.hitEntity?.let { hitEntity ->
             if (hitEntity is Player && hitEntity != player) {
                 dealDamageAndKnockback(hitEntity, splashLocation, damage, knockbackModifier)
-                player.sendMessage("§aDirectly hit ${hitEntity.name} for §6${damage.toInt()} §adamage!")
+                player.sendMessage(
+                    "§aDirectly hit ${hitEntity.name} for §6${damage.toInt()} §adamage!"
+                )
             }
         }
 
@@ -116,12 +111,11 @@ class SulphurBombAbilityInstance(
     }
 
     private fun handleAreaDamage(location: org.bukkit.Location, damage: Double) {
-        val nearbyPlayers = location.world?.getNearbyEntities(
-            location,
-            explosionRadius,
-            explosionRadius,
-            explosionRadius
-        )?.filterIsInstance<Player>()?.filter { it != player }
+        val nearbyPlayers =
+            location.world
+                ?.getNearbyEntities(location, explosionRadius, explosionRadius, explosionRadius)
+                ?.filterIsInstance<Player>()
+                ?.filter { it != player }
 
         nearbyPlayers?.forEach { target ->
             val distance = target.location.distance(location)
@@ -140,15 +134,9 @@ class SulphurBombAbilityInstance(
         target: Player,
         explosionLocation: org.bukkit.Location,
         damage: Double,
-        knockback: Double
+        knockback: Double,
     ) {
-        target.doKnockback(
-            knockback,
-            damage,
-            target.health,
-            explosionLocation.toVector(),
-            null
-        )
+        target.doKnockback(knockback, damage, target.health, explosionLocation.toVector(), null)
         target.damage(damage, player)
     }
 

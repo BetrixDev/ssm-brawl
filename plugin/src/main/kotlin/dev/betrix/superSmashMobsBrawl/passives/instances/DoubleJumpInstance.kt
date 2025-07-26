@@ -11,10 +11,8 @@ import org.bukkit.entity.Player
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerToggleFlightEvent
 
-class DoubleJumpInstance(
-    definition: PassiveDefinition,
-    player:  Player
-) : PassiveInstance(definition, player) {
+class DoubleJumpInstance(definition: PassiveDefinition, player: Player) :
+    PassiveInstance(definition, player) {
     private var canDoubleJump = true
 
     private var groundCheckJob: TwilightRunnable? = null
@@ -22,7 +20,7 @@ class DoubleJumpInstance(
     override fun setup() {
         player.allowFlight = true
 
-        event<PlayerToggleFlightEvent> ToggleFlightEvent@ {
+        event<PlayerToggleFlightEvent> ToggleFlightEvent@{
             if (player != this@DoubleJumpInstance.player) {
                 return@ToggleFlightEvent
             }
@@ -40,15 +38,16 @@ class DoubleJumpInstance(
             player.allowFlight = false
             canDoubleJump = false
 
-            groundCheckJob = repeatingTask(1) {
-                if (isOnGround(player) || canDoubleJump) {
-                    canDoubleJump = true
-                    player.allowFlight = true
-                    this.cancel()
+            groundCheckJob =
+                repeatingTask(1) {
+                    if (isOnGround(player) || canDoubleJump) {
+                        canDoubleJump = true
+                        player.allowFlight = true
+                        this.cancel()
+                    }
                 }
-            }
 
-            event<PlayerDeathEvent> DeathEvent@ {
+            event<PlayerDeathEvent> DeathEvent@{
                 if (player != this@ToggleFlightEvent.player) {
                     return@DeathEvent
                 }

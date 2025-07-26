@@ -8,10 +8,12 @@ data class KitMetadata(
     val type: KitType = KitType.DEFAULT,
     val meleeDamage: Int = 0,
     val passives: List<PassiveDefinition>,
-    val abilities: List<AbilityDefinition>
+    val abilities: List<AbilityDefinition>,
 )
 
-enum class KitType { DEFAULT }
+enum class KitType {
+    DEFAULT
+}
 
 class Kit {
     var description = ""

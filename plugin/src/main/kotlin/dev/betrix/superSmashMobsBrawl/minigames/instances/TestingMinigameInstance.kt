@@ -9,21 +9,19 @@ import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
 import dev.betrix.superSmashMobsBrawl.maps.campsiteMap
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
+import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.KitService
+import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.utils.WorldUtils
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
-import org.bukkit.World
-import org.bukkit.entity.Player
-import java.util.UUID
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
-import dev.betrix.superSmashMobsBrawl.services.MinigameService
-import dev.betrix.superSmashMobsBrawl.services.HubService
+import java.util.UUID
+import org.bukkit.World
+import org.bukkit.entity.Player
 
-class TestingMinigameInstance(
-    definition: MinigameDefinition,
-    teams: List<MinigameTeam>
-) : MinigameInstance(definition, teams) {
+class TestingMinigameInstance(definition: MinigameDefinition, teams: List<MinigameTeam>) :
+    MinigameInstance(definition, teams) {
     override lateinit var world: World
 
     private val players: List<Player>
@@ -34,7 +32,9 @@ class TestingMinigameInstance(
             val gameId = UUID.randomUUID().toString()
 
             WorldUtils.copyAndLoadWorld(campsiteMap.id, gameId)
-                .onFailure { err -> return Err(err) }
+                .onFailure { err ->
+                    return Err(err)
+                }
                 .onSuccess { world ->
                     this@TestingMinigameInstance.world = world
 
@@ -48,11 +48,10 @@ class TestingMinigameInstance(
             // Assign kits to all players
             teams.forEach { team ->
                 team.players.forEach { player ->
-                    KitService.assignKit(player, CreeperKitDefinition)
-                        .onFailure { error ->
-                            // Log error if kit assignment fails
-                            println("Failed to assign kit to ${player.name}: $error")
-                        }
+                    KitService.assignKit(player, CreeperKitDefinition).onFailure { error ->
+                        // Log error if kit assignment fails
+                        println("Failed to assign kit to ${player.name}: $error")
+                    }
                 }
             }
 
@@ -68,17 +67,15 @@ class TestingMinigameInstance(
             HubService.teleportToDefaultHub(player)
             KitService.unassignKit(player)
         }
-        
+
         WorldUtils.deleteWorldAsync(world)
         MinigameService.removeMinigameInstance(this)
     }
 
     override fun onPlayerLeave(player: Player): Result<Unit, String> {
         // Remove the player from teams
-        teams.forEach { team ->
-            team.players.remove(player)
-        }
-        
+        teams.forEach { team -> team.players.remove(player) }
+
         // Unassign kit
         KitService.unassignKit(player)
 

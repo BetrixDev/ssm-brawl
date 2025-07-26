@@ -3,7 +3,6 @@ package dev.betrix.superSmashMobsBrawl.services
 import dev.betrix.superSmashMobsBrawl.extensions.isHubInteractable
 import gg.flyte.twilight.event.event
 import org.bukkit.GameMode
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
@@ -16,14 +15,10 @@ import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.weather.WeatherChangeEvent
 
-/**
- * Service responsible for protecting players and the environment in hub worlds
- */
+/** Service responsible for protecting players and the environment in hub worlds */
 object HubProtectionService {
 
-    /**
-     * Register all protection events
-     */
+    /** Register all protection events */
     fun registerEvents() {
         // Block protection
         event<BlockBreakEvent> {
@@ -33,7 +28,7 @@ object HubProtectionService {
                 }
             }
         }
-        
+
         event<BlockPlaceEvent> {
             if (HubService.isInHub(player, block.world)) {
                 if (player.gameMode != GameMode.CREATIVE) {
@@ -41,7 +36,7 @@ object HubProtectionService {
                 }
             }
         }
-        
+
         // Player interaction protection
         event<PlayerInteractEvent> {
             if (HubService.isInHub(player, player.world)) {
@@ -53,8 +48,10 @@ object HubProtectionService {
                         }
                     }
                     org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK -> {
-                        // Only allow interactions with specific hub-interactable blocks (doors, buttons, levers, pressure plates)
-                        // Cancel all other block interactions to prevent opening chests, crafting tables, etc.
+                        // Only allow interactions with specific hub-interactable blocks (doors,
+                        // buttons, levers, pressure plates)
+                        // Cancel all other block interactions to prevent opening chests, crafting
+                        // tables, etc.
                         if (player.gameMode != GameMode.CREATIVE) {
                             val clickedBlockType = clickedBlock?.type
                             if (clickedBlockType == null || !clickedBlockType.isHubInteractable()) {
@@ -62,11 +59,13 @@ object HubProtectionService {
                             }
                         }
                     }
-                    else -> { /* Allow other interactions */ }
+                    else -> {
+                        /* Allow other interactions */
+                    }
                 }
             }
         }
-        
+
         // Entity interaction protection
         event<PlayerInteractEntityEvent> {
             if (HubService.isInHub(player, player.world)) {
@@ -74,7 +73,7 @@ object HubProtectionService {
                 // This allows for NPCs, signs, etc. to work
             }
         }
-        
+
         // Damage protection (comprehensive)
         event<EntityDamageEvent> {
             if (entity is Player) {
@@ -84,7 +83,7 @@ object HubProtectionService {
                 }
             }
         }
-        
+
         event<EntityDamageByEntityEvent> {
             if (damager is Player) {
                 val player = damager as Player
@@ -99,7 +98,7 @@ object HubProtectionService {
                 }
             }
         }
-        
+
         // Food level protection
         event<FoodLevelChangeEvent> {
             if (entity is Player) {
@@ -109,7 +108,7 @@ object HubProtectionService {
                 }
             }
         }
-        
+
         // Entity targeting protection
         event<EntityTargetEvent> {
             if (target is Player) {
@@ -119,7 +118,7 @@ object HubProtectionService {
                 }
             }
         }
-        
+
         // Item pickup protection (prevent accidental pickups)
         event<EntityPickupItemEvent> {
             if (entity is Player) {
@@ -129,7 +128,7 @@ object HubProtectionService {
                 }
             }
         }
-        
+
         // Weather protection (keep hub worlds nice)
         event<WeatherChangeEvent> {
             if (HubService.isInHub(null, world)) {

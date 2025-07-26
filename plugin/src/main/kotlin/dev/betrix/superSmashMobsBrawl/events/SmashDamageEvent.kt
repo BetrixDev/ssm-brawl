@@ -12,11 +12,12 @@ class SmashDamageEvent(
     val damager: LivingEntity?,
     val damage: Double,
     val knockbackMultiplier: Double = 1.0,
-    val damageType: SmashDamageType? = null
+    val damageType: SmashDamageType? = null,
 ) : TwilightEvent() {
 
     fun isValid(minigame: MinigameInstance): Boolean {
-        // TODO: Once we figure out how we want to handle all living entities in minigames, this check will be removed
+        // TODO: Once we figure out how we want to handle all living entities in minigames, this
+        // check will be removed
         if (victim !is Player || damager !is Player) {
             return false
         }

@@ -5,7 +5,6 @@ import dev.betrix.superSmashMobsBrawl.abilities.definitions.LightningJumpAbility
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.StealthAbilityDefinition
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.SulphurBombAbilityDefinition
 import dev.betrix.superSmashMobsBrawl.kits.instances.CreeperKitInstance
-import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
 import dev.betrix.superSmashMobsBrawl.kits.kit
 import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.ExplosiveFeedbackPassiveDefinition

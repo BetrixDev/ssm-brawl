@@ -1,13 +1,13 @@
 package dev.betrix.superSmashMobsBrawl
 
 import dev.betrix.superSmashMobsBrawl.commands.KitCommand
-import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
 import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
+import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
 import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinitionArgument
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
-import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
+import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
 import gg.flyte.twilight.Twilight
@@ -31,12 +31,12 @@ class SuperSmashMobsBrawl : JavaPlugin() {
     override fun onEnable() {
         instance = this
         twilight = twilight(this)
-        
+
         // Initialize services
         HotbarService.initialize(this)
         HubService.initialize(this)
         HubProtectionService.registerEvents()
-        
+
         liteCommands =
             LiteBukkitFactory.builder(this)
                 .argument(MinigameDefinition::class.java, MinigameDefinitionArgument())

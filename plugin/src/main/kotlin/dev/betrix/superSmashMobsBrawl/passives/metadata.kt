@@ -1,19 +1,13 @@
 package dev.betrix.superSmashMobsBrawl.passives
 
-data class PassiveMetadata(
-    val description: String = "",
-    val userFacing: Boolean = false
-)
+data class PassiveMetadata(val description: String = "", val userFacing: Boolean = false)
 
 class PassiveBuilder {
     var description = ""
     var userFacing = false
 
     internal fun build(): PassiveMetadata {
-        return PassiveMetadata(
-            description = description,
-            userFacing = userFacing
-        )
+        return PassiveMetadata(description = description, userFacing = userFacing)
     }
 }
 

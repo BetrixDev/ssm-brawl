@@ -34,7 +34,10 @@ data class QueueEntry(val player: Player, val minigame: MinigameDefinition) {
 object QueueService {
     private val queue = hashSetOf<QueueEntry>()
 
-    fun addPlayer(player: Player, minigameDefinition: MinigameDefinition): Result<QueueEntry, QueueEntry> {
+    fun addPlayer(
+        player: Player,
+        minigameDefinition: MinigameDefinition,
+    ): Result<QueueEntry, QueueEntry> {
         val newEntry = QueueEntry(player, minigameDefinition)
 
         val existingEntry = queue.find { it.player == player }
@@ -52,7 +55,7 @@ object QueueService {
 
     fun removePlayer(player: Player): Result<QueueEntry, Unit> {
         val existingEntry = queue.find { it.player == player }
-        
+
         return if (existingEntry != null) {
             queue.remove(existingEntry)
             Ok(existingEntry)
@@ -70,7 +73,8 @@ object QueueService {
     }
 
     private fun getRequiredPlayersForMinigame(minigameDefinition: MinigameDefinition): Int {
-        return minigameDefinition.metadata.playersPerTeam * minigameDefinition.metadata.amountOfTeams
+        return minigameDefinition.metadata.playersPerTeam *
+            minigameDefinition.metadata.amountOfTeams
     }
 
     private fun checkMinigameCanStart(minigameDefinition: MinigameDefinition): Unit {
@@ -87,7 +91,10 @@ object QueueService {
         onMinigameCanStart(minigameDefinition, playersToStart)
     }
 
-    private fun onMinigameCanStart(minigameDefinition: MinigameDefinition, queuedPlayers: List<QueueEntry>) {
+    private fun onMinigameCanStart(
+        minigameDefinition: MinigameDefinition,
+        queuedPlayers: List<QueueEntry>,
+    ) {
         val playersPerTeam = minigameDefinition.metadata.playersPerTeam
         val amountOfTeams = minigameDefinition.metadata.amountOfTeams
 
@@ -96,7 +103,10 @@ object QueueService {
         val entriesToUse = queuedPlayers.take(totalPlayersNeeded)
 
         // Split into teams
-        val teams = entriesToUse.chunked(playersPerTeam).map { chunk -> MinigameTeam(chunk.map { it.player }.toMutableList()) }
+        val teams =
+            entriesToUse.chunked(playersPerTeam).map { chunk ->
+                MinigameTeam(chunk.map { it.player }.toMutableList())
+            }
 
         // Remove these players from the queue
         entriesToUse.forEach { removePlayer(it.player) }
@@ -105,11 +115,14 @@ object QueueService {
             .onFailure { err ->
                 when (err) {
                     is MinigameInitError.PlayerAlreadyInMinigame -> {
-                        val playersToAddBackToQueue = entriesToUse.map { it.player }.filter { !err.players.contains(it) }
+                        val playersToAddBackToQueue =
+                            entriesToUse.map { it.player }.filter { !err.players.contains(it) }
 
                         playersToAddBackToQueue.forEach { player ->
                             player.sendMessage(
-                                mm("<light_gray>There was an error. You have been added back to the queue for ${minigameDefinition.name}</light_gray>")
+                                mm(
+                                    "<light_gray>There was an error. You have been added back to the queue for ${minigameDefinition.name}</light_gray>"
+                                )
                             )
                             addPlayer(player, minigameDefinition)
                         }

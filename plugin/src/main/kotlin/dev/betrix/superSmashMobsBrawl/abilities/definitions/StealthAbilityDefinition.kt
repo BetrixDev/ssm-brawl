@@ -2,7 +2,6 @@ package dev.betrix.superSmashMobsBrawl.abilities.definitions
 
 import dev.betrix.superSmashMobsBrawl.abilities.AbilityType
 import dev.betrix.superSmashMobsBrawl.abilities.ability
-import dev.betrix.superSmashMobsBrawl.abilities.instances.AbilityInstance
 import dev.betrix.superSmashMobsBrawl.abilities.instances.StealthAbilityInstance
 import gg.flyte.twilight.extension.name
 import org.bukkit.Material

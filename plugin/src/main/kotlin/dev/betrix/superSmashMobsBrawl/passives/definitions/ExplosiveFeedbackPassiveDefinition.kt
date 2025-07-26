@@ -1,7 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.passives.definitions
 
 import dev.betrix.superSmashMobsBrawl.passives.instances.ExplosiveFeedbackInstance
-import dev.betrix.superSmashMobsBrawl.passives.instances.PassiveInstance
 import dev.betrix.superSmashMobsBrawl.passives.passive
 import org.bukkit.entity.Player
 

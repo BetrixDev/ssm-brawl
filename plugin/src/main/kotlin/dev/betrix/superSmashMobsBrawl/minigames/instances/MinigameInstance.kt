@@ -7,10 +7,7 @@ import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import org.bukkit.World
 import org.bukkit.entity.Player
 
-abstract class MinigameInstance(
-    val definition: MinigameDefinition,
-    val teams: List<MinigameTeam>
-) {
+abstract class MinigameInstance(val definition: MinigameDefinition, val teams: List<MinigameTeam>) {
     open lateinit var world: World
 
     open fun setup(): Result<Unit, Exception> {
@@ -19,7 +16,7 @@ abstract class MinigameInstance(
 
     open fun teardown(): Unit {}
 
-abstract fun onPlayerLeave(player: Player): Result<Unit, String>
+    abstract fun onPlayerLeave(player: Player): Result<Unit, String>
 
     fun isPlayerInMinigame(player: Player): Boolean {
         return teams.find { it.players.contains(player) } != null

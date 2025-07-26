@@ -14,14 +14,17 @@ enum class AssignKitError {
 object KitService {
     private val assignedKits = hashMapOf<Player, KitInstance>()
 
-    fun assignKit(player: Player, kitDefinition: KitDefinition): Result<KitInstance, AssignKitError> {
+    fun assignKit(
+        player: Player,
+        kitDefinition: KitDefinition,
+    ): Result<KitInstance, AssignKitError> {
         if (assignedKits.containsKey(player)) {
             return Err(AssignKitError.PLAYER_HAS_KIT)
         }
 
         val kitInstance = kitDefinition.createInstance(player)
         assignedKits[player] = kitInstance
-        
+
         // Setup the kit (which will also setup hotbar items)
         kitInstance.setup()
 
@@ -44,11 +47,11 @@ object KitService {
         assignedKits.remove(entry)
         kitInstance.teardown()
     }
-    
+
     fun getKitInstance(player: Player): KitInstance? {
         return assignedKits[player]
     }
-    
+
     fun hasKit(player: Player): Boolean {
         return assignedKits.containsKey(player)
     }
