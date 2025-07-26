@@ -6,12 +6,11 @@ val blueForestHub = defineMap {
     description = "The main hub world for players to gather and prepare for matches"
     voidLevel = 0
     type = MapType.HUB
-    maxPlayers = null // Hubs don't have player limits
-    isDefault = true
+    maxPlayers = null
 
     addCreator("PLACEHOLDER_UUID")
 
     spawnPoints {
-        at(0.0, 100.0, 0.0)
+        at(-29.5, 58.0, 1.5)
     }
 }

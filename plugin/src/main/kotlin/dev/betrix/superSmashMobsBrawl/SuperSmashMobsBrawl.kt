@@ -34,7 +34,6 @@ class SuperSmashMobsBrawl : JavaPlugin() {
         // Initialize services
         HotbarService.initialize(this)
         HubService.initialize(this)
-        HubService.setupDefaultHub()
         HubProtectionService.registerEvents()
         
         liteCommands =

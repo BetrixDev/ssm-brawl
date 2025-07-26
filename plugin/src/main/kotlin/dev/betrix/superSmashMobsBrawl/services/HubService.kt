@@ -1,10 +1,11 @@
 package dev.betrix.superSmashMobsBrawl.services
 
-import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
+import dev.betrix.superSmashMobsBrawl.maps.blueForestHub
 import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.instances.PassiveInstance
 import dev.betrix.superSmashMobsBrawl.registries.MapRegistry
+import dev.betrix.superSmashMobsBrawl.utils.WorldUtils
 import gg.flyte.twilight.event.event
 import org.bukkit.GameMode
 import org.bukkit.Location
@@ -15,11 +16,13 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.UUID
 
 /**
  * Service responsible for managing hub worlds and player hub interactions
  */
 object HubService {
+    private lateinit var defaultHubWorld: Pair<World, SsmbMap>
     private lateinit var plugin: JavaPlugin
     private val playersInHub = mutableSetOf<Player>()
     private val playerPassives = mutableMapOf<Player, PassiveInstance>()
@@ -29,34 +32,23 @@ object HubService {
      */
     fun initialize(plugin: JavaPlugin) {
         this.plugin = plugin
-        registerEvents()
-    }
-    
-    /**
-     * Set up the default blue_forest hub
-     */
-    fun setupDefaultHub() {
-        // Validate hub configuration
-        if (!MapRegistry.validateHubConfiguration()) {
-            val defaultHubs = MapRegistry.getDefaultHubs()
-            if (defaultHubs.isEmpty()) {
-                plugin.logger.warning("No default hub found! Hub system may not work properly.")
-            } else {
-                plugin.logger.warning("Multiple default hubs found (${defaultHubs.size})! Only one hub should be marked as default.")
-            }
-            return
-        }
 
-        val hubMap = MapRegistry.getDefaultHub()
-        if (hubMap != null) {
-            val world = plugin.server.getWorld(hubMap.id)
-            if (world != null) {
-                plugin.logger.info("Default hub world '${hubMap.id}' registered with spawn at ${hubMap.spawnPoints[0].x}, ${hubMap.spawnPoints[0].y}, ${hubMap.spawnPoints[0].z}")
-            } else {
-                plugin.logger.warning("World '${hubMap.id}' not found! Hub system may not work properly.")
-            }
-        } else {
-            plugin.logger.warning("No default hub map found! Hub system may not work properly.")
+        val defaultHubId = UUID.randomUUID().toString()
+
+        plugin.logger.info("Trying to load default world hub with id $defaultHubId")
+
+        WorldUtils.copyAndLoadWorldAsync("blue_forest", defaultHubId) { result ->
+            result.fold(
+                onSuccess = { world ->
+                    plugin.logger.info("Successfully loaded default hub world")
+                    defaultHubWorld = Pair(world, blueForestHub)
+                    registerEvents()
+                },
+                onFailure = { err ->
+                    plugin.logger.severe("Couldn't load default hub")
+                    err.printStackTrace()
+                }
+            )
         }
     }
     
@@ -66,11 +58,15 @@ object HubService {
     private fun registerEvents() {
         // Player join event - teleport to hub and give double jump
         event<PlayerJoinEvent> {
-            val hubMap = MapRegistry.getDefaultHub()
-            if (hubMap != null) {
-                teleportToHub(player, hubMap)
-                giveHubPassives(player)
+            plugin.logger.info("${player.name} joined in hub server right now")
+
+            if (!::defaultHubWorld.isInitialized) {
+                plugin.logger.severe("No default hub world set")
+                return@event
             }
+
+            teleportToHub(player, defaultHubWorld.first, defaultHubWorld.second)
+            giveHubPassives(player)
         }
         
         // Player quit event - cleanup
@@ -109,9 +105,8 @@ object HubService {
     /**
      * Teleport a player to a specific hub
      */
-    fun teleportToHub(player: Player, hubMap: SsmbMap) {
-        val world = plugin.server.getWorld(hubMap.id)
-        if (world != null && hubMap.spawnPoints.isNotEmpty()) {
+    fun teleportToHub(player: Player, world: World, hubMap: SsmbMap) {
+        if (hubMap.spawnPoints.isNotEmpty()) {
             val spawnPoint = hubMap.spawnPoints[0]
             val location = Location(world, spawnPoint.x, spawnPoint.y, spawnPoint.z)
             player.teleport(location)
@@ -126,10 +121,7 @@ object HubService {
      * Teleport a player to the default hub
      */
     fun teleportToDefaultHub(player: Player) {
-        val hubMap = MapRegistry.getDefaultHub()
-        if (hubMap != null) {
-            teleportToHub(player, hubMap)
-        }
+        teleportToHub(player, defaultHubWorld.first, defaultHubWorld.second)
     }
     
     /**

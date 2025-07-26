@@ -1,7 +1,9 @@
 package dev.betrix.superSmashMobsBrawl.services
 
+import dev.betrix.superSmashMobsBrawl.extensions.isDoor
 import gg.flyte.twilight.event.event
 import org.bukkit.GameMode
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
@@ -18,7 +20,7 @@ import org.bukkit.event.weather.WeatherChangeEvent
  * Service responsible for protecting players and the environment in hub worlds
  */
 object HubProtectionService {
-    
+
     /**
      * Register all protection events
      */
@@ -52,7 +54,7 @@ object HubProtectionService {
                     }
                     org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK -> {
                         // Allow right-click for doors, buttons, etc. but prevent block placement
-                        if (player.gameMode != GameMode.CREATIVE && clickedBlock != null) {
+                        if (player.gameMode != GameMode.CREATIVE && clickedBlock != null && clickedBlock?.type?.isDoor() == true) {
                             // Check if it's a block that can be placed
                             val itemInHand = player.inventory.itemInMainHand
                             if (itemInHand.type.isBlock) {

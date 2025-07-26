@@ -8,7 +8,6 @@ import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import org.bukkit.entity.Player
-import kotlin.onFailure
 
 sealed class MinigameInitError {
     data class PlayerAlreadyInMinigame(val players: List<Player>): MinigameInitError()

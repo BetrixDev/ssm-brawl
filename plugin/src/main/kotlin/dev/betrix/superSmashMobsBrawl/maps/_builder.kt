@@ -15,8 +15,7 @@ data class SsmbMap(
     val description: String,
     val voidLevel: Int,
     val creatorUuids: List<String>,
-    val spawnPoints: List<Vector>,
-    val isDefault: Boolean = false
+    val spawnPoints: List<Vector>
 )
 
 class MapBuilder {
@@ -60,8 +59,7 @@ class MapBuilder {
             maxPlayers = maxPlayers,
             description = description,
             voidLevel = voidLevel,
-            creatorUuids = creatorUuids.toList(),
-            isDefault = isDefault
+            creatorUuids = creatorUuids.toList()
         )
     }
 }
