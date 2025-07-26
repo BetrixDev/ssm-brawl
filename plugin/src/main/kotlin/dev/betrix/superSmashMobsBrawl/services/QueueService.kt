@@ -3,13 +3,11 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.mapBoth
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.utils.mm
-import gg.flyte.twilight.scheduler.delay
 import org.bukkit.entity.Player
 
 // This will be easy to add party data to in the future if we want
@@ -98,7 +96,7 @@ object QueueService {
         val entriesToUse = queuedPlayers.take(totalPlayersNeeded)
 
         // Split into teams
-        val teams = entriesToUse.chunked(playersPerTeam).map { chunk -> MinigameTeam(chunk.map { it.player }) }
+        val teams = entriesToUse.chunked(playersPerTeam).map { chunk -> MinigameTeam(chunk.map { it.player }.toMutableList()) }
 
         // Remove these players from the queue
         entriesToUse.forEach { removePlayer(it.player) }
