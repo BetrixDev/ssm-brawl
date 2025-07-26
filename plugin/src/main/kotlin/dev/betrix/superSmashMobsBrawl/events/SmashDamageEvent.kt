@@ -1,61 +1,26 @@
 package dev.betrix.superSmashMobsBrawl.events
 
+import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
 import gg.flyte.twilight.event.TwilightEvent
-import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.Cancellable
-import org.bukkit.event.HandlerList
-import org.bukkit.util.Vector
-import java.time.Instant
+
+sealed class SmashDamageType {}
 
 class SmashDamageEvent(
-    val victim: Player,
-    val damager: Entity?,
+    val victim: LivingEntity,
+    val damager: LivingEntity?,
     val damage: Double,
-    val knockback: Vector?,
-    val damageSource: DamageSource,
-    val extraData: Map<String, Any> = emptyMap(),
-    async: Boolean = false
-) : TwilightEvent(async), Cancellable {
-    
-    private var cancelled = false
-    
-    enum class DamageSource {
-        MELEE_ATTACK,
-        ABILITY,
-        PASSIVE,
-        PROJECTILE,
-        EXPLOSION,
-        FALL,
-        ENVIRONMENT,
-        OTHER
+    val knockbackMultiplier: Double = 1.0,
+    val damageType: SmashDamageType? = null
+) : TwilightEvent() {
+
+    fun isValid(minigame: MinigameInstance): Boolean {
+        // TODO: Once we figure out how we want to handle all living entities in minigames, this check will be removed
+        if (victim !is Player || damager !is Player) {
+            return false
+        }
+
+        return minigame.isPlayerInMinigame(damager) && minigame.isPlayerInMinigame(victim)
     }
-    
-    @Suppress("UNCHECKED_CAST")
-    inline fun <reified T> getExtraData(key: String): T? {
-        return extraData[key] as? T
-    }
-    
-    inline fun <reified T> getExtraData(key: String, default: T): T {
-        return getExtraData<T>(key) ?: default
-    }
-    
-    fun hasExtraData(key: String): Boolean {
-        return extraData.containsKey(key)
-    }
-    
-    override fun isCancelled(): Boolean = cancelled
-    
-    override fun setCancelled(cancel: Boolean) {
-        cancelled = cancel
-    }
-    
-    companion object {
-        private val HANDLERS = HandlerList()
-        
-        @JvmStatic
-        fun getHandlerList(): HandlerList = HANDLERS
-    }
-    
-    override fun getHandlers(): HandlerList = HANDLERS
 }
