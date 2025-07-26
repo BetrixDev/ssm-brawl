@@ -41,6 +41,10 @@ class LeaveCommand {
                     MinigameLeaveError.PlayerNotInMinigame -> {
                         return@onFailure
                     }
+                    MinigameLeaveError.HubNotReady -> {
+                        sender.sendMessage(mm("<red>Hub world is still loading, please try again in a moment</red>"))
+                        return
+                    }
                     else -> {
                         sender.sendMessage(mm("<red>You cannot leave this minigame</red>"))
                         return

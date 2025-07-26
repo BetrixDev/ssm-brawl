@@ -122,9 +122,28 @@ object HubService {
      * Teleport a player to the default hub
      */
     fun teleportToDefaultHub(player: Player) {
+        if (!::defaultHubWorld.isInitialized) {
+            throw IllegalStateException("Default hub world is not yet initialized")
+        }
         teleportToHub(player, defaultHubWorld.first, defaultHubWorld.second)
     }
     
+    /**
+     * Teleport a player to the default hub with result handling
+     */
+    fun tryTeleportToDefaultHub(player: Player): Result<Unit> {
+        return if (::defaultHubWorld.isInitialized) {
+            try {
+                teleportToHub(player, defaultHubWorld.first, defaultHubWorld.second)
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        } else {
+            Result.failure(IllegalStateException("Default hub world is not yet initialized"))
+        }
+    }
+
     /**
      * Check if a player is in a hub world
      */

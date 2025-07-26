@@ -96,7 +96,7 @@ object QueueService {
         val entriesToUse = queuedPlayers.take(totalPlayersNeeded)
 
         // Split into teams
-        val teams = entriesToUse.chunked(playersPerTeam).map { chunk -> MinigameTeam(chunk.map { it.player }) }
+        val teams = entriesToUse.chunked(playersPerTeam).map { chunk -> MinigameTeam(chunk.map { it.player }.toMutableList()) }
 
         // Remove these players from the queue
         entriesToUse.forEach { removePlayer(it.player) }

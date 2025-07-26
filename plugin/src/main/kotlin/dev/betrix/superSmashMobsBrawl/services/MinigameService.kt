@@ -18,6 +18,7 @@ sealed class MinigameInitError {
 enum class MinigameLeaveError {
     PlayerNotInMinigame,
     NotAllowedToLeave,
+    HubNotReady,
     Unknown,
 }
 
@@ -65,8 +66,11 @@ object MinigameService {
         return try {
             minigameInstance.onPlayerLeave(player)
                 .onSuccess {
-                    // Move player back to hub
-                    HubService.teleportToDefaultHub(player)
+                    // Try to move player back to hub
+                    val hubResult = HubService.tryTeleportToDefaultHub(player)
+                    if (hubResult.isFailure) {
+                        return Err(MinigameLeaveError.HubNotReady)
+                    }
                 }
                 .onFailure {
                     return Err(MinigameLeaveError.NotAllowedToLeave)

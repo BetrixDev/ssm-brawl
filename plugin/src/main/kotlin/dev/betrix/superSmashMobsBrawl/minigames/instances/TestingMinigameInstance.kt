@@ -17,6 +17,8 @@ import org.bukkit.entity.Player
 import java.util.UUID
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
+import dev.betrix.superSmashMobsBrawl.services.MinigameService
+import dev.betrix.superSmashMobsBrawl.services.HubService
 
 class TestingMinigameInstance(
     definition: MinigameDefinition,
@@ -63,15 +65,24 @@ class TestingMinigameInstance(
     override fun teardown() {
         // Unassign kits from all players
         players.forEach { player ->
+            HubService.teleportToDefaultHub(player)
             KitService.unassignKit(player)
         }
         
         WorldUtils.deleteWorldAsync(world)
+        MinigameService.removeMinigameInstance(this)
     }
 
     override fun onPlayerLeave(player: Player): Result<Unit, String> {
+        // Remove the player from teams
+        teams.forEach { team ->
+            team.players.remove(player)
+        }
+        
+        // Unassign kit
         KitService.unassignKit(player)
 
+        // Check if minigame should end and clean up
         if (shouldEndMinigame()) {
             teardown()
         }
