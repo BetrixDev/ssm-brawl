@@ -5,7 +5,6 @@ import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
-import dev.betrix.superSmashMobsBrawl.utils.isOnGround
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.add
 import gg.flyte.twilight.extension.getNearbyEntities
@@ -59,25 +58,21 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
                     )
                 }
 
-                player.world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, entity.location.add(0,0.25,0), 25)
+                player.world.spawnParticle(
+                    Particle.CAMPFIRE_COSY_SMOKE,
+                    entity.location.add(0, 0.25, 0),
+                    25,
+                )
                 player.world.playSound(entity.location, Sound.ENTITY_GENERIC_EXPLODE, 1F, 1F)
             }
         )
     }
 
-    override fun activate(): Boolean {
-        if (!canActivate()) {
-            if (isOnCooldown()) {
-                player.sendMessage("§cSulphur Bomb is on cooldown! (${getRemainingCooldown()}s)")
-            }
-            return false
-        }
-
+    override fun activate() {
         setCooldown()
         throwProjectile()
 
         player.sendMessage("§7Sulphur Bomb thrown!")
-        return true
     }
 
     private fun throwProjectile() {
@@ -89,22 +84,25 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
         projectile.shooter = player
         projectile.item = ItemStack.of(Material.COAL)
 
-        runnables.add(repeatingTask(1) {
-            val nearbyEntities =
-                projectile.getNearbyEntities(projectileCollisionSize).filter { it != player }.sortedBy {
-                    it.location.distance(projectile.location)
+        runnables.add(
+            repeatingTask(1) {
+                val nearbyEntities =
+                    projectile
+                        .getNearbyEntities(projectileCollisionSize)
+                        .filter { it != player }
+                        .sortedBy { it.location.distance(projectile.location) }
+
+                if (nearbyEntities.isEmpty()) {
+                    return@repeatingTask
                 }
 
-            if (nearbyEntities.isEmpty()) {
-                return@repeatingTask
+                val closestEntity = nearbyEntities.first()
+
+                val splashEvent = PotionSplashEvent(projectile, closestEntity, null, null, mapOf())
+                splashEvent.callEvent()
+
+                cancel()
             }
-
-            val closestEntity = nearbyEntities.first()
-
-            val splashEvent = PotionSplashEvent(projectile, closestEntity, null, null, mapOf())
-            splashEvent.callEvent()
-
-            cancel()
-        })
+        )
     }
 }

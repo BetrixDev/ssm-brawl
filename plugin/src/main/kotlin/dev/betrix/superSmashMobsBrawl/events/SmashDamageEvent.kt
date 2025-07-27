@@ -7,6 +7,8 @@ import org.bukkit.entity.Player
 
 sealed class SmashDamageType {
     object Projectile : SmashDamageType()
+
+    object Explosion : SmashDamageType()
 }
 
 class SmashDamageEvent(
