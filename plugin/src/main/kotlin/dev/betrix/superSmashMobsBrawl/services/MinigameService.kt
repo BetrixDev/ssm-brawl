@@ -5,6 +5,8 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
+import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
@@ -45,7 +47,9 @@ object MinigameService {
     }
 
     fun handleMinigameSetup(minigameInstance: MinigameInstance) {
-        minigameInstance.setup().onFailure { minigameInstance.teardown() }
+        SuperSmashMobsBrawl.instance.launch {
+            minigameInstance.setup().onFailure { minigameInstance.teardown() }
+        }
     }
 
     fun removeMinigameInstance(minigameInstance: MinigameInstance): Boolean {

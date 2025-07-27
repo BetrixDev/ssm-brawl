@@ -6,7 +6,8 @@ val campsiteMap = defineMap {
     description = "The OG SSMB map"
     voidLevel = 80
     type = MapType.MINIGAME
-    maxPlayers = 1 // TODO: `1` is temporary
+    maxPlayers = 1 // TODO: `1` is temporary,
+    worldBorderSize = 300.0
 
     addCreator("PLACEHOLDER_UUID")
 

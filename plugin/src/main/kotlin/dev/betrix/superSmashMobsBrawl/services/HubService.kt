@@ -1,11 +1,12 @@
 package dev.betrix.superSmashMobsBrawl.services
 
+import com.github.michaelbull.result.mapBoth
+import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import dev.betrix.superSmashMobsBrawl.maps.blueForestHub
 import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.instances.PassiveInstance
 import dev.betrix.superSmashMobsBrawl.registries.MapRegistry
-import dev.betrix.superSmashMobsBrawl.utils.WorldUtils
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import gg.flyte.twilight.event.event
 import java.util.UUID
@@ -20,10 +21,18 @@ import org.bukkit.plugin.java.JavaPlugin
 
 /** Service responsible for managing hub worlds and player hub interactions */
 object HubService {
-    private lateinit var defaultHubWorld: Pair<World, SsmbMap>
+    private lateinit var defaultLoadedHubWorld: LoadedWorld
     private lateinit var plugin: JavaPlugin
     private val playersInHub = mutableSetOf<Player>()
     private val playerPassives = mutableMapOf<Player, PassiveInstance>()
+
+    /** Removes all current loaded worlds and teleports all players to default world */
+    fun teardown() {
+        playerPassives.values.forEach { it.teardown() }
+        playerPassives.clear()
+        playersInHub.clear()
+        plugin.logger.info("Hub service cleaned up")
+    }
 
     /** Initialize the hub service */
     fun initialize(plugin: JavaPlugin) {
@@ -33,18 +42,19 @@ object HubService {
 
         plugin.logger.info("Trying to load default world hub with id $defaultHubId")
 
-        WorldUtils.copyAndLoadWorldAsync("blue_forest", defaultHubId) { result ->
-            result.fold(
-                onSuccess = { world ->
-                    plugin.logger.info("Successfully loaded default hub world")
-                    defaultHubWorld = Pair(world, blueForestHub)
-                    registerEvents()
-                },
-                onFailure = { err ->
-                    plugin.logger.severe("Couldn't load default hub")
-                    err.printStackTrace()
-                },
-            )
+        plugin.launch {
+            WorldService.copyAndLoadWorld(blueForestHub)
+                .mapBoth(
+                    success = { loadedWorld ->
+                        plugin.logger.info("Successfully loaded default hub world")
+                        defaultLoadedHubWorld = loadedWorld
+                        registerEvents()
+                    },
+                    failure = { err ->
+                        plugin.logger.severe("Couldn't load default hub")
+                        err.printStackTrace()
+                    },
+                )
         }
     }
 
@@ -54,13 +64,13 @@ object HubService {
         event<PlayerJoinEvent> {
             plugin.logger.info("${player.name} joined in hub server right now")
 
-            if (!::defaultHubWorld.isInitialized) {
+            if (!::defaultLoadedHubWorld.isInitialized) {
                 plugin.logger.severe("No default hub world set")
                 return@event
             }
 
             player.inventory.clear()
-            teleportToHub(player, defaultHubWorld.first, defaultHubWorld.second)
+            teleportToHub(player, defaultLoadedHubWorld)
             giveHubPassives(player)
         }
 
@@ -72,8 +82,8 @@ object HubService {
 
         // Player teleport event - handle hub entry/exit
         event<PlayerTeleportEvent> {
-            val fromHub = isInHub(player, from.world)
-            val toHub = isInHub(player, to.world)
+            val fromHub = isWorldHub( from.world)
+            val toHub = isWorldHub(to.world)
 
             if (!fromHub && toHub) {
                 // Player entering hub
@@ -91,7 +101,7 @@ object HubService {
         event<EntityDamageEvent> {
             if (entity is Player) {
                 val player = entity as Player
-                if (isInHub(player, player.world)) {
+                if (isPlayerInHub(player)) {
                     isCancelled = true
                 }
             }
@@ -99,10 +109,10 @@ object HubService {
     }
 
     /** Teleport a player to a specific hub */
-    fun teleportToHub(player: Player, world: World, hubMap: SsmbMap) {
-        if (hubMap.spawnPoints.isNotEmpty()) {
-            val spawnPoint = hubMap.spawnPoints[0]
-            player.teleport(createLocation(world, spawnPoint))
+    fun teleportToHub(player: Player, loadedWorld: LoadedWorld) {
+        if (loadedWorld.mapDefinition.spawnPoints.isNotEmpty()) {
+            val spawnPoint = loadedWorld.mapDefinition.spawnPoints[0]
+            player.teleport(createLocation(loadedWorld.world, spawnPoint))
             player.gameMode = GameMode.ADVENTURE
             player.fallDistance = 0f
             playersInHub.add(player)
@@ -111,17 +121,17 @@ object HubService {
 
     /** Teleport a player to the default hub */
     fun teleportToDefaultHub(player: Player) {
-        if (!::defaultHubWorld.isInitialized) {
+        if (!::defaultLoadedHubWorld.isInitialized) {
             throw IllegalStateException("Default hub world is not yet initialized")
         }
-        teleportToHub(player, defaultHubWorld.first, defaultHubWorld.second)
+        teleportToHub(player, defaultLoadedHubWorld)
     }
 
     /** Teleport a player to the default hub with result handling */
     fun tryTeleportToDefaultHub(player: Player): Result<Unit> {
-        return if (::defaultHubWorld.isInitialized) {
+        return if (::defaultLoadedHubWorld.isInitialized) {
             try {
-                teleportToHub(player, defaultHubWorld.first, defaultHubWorld.second)
+                teleportToHub(player, defaultLoadedHubWorld)
                 Result.success(Unit)
             } catch (e: Exception) {
                 Result.failure(e)
@@ -132,14 +142,11 @@ object HubService {
     }
 
     /** Check if a player is in a hub world */
-    fun isInHub(player: Player?, world: World?): Boolean {
-        return world != null && MapRegistry.isHubMap(world.name)
+    fun isPlayerInHub(player: Player): Boolean {
+        return isWorldHub(player.world)
     }
 
-    /** Check if a player is currently in any hub */
-    fun isPlayerInHub(player: Player): Boolean {
-        return playersInHub.contains(player)
-    }
+    fun isWorldHub(world: World): Boolean = defaultLoadedHubWorld.world == world
 
     /** Get the default hub world */
     fun getDefaultHub(): SsmbMap? {
@@ -170,13 +177,5 @@ object HubService {
         passive?.teardown()
 
         plugin.logger.info("Removed hub passives from player: ${player.name}")
-    }
-
-    /** Clean up all player data (called on plugin disable) */
-    fun cleanup() {
-        playerPassives.values.forEach { it.teardown() }
-        playerPassives.clear()
-        playersInHub.clear()
-        plugin.logger.info("Hub service cleaned up")
     }
 }
