@@ -163,8 +163,8 @@ object WorldService {
                                 )
                         }
                     },
-                    onFailure = {
-                        return@mainContext Err(RuntimeException(""))
+                    onFailure = { err ->
+                        return@mainContext Err(RuntimeException(err.message, err))
                     },
                 )
         }
