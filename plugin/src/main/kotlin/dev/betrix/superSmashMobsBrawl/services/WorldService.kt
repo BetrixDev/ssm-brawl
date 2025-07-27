@@ -18,6 +18,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.util.UUID
 import kotlinx.coroutines.withContext
 import org.bukkit.Bukkit
+import org.bukkit.GameRule
 import org.bukkit.World
 import org.bukkit.WorldCreator
 
@@ -171,6 +172,13 @@ object WorldService {
 
     private fun setupWorld(world: World, map: SsmbMap) {
         world.worldBorder.size = map.worldBorderSize
+        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
+        world.setGameRule(GameRule.DO_WEATHER_CYCLE, false)
+        world.setGameRule(GameRule.DO_MOB_SPAWNING, false)
+        world.setGameRule(GameRule.ALLOW_FIRE_TICKS_AWAY_FROM_PLAYER, false)
+        world.setGameRule(GameRule.DO_MOB_LOOT, false)
+        world.setGameRule(GameRule.DO_VINES_SPREAD, false)
+        world.setGameRule(GameRule.MOB_GRIEFING, false)
     }
 
     /**
