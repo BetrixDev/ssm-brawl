@@ -7,6 +7,7 @@ import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.utils.isOnGround
 import gg.flyte.twilight.event.event
+import gg.flyte.twilight.extension.add
 import gg.flyte.twilight.extension.getNearbyEntities
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.Material
@@ -24,10 +25,6 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
     private val projectileCollisionSize = 0.65
     private val projectileKnockbackModifier = 2.5
     private val projectileDamage = 6.5
-
-    override fun canActivate(): Boolean {
-        return super.canActivate() && isOnGround(player) && !player.isInWater
-    }
 
     override fun setup() {
         listeners.add(
@@ -62,8 +59,8 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
                     )
                 }
 
-                player.world.spawnParticle(Particle.SMOKE, entity.location, 1)
-                player.world.playSound(entity.location, Sound.ENTITY_GENERIC_EXPLODE, 1F, 1.5F)
+                player.world.spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, entity.location.add(0,0.25,0), 25)
+                player.world.playSound(entity.location, Sound.ENTITY_GENERIC_EXPLODE, 1F, 1F)
             }
         )
     }
@@ -92,9 +89,9 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
         projectile.shooter = player
         projectile.item = ItemStack.of(Material.COAL)
 
-        repeatingTask(1) {
+        runnables.add(repeatingTask(1) {
             val nearbyEntities =
-                projectile.getNearbyEntities(projectileCollisionSize).sortedBy {
+                projectile.getNearbyEntities(projectileCollisionSize).filter { it != player }.sortedBy {
                     it.location.distance(projectile.location)
                 }
 
@@ -106,6 +103,8 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
 
             val splashEvent = PotionSplashEvent(projectile, closestEntity, null, null, mapOf())
             splashEvent.callEvent()
-        }
+
+            cancel()
+        })
     }
 }
