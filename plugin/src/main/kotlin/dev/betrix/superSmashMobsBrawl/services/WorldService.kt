@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.onFailure
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
@@ -28,8 +29,10 @@ object WorldService {
     private const val WORLD_PREFIX = "ssmbworld_"
 
     suspend fun teardown() {
-        loadedWorlds.forEach {
-            deleteWorld(it.value)
+        loadedWorlds.forEach { it ->
+            deleteWorld(it.value).onFailure { error ->
+                SuperSmashMobsBrawl.instance.logger.severe("Failed to delete world: ${error.message}")
+            }
         }
     }
 
