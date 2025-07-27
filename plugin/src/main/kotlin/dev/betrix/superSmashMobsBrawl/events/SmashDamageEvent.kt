@@ -5,7 +5,9 @@ import gg.flyte.twilight.event.TwilightEvent
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
-sealed class SmashDamageType {}
+sealed class SmashDamageType {
+    object Projectile : SmashDamageType()
+}
 
 class SmashDamageEvent(
     val victim: LivingEntity,

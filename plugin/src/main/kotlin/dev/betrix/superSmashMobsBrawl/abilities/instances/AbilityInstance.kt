@@ -1,14 +1,18 @@
 package dev.betrix.superSmashMobsBrawl.abilities.instances
 
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
+import gg.flyte.twilight.event.TwilightListener
 import org.bukkit.entity.Player
 
 abstract class AbilityInstance(val definition: AbilityDefinition, val player: Player) {
     private var lastUsed: Long = 0
+    protected val listeners = arrayListOf<TwilightListener>()
 
-    abstract fun setup(): Unit
+    abstract fun setup()
 
-    abstract fun teardown(): Unit
+    open fun teardown() {
+        listeners.forEach { it.unregister() }
+    }
 
     abstract fun activate(): Boolean
 

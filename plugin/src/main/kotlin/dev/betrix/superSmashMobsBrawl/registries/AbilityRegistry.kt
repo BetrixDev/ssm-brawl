@@ -3,8 +3,6 @@ package dev.betrix.superSmashMobsBrawl.registries
 import dev.betrix.superSmashMobsBrawl.abilities.AbilityType
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.ExplosionAbilityDefinition
-import dev.betrix.superSmashMobsBrawl.abilities.definitions.LightningJumpAbilityDefinition
-import dev.betrix.superSmashMobsBrawl.abilities.definitions.StealthAbilityDefinition
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.SulphurBombAbilityDefinition
 
 object AbilityRegistry {
@@ -24,8 +22,6 @@ object AbilityRegistry {
 
     init {
         register(SulphurBombAbilityDefinition)
-        register(LightningJumpAbilityDefinition)
         register(ExplosionAbilityDefinition)
-        register(StealthAbilityDefinition)
     }
 }
