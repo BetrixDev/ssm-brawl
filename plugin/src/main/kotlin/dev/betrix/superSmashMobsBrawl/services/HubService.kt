@@ -82,8 +82,8 @@ object HubService {
 
         // Player teleport event - handle hub entry/exit
         event<PlayerTeleportEvent> {
-            val fromHub = isPlayerInHub(player, from.world)
-            val toHub = isPlayerInHub(player, to.world)
+            val fromHub = isWorldHub( from.world)
+            val toHub = isWorldHub(to.world)
 
             if (!fromHub && toHub) {
                 // Player entering hub
@@ -101,7 +101,7 @@ object HubService {
         event<EntityDamageEvent> {
             if (entity is Player) {
                 val player = entity as Player
-                if (isPlayerInHub(player, player.world)) {
+                if (isPlayerInHub(player)) {
                     isCancelled = true
                 }
             }
@@ -142,16 +142,11 @@ object HubService {
     }
 
     /** Check if a player is in a hub world */
-    fun isPlayerInHub(player: Player, world: World?): Boolean {
+    fun isPlayerInHub(player: Player): Boolean {
         return isWorldHub(player.world)
     }
 
     fun isWorldHub(world: World): Boolean = defaultLoadedHubWorld.world == world
-
-    /** Check if a player is currently in any hub */
-    fun isPlayerInHub(player: Player): Boolean {
-        return playersInHub.contains(player)
-    }
 
     /** Get the default hub world */
     fun getDefaultHub(): SsmbMap? {

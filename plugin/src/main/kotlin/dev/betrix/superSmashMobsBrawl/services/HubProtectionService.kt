@@ -23,7 +23,7 @@ object HubProtectionService {
     fun registerEvents() {
         // Block protection
         event<BlockBreakEvent> {
-            if (HubService.isPlayerInHub(player, block.world)) {
+            if (HubService.isWorldHub(block.world)) {
                 if (player.gameMode != GameMode.CREATIVE) {
                     isCancelled = true
                 }
@@ -31,7 +31,7 @@ object HubProtectionService {
         }
 
         event<BlockPlaceEvent> {
-            if (HubService.isPlayerInHub(player, block.world)) {
+            if (HubService.isWorldHub( block.world)) {
                 if (player.gameMode != GameMode.CREATIVE) {
                     isCancelled = true
                 }
@@ -40,7 +40,7 @@ object HubProtectionService {
 
         // Player interaction protection
         event<PlayerInteractEvent> {
-            if (HubService.isPlayerInHub(player, player.world)) {
+            if (HubService.isPlayerInHub(player)) {
                 // Allow certain interactions but prevent block breaking/placing
                 when (action) {
                     org.bukkit.event.block.Action.LEFT_CLICK_BLOCK -> {
@@ -69,7 +69,7 @@ object HubProtectionService {
 
         // Entity interaction protection
         event<PlayerInteractEntityEvent> {
-            if (HubService.isPlayerInHub(player, player.world)) {
+            if (HubService.isPlayerInHub(player)) {
                 // Allow interaction with entities but prevent damage
                 // This allows for NPCs, signs, etc. to work
             }
@@ -79,7 +79,7 @@ object HubProtectionService {
         event<EntityDamageEvent> {
             if (entity is Player) {
                 val player = entity as Player
-                if (HubService.isPlayerInHub(player, player.world)) {
+                if (HubService.isPlayerInHub(player)) {
                     isCancelled = true
                 }
             }
@@ -88,13 +88,13 @@ object HubProtectionService {
         event<EntityDamageByEntityEvent> {
             if (damager is Player) {
                 val player = damager as Player
-                if (HubService.isPlayerInHub(player, player.world)) {
+                if (HubService.isPlayerInHub(player)) {
                     isCancelled = true
                 }
             }
             if (entity is Player) {
                 val player = entity as Player
-                if (HubService.isPlayerInHub(player, player.world)) {
+                if (HubService.isPlayerInHub(player)) {
                     isCancelled = true
                 }
             }
@@ -104,7 +104,7 @@ object HubProtectionService {
         event<FoodLevelChangeEvent> {
             if (entity is Player) {
                 val player = entity as Player
-                if (HubService.isPlayerInHub(player, player.world)) {
+                if (HubService.isPlayerInHub(player)) {
                     player.feed()
                     isCancelled = true
                 }
@@ -115,7 +115,7 @@ object HubProtectionService {
         event<EntityTargetEvent> {
             if (target is Player) {
                 val player = target as Player
-                if (HubService.isPlayerInHub(player, player.world)) {
+                if (HubService.isPlayerInHub(player)) {
                     isCancelled = true
                 }
             }
@@ -125,7 +125,7 @@ object HubProtectionService {
         event<EntityPickupItemEvent> {
             if (entity is Player) {
                 val player = entity as Player
-                if (HubService.isPlayerInHub(player, player.world)) {
+                if (HubService.isPlayerInHub(player)) {
                     isCancelled = true
                 }
             }
