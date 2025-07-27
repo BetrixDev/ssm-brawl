@@ -18,6 +18,7 @@ data class SsmbMap(
     val voidLevel: Int,
     val creatorUuids: List<String>,
     val spawnPoints: List<SpawnPoint>,
+    val worldBorderSize: Double,
 )
 
 class MapBuilder {
@@ -27,7 +28,7 @@ class MapBuilder {
     var description = ""
     var type = MapType.MINIGAME
     var voidLevel = 0
-    var isDefault = false
+    var worldBorderSize = 0.0
     var creatorUuids = hashSetOf<String>()
     private val spawnPoints = mutableListOf<SpawnPoint>()
 
@@ -62,6 +63,7 @@ class MapBuilder {
             description = description,
             voidLevel = voidLevel,
             creatorUuids = creatorUuids.toList(),
+            worldBorderSize = worldBorderSize,
         )
     }
 }

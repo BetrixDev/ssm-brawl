@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl
 
+import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
@@ -8,6 +9,7 @@ import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
 import dev.betrix.superSmashMobsBrawl.services.HubService
+import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
 import gg.flyte.twilight.Twilight
@@ -18,9 +20,8 @@ import org.bukkit.command.CommandSender
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
-import org.bukkit.plugin.java.JavaPlugin
 
-class SuperSmashMobsBrawl : JavaPlugin() {
+class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var liteCommands: LiteCommands<CommandSender>
     lateinit var twilight: Twilight
 
@@ -28,7 +29,7 @@ class SuperSmashMobsBrawl : JavaPlugin() {
         lateinit var instance: SuperSmashMobsBrawl
     }
 
-    override fun onEnable() {
+    override suspend fun onEnableAsync() {
         instance = this
         twilight = twilight(this)
 
@@ -62,8 +63,9 @@ class SuperSmashMobsBrawl : JavaPlugin() {
         logger.info("SSMB started!")
     }
 
-    override fun onDisable() {
-        HubService.cleanup()
+    override suspend fun onDisableAsync() {
+        HubService.teardown()
+        WorldService.teardown()
         logger.info("SSMB shutting down")
     }
 }

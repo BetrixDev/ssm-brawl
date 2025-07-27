@@ -2,6 +2,7 @@ package dev.betrix.superSmashMobsBrawl.services
 
 import dev.betrix.superSmashMobsBrawl.extensions.isHubInteractable
 import gg.flyte.twilight.event.event
+import gg.flyte.twilight.extension.feed
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
@@ -22,7 +23,7 @@ object HubProtectionService {
     fun registerEvents() {
         // Block protection
         event<BlockBreakEvent> {
-            if (HubService.isInHub(player, block.world)) {
+            if (HubService.isPlayerInHub(player, block.world)) {
                 if (player.gameMode != GameMode.CREATIVE) {
                     isCancelled = true
                 }
@@ -30,7 +31,7 @@ object HubProtectionService {
         }
 
         event<BlockPlaceEvent> {
-            if (HubService.isInHub(player, block.world)) {
+            if (HubService.isPlayerInHub(player, block.world)) {
                 if (player.gameMode != GameMode.CREATIVE) {
                     isCancelled = true
                 }
@@ -39,7 +40,7 @@ object HubProtectionService {
 
         // Player interaction protection
         event<PlayerInteractEvent> {
-            if (HubService.isInHub(player, player.world)) {
+            if (HubService.isPlayerInHub(player, player.world)) {
                 // Allow certain interactions but prevent block breaking/placing
                 when (action) {
                     org.bukkit.event.block.Action.LEFT_CLICK_BLOCK -> {
@@ -68,7 +69,7 @@ object HubProtectionService {
 
         // Entity interaction protection
         event<PlayerInteractEntityEvent> {
-            if (HubService.isInHub(player, player.world)) {
+            if (HubService.isPlayerInHub(player, player.world)) {
                 // Allow interaction with entities but prevent damage
                 // This allows for NPCs, signs, etc. to work
             }
@@ -78,7 +79,7 @@ object HubProtectionService {
         event<EntityDamageEvent> {
             if (entity is Player) {
                 val player = entity as Player
-                if (HubService.isInHub(player, player.world)) {
+                if (HubService.isPlayerInHub(player, player.world)) {
                     isCancelled = true
                 }
             }
@@ -87,13 +88,13 @@ object HubProtectionService {
         event<EntityDamageByEntityEvent> {
             if (damager is Player) {
                 val player = damager as Player
-                if (HubService.isInHub(player, player.world)) {
+                if (HubService.isPlayerInHub(player, player.world)) {
                     isCancelled = true
                 }
             }
             if (entity is Player) {
                 val player = entity as Player
-                if (HubService.isInHub(player, player.world)) {
+                if (HubService.isPlayerInHub(player, player.world)) {
                     isCancelled = true
                 }
             }
@@ -103,7 +104,8 @@ object HubProtectionService {
         event<FoodLevelChangeEvent> {
             if (entity is Player) {
                 val player = entity as Player
-                if (HubService.isInHub(player, player.world)) {
+                if (HubService.isPlayerInHub(player, player.world)) {
+                    player.feed()
                     isCancelled = true
                 }
             }
@@ -113,7 +115,7 @@ object HubProtectionService {
         event<EntityTargetEvent> {
             if (target is Player) {
                 val player = target as Player
-                if (HubService.isInHub(player, player.world)) {
+                if (HubService.isPlayerInHub(player, player.world)) {
                     isCancelled = true
                 }
             }
@@ -123,7 +125,7 @@ object HubProtectionService {
         event<EntityPickupItemEvent> {
             if (entity is Player) {
                 val player = entity as Player
-                if (HubService.isInHub(player, player.world)) {
+                if (HubService.isPlayerInHub(player, player.world)) {
                     isCancelled = true
                 }
             }
@@ -131,10 +133,8 @@ object HubProtectionService {
 
         // Weather protection (keep hub worlds nice)
         event<WeatherChangeEvent> {
-            if (HubService.isInHub(null, world)) {
-                if (toWeatherState()) {
-                    isCancelled = true
-                }
+            if (HubService.isWorldHub(world) && toWeatherState()) {
+                isCancelled = true
             }
         }
     }

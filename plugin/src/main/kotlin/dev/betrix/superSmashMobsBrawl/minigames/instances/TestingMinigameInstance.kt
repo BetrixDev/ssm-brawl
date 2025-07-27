@@ -3,8 +3,10 @@ package dev.betrix.superSmashMobsBrawl.minigames.instances
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.mapBoth
 import com.github.michaelbull.result.onFailure
-import com.github.michaelbull.result.onSuccess
+import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
 import dev.betrix.superSmashMobsBrawl.maps.campsiteMap
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
@@ -12,11 +14,10 @@ import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
-import dev.betrix.superSmashMobsBrawl.utils.WorldUtils
+import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
-import java.util.UUID
 import org.bukkit.World
 import org.bukkit.entity.Player
 
@@ -27,23 +28,23 @@ class TestingMinigameInstance(definition: MinigameDefinition, teams: List<Miniga
     private val players: List<Player>
         get() = teams.flatMap { it.players }
 
-    override fun setup(): Result<Unit, Exception> {
+    override suspend fun setup(): Result<Unit, Exception> {
         try {
-            val gameId = UUID.randomUUID().toString()
+            WorldService.copyAndLoadWorld(campsiteMap, gameId)
+                .mapBoth(
+                    failure = {
+                        return Err(it)
+                    },
+                    success = { loadedWorld ->
+                        this@TestingMinigameInstance.world = loadedWorld.world
 
-            WorldUtils.copyAndLoadWorld(campsiteMap.id, gameId)
-                .onFailure { err ->
-                    return Err(err)
-                }
-                .onSuccess { world ->
-                    this@TestingMinigameInstance.world = world
-
-                    players.forEach { player ->
-                        player.feed()
-                        player.heal()
-                        player.teleport(createLocation(world, campsiteMap.spawnPoints[0]))
-                    }
-                }
+                        players.forEach { player ->
+                            player.feed()
+                            player.heal()
+                            player.teleport(createLocation(world, campsiteMap.spawnPoints[0]))
+                        }
+                    },
+                )
 
             // Assign kits to all players
             teams.forEach { team ->
@@ -61,14 +62,14 @@ class TestingMinigameInstance(definition: MinigameDefinition, teams: List<Miniga
         }
     }
 
-    override fun teardown() {
+    override suspend fun teardown() {
         // Unassign kits from all players
         players.forEach { player ->
             HubService.teleportToDefaultHub(player)
             KitService.unassignKit(player)
         }
 
-        WorldUtils.deleteWorldAsync(world)
+        WorldService.deleteWorld(world)
         MinigameService.removeMinigameInstance(this)
     }
 
@@ -81,17 +82,13 @@ class TestingMinigameInstance(definition: MinigameDefinition, teams: List<Miniga
 
         // Check if minigame should end and clean up
         if (shouldEndMinigame()) {
-            teardown()
+            SuperSmashMobsBrawl.instance.launch { teardown() }
         }
 
         return Ok(Unit)
     }
 
     private fun shouldEndMinigame(): Boolean {
-        if (players.size == 0) {
-            return true
-        }
-
-        return false
+        return players.isEmpty()
     }
 }
