@@ -114,14 +114,7 @@ src/main/kotlin/dev/betrix/superSmashMobsBrawl/
 2. Install the EditorConfig extension
 3. The project will automatically use the formatting configuration
 
-## Continuous Integration
 
-The project includes GitHub Actions CI that:
-
-- Runs code quality checks
-- Executes tests
-- Builds the plugin
-- Uploads build artifacts
 
 ## License
 
