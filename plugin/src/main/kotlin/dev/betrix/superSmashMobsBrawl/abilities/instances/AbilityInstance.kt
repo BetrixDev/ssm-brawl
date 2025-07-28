@@ -1,21 +1,22 @@
 package dev.betrix.superSmashMobsBrawl.abilities.instances
 
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
+import dev.betrix.superSmashMobsBrawl.lifecycle.Manageable
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import gg.flyte.twilight.event.TwilightListener
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import kotlinx.coroutines.Job
 import org.bukkit.entity.Player
 
-abstract class AbilityInstance(val definition: AbilityDefinition, val player: Player) {
+abstract class AbilityInstance(val definition: AbilityDefinition, val player: Player) : Manageable {
     private var lastUsed: Long = 0
     protected val listeners = arrayListOf<TwilightListener>()
     protected val runnables = arrayListOf<TwilightRunnable>()
     protected val jobs = arrayListOf<Job>()
 
-    open fun setup() {}
+    override fun setup() {}
 
-    open fun teardown() {
+    override fun teardown() {
         listeners.forEach { it.unregister() }
         runnables.forEach { it.cancel() }
         jobs.forEach { it.cancel() }

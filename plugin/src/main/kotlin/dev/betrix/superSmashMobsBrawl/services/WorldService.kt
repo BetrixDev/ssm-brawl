@@ -7,6 +7,7 @@ import com.github.michaelbull.result.onFailure
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
+import dev.betrix.superSmashMobsBrawl.lifecycle.AsyncManageable
 import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import java.io.IOException
 import java.nio.file.FileVisitResult
@@ -24,12 +25,12 @@ import org.bukkit.WorldCreator
 
 data class LoadedWorld(val world: World, val mapDefinition: SsmbMap)
 
-object WorldService {
+object WorldService : AsyncManageable {
     private val loadedWorlds = hashMapOf<String, LoadedWorld>()
 
     private const val WORLD_PREFIX = "ssmbworld_"
 
-    suspend fun teardown() {
+    override suspend fun teardown() {
         loadedWorlds.forEach { it ->
             deleteWorld(it.value).onFailure { error ->
                 SuperSmashMobsBrawl.instance.logger.severe(

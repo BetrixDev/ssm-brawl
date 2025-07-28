@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.services
 
+import dev.betrix.superSmashMobsBrawl.lifecycle.Manageable
 import gg.flyte.twilight.event.event
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerQuitEvent
@@ -35,7 +36,7 @@ import org.bukkit.plugin.java.JavaPlugin
  * 2. Use `/debug` command to toggle debug mode on/off
  * 3. Debug state is automatically cleaned up when player quits
  */
-object DebugService {
+object DebugService : Manageable {
     private lateinit var plugin: JavaPlugin
     private val playersWithDebug = mutableSetOf<Player>()
 
@@ -88,7 +89,7 @@ object DebugService {
     }
 
     /** Clean up debug service */
-    fun teardown() {
+    override fun teardown() {
         playersWithDebug.clear()
         plugin.logger.info("Debug service cleaned up")
     }

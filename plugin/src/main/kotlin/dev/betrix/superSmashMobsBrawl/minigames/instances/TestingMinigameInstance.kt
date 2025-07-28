@@ -28,7 +28,7 @@ class TestingMinigameInstance(definition: MinigameDefinition, teams: List<Miniga
     private val players: List<Player>
         get() = teams.flatMap { it.players }
 
-    override suspend fun setup(): Result<Unit, Exception> {
+    override suspend fun setupMinigame(): Result<Unit, Exception> {
         try {
             WorldService.copyAndLoadWorld(campsiteMap, gameId)
                 .mapBoth(

@@ -2,6 +2,7 @@ package dev.betrix.superSmashMobsBrawl.services
 
 import com.github.michaelbull.result.mapBoth
 import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.lifecycle.Manageable
 import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import dev.betrix.superSmashMobsBrawl.maps.blueForestHub
 import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
@@ -20,14 +21,14 @@ import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.plugin.java.JavaPlugin
 
 /** Service responsible for managing hub worlds and player hub interactions */
-object HubService {
+object HubService : Manageable {
     private lateinit var defaultLoadedHubWorld: LoadedWorld
     private lateinit var plugin: JavaPlugin
     private val playersInHub = mutableSetOf<Player>()
     private val playerPassives = mutableMapOf<Player, PassiveInstance>()
 
     /** Removes all current loaded worlds and teleports all players to default world */
-    fun teardown() {
+    override fun teardown() {
         playerPassives.values.forEach { it.teardown() }
         playerPassives.clear()
         playersInHub.clear()

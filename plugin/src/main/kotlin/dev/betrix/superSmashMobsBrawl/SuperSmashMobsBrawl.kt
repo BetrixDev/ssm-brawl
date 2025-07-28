@@ -6,6 +6,7 @@ import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
 import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinitionArgument
+import dev.betrix.superSmashMobsBrawl.lifecycle.ServiceRegistry
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
@@ -41,6 +42,11 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         HubProtectionService.registerEvents()
         DebugService.initialize(this)
 
+        // Register manageable services for automatic teardown
+        ServiceRegistry.register(HubService)
+        ServiceRegistry.register(DebugService)
+        ServiceRegistry.register(WorldService)
+
         liteCommands =
             LiteBukkitFactory.builder(this)
                 .argument(MinigameDefinition::class.java, MinigameDefinitionArgument())
@@ -68,9 +74,9 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     }
 
     override suspend fun onDisableAsync() {
-        HubService.teardown()
-        WorldService.teardown()
-        DebugService.teardown()
+        // Tear down all registered manageable services
+        ServiceRegistry.teardownAllAsync()
+        ServiceRegistry.teardownAll()
         logger.info("SSMB shutting down")
     }
 }
