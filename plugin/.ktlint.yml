@@ -1,0 +1,32 @@
+# ktlint configuration for Super Smash Mobs Brawl
+
+disabled_rules:
+  - no-wildcard-imports  # Allow wildcard imports for convenience
+  - max-line-length      # Handled by .editorconfig
+
+ktlint_standard_chain-wrapping:
+  disabled: false
+  
+ktlint_standard_condition-wrapping:
+  disabled: false
+  
+ktlint_standard_filename:
+  disabled: false
+  
+ktlint_standard_function-naming:
+  disabled: false
+  
+ktlint_standard_import-ordering:
+  disabled: false
+  
+ktlint_standard_indent:
+  disabled: false
+  
+ktlint_standard_parameter-list-wrapping:
+  disabled: false
+  
+ktlint_standard_trailing-comma-on-call-site:
+  disabled: true  # Optional trailing commas
+  
+ktlint_standard_trailing-comma-on-declaration-site:
+  disabled: true  # Optional trailing commas

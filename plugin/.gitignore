@@ -85,3 +85,11 @@ temp/
 !gradle/wrapper/gradle-wrapper.jar
 run
 .kotlin
+
+# Code formatting and linting
+.ktlint
+ktlint-report.*
+*.sarif
+
+# Build cache
+.gradle-build-cache/
