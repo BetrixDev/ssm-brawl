@@ -16,7 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin
  * 
  * ### Option 1: Using the extension function (recommended)
  * ```kotlin
- * import dev.betrix.superSmashMobsBrawl.utils.hasDebugEnabled
+ * import dev.betrix.superSmashMobsBrawl.extensions.hasDebugEnabled
  * 
  * if (player.hasDebugEnabled()) {
  *     player.sendMessage(mm("<gray>[DEBUG] Some debug information</gray>"))
