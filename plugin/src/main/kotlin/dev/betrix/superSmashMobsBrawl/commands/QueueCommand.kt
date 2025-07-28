@@ -2,6 +2,7 @@ package dev.betrix.superSmashMobsBrawl.commands
 
 import com.github.michaelbull.result.mapBoth
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.extensions.hasDebugEnabled
 import dev.betrix.superSmashMobsBrawl.services.QueueService
 import dev.betrix.superSmashMobsBrawl.utils.ONLY_PLAYERS_EXEC_MESSAGE
 import dev.betrix.superSmashMobsBrawl.utils.mm
@@ -32,6 +33,11 @@ class QueueCommand() {
             }
 
         sender.sendMessage(playerMessage)
+        
+        // Example debug usage - show additional information if debug is enabled
+        if (sender.hasDebugEnabled()) {
+            sender.sendMessage(mm("<gray>[DEBUG] Queue status checked at ${System.currentTimeMillis()}</gray>"))
+        }
     }
 
     @Execute

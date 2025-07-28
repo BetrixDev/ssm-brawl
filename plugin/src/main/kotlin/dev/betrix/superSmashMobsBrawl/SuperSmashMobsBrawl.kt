@@ -1,11 +1,13 @@
 package dev.betrix.superSmashMobsBrawl
 
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
+import dev.betrix.superSmashMobsBrawl.commands.DebugCommand
 import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
 import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinitionArgument
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
 import dev.betrix.superSmashMobsBrawl.services.HubService
@@ -37,6 +39,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         HotbarService.initialize(this)
         HubService.initialize(this)
         HubProtectionService.registerEvents()
+        DebugService.initialize(this)
 
         liteCommands =
             LiteBukkitFactory.builder(this)
@@ -44,6 +47,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
                 .commands(QueueCommand())
                 .commands(KitCommand())
                 .commands(LeaveCommand())
+                .commands(DebugCommand())
                 .build()
 
         // Player join events are now handled by HubService
@@ -66,6 +70,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     override suspend fun onDisableAsync() {
         HubService.teardown()
         WorldService.teardown()
+        DebugService.teardown()
         logger.info("SSMB shutting down")
     }
 }
