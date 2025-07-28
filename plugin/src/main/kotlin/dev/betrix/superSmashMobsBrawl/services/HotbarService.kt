@@ -2,7 +2,6 @@ package dev.betrix.superSmashMobsBrawl.services
 
 import dev.betrix.superSmashMobsBrawl.abilities.instances.AbilityInstance
 import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
-import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -149,10 +148,10 @@ object HotbarService : Listener {
             kitInstance.abilityInstances.find { it.definition.id == abilityId } ?: return
 
         // Attempt to activate the ability
-        val success = abilityInstance.activate()
+        if (abilityInstance.canActivate()) {
+            abilityInstance.activate()
 
-        // Update hotbar items to reflect new cooldown state
-        if (success) {
+            // Update hotbar items to reflect new cooldown state
             updateHotbarItems(kitInstance)
         }
     }

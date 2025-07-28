@@ -31,7 +31,7 @@ object HubProtectionService {
         }
 
         event<BlockPlaceEvent> {
-            if (HubService.isWorldHub( block.world)) {
+            if (HubService.isWorldHub(block.world)) {
                 if (player.gameMode != GameMode.CREATIVE) {
                     isCancelled = true
                 }

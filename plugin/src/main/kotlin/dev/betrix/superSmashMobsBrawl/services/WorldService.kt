@@ -32,7 +32,9 @@ object WorldService {
     suspend fun teardown() {
         loadedWorlds.forEach { it ->
             deleteWorld(it.value).onFailure { error ->
-                SuperSmashMobsBrawl.instance.logger.severe("Failed to delete world: ${error.message}")
+                SuperSmashMobsBrawl.instance.logger.severe(
+                    "Failed to delete world: ${error.message}"
+                )
             }
         }
     }

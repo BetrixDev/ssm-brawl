@@ -82,7 +82,7 @@ object HubService {
 
         // Player teleport event - handle hub entry/exit
         event<PlayerTeleportEvent> {
-            val fromHub = isWorldHub( from.world)
+            val fromHub = isWorldHub(from.world)
             val toHub = isWorldHub(to.world)
 
             if (!fromHub && toHub) {

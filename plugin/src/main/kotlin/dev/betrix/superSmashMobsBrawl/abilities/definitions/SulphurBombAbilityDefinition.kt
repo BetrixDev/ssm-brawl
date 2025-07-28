@@ -14,7 +14,7 @@ object SulphurBombAbilityDefinition : AbilityDefinition() {
 
     override val metadata = ability {
         description =
-            "Throws a coal projectile that explodes on impact, dealing damage and knockback"
+            "Throws a coal projectile that explodes on impact or contact with players, dealing damage and knockback"
         type = AbilityType.PROJECTILE
         cooldown = 3
         hotbarItemSlot = 1
