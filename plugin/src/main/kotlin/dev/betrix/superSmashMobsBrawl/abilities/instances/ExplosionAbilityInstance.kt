@@ -2,7 +2,6 @@ package dev.betrix.superSmashMobsBrawl.abilities.instances
 
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.launch
-import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.github.shynixn.mccoroutine.bukkit.ticks
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
@@ -72,7 +71,7 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
         runnables.add(
             repeatingTask(1) {
                 if (iteration == fuseTimeTicks || !isExplodeActive) {
-                    return@repeatingTask cancel()
+                    cancel()
                 }
 
                 player.exp = (iteration + 1) / fuseTimeTicks.toFloat()
@@ -85,55 +84,55 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
             }
         )
 
-        SuperSmashMobsBrawl.instance.launch {
-            withContext(SuperSmashMobsBrawl.instance.asyncDispatcher) {
-                delay(fuseTimeTicks.ticks)
+        jobs.add(
+            SuperSmashMobsBrawl.instance.launch {
+                withContext(SuperSmashMobsBrawl.instance.asyncDispatcher) {
+                    delay(fuseTimeTicks.ticks)
+                }
 
-                withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) {
-                    if (!isExplodeActive) {
-                        return@withContext cancel()
-                    }
+                if (!isExplodeActive) {
+                    cancel()
+                    return@launch
+                }
 
-                    resetPlayerData()
+                resetPlayerData()
 
-                    isExplodeActive = false
+                isExplodeActive = false
 
-                    player.world.playSound(player.location, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f)
-                    player.world.spawnParticle(Particle.EXPLOSION, player.location, 3)
+                player.world.playSound(player.location, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f)
+                player.world.spawnParticle(Particle.EXPLOSION, player.location, 3)
 
-                    player
-                        .getNearbyEntities(explosionRadius)
-                        .filter { it is LivingEntity && it != player }
-                        .forEach { entity ->
-                            val distance = player.location.distance(entity.location)
-                            val damage =
-                                (0.1 + 0.9 * ((explosionRadius - distance) / explosionRadius)) *
-                                    0.75
+                player
+                    .getNearbyEntities(explosionRadius)
+                    .filter { it is LivingEntity && it != player }
+                    .forEach { entity ->
+                        val distance = player.location.distance(entity.location)
+                        val damage =
+                            (0.1 + 0.9 * ((explosionRadius - distance) / explosionRadius)) * 0.75
 
-                            entity.doKnockback(
-                                explosionKnockbackMultiplier,
+                        entity.doKnockback(
+                            explosionKnockbackMultiplier,
+                            damage,
+                            (entity as LivingEntity).health,
+                            player.location.toVector(),
+                            null,
+                        )
+
+                        val damageEvent =
+                            SmashDamageEvent(
+                                entity,
+                                player,
                                 damage,
-                                (entity as LivingEntity).health,
-                                player.location.toVector(),
-                                null,
+                                explosionKnockbackMultiplier,
+                                SmashDamageType.Explosion,
                             )
 
-                            val damageEvent =
-                                SmashDamageEvent(
-                                    entity,
-                                    player,
-                                    damage,
-                                    explosionKnockbackMultiplier,
-                                    SmashDamageType.Explosion,
-                                )
+                        damageEvent.callEvent()
+                    }
 
-                            damageEvent.callEvent()
-                        }
-
-                    setCooldown(currentTimeAtActivation)
-                }
+                setCooldown(currentTimeAtActivation)
             }
-        }
+        )
     }
 
     private fun resetPlayerData() {

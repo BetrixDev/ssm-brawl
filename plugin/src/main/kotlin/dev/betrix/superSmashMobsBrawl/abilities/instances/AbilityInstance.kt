@@ -4,18 +4,21 @@ import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import gg.flyte.twilight.event.TwilightListener
 import gg.flyte.twilight.scheduler.TwilightRunnable
+import kotlinx.coroutines.Job
 import org.bukkit.entity.Player
 
 abstract class AbilityInstance(val definition: AbilityDefinition, val player: Player) {
     private var lastUsed: Long = 0
     protected val listeners = arrayListOf<TwilightListener>()
     protected val runnables = arrayListOf<TwilightRunnable>()
+    protected val jobs = arrayListOf<Job>()
 
     open fun setup() {}
 
     open fun teardown() {
         listeners.forEach { it.unregister() }
         runnables.forEach { it.cancel() }
+        jobs.forEach { it.cancel() }
     }
 
     abstract fun activate()

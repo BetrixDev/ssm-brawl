@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.abilities.instances
 
-import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
@@ -28,7 +27,6 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
     override fun setup() {
         listeners.add(
             event<PotionSplashEvent> {
-                SuperSmashMobsBrawl.instance.logger.info("Potion splashed")
                 if (entity.ownerUniqueId != player.uniqueId) {
                     return@event
                 }
@@ -85,7 +83,7 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
         projectile.item = ItemStack.of(Material.COAL)
 
         runnables.add(
-            repeatingTask(1) {
+            repeatingTask(2) {
                 val nearbyEntities =
                     projectile
                         .getNearbyEntities(projectileCollisionSize)
