@@ -8,6 +8,7 @@ import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
+import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.getNearbyEntities
@@ -109,7 +110,7 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
                     .forEach { entity ->
                         val distance = player.location.distance(entity.location)
                         val damage =
-                            (0.1 + 0.9 * ((explosionRadius - distance) / explosionRadius)) * 0.75
+                            ((0.1 + 0.9 * ((explosionRadius - distance) / explosionRadius)) * 20) * 0.75
 
                         entity.doKnockback(
                             explosionKnockbackMultiplier,
@@ -130,6 +131,8 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
 
                         damageEvent.callEvent()
                     }
+
+                player.setVelocity(1.8, 0.2, 1.4, true)
 
                 setCooldown(currentTimeAtActivation)
             }
