@@ -7,6 +7,7 @@ import com.github.michaelbull.result.onFailure
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
+import dev.betrix.superSmashMobsBrawl.di.Injectable
 import dev.betrix.superSmashMobsBrawl.lifecycle.AsyncManageable
 import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import java.io.IOException
@@ -22,10 +23,12 @@ import org.bukkit.Bukkit
 import org.bukkit.GameRule
 import org.bukkit.World
 import org.bukkit.WorldCreator
+import org.koin.core.component.inject
 
 data class LoadedWorld(val world: World, val mapDefinition: SsmbMap)
 
-object WorldService : AsyncManageable {
+object WorldService : AsyncManageable, Injectable {
+    private val plugin: SuperSmashMobsBrawl by inject()
     private val loadedWorlds = hashMapOf<String, LoadedWorld>()
 
     private const val WORLD_PREFIX = "ssmbworld_"
@@ -33,7 +36,7 @@ object WorldService : AsyncManageable {
     override suspend fun teardown() {
         loadedWorlds.forEach { it ->
             deleteWorld(it.value).onFailure { error ->
-                SuperSmashMobsBrawl.instance.logger.severe(
+                plugin.logger.severe(
                     "Failed to delete world: ${error.message}"
                 )
             }
@@ -44,7 +47,7 @@ object WorldService : AsyncManageable {
         map: SsmbMap,
         customWorldName: String = UUID.randomUUID().toString(),
     ): Result<LoadedWorld, Exception> =
-        withContext(SuperSmashMobsBrawl.instance.asyncDispatcher) {
+        withContext(plugin.asyncDispatcher) {
             val copyResult = runCatching {
                 val serverFolder = Bukkit.getWorldContainer().toPath()
                 val worldsFolder = serverFolder.resolve("worlds")
@@ -72,7 +75,7 @@ object WorldService : AsyncManageable {
                 prefixedWorldName
             }
 
-            withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) {
+            withContext(plugin.minecraftDispatcher) {
                 copyResult.fold(
                     onSuccess = { worldName ->
                         runCatching {
@@ -116,7 +119,7 @@ object WorldService : AsyncManageable {
     }
 
     suspend fun deleteWorld(loadedWorld: LoadedWorld): Result<Unit, Exception> =
-        withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) mainContext@{
+        withContext(plugin.minecraftDispatcher) mainContext@{
             val loadedWorldEntry = loadedWorlds.entries.find { it.value == loadedWorld }
 
             if (loadedWorldEntry == null) {
@@ -149,7 +152,7 @@ object WorldService : AsyncManageable {
                 .fold(
                     onSuccess = { actualWorldName ->
                         return@mainContext withContext(
-                            SuperSmashMobsBrawl.instance.asyncDispatcher
+                            plugin.asyncDispatcher
                         ) {
                             runCatching {
                                     val serverFolder = Bukkit.getWorldContainer().toPath()

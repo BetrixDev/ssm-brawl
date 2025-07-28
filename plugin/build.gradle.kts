@@ -28,6 +28,9 @@ dependencies {
     implementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.22.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("com.michael-bull.kotlin-result:kotlin-result:2.0.1")
+    
+    // Koin dependency injection
+    implementation("io.insert-koin:koin-core:4.0.0")
 }
 
 tasks {

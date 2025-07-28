@@ -2,6 +2,7 @@ package dev.betrix.superSmashMobsBrawl.services
 
 import com.github.michaelbull.result.mapBoth
 import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.di.Injectable
 import dev.betrix.superSmashMobsBrawl.lifecycle.Manageable
 import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import dev.betrix.superSmashMobsBrawl.maps.blueForestHub
@@ -19,11 +20,12 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.plugin.java.JavaPlugin
+import org.koin.core.component.inject
 
 /** Service responsible for managing hub worlds and player hub interactions */
-object HubService : Manageable {
+object HubService : Manageable, Injectable {
     private lateinit var defaultLoadedHubWorld: LoadedWorld
-    private lateinit var plugin: JavaPlugin
+    private val plugin: JavaPlugin by inject()
     private val playersInHub = mutableSetOf<Player>()
     private val playerPassives = mutableMapOf<Player, PassiveInstance>()
 
@@ -37,7 +39,6 @@ object HubService : Manageable {
 
     /** Initialize the hub service */
     fun initialize(plugin: JavaPlugin) {
-        this.plugin = plugin
 
         val defaultHubId = UUID.randomUUID().toString()
 

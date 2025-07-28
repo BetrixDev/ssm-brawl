@@ -1,18 +1,26 @@
 package dev.betrix.superSmashMobsBrawl.abilities.instances
 
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
+import dev.betrix.superSmashMobsBrawl.di.Injectable
 import dev.betrix.superSmashMobsBrawl.lifecycle.Manageable
 import dev.betrix.superSmashMobsBrawl.utils.mm
+import gg.flyte.twilight.Twilight
 import gg.flyte.twilight.event.TwilightListener
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import kotlinx.coroutines.Job
 import org.bukkit.entity.Player
+import org.koin.core.component.inject
 
-abstract class AbilityInstance(val definition: AbilityDefinition, val player: Player) : Manageable {
+abstract class AbilityInstance(val definition: AbilityDefinition, val player: Player) : Manageable, Injectable {
     private var lastUsed: Long = 0
     protected val listeners = arrayListOf<TwilightListener>()
     protected val runnables = arrayListOf<TwilightRunnable>()
     protected val jobs = arrayListOf<Job>()
+    
+    // Injected dependencies available to all ability instances
+    protected val plugin: SuperSmashMobsBrawl by inject()
+    protected val twilight: Twilight by inject()
 
     override fun setup() {}
 

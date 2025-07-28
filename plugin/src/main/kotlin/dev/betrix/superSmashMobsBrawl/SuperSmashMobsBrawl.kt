@@ -6,12 +6,14 @@ import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
 import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinitionArgument
+import dev.betrix.superSmashMobsBrawl.di.appModule
 import dev.betrix.superSmashMobsBrawl.lifecycle.ServiceRegistry
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
 import dev.betrix.superSmashMobsBrawl.services.HubService
+import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
@@ -23,6 +25,8 @@ import org.bukkit.command.CommandSender
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 
 class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var liteCommands: LiteCommands<CommandSender>
@@ -36,6 +40,11 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         instance = this
         twilight = twilight(this)
 
+        // Initialize Koin dependency injection
+        startKoin {
+            modules(appModule)
+        }
+
         // Initialize services
         HotbarService.initialize(this)
         HubService.initialize(this)
@@ -45,6 +54,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         // Register manageable services for automatic teardown
         ServiceRegistry.register(HubService)
         ServiceRegistry.register(DebugService)
+        ServiceRegistry.register(KitService)
         ServiceRegistry.register(WorldService)
 
         liteCommands =
@@ -77,6 +87,10 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         // Tear down all registered manageable services
         ServiceRegistry.teardownAllAsync()
         ServiceRegistry.teardownAll()
+        
+        // Stop Koin
+        stopKoin()
+        
         logger.info("SSMB shutting down")
     }
 }

@@ -3,15 +3,20 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
+import dev.betrix.superSmashMobsBrawl.di.Injectable
 import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
+import dev.betrix.superSmashMobsBrawl.lifecycle.Manageable
 import org.bukkit.entity.Player
+import org.koin.core.component.inject
 
 enum class AssignKitError {
     PLAYER_HAS_KIT
 }
 
-object KitService {
+object KitService : Manageable, Injectable {
+    private val plugin: SuperSmashMobsBrawl by inject()
     private val assignedKits = hashMapOf<Player, KitInstance>()
 
     fun assignKit(
@@ -54,5 +59,12 @@ object KitService {
 
     fun hasKit(player: Player): Boolean {
         return assignedKits.containsKey(player)
+    }
+    
+    override fun teardown() {
+        // Teardown all assigned kits
+        assignedKits.values.forEach { it.teardown() }
+        assignedKits.clear()
+        plugin.logger.info("Kit service cleaned up")
     }
 }
