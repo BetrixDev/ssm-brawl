@@ -32,6 +32,7 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
     override fun canActivate(): Boolean {
         if (isExplodeActive) {
             player.sendMessage(mm("<red>Already charging explosion!</red>"))
+            return false
         }
 
         return super.canActivate() && !isExplodeActive

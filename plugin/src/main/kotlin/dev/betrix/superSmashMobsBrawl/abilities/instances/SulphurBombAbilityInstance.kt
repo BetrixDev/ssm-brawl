@@ -23,6 +23,7 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
     private val projectileCollisionSize = 0.65
     private val projectileKnockbackModifier = 2.5
     private val projectileDamage = 6.5
+    private val projectileVelocityMultiplier = 1.55
 
     override fun setup() {
         listeners.add(
@@ -78,12 +79,17 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
         val direction = location.direction
 
         val projectile = player.world.spawn(location, ThrownPotion::class.java)
-        projectile.velocity = direction.multiply(1.55)
+        projectile.velocity = direction.multiply(projectileVelocityMultiplier)
         projectile.shooter = player
         projectile.item = ItemStack.of(Material.COAL)
 
         runnables.add(
             repeatingTask(2) {
+                if (projectile.isDead || !projectile.isValid) {
+                    cancel()
+                    return@repeatingTask
+                }
+
                 val nearbyEntities =
                     projectile
                         .getNearbyEntities(projectileCollisionSize)
