@@ -5,6 +5,7 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.ticks
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
+import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
@@ -123,7 +124,7 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
                         val damageEvent =
                             SmashDamageEvent(
                                 entity,
-                                player,
+                                Damager.LivingEntity(player),
                                 damage,
                                 explosionKnockbackMultiplier,
                                 SmashDamageType.Explosion,

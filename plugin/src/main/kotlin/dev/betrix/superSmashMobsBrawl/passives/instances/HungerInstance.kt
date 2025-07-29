@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.passives.instances
 
+import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
 import gg.flyte.twilight.event.event
@@ -22,7 +23,14 @@ class HungerInstance(definition: PassiveDefinition, player: Player) :
     override fun setup() {
         // Listen for when this player deals damage
         event<SmashDamageEvent> {
-            if (damager != this@HungerInstance.player) return@event
+            // Check if this player is the damager
+            val isThisPlayerDamager = when (damager) {
+                is Damager.LivingEntity -> damager.livingEntity == this@HungerInstance.player
+                is Damager.System -> false
+                null -> false
+            }
+            
+            if (!isThisPlayerDamager) return@event
             
             // Reset the last damage time
             lastDamageTime = System.currentTimeMillis()
@@ -54,9 +62,15 @@ class HungerInstance(definition: PassiveDefinition, player: Player) :
                     player.foodLevel = (player.foodLevel - 1).coerceAtLeast(0)
                 }
                 
-                // If hunger is depleted, deal damage
+                // If hunger is depleted, deal damage using SmashDamageEvent
                 if (player.foodLevel <= 0 && player.health > 0) {
-                    player.damage(hungerDamage)
+                    val damageEvent = SmashDamageEvent(
+                        victim = player,
+                        damager = Damager.System,
+                        damage = hungerDamage,
+                        knockbackMultiplier = 0.0 // No knockback from hunger damage
+                    )
+                    damageEvent.callEvent()
                 }
             }
         }
