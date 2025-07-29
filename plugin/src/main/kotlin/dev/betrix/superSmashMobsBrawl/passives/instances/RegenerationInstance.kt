@@ -10,8 +10,8 @@ class RegenerationInstance(definition: PassiveDefinition, player: Player) :
     PassiveInstance(definition, player) {
     
     // Configuration values for regeneration
-    private val regenPeriodTicks = 40L  // 2 seconds (40 ticks)
-    private val regenAmount = 1.0       // 1 heart per period
+    private val regenPeriodTicks = 20L  // 1 second (20 ticks)
+    private val regenAmount = 0.25      // 0.25 health per period
     
     private var regenTask: TwilightRunnable? = null
     
