@@ -2,7 +2,6 @@ plugins {
     kotlin("jvm") version "2.1.0"
     id("com.gradleup.shadow") version "8.3.5"
     id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("com.ncorti.ktfmt.gradle") version "0.20.1"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
 }
 
@@ -36,15 +35,6 @@ dependencies {
 val targetJavaVersion = 21
 kotlin {
     jvmToolchain(targetJavaVersion)
-}
-
-// ktfmt configuration
-ktfmt {
-    kotlinLangStyle()
-    maxWidth.set(100)
-    blockIndent.set(4)
-    continuationIndent.set(4)
-    removeUnusedImports.set(true)
 }
 
 // ktlint configuration
@@ -106,15 +96,15 @@ tasks {
     // Custom task to run all code quality checks
     register("codeQuality") {
         group = "verification"
-        description = "Runs all code quality checks (ktlint, ktfmt)"
-        dependsOn("ktlintCheck", "ktfmtCheck")
+        description = "Runs all code quality checks (ktlint)"
+        dependsOn("ktlintCheck")
     }
     
     // Custom task to apply all code formatting
     register("formatCode") {
         group = "formatting"
-        description = "Applies all code formatting (ktlint, ktfmt)"
-        dependsOn("ktlintFormat", "ktfmtFormat")
+        description = "Applies all code formatting (ktlint)"
+        dependsOn("ktlintFormat")
     }
     
     // Make check task depend on code quality
