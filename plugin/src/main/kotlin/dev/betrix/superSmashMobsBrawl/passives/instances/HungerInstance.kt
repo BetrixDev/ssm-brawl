@@ -6,22 +6,24 @@ import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
+import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.PlayerDeathEvent
+import kotlin.math.max
+import kotlin.math.min
 
 class HungerInstance(definition: PassiveDefinition, player: Player) :
     PassiveInstance(definition, player) {
     
-    private var lastDamageTime = System.currentTimeMillis()
-    private val hungerDelay = 10000L // 10 seconds without dealing damage before hunger starts
-    private val hungerDamage = 1.0 // Damage per tick
-    private val hungerInterval = 20L // Ticks between hunger damage (1 second)
-    private val maxHungerLevel = 20 // Maximum hunger level (full bar)
+    private val secondsToDrain = 10.0
+    private val hungerRestoreDelayMs = 250L
+    private var hungerTicks = 0L
+    private var lastHungerRestoreMs = System.currentTimeMillis()
     
     private var hungerTask: TwilightRunnable? = null
     
     override fun setup() {
-        // Listen for when this player deals damage
+        // Listen for when this player deals damage to restore hunger
         event<SmashDamageEvent> {
             // Check if this player is the damager
             val isThisPlayerDamager = when (damager) {
@@ -32,53 +34,79 @@ class HungerInstance(definition: PassiveDefinition, player: Player) :
             
             if (!isThisPlayerDamager) return@event
             
-            // Reset the last damage time
-            lastDamageTime = System.currentTimeMillis()
-            
-            // Restore hunger if they deal damage
-            if (player.foodLevel < maxHungerLevel) {
-                player.foodLevel = (player.foodLevel + 2).coerceAtMost(maxHungerLevel)
-            }
+            // Restore hunger based on damage dealt
+            hungerRestore(damage)
         }
         
         // Listen for player death to reset
         event<PlayerDeathEvent> {
             if (player != this@HungerInstance.player) return@event
             
-            // Reset on death
-            lastDamageTime = System.currentTimeMillis()
-            player.foodLevel = maxHungerLevel
+            // Reset hunger on death
+            player.foodLevel = 20
+            lastHungerRestoreMs = System.currentTimeMillis()
         }
         
-        // Start the hunger check task
-        hungerTask = repeatingTask(hungerInterval) {
-            val currentTime = System.currentTimeMillis()
-            val timeSinceLastDamage = currentTime - lastDamageTime
-            
-            // If player hasn't dealt damage in a while, start depleting hunger
-            if (timeSinceLastDamage > hungerDelay) {
-                // Reduce hunger bar
-                if (player.foodLevel > 0) {
-                    player.foodLevel = (player.foodLevel - 1).coerceAtLeast(0)
-                }
-                
-                // If hunger is depleted, deal damage using SmashDamageEvent
-                if (player.foodLevel <= 0 && player.health > 0) {
-                    val damageEvent = SmashDamageEvent(
-                        victim = player,
-                        damager = Damager.System,
-                        damage = hungerDamage,
-                        knockbackMultiplier = 0.0 // No knockback from hunger damage
-                    )
-                    damageEvent.callEvent()
-                }
-            }
+        // Start the hunger task that runs every tick (20 times per second)
+        hungerTask = repeatingTask(1L) {
+            activate()
         }
+    }
+    
+    private fun activate() {
+        // Skip if player is in creative mode
+        if (player.gameMode == GameMode.CREATIVE) {
+            return
+        }
+        
+        // Increment hunger ticks and wrap around at 10
+        hungerTicks = (hungerTicks + 1) % 10
+        
+        // Set saturation and exhaustion to prevent natural hunger depletion
+        player.saturation = 3f
+        player.exhaustion = 0f
+        
+        // If food level is 0, deal damage
+        if (player.foodLevel <= 0) {
+            // TODO: Send message to player when server messaging system is available
+            // "Attack other players to restore hunger!"
+            
+            val damageEvent = SmashDamageEvent(
+                victim = player,
+                damager = Damager.System,
+                damage = 1.0,
+                knockbackMultiplier = 0.0
+            )
+            // Note: In the Java version they set damage cause, damager name, and reason
+            // but our SmashDamageEvent doesn't have those fields currently
+            damageEvent.callEvent()
+            return
+        }
+        
+        // Every 10 ticks (0.5 seconds), reduce food level by 1
+        if (hungerTicks == 0L) {
+            player.foodLevel = max(0, player.foodLevel - 1)
+        }
+    }
+    
+    private fun hungerRestore(damage: Double) {
+        // Check if enough time has passed since last restore
+        if ((System.currentTimeMillis() - lastHungerRestoreMs) < hungerRestoreDelayMs) {
+            return
+        }
+        
+        lastHungerRestoreMs = System.currentTimeMillis()
+        
+        // Calculate amount to restore (half of damage dealt, minimum 1)
+        val amount = max(1, (damage / 2).toInt())
+        
+        // Restore food level, capped at 20
+        player.foodLevel = min(20, player.foodLevel + amount)
     }
     
     override fun teardown() {
         hungerTask?.cancel()
         // Restore full hunger when passive is removed
-        player.foodLevel = maxHungerLevel
+        player.foodLevel = 20
     }
 }
