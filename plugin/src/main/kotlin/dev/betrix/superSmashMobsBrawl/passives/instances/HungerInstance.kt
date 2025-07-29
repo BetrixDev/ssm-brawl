@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.passives.instances
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
+import dev.betrix.superSmashMobsBrawl.utils.mm
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
@@ -68,8 +69,7 @@ class HungerInstance(definition: PassiveDefinition, player: Player) :
         
         // If food level is 0, deal damage
         if (player.foodLevel <= 0) {
-            // TODO: Send message to player when server messaging system is available
-            // "Attack other players to restore hunger!"
+            player.sendMessage(mm("<red>Attack other players to restore hunger!</red>"))
             
             val damageEvent = SmashDamageEvent(
                 victim = player,
