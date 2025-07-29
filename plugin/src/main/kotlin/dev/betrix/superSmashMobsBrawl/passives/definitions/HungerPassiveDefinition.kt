@@ -1,6 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.passives.definitions
 
-import dev.betrix.superSmashMobsBrawl.passives.instances.HungerInstance
+import dev.betrix.superSmashMobsBrawl.passives.instances.HungerPassiveInstance
 import dev.betrix.superSmashMobsBrawl.passives.passive
 import org.bukkit.entity.Player
 
@@ -13,7 +13,7 @@ object HungerPassiveDefinition : PassiveDefinition() {
         userFacing = false
     }
 
-    override fun createInstance(player: Player): HungerInstance {
-        return HungerInstance(this, player)
+    override fun createInstance(player: Player): HungerPassiveInstance {
+        return HungerPassiveInstance(this, player)
     }
 }

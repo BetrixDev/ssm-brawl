@@ -1,6 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.passives.definitions
 
-import dev.betrix.superSmashMobsBrawl.passives.instances.DoubleJumpInstance
+import dev.betrix.superSmashMobsBrawl.passives.instances.DoubleJumpPassiveInstance
 import dev.betrix.superSmashMobsBrawl.passives.passive
 import org.bukkit.entity.Player
 
@@ -13,7 +13,7 @@ object DoubleJumpPassiveDefinition : PassiveDefinition() {
         userFacing = false
     }
 
-    override fun createInstance(player: Player): DoubleJumpInstance {
-        return DoubleJumpInstance(this, player)
+    override fun createInstance(player: Player): DoubleJumpPassiveInstance {
+        return DoubleJumpPassiveInstance(this, player)
     }
 }

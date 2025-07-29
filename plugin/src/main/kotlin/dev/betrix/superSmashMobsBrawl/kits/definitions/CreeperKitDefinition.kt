@@ -6,6 +6,8 @@ import dev.betrix.superSmashMobsBrawl.kits.instances.CreeperKitInstance
 import dev.betrix.superSmashMobsBrawl.kits.kit
 import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.ExplosiveFeedbackPassiveDefinition
+import dev.betrix.superSmashMobsBrawl.passives.definitions.HungerPassiveDefinition
+import dev.betrix.superSmashMobsBrawl.passives.definitions.RegenerationPassiveDefinition
 import org.bukkit.entity.Player
 
 object CreeperKitDefinition : KitDefinition() {
@@ -16,11 +18,11 @@ object CreeperKitDefinition : KitDefinition() {
         description = "Explosive assassin with stealth and teleportation abilities"
         meleeDamage = 6
 
-        // Passive abilities
         passive(DoubleJumpPassiveDefinition)
         passive(ExplosiveFeedbackPassiveDefinition)
+        passive(RegenerationPassiveDefinition)
+        passive(HungerPassiveDefinition)
 
-        // Active abilities
         ability(SulphurBombAbilityDefinition)
         ability(ExplosionAbilityDefinition)
     }

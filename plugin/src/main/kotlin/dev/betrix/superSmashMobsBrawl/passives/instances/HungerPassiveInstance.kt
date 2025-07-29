@@ -13,7 +13,7 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import kotlin.math.max
 import kotlin.math.min
 
-class HungerInstance(definition: PassiveDefinition, player: Player) :
+class HungerPassiveInstance(definition: PassiveDefinition, player: Player) :
     PassiveInstance(definition, player) {
     
     private val secondsToDrain = 10.0
@@ -28,7 +28,7 @@ class HungerInstance(definition: PassiveDefinition, player: Player) :
         event<SmashDamageEvent> {
             // Check if this player is the damager
             val isThisPlayerDamager = when (damager) {
-                is Damager.LivingEntity -> damager.livingEntity == this@HungerInstance.player
+                is Damager.LivingEntity -> damager.livingEntity == this@HungerPassiveInstance.player
                 is Damager.System -> false
                 null -> false
             }
@@ -41,7 +41,7 @@ class HungerInstance(definition: PassiveDefinition, player: Player) :
         
         // Listen for player death to reset
         event<PlayerDeathEvent> {
-            if (player != this@HungerInstance.player) return@event
+            if (player != this@HungerPassiveInstance.player) return@event
             
             // Reset hunger on death
             player.foodLevel = 20

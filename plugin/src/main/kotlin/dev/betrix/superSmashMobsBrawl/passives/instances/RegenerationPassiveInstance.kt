@@ -6,7 +6,7 @@ import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.entity.Player
 import kotlin.math.min
 
-class RegenerationInstance(definition: PassiveDefinition, player: Player) :
+class RegenerationPassiveInstance(definition: PassiveDefinition, player: Player) :
     PassiveInstance(definition, player) {
     
     // Configuration values for regeneration

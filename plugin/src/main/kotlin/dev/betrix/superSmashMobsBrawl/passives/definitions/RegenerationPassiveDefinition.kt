@@ -1,6 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.passives.definitions
 
-import dev.betrix.superSmashMobsBrawl.passives.instances.RegenerationInstance
+import dev.betrix.superSmashMobsBrawl.passives.instances.RegenerationPassiveInstance
 import dev.betrix.superSmashMobsBrawl.passives.passive
 import org.bukkit.entity.Player
 
@@ -13,7 +13,7 @@ object RegenerationPassiveDefinition : PassiveDefinition() {
         userFacing = false
     }
 
-    override fun createInstance(player: Player): RegenerationInstance {
-        return RegenerationInstance(this, player)
+    override fun createInstance(player: Player): RegenerationPassiveInstance {
+        return RegenerationPassiveInstance(this, player)
     }
 }

@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerToggleFlightEvent
 
-class DoubleJumpInstance(definition: PassiveDefinition, player: Player) :
+class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
     PassiveInstance(definition, player) {
     private var canDoubleJump = true
 
@@ -21,7 +21,7 @@ class DoubleJumpInstance(definition: PassiveDefinition, player: Player) :
         player.allowFlight = true
 
         event<PlayerToggleFlightEvent> ToggleFlightEvent@{
-            if (player != this@DoubleJumpInstance.player) {
+            if (player != this@DoubleJumpPassiveInstance.player) {
                 return@ToggleFlightEvent
             }
 

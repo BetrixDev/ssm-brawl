@@ -10,7 +10,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 
-class ExplosiveFeedbackInstance(definition: PassiveDefinition, player: Player) :
+class ExplosiveFeedbackPassiveInstance(definition: PassiveDefinition, player: Player) :
     PassiveInstance(definition, player) {
 
     private val explosionDamage = 3.0
@@ -21,7 +21,7 @@ class ExplosiveFeedbackInstance(definition: PassiveDefinition, player: Player) :
 
     override fun setup() {
         event<EntityDamageByEntityEvent> {
-            if (entity != this@ExplosiveFeedbackInstance.player) return@event
+            if (entity != this@ExplosiveFeedbackPassiveInstance.player) return@event
             if (damage <= 0) return@event
 
             val currentTime = System.currentTimeMillis()
