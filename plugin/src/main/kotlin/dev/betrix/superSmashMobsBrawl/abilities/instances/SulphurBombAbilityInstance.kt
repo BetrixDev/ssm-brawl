@@ -1,6 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.abilities.instances
 
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
+import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
@@ -40,7 +41,7 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
                     val damageEvent =
                         SmashDamageEvent(
                             target,
-                            player,
+                            Damager.LivingEntity(player),
                             projectileDamage,
                             0.0,
                             SmashDamageType.Projectile,

@@ -11,9 +11,14 @@ sealed class SmashDamageType {
     object Explosion : SmashDamageType()
 }
 
+sealed class Damager {
+    object System : Damager()
+    data class LivingEntity(val livingEntity: org.bukkit.entity.LivingEntity) : Damager()
+}
+
 class SmashDamageEvent(
     val victim: LivingEntity,
-    val damager: LivingEntity?,
+    val damager: Damager?,
     val damage: Double,
     val knockbackMultiplier: Double = 1.0,
     val damageType: SmashDamageType? = null,
@@ -22,10 +27,21 @@ class SmashDamageEvent(
     fun isValid(minigame: MinigameInstance): Boolean {
         // TODO: Once we figure out how we want to handle all living entities in minigames, this
         // check will be removed
-        if (victim !is Player || damager !is Player) {
+        if (victim !is Player) {
+            return false
+        }
+        
+        // Check if damager is a player when it's a LivingEntity
+        val damagerPlayer = when (damager) {
+            is Damager.LivingEntity -> damager.livingEntity as? Player
+            is Damager.System -> return minigame.isPlayerInMinigame(victim)
+            null -> return false
+        }
+        
+        if (damagerPlayer == null) {
             return false
         }
 
-        return minigame.isPlayerInMinigame(damager) && minigame.isPlayerInMinigame(victim)
+        return minigame.isPlayerInMinigame(damagerPlayer) && minigame.isPlayerInMinigame(victim)
     }
 }
