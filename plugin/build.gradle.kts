@@ -1,13 +1,19 @@
+// Super Smash Mobs Brawl Minecraft Plugin
+// Gradle build configuration
+
 plugins {
     kotlin("jvm") version "2.1.0"
     id("com.gradleup.shadow") version "8.3.5"
     id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
+    id("com.ncorti.ktfmt.gradle") version "0.20.1"
 }
 
+// Project Information
 group = "dev.betrix"
 version = "0.1.0"
+description = "Super Smash Mobs Brawl Minecraft Plugin"
 
+// Repositories
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/") {
@@ -17,73 +23,67 @@ repositories {
         name = "sonatype"
     }
     maven("https://repo.flyte.gg/releases")
-    maven { url = uri("https://repo.panda-lang.org/releases") }
+    maven("https://repo.panda-lang.org/releases")
 }
 
+// Dependencies
 dependencies {
+    // Minecraft
     compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
+    
+    // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    
+    // Frameworks
     implementation("gg.flyte:twilight:1.1.19")
     implementation("dev.rollczi:litecommands-bukkit:3.9.7")
     implementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.22.0")
     implementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.22.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    
+    // Utilities
     implementation("com.michael-bull.kotlin-result:kotlin-result:2.0.1")
 }
 
-// Kotlin and Java configuration
-val targetJavaVersion = 21
+// Kotlin Configuration
 kotlin {
-    jvmToolchain(targetJavaVersion)
+    jvmToolchain(21)
 }
 
-// ktlint configuration
-ktlint {
-    version.set("1.0.1")
-    debug.set(false)
-    verbose.set(true)
-    android.set(false)
-    outputToConsole.set(true)
-    outputColorName.set("RED")
-    ignoreFailures.set(false)
-    
-    filter {
-        exclude("**/generated/**")
-        include("**/kotlin/**")
+// Compiler Configuration
+tasks.compileKotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        freeCompilerArgs.addAll(
+            "-Xjsr305=strict",
+            "-opt-in=kotlin.RequiresOptIn"
+        )
     }
 }
 
-// Task configurations
+// Java Compiler Configuration
+tasks.compileJava {
+    options.apply {
+        encoding = "UTF-8"
+        compilerArgs.addAll(listOf("-parameters", "-Xlint:all", "-Xlint:-serial"))
+    }
+}
+
+// Code Formatting Configuration (Prettier-like defaults)
+ktfmt {
+    // Use Google style as base but customize for prettier-like formatting
+    googleStyle()
+    
+    // Prettier-like configuration
+    maxWidth.set(80)           // Prettier default line width
+    blockIndent.set(2)         // Prettier default indent (2 spaces)
+    continuationIndent.set(2)  // Prettier default continuation indent
+    removeUnusedImports.set(true)
+}
+
+// Task Configuration
 tasks {
-    compileJava {
-        options.apply {
-            encoding = "UTF-8"
-            compilerArgs.addAll(listOf("-parameters", "-Xlint:all", "-Xlint:-serial"))
-        }
-    }
-    
-    compileKotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
-            freeCompilerArgs.addAll(
-                "-Xjsr305=strict",
-                "-opt-in=kotlin.RequiresOptIn"
-            )
-        }
-    }
-    
-    runServer {
-        // Configure the Minecraft version for our task.
-        // This is the only required configuration besides applying the plugin.
-        // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.21.6")
-        jvmArgs("-Xmx2G", "-Xms1G")
-    }
-    
-    build {
-        dependsOn("shadowJar")
-    }
-    
+    // Resource Processing
     processResources {
         val props = mapOf("version" to version)
         inputs.properties(props)
@@ -93,29 +93,33 @@ tasks {
         }
     }
     
-    // Custom task to run all code quality checks
-    register("codeQuality") {
-        group = "verification"
-        description = "Runs all code quality checks (ktlint)"
-        dependsOn("ktlintCheck")
+    // Build Configuration
+    build {
+        dependsOn("shadowJar")
     }
     
-    // Custom task to apply all code formatting
-    register("formatCode") {
+    // Development Server
+    runServer {
+        minecraftVersion("1.21.6")
+        jvmArgs("-Xmx2G", "-Xms1G")
+    }
+    
+    // Custom Tasks
+    register("format") {
         group = "formatting"
-        description = "Applies all code formatting (ktlint)"
-        dependsOn("ktlintFormat")
+        description = "Format all Kotlin code"
+        dependsOn("ktfmtFormat")
     }
     
-    // Make check task depend on code quality
-    check {
-        dependsOn("codeQuality")
+    register("formatCheck") {
+        group = "verification"
+        description = "Check if code is properly formatted"
+        dependsOn("ktfmtCheck")
     }
     
-    // Development build without formatting checks
     register("devBuild") {
         group = "build"
-        description = "Builds the plugin without running code quality checks (for development)"
+        description = "Quick build for development (skips formatting checks)"
         dependsOn("compileKotlin", "processResources", "shadowJar")
     }
 }
