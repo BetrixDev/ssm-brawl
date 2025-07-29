@@ -10,7 +10,7 @@ object HungerPassiveDefinition : PassiveDefinition() {
 
     override val metadata = passive {
         description = "Damages the player if they haven't dealt damage in a while"
-        userFacing = true
+        userFacing = false
     }
 
     override fun createInstance(player: Player): HungerInstance {
