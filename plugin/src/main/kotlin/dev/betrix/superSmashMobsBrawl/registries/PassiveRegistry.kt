@@ -4,6 +4,7 @@ import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefi
 import dev.betrix.superSmashMobsBrawl.passives.definitions.ExplosiveFeedbackPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.HungerPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
+import dev.betrix.superSmashMobsBrawl.passives.definitions.RegenerationPassiveDefinition
 
 object PassiveRegistry {
     private val definitions = mutableMapOf<String, PassiveDefinition>()
@@ -20,5 +21,6 @@ object PassiveRegistry {
         register(DoubleJumpPassiveDefinition)
         register(ExplosiveFeedbackPassiveDefinition)
         register(HungerPassiveDefinition)
+        register(RegenerationPassiveDefinition)
     }
 }
