@@ -5,7 +5,6 @@ import dev.betrix.superSmashMobsBrawl.abilities.definitions.SulphurBombAbilityDe
 import dev.betrix.superSmashMobsBrawl.kits.instances.CreeperKitInstance
 import dev.betrix.superSmashMobsBrawl.kits.kit
 import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
-import dev.betrix.superSmashMobsBrawl.passives.definitions.ExplosiveFeedbackPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.HungerPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.RegenerationPassiveDefinition
 import org.bukkit.entity.Player
@@ -19,7 +18,6 @@ object CreeperKitDefinition : KitDefinition() {
         meleeDamage = 6
 
         passive(DoubleJumpPassiveDefinition)
-        passive(ExplosiveFeedbackPassiveDefinition)
         passive(RegenerationPassiveDefinition)
         passive(HungerPassiveDefinition)
 
