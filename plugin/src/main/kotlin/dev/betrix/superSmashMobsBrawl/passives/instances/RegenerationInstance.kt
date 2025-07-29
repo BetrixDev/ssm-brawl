@@ -28,6 +28,11 @@ class RegenerationInstance(definition: PassiveDefinition, player: Player) :
             return
         }
         
+        // Skip if player has no food (hunger)
+        if (player.foodLevel <= 0) {
+            return
+        }
+        
         // Calculate new health, capped at max health
         val currentHealth = player.health
         val maxHealth = player.maxHealth
