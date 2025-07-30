@@ -174,6 +174,9 @@ object WorldService {
 
     private fun setupWorld(world: World, map: SsmbMap) {
         world.worldBorder.size = map.worldBorderSize
+        world.setStorm(false)
+        world.isVoidDamageEnabled = false
+        world.time = 5000L
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
         world.setGameRule(GameRule.DO_WEATHER_CYCLE, false)
         world.setGameRule(GameRule.DO_MOB_SPAWNING, false)

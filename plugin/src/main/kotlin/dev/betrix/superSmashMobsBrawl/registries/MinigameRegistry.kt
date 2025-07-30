@@ -2,6 +2,7 @@ package dev.betrix.superSmashMobsBrawl.registries
 
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.TestingMinigameDefinition
+import dev.betrix.superSmashMobsBrawl.minigames.definitions.TwoPlayerDuelsMinigameDefinition
 
 object MinigameRegistry {
     private val definitions = mutableMapOf<String, MinigameDefinition>()
@@ -35,5 +36,6 @@ object MinigameRegistry {
 
     init {
         register(TestingMinigameDefinition)
+        register(TwoPlayerDuelsMinigameDefinition)
     }
 }
