@@ -11,6 +11,10 @@ fun List<SpawnPoint>.getEquidistant(n: Int): List<SpawnPoint> {
         return emptyList()
     }
 
+    if (n == 1) {
+        return listOf(this[0])
+    }
+
     if (n >= size) {
         return this.toList()
     }

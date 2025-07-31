@@ -295,8 +295,11 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
         KitService.assignKit(player).onFailure {
             when (it) {
                 AssignKitError.PLAYER_HAS_KIT -> {
+                    plugin.logger.warning("Player ${player.name} already had a kit during respawn, reassigning...")
                     KitService.unassignKit(player)
-                    KitService.assignKit(player)
+                    KitService.assignKit(player).onFailure { error ->
+                        plugin.logger.severe("Failed to reassign kit to ${player.name} during respawn: $error")
+                    }
                 }
             }
         }
