@@ -35,6 +35,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.util.Vector
 import java.time.Duration
+import java.util.Collections
 import kotlin.time.Duration.Companion.seconds
 
 class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List<MinigameTeam>): MinigameInstance(definition, teams) {
@@ -45,7 +46,7 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
     private val spectatorHeightAboveSpawn = 50.0
     
     // Track dead players to prevent multiple death events
-    private val deadPlayers = mutableSetOf<Player>()
+    private val deadPlayers = Collections.synchronizedSet(mutableSetOf<Player>())
 
     override suspend fun initMinigame(): Result<Unit, Exception> {
         super.initMinigame().onFailure { return Err(it) }
@@ -102,7 +103,15 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
     }
 
     override fun shouldEndMinigame(): Boolean {
+        if (teams.isEmpty()) {
+            return true
+        }
+
         teams.forEach {
+            if (it.stocks == 0) {
+                return true
+            }
+
             if (it.players.isEmpty()) {
                 return true
             }
@@ -112,9 +121,14 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
     }
 
     override suspend fun onMinigameEnd() {
+        if (teams.isEmpty()) {
+            super.onMinigameEnd()
+            teardownMinigame()
+        }
+
         state = MinigameState.ENDED
 
-        val winningTeam = teams.first { it.stocks > 0 }
+        val winningTeam = teams.find { it.stocks > 0 } ?: teams.find { !it.players.isEmpty() } ?: teams.first()
 
         winningTeam.players.forEach {
             it.sendMessage("You won!")
@@ -214,7 +228,9 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
         val playerTeam = teams.find { it.players.contains(player) }
 
         // Reduce team stocks
-        playerTeam?.stocks--
+        if (playerTeam != null) {
+            playerTeam.stocks--
+        }
         
         // Set player to spectator mode
         player.gameMode = GameMode.SPECTATOR
