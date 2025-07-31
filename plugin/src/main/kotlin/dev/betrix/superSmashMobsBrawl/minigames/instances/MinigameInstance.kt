@@ -66,9 +66,7 @@ abstract class MinigameInstance(val definition: MinigameDefinition, val teams: L
         // Check if minigame should end and clean up
         if (shouldEndMinigame()) {
             SuperSmashMobsBrawl.instance.launch {
-                state = MinigameState.ENDED
                 onMinigameEnd()
-                teardownMinigame()
             }
         }
 
