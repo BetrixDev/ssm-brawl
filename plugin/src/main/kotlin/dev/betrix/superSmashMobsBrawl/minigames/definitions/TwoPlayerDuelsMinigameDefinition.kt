@@ -13,7 +13,7 @@ object TwoPlayerDuelsMinigameDefinition : MinigameDefinition() {
         description = "The most competitive game mode SSMB has to offer"
         isHidden = false
         playersPerTeam = 1
-        amountOfTeams = 1
+        amountOfTeams = 2
         stocks = 4
 
         whitelistMap("campsite")

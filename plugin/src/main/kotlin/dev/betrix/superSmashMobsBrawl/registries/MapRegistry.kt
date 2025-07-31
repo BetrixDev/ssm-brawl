@@ -38,19 +38,19 @@ object MapRegistry {
         val playerCount = definition.metadata.playersPerTeam * definition.metadata.amountOfTeams
 
         return maps.filter { (mapId, map) ->
-            if (map.maxPlayers == null || map.maxPlayers < playerCount || map.spawnPoints.size < playerCount) {
-                false
-            }
+            // Check player capacity and spawn points
+            if (map.maxPlayers != null && map.maxPlayers < playerCount) return@filter false
+            if (map.spawnPoints.size < playerCount) return@filter false
 
-            if (definition.metadata.mapBlackList.contains(mapId)) {
-                false
-            }
+            // Check blacklist
+            if (definition.metadata.mapBlackList.contains(mapId)) return@filter false
 
-            if (definition.metadata.mapWhitelist.contains(mapId)) {
+            // Check whitelist - if whitelist exists, map must be in it
+            if (definition.metadata.mapWhitelist.isNotEmpty()) {
+                definition.metadata.mapWhitelist.contains(mapId)
+            } else {
                 true
             }
-
-            definition.metadata.mapWhitelist.isEmpty()
         }.values.toList()
     }
 

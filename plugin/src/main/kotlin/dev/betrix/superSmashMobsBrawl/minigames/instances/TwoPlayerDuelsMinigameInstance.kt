@@ -64,7 +64,8 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
                 player.flySpeed = 0f
                 player.velocity = Vector(0, 0, 0)
 
-                player.teleport(createLocation(world, spawnPoints[(teamIdx + 1) * playerIdx]))
+                val playerNumber = teamIdx * definition.metadata.playersPerTeam + playerIdx
+                player.teleport(createLocation(world, spawnPoints[playerNumber]))
 
                 KitService.assignKit(player).onFailure {
                     when (it) {
@@ -82,6 +83,7 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
 
         players.forEach { player ->
             player.resetWalkSpeed()
+            player.resetFlySpeed()
         }
 
         state = MinigameState.ONGOING
@@ -121,12 +123,15 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
     }
 
     override suspend fun onMinigameEnd() {
+        state = MinigameState.ENDED
+
         if (teams.isEmpty()) {
             super.onMinigameEnd()
             teardownMinigame()
+
+            return
         }
 
-        state = MinigameState.ENDED
 
         val winningTeam = teams.find { it.stocks > 0 } ?: teams.find { !it.players.isEmpty() } ?: teams.first()
 
@@ -144,7 +149,7 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
                 playPingSound()
 
                 val title = Title.title(
-                    mm("<green>${iteration + 1}</green>"),
+                    mm("<green>${countdownSeconds - iteration}</green>"),
                     mm("<gray>Game starting in</gray>"),
                     Title.Times.times(
                         Duration.ofMillis(250),

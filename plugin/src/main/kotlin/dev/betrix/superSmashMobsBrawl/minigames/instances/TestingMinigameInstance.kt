@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.services.HubService
@@ -30,7 +31,7 @@ class TestingMinigameInstance(definition: MinigameDefinition, teams: List<Miniga
 
                 KitService.assignKit(player).onFailure { error ->
                     // Log error if kit assignment fails
-                    println("Failed to assign kit to ${player.name}: $error")
+                    SuperSmashMobsBrawl.instance.logger.warning("Failed to assign kit to ${player.name}: $error")
                 }
             }
         }

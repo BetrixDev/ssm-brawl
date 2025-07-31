@@ -21,11 +21,11 @@ object KitService {
     }
 
     fun assignKit(player: Player): Result<KitInstance, AssignKitError> {
-        if (!playerSelectedKits.containsKey(player) && playerSelectedKits[player] != null) {
+        if (!playerSelectedKits.containsKey(player) || playerSelectedKits[player] == null) {
             playerSelectedKits[player] = CreeperKitDefinition // Default kit for now
         }
 
-        return assignKit(player, playerSelectedKits[player]!!)
+        return assignKit(player, playerSelectedKits[player] ?: CreeperKitDefinition)
     }
 
     fun assignKit(
