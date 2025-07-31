@@ -12,6 +12,7 @@ import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
 import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
+import dev.betrix.superSmashMobsBrawl.utils.mm
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
 import gg.flyte.twilight.Twilight
@@ -40,6 +41,8 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         HubService.initialize(this)
         HubProtectionService.registerEvents()
         DebugService.initialize(this)
+
+        server.motd(mm("<gradient:#ff6b6b:#4ecdc4>⚔ <bold>SUPER SMASH MOBS BRAWL</bold> ⚔</gradient><newline><gradient:#ffd93d:#6bcf7f>\uD83C\uDFAE Choose Your Mob • Smash Enemies • Dominate! \uD83C\uDFC6</gradient>"))
 
         liteCommands =
             LiteBukkitFactory.builder(this)

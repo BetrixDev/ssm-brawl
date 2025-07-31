@@ -13,6 +13,7 @@ import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.getNearbyEntities
+import gg.flyte.twilight.extension.resetWalkSpeed
 import gg.flyte.twilight.scheduler.repeatingTask
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -141,7 +142,7 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
     }
 
     private fun resetPlayerData() {
-        player.walkSpeed = 0.2f
+        player.resetWalkSpeed()
         player.level = 0
         player.exp = 0f
     }

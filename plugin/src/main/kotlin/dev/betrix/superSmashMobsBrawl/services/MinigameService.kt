@@ -48,7 +48,7 @@ object MinigameService {
 
     fun handleMinigameSetup(minigameInstance: MinigameInstance) {
         SuperSmashMobsBrawl.instance.launch {
-            minigameInstance.setup().onFailure { minigameInstance.teardown() }
+            minigameInstance.initMinigame().onFailure { minigameInstance.teardownMinigame() }
         }
     }
 

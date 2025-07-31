@@ -1,25 +1,26 @@
 package dev.betrix.superSmashMobsBrawl.minigames.definitions
 
 import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
-import dev.betrix.superSmashMobsBrawl.minigames.instances.TestingMinigameInstance
+import dev.betrix.superSmashMobsBrawl.minigames.instances.TwoPlayerDuelsMinigameInstance
 import dev.betrix.superSmashMobsBrawl.minigames.minigame
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 
-object TestingMinigameDefinition : MinigameDefinition() {
-    override val name = "Testing"
-    override val id = "testing"
+object TwoPlayerDuelsMinigameDefinition : MinigameDefinition() {
+    override val name = "1v1 Duels"
+    override val id = "two_player_duels"
 
     override val metadata = minigame {
-        description = "A simple testing minigame"
-        isHidden = true
+        description = "The most competitive game mode SSMB has to offer"
+        isHidden = false
         playersPerTeam = 1
-        amountOfTeams = 1
-        allowKitSwitching = true
+        amountOfTeams = 2
+        stocks = 4
 
         whitelistMap("campsite")
     }
 
     override fun createInstance(teams: List<MinigameTeam>): MinigameInstance {
-        return TestingMinigameInstance(this, teams)
+        return TwoPlayerDuelsMinigameInstance(this, teams)
     }
+
 }

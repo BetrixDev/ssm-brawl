@@ -7,6 +7,8 @@ data class MinigameMetadata(
     val amountOfTeams: Int,
     val mapWhitelist: Set<String> = setOf(),
     val mapBlackList: Set<String> = setOf(),
+    val allowKitSwitching: Boolean = false,
+    val stocks: Int = 4,
 )
 
 class Minigame {
@@ -16,6 +18,8 @@ class Minigame {
     private var mapBlackList = hashSetOf<String>()
     var playersPerTeam: Int? = null
     var amountOfTeams: Int? = null
+    var allowKitSwitching = false
+    var stocks = 4
 
     fun whitelistMap(mapId: String): Minigame {
         require(!mapBlackList.contains(mapId)) {
@@ -59,6 +63,8 @@ class Minigame {
             mapWhitelist = mapWhiteList.toSet(),
             playersPerTeam = playersPerTeam!!,
             amountOfTeams = amountOfTeams!!,
+            allowKitSwitching = allowKitSwitching,
+            stocks = stocks,
         )
     }
 }
