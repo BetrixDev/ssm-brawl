@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
+import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
@@ -24,19 +25,16 @@ import gg.flyte.twilight.extension.resetFlySpeed
 import gg.flyte.twilight.extension.resetWalkSpeed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import org.bukkit.GameMode
-import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.util.Vector
 import java.time.Duration
-import kotlin.math.pow
-import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.seconds
 
 class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List<MinigameTeam>): MinigameInstance(definition, teams) {
@@ -114,6 +112,8 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
     }
 
     override suspend fun onMinigameEnd() {
+        state = MinigameState.ENDED
+
         val winningTeam = teams.first { it.stocks > 0 }
 
         winningTeam.players.forEach {
@@ -121,6 +121,7 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
         }
 
         super.onMinigameEnd()
+        teardownMinigame()
     }
 
     private suspend fun doCountdown() {
@@ -164,17 +165,17 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
     
     private fun setupEventListeners() {
         // Listen for SmashDamageEvent to apply damage and handle deaths
-        event<SmashDamageEvent> {
+        listeners.add(event<SmashDamageEvent> {
             if (!isValid(this@TwoPlayerDuelsMinigameInstance)) return@event
             if (state != MinigameState.ONGOING) return@event
-            
+
             val player = victim as? Player ?: return@event
             if (deadPlayers.contains(player)) return@event
-            
+
             // Apply damage to the player
             val newHealth = (player.health - damage).coerceAtLeast(0.0)
             player.health = newHealth
-            
+
             // Apply knockback
             if (knockbackMultiplier > 0.0 && damager is dev.betrix.superSmashMobsBrawl.events.Damager.LivingEntity) {
                 val damagerEntity = damager.livingEntity
@@ -182,35 +183,38 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
                 val knockback = direction.multiply(knockbackMultiplier)
                 player.velocity = player.velocity.add(knockback)
             }
-            
+
             // Check if player should die
             if (newHealth <= 0.0) {
                 handlePlayerDeath(player)
             }
-        }
+        })
         
         // Listen for PlayerDeathEvent to handle the death loop
-        event<PlayerDeathEvent> {
+        listeners.add(event<PlayerDeathEvent> {
             val player = player
             if (!isPlayerInMinigame(player)) return@event
             if (state != MinigameState.ONGOING) return@event
-            
+
             // Cancel the default death behavior
             isCancelled = true
-            
+
             handlePlayerDeath(player)
-        }
+        })
     }
     
     private fun handlePlayerDeath(player: Player) {
         if (deadPlayers.contains(player)) return
         deadPlayers.add(player)
+
+        // Lightning strike to match other ssm versions
+        world.strikeLightningEffect(player.location)
         
         // Find the team this player belongs to
-        val playerTeam = teams.find { it.players.contains(player) } ?: return
-        
+        val playerTeam = teams.find { it.players.contains(player) }
+
         // Reduce team stocks
-        playerTeam.stocks--
+        playerTeam?.stocks--
         
         // Set player to spectator mode
         player.gameMode = GameMode.SPECTATOR
@@ -225,25 +229,35 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
             y += spectatorHeightAboveSpawn
         }
         player.teleport(spectatorLocation)
-        
-        // Send death message
-        player.sendMessage(mm("<red>You died! Respawning in $deathSpectatorSeconds seconds...</red>"))
+
+        // Send death message and title
+        val deathTitle = Title.title(
+            mm("<red>You Died</red>"),
+            Component.empty(),
+            Title.Times.times(
+                Duration.ofMillis(0),
+                Duration.ofMillis(750),
+                Duration.ofMillis(250)
+            ))
+
+        Audience.audience(player).showTitle(deathTitle)
+        player.sendMessage(mm("<red>Respawning in $deathSpectatorSeconds seconds...</red>"))
         
         // Check if game should end after stock reduction
         if (shouldEndMinigame()) {
             SuperSmashMobsBrawl.instance.launch {
-                state = MinigameState.ENDED
                 onMinigameEnd()
-                teardownMinigame()
             }
             return
         }
         
         // Start respawn timer
         SuperSmashMobsBrawl.instance.launch {
-            withContext(plugin.minecraftDispatcher) {
+            withContext(plugin.asyncDispatcher) {
                 delay(deathSpectatorSeconds.seconds)
-                
+            }
+
+            withContext(plugin.minecraftDispatcher) {
                 // Only respawn if player is still in the minigame and game is ongoing
                 if (isPlayerInMinigame(player) && state == MinigameState.ONGOING) {
                     respawnPlayer(player)
@@ -252,26 +266,31 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
         }
     }
     
-    private suspend fun respawnPlayer(player: Player) {
+    private fun respawnPlayer(player: Player) {
         // Remove from dead players set
         deadPlayers.remove(player)
-        
+
+        // Reassign kit
+        KitService.assignKit(player).onFailure {
+            when (it) {
+                AssignKitError.PLAYER_HAS_KIT -> {
+                    KitService.unassignKit(player)
+                    KitService.assignKit(player)
+                }
+            }
+        }
+
         // Find the furthest spawn point from enemy players
         val furthestSpawnPoint = findFurthestSpawnPointFromEnemies(player)
-        
+
         // Teleport to respawn location
         player.teleport(createLocation(world, furthestSpawnPoint))
         
         // Reset player state
         player.gameMode = GameMode.SURVIVAL
-        @Suppress("DEPRECATION")
-        player.health = player.maxHealth
         player.feed()
         player.heal()
-        
-        // Reassign kit
-        KitService.assignKit(player)
-        
+
         // Send respawn message
         player.sendMessage(mm("<green>You have respawned!</green>"))
     }
@@ -279,28 +298,22 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
     private fun findFurthestSpawnPointFromEnemies(respawningPlayer: Player): SpawnPoint {
         // Get all enemy players (players not on the same team)
         val respawningPlayerTeam = teams.find { it.players.contains(respawningPlayer) }
-        val enemyPlayers = teams.filter { it != respawningPlayerTeam }
+        val enemyPlayers = teams
+            .filter { it != respawningPlayerTeam }
             .flatMap { it.players }
             .filter { !deadPlayers.contains(it) } // Only consider alive enemies
-        
+
         if (enemyPlayers.isEmpty()) {
             // If no enemies are alive, return any spawn point
             return map.spawnPoints.random()
         }
-        
+
         // Calculate the spawn point with maximum distance from all enemies
         return map.spawnPoints.maxByOrNull { spawnPoint ->
             val spawnLocation = createLocation(world, spawnPoint)
             enemyPlayers.minOfOrNull { enemy ->
-                calculateDistance(spawnLocation, enemy.location)
+                spawnLocation.distance(enemy.location)
             } ?: Double.MAX_VALUE
         } ?: map.spawnPoints.random()
-    }
-    
-    private fun calculateDistance(loc1: Location, loc2: Location): Double {
-        val deltaX = loc1.x - loc2.x
-        val deltaY = loc1.y - loc2.y
-        val deltaZ = loc1.z - loc2.z
-        return sqrt(deltaX.pow(2) + deltaY.pow(2) + deltaZ.pow(2))
     }
 }
