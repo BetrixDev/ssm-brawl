@@ -340,4 +340,37 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
             } ?: Double.MAX_VALUE
         } ?: map.spawnPoints.random()
     }
+    
+    override fun onPlayerLeaveRequest(player: Player): Result<Unit, LeaveRequestDenialReason> {
+        return when (state) {
+            MinigameState.PREFLIGHT -> {
+                // Allow leaving during preflight
+                Ok(Unit)
+            }
+            MinigameState.STARTING -> {
+                // Allow leaving during start phase, but we'll handle ending the game in onPlayerLeave
+                Ok(Unit)
+            }
+            MinigameState.ONGOING -> {
+                // Disallow leaving during ongoing duels
+                Err(LeaveRequestDenialReason.GAME_IN_PROGRESS)
+            }
+            MinigameState.ENDED -> {
+                // Always allow leaving after game ends
+                Ok(Unit)
+            }
+        }
+    }
+    
+    override fun onPlayerLeave(player: Player) {
+        // If someone leaves during the starting phase, end the minigame
+        if (state == MinigameState.STARTING) {
+            plugin.launch {
+                onMinigameEnd()
+            }
+        }
+        
+        // Call parent cleanup logic
+        super.onPlayerLeave(player)
+    }
 }
