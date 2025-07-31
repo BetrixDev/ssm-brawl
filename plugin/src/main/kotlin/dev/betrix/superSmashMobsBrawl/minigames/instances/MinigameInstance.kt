@@ -79,22 +79,22 @@ abstract class MinigameInstance(val definition: MinigameDefinition, val teams: L
      * - ENDED: Always allow leaving
      * 
      * @param player The player requesting to leave
-     * @return LeaveRequestResult indicating if the request is approved or denied with reason
+     * @return Result.Ok if approved, Result.Err with denial reason if denied
      */
-    open fun onPlayerLeaveRequest(player: Player): LeaveRequestResult {
+    open fun onPlayerLeaveRequest(player: Player): Result<Unit, LeaveRequestDenialReason> {
         return when (state) {
             MinigameState.PREFLIGHT, MinigameState.STARTING -> {
                 // Always allow leaving during setup phase
-                LeaveRequestResult.APPROVED
+                Ok(Unit)
             }
             MinigameState.ONGOING -> {
                 // Default to allowing leave during gameplay
                 // Specific minigames can override this for competitive restrictions
-                LeaveRequestResult.APPROVED
+                Ok(Unit)
             }
             MinigameState.ENDED -> {
                 // Always allow leaving after game ends
-                LeaveRequestResult.APPROVED
+                Ok(Unit)
             }
         }
     }
