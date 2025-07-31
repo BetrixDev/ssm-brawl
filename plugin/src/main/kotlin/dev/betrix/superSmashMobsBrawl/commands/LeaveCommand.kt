@@ -2,6 +2,7 @@ package dev.betrix.superSmashMobsBrawl.commands
 
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
+import dev.betrix.superSmashMobsBrawl.minigames.instances.LeaveRequestResult
 import dev.betrix.superSmashMobsBrawl.services.MinigameLeaveError
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.services.QueueService
@@ -33,13 +34,27 @@ class LeaveCommand {
 
         // If not in queue, try to leave minigame
         MinigameService.handlePlayerLeave(sender)
-            .onSuccess {
-                sender.sendMessage(mm("<green>You have left the minigame</green>"))
+            .onSuccess { leaveResult ->
+                when (leaveResult) {
+                    LeaveRequestResult.APPROVED -> {
+                        sender.sendMessage(mm("<green>You have left the minigame</green>"))
+                    }
+                    else -> {
+                        // Leave request was denied - show the specific reason
+                        val message = if (leaveResult.message.isNotEmpty()) {
+                            "<red>${leaveResult.message}</red>"
+                        } else {
+                            "<red>You cannot leave this minigame right now</red>"
+                        }
+                        sender.sendMessage(mm(message))
+                    }
+                }
                 return
             }
             .onFailure { err ->
                 when (err) {
                     MinigameLeaveError.PlayerNotInMinigame -> {
+                        // Continue to show "not in anything" message
                         return@onFailure
                     }
                     MinigameLeaveError.HubNotReady -> {
@@ -50,8 +65,12 @@ class LeaveCommand {
                         )
                         return
                     }
-                    else -> {
-                        sender.sendMessage(mm("<red>You cannot leave this minigame</red>"))
+                    MinigameLeaveError.LeaveRequestDenied -> {
+                        sender.sendMessage(mm("<red>Your leave request was denied</red>"))
+                        return
+                    }
+                    MinigameLeaveError.Unknown -> {
+                        sender.sendMessage(mm("<red>An error occurred while trying to leave</red>"))
                         return
                     }
                 }

@@ -8,6 +8,7 @@ import com.github.michaelbull.result.onSuccess
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.minigames.instances.LeaveRequestResult
 import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import org.bukkit.entity.Player
@@ -16,9 +17,12 @@ sealed class MinigameInitError {
     data class PlayerAlreadyInMinigame(val players: List<Player>) : MinigameInitError()
 }
 
+/**
+ * Represents the different error cases that can occur when processing a player leave request.
+ */
 enum class MinigameLeaveError {
     PlayerNotInMinigame,
-    NotAllowedToLeave,
+    LeaveRequestDenied,
     HubNotReady,
     Unknown,
 }

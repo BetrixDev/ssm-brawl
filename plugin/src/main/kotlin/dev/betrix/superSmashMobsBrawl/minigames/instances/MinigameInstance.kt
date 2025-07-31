@@ -69,7 +69,45 @@ abstract class MinigameInstance(val definition: MinigameDefinition, val teams: L
         teardownAsync()
     }
 
-    open fun onPlayerLeave(player: Player): Result<Unit, String> {
+    /**
+     * Called when a player requests to leave the minigame.
+     * Minigames should override this method to implement game-specific leave policies.
+     * 
+     * The default implementation provides sensible state-based behavior:
+     * - PREFLIGHT/STARTING: Always allow leaving
+     * - ONGOING: Allow leaving but minigames can override for competitive rules
+     * - ENDED: Always allow leaving
+     * 
+     * @param player The player requesting to leave
+     * @return LeaveRequestResult indicating if the request is approved or denied with reason
+     */
+    open fun onPlayerLeaveRequest(player: Player): LeaveRequestResult {
+        return when (state) {
+            MinigameState.PREFLIGHT, MinigameState.STARTING -> {
+                // Always allow leaving during setup phase
+                LeaveRequestResult.APPROVED
+            }
+            MinigameState.ONGOING -> {
+                // Default to allowing leave during gameplay
+                // Specific minigames can override this for competitive restrictions
+                LeaveRequestResult.APPROVED
+            }
+            MinigameState.ENDED -> {
+                // Always allow leaving after game ends
+                LeaveRequestResult.APPROVED
+            }
+        }
+    }
+
+    /**
+     * Called when a player's leave request has been approved and the player is actually leaving.
+     * This handles the cleanup logic for removing the player from the minigame.
+     * 
+     * Minigames can override this to add custom cleanup logic, but should call super.onPlayerLeave(player).
+     * 
+     * @param player The player that is leaving the minigame
+     */
+    open fun onPlayerLeave(player: Player) {
         // Remove the player from teams
         teams.forEach { team -> team.players.remove(player) }
 
@@ -82,8 +120,6 @@ abstract class MinigameInstance(val definition: MinigameDefinition, val teams: L
                 onMinigameEnd()
             }
         }
-
-        return Ok(Unit)
     }
 
     open suspend fun onMinigameEnd() {}
