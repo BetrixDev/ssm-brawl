@@ -4,18 +4,18 @@ import gg.flyte.twilight.event.TwilightListener
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import kotlinx.coroutines.Job
 
-abstract class Managable {
+abstract class Manageable {
     protected val runnables = arrayListOf<TwilightRunnable>()
     protected val listeners = arrayListOf<TwilightListener>()
     protected val jobs = arrayListOf<Job>()
 
-    open fun setupAsync() {
+    open suspend fun setupAsync() {
         setup()
     }
 
     open fun setup() {}
 
-    open fun teardownAsync() {
+    open suspend fun teardownAsync() {
         teardown()
     }
 

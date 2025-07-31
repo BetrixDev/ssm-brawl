@@ -6,19 +6,20 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.github.shynixn.mccoroutine.bukkit.launch
-import dev.betrix.superSmashMobsBrawl.Managable
+import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.MinigameState
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.registries.MapRegistry
+import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
 import java.util.UUID
 import org.bukkit.World
 import org.bukkit.entity.Player
 
-abstract class MinigameInstance(val definition: MinigameDefinition, val teams: List<MinigameTeam>): Managable() {
+abstract class MinigameInstance(val definition: MinigameDefinition, val teams: List<MinigameTeam>): Manageable() {
     open lateinit var world: World
         protected set
     var state = MinigameState.PREFLIGHT
@@ -50,6 +51,18 @@ abstract class MinigameInstance(val definition: MinigameDefinition, val teams: L
 
         setupAsync()
         return Ok(Unit)
+    }
+
+    override suspend fun teardownAsync() {
+        WorldService.deleteWorld(world).onFailure {
+            SuperSmashMobsBrawl.instance.logger.severe("Unable to delete world $world")
+        }
+
+        players.forEach { player ->
+            HubService.teleportToDefaultHub(player)
+        }
+
+        super.teardownAsync()
     }
 
     open suspend fun teardownMinigame() {
