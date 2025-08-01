@@ -11,7 +11,7 @@ object HubKitDefinition : KitDefinition() {
 
     override val metadata = kit {
         description = "Hub kit with double jump ability"
-        meleeDamage = 1 // Minimal damage since this is just for hub functionality
+        meleeDamage = 0 // No melee damage since this is just for hub functionality
         isUserFacing = false // This kit should not be selectable by users
 
         passive(DoubleJumpPassiveDefinition)
