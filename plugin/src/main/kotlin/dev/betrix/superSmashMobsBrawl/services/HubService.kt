@@ -1,12 +1,14 @@
 package dev.betrix.superSmashMobsBrawl.services
 
 import com.github.michaelbull.result.mapBoth
+import com.github.michaelbull.result.onFailure
+import com.github.michaelbull.result.onSuccess
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import dev.betrix.superSmashMobsBrawl.maps.blueForestHub
-import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
-import dev.betrix.superSmashMobsBrawl.passives.instances.PassiveInstance
+import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
 import dev.betrix.superSmashMobsBrawl.registries.MapRegistry
+import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import gg.flyte.twilight.event.event
 import java.util.UUID
@@ -24,12 +26,13 @@ object HubService {
     private lateinit var defaultLoadedHubWorld: LoadedWorld
     private lateinit var plugin: JavaPlugin
     private val playersInHub = mutableSetOf<Player>()
-    private val playerPassives = mutableMapOf<Player, PassiveInstance>()
 
     /** Removes all current loaded worlds and teleports all players to default world */
     fun teardown() {
-        playerPassives.values.forEach { it.teardown() }
-        playerPassives.clear()
+        // Clean up all players in hub by removing their kits
+        playersInHub.forEach { player ->
+            KitService.unassignKit(player)
+        }
         playersInHub.clear()
         plugin.logger.info("Hub service cleaned up")
     }
@@ -72,6 +75,7 @@ object HubService {
             player.inventory.clear()
             teleportToHub(player, defaultLoadedHubWorld)
             giveHubPassives(player)
+            plugin.logger.info("Player ${player.name} has been set up in hub with passives")
         }
 
         // Player quit event - cleanup
@@ -87,11 +91,13 @@ object HubService {
 
             if (!fromHub && toHub) {
                 // Player entering hub
+                plugin.logger.info("Player ${player.name} entering hub from ${from.world.name} to ${to.world.name}")
                 player.inventory.clear()
                 playersInHub.add(player)
                 giveHubPassives(player)
             } else if (fromHub && !toHub) {
                 // Player leaving hub
+                plugin.logger.info("Player ${player.name} leaving hub from ${from.world.name} to ${to.world.name}")
                 playersInHub.remove(player)
                 removeHubPassives(player)
             }
@@ -158,24 +164,29 @@ object HubService {
         return MapRegistry.getHubMaps()
     }
 
-    /** Give hub-specific passives to a player */
+    /** Give hub-specific passives to a player using the proper kit system */
     private fun giveHubPassives(player: Player) {
-        if (playerPassives.containsKey(player)) {
-            return // Already has passives
+        // If player already has a kit, unassign it first to ensure clean state
+        if (KitService.hasKit(player)) {
+            KitService.unassignKit(player)
+            plugin.logger.info("Unassigned existing kit from player ${player.name} for hub transition")
         }
-
-        // Give double jump passive
-        val doubleJumpPassive = DoubleJumpPassiveDefinition.createInstance(player)
-        doubleJumpPassive.setup()
-        playerPassives[player] = doubleJumpPassive
-        plugin.logger.info("Gave double jump passive to player: ${player.name}")
+        
+        // Use the default kit (CreeperKit) which includes DoubleJumpPassive
+        KitService.assignKit(player, CreeperKitDefinition)
+            .onFailure { error ->
+                plugin.logger.warning("Failed to assign hub kit to player ${player.name}: $error")
+            }
+            .onSuccess {
+                plugin.logger.info("Gave hub kit (with double jump) to player: ${player.name}")
+            }
     }
 
     /** Remove hub-specific passives from a player */
     private fun removeHubPassives(player: Player) {
-        val passive = playerPassives.remove(player)
-        passive?.teardown()
-
-        plugin.logger.info("Removed hub passives from player: ${player.name}")
+        val removedKit = KitService.unassignKit(player)
+        if (removedKit != null) {
+            plugin.logger.info("Removed hub kit from player: ${player.name}")
+        }
     }
 }
