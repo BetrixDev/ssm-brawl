@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.commands
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
+import dev.betrix.superSmashMobsBrawl.registries.KitRegistry
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
@@ -24,6 +25,21 @@ class KitCommand {
                 player.sendMessage("§7Use the items in your hotbar to activate abilities.")
             }
             .onFailure { error -> player.sendMessage("§cFailed to assign kit: $error") }
+    }
+
+    @Execute(name = "list")
+    fun listKits(@Context player: Player) {
+        val userFacingKits = KitRegistry.getAllDefinitions().filter { it.metadata.isUserFacing }
+        
+        if (userFacingKits.isEmpty()) {
+            player.sendMessage("§cNo kits available.")
+            return
+        }
+        
+        player.sendMessage("§6Available kits:")
+        userFacingKits.forEach { kit ->
+            player.sendMessage("§7- §e${kit.name}§7: ${kit.metadata.description}")
+        }
     }
 
     @Execute(name = "clear")

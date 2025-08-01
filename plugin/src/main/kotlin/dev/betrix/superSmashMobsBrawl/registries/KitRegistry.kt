@@ -1,6 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.registries
 
 import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
+import dev.betrix.superSmashMobsBrawl.kits.definitions.HubKitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
 
 object KitRegistry {
@@ -16,5 +17,6 @@ object KitRegistry {
 
     init {
         register(CreeperKitDefinition)
+        register(HubKitDefinition)
     }
 }

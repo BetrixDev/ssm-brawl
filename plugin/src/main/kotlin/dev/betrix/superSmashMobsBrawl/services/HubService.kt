@@ -6,7 +6,7 @@ import com.github.michaelbull.result.onSuccess
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import dev.betrix.superSmashMobsBrawl.maps.blueForestHub
-import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
+import dev.betrix.superSmashMobsBrawl.kits.definitions.HubKitDefinition
 import dev.betrix.superSmashMobsBrawl.registries.MapRegistry
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
@@ -172,8 +172,8 @@ object HubService {
             plugin.logger.info("Unassigned existing kit from player ${player.name} for hub transition")
         }
         
-        // Use the default kit (CreeperKit) which includes DoubleJumpPassive
-        KitService.assignKit(player, CreeperKitDefinition)
+        // Use the hub kit which includes only the DoubleJumpPassive
+        KitService.assignKit(player, HubKitDefinition)
             .onFailure { error ->
                 plugin.logger.warning("Failed to assign hub kit to player ${player.name}: $error")
             }

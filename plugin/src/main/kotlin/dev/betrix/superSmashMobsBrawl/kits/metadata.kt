@@ -9,6 +9,7 @@ data class KitMetadata(
     val meleeDamage: Int = 0,
     val passives: List<PassiveDefinition>,
     val abilities: List<AbilityDefinition>,
+    val isUserFacing: Boolean = true,
 )
 
 enum class KitType {
@@ -19,6 +20,7 @@ class Kit {
     var description = ""
     var type = KitType.DEFAULT
     var meleeDamage = 0
+    var isUserFacing = true
     val passives = arrayListOf<PassiveDefinition>()
     val abilities = arrayListOf<AbilityDefinition>()
 
@@ -43,6 +45,7 @@ class Kit {
             meleeDamage = meleeDamage,
             passives = passives.toList(),
             abilities = abilities.toList(),
+            isUserFacing = isUserFacing,
         )
     }
 }
