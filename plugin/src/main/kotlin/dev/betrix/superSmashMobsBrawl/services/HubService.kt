@@ -74,13 +74,13 @@ object HubService {
 
             player.inventory.clear()
             teleportToHub(player, defaultLoadedHubWorld)
-            giveHubPassives(player)
-            plugin.logger.info("Player ${player.name} has been set up in hub with passives")
+            assignHubKit(player)
+            plugin.logger.info("Player ${player.name} has been set up in hub with hub kit")
         }
 
         // Player quit event - cleanup
         event<PlayerQuitEvent> {
-            removeHubPassives(player)
+            unassignHubKit(player)
             playersInHub.remove(player)
         }
 
@@ -94,12 +94,12 @@ object HubService {
                 plugin.logger.info("Player ${player.name} entering hub from ${from.world.name} to ${to.world.name}")
                 player.inventory.clear()
                 playersInHub.add(player)
-                giveHubPassives(player)
+                assignHubKit(player)
             } else if (fromHub && !toHub) {
                 // Player leaving hub
                 plugin.logger.info("Player ${player.name} leaving hub from ${from.world.name} to ${to.world.name}")
                 playersInHub.remove(player)
-                removeHubPassives(player)
+                unassignHubKit(player)
             }
         }
 
@@ -164,8 +164,8 @@ object HubService {
         return MapRegistry.getHubMaps()
     }
 
-    /** Give hub-specific passives to a player using the proper kit system */
-    private fun giveHubPassives(player: Player) {
+    /** Assign hub kit to a player using the proper kit system */
+    private fun assignHubKit(player: Player) {
         // If player already has a kit, unassign it first to ensure clean state
         if (KitService.hasKit(player)) {
             KitService.unassignKit(player)
@@ -182,8 +182,8 @@ object HubService {
             }
     }
 
-    /** Remove hub-specific passives from a player */
-    private fun removeHubPassives(player: Player) {
+    /** Unassign hub kit from a player */
+    private fun unassignHubKit(player: Player) {
         val removedKit = KitService.unassignKit(player)
         if (removedKit != null) {
             plugin.logger.info("Removed hub kit from player: ${player.name}")
