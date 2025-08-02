@@ -42,7 +42,11 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         HubProtectionService.registerEvents()
         DebugService.initialize(this)
 
-        server.motd(mm("<gradient:#ff6b6b:#4ecdc4>⚔ <bold>SUPER SMASH MOBS BRAWL</bold> ⚔</gradient><newline><gradient:#ffd93d:#6bcf7f>\uD83C\uDFAE Choose Your Mob • Smash Enemies • Dominate! \uD83C\uDFC6</gradient>"))
+        server.motd(
+            mm(
+                "<gradient:#ff6b6b:#4ecdc4>⚔ <bold>SUPER SMASH MOBS BRAWL</bold> ⚔</gradient><newline><gradient:#ffd93d:#6bcf7f>\uD83C\uDFAE Choose Your Mob • Smash Enemies • Dominate! \uD83C\uDFC6</gradient>"
+            )
+        )
 
         liteCommands =
             LiteBukkitFactory.builder(this)

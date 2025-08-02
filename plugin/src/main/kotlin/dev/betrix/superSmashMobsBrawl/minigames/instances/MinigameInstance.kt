@@ -19,9 +19,11 @@ import java.util.UUID
 import org.bukkit.World
 import org.bukkit.entity.Player
 
-abstract class MinigameInstance(val definition: MinigameDefinition, val teams: List<MinigameTeam>): Manageable() {
+abstract class MinigameInstance(val definition: MinigameDefinition, val teams: List<MinigameTeam>) :
+    Manageable() {
     open lateinit var world: World
         protected set
+
     var state = MinigameState.PREFLIGHT
         protected set
 
@@ -42,9 +44,10 @@ abstract class MinigameInstance(val definition: MinigameDefinition, val teams: L
             }
 
             WorldService.copyAndLoadWorld(map, gameId)
-                .onFailure { return Err(it) }
+                .onFailure {
+                    return Err(it)
+                }
                 .onSuccess { world = it.world }
-
         } catch (e: Exception) {
             return Err(e)
         }
@@ -58,9 +61,7 @@ abstract class MinigameInstance(val definition: MinigameDefinition, val teams: L
             SuperSmashMobsBrawl.instance.logger.severe("Unable to delete world $world")
         }
 
-        players.forEach { player ->
-            HubService.teleportToDefaultHub(player)
-        }
+        players.forEach { player -> HubService.teleportToDefaultHub(player) }
 
         super.teardownAsync()
     }
@@ -78,9 +79,7 @@ abstract class MinigameInstance(val definition: MinigameDefinition, val teams: L
 
         // Check if minigame should end and clean up
         if (shouldEndMinigame()) {
-            SuperSmashMobsBrawl.instance.launch {
-                onMinigameEnd()
-            }
+            SuperSmashMobsBrawl.instance.launch { onMinigameEnd() }
         }
 
         return Ok(Unit)

@@ -21,7 +21,9 @@ class TestingMinigameInstance(definition: MinigameDefinition, teams: List<Miniga
     override lateinit var world: World
 
     override suspend fun initMinigame(): Result<Unit, Exception> {
-        super.initMinigame().onFailure { return Err(it) }
+        super.initMinigame().onFailure {
+            return Err(it)
+        }
 
         teams.forEach { team ->
             team.players.forEach { player ->
@@ -31,7 +33,9 @@ class TestingMinigameInstance(definition: MinigameDefinition, teams: List<Miniga
 
                 KitService.assignKit(player).onFailure { error ->
                     // Log error if kit assignment fails
-                    SuperSmashMobsBrawl.instance.logger.warning("Failed to assign kit to ${player.name}: $error")
+                    SuperSmashMobsBrawl.instance.logger.warning(
+                        "Failed to assign kit to ${player.name}: $error"
+                    )
                 }
             }
         }

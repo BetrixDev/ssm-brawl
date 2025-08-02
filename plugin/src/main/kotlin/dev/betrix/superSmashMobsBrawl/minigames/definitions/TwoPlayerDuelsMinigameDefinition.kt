@@ -22,5 +22,4 @@ object TwoPlayerDuelsMinigameDefinition : MinigameDefinition() {
     override fun createInstance(teams: List<MinigameTeam>): MinigameInstance {
         return TwoPlayerDuelsMinigameInstance(this, teams)
     }
-
 }

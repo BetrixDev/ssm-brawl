@@ -3,9 +3,7 @@ package dev.betrix.superSmashMobsBrawl.extensions
 import dev.betrix.superSmashMobsBrawl.maps.SpawnPoint
 import kotlin.math.roundToInt
 
-/**
- * Returns `n` equally spaced spawn points
- */
+/** Returns `n` equally spaced spawn points */
 fun List<SpawnPoint>.getEquidistant(n: Int): List<SpawnPoint> {
     if (isEmpty() || n <= 0) {
         return emptyList()

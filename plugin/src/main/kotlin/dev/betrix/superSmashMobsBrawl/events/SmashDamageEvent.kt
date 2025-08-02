@@ -13,6 +13,7 @@ sealed class SmashDamageType {
 
 sealed class Damager {
     object System : Damager()
+
     data class LivingEntity(val livingEntity: org.bukkit.entity.LivingEntity) : Damager()
 }
 
@@ -30,14 +31,15 @@ class SmashDamageEvent(
         if (victim !is Player) {
             return false
         }
-        
+
         // Check if damager is a player when it's a LivingEntity
-        val damagerPlayer = when (damager) {
-            is Damager.LivingEntity -> damager.livingEntity as? Player
-            is Damager.System -> return minigame.isPlayerInMinigame(victim)
-            null -> return false
-        }
-        
+        val damagerPlayer =
+            when (damager) {
+                is Damager.LivingEntity -> damager.livingEntity as? Player
+                is Damager.System -> return minigame.isPlayerInMinigame(victim)
+                null -> return false
+            }
+
         if (damagerPlayer == null) {
             return false
         }

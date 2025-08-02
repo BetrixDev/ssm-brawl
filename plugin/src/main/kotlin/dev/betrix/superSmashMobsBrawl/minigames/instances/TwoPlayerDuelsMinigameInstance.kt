@@ -23,6 +23,9 @@ import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
 import gg.flyte.twilight.extension.resetFlySpeed
 import gg.flyte.twilight.extension.resetWalkSpeed
+import java.time.Duration
+import java.util.Collections
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -34,27 +37,27 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.util.Vector
-import java.time.Duration
-import java.util.Collections
-import kotlin.time.Duration.Companion.seconds
 
-class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List<MinigameTeam>): MinigameInstance(definition, teams) {
+class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List<MinigameTeam>) :
+    MinigameInstance(definition, teams) {
     private val plugin = SuperSmashMobsBrawl.instance
 
     private val countdownSeconds = 5
     private val deathSpectatorSeconds = 5
     private val spectatorHeightAboveSpawn = 50.0
-    
+
     // Track dead players to prevent multiple death events
     private val deadPlayers = Collections.synchronizedSet(mutableSetOf<Player>())
 
     override suspend fun initMinigame(): Result<Unit, Exception> {
-        super.initMinigame().onFailure { return Err(it) }
+        super.initMinigame().onFailure {
+            return Err(it)
+        }
 
         val spawnPoints = map.spawnPoints.getEquidistant(players.size)
 
         teams.forEachIndexed { teamIdx, team ->
-            team.players.forEachIndexed { playerIdx, player  ->
+            team.players.forEachIndexed { playerIdx, player ->
                 player.feed()
                 player.heal()
                 player.gameMode = GameMode.SURVIVAL
@@ -69,7 +72,12 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
 
                 KitService.assignKit(player).onFailure {
                     when (it) {
-                        AssignKitError.PLAYER_HAS_KIT -> return Err(RuntimeException("Player $player already has a kit assigned to them"))
+                        AssignKitError.PLAYER_HAS_KIT ->
+                            return Err(
+                                RuntimeException(
+                                    "Player $player already has a kit assigned to them"
+                                )
+                            )
                     }
                 }
             }
@@ -99,7 +107,7 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
             player.resetWalkSpeed()
             KitService.unassignKit(player)
         }
-        
+
         // Clear dead players set
         deadPlayers.clear()
     }
@@ -132,12 +140,10 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
             return
         }
 
+        val winningTeam =
+            teams.find { it.stocks > 0 } ?: teams.find { !it.players.isEmpty() } ?: teams.first()
 
-        val winningTeam = teams.find { it.stocks > 0 } ?: teams.find { !it.players.isEmpty() } ?: teams.first()
-
-        winningTeam.players.forEach {
-            it.sendMessage("You won!")
-        }
+        winningTeam.players.forEach { it.sendMessage("You won!") }
 
         super.onMinigameEnd()
         teardownMinigame()
@@ -148,29 +154,25 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
             repeat(countdownSeconds) { iteration ->
                 playPingSound()
 
-                val title = Title.title(
-                    mm("<green>${countdownSeconds - iteration}</green>"),
-                    mm("<gray>Game starting in</gray>"),
-                    Title.Times.times(
-                        Duration.ofMillis(250),
-                        Duration.ofMillis(500),
-                        Duration.ofMillis(250),
+                val title =
+                    Title.title(
+                        mm("<green>${countdownSeconds - iteration}</green>"),
+                        mm("<gray>Game starting in</gray>"),
+                        Title.Times.times(
+                            Duration.ofMillis(250),
+                            Duration.ofMillis(500),
+                            Duration.ofMillis(250),
+                        ),
                     )
-                )
 
                 world.showTitle(title)
 
-                withContext(Dispatchers.IO) {
-                    delay(1.seconds)
-                }
+                withContext(Dispatchers.IO) { delay(1.seconds) }
             }
 
             playPingSound()
 
-            val startTitle = Title.title(
-                mm("<green>Go!</green>"),
-                Component.empty()
-            )
+            val startTitle = Title.title(mm("<green>Go!</green>"), Component.empty())
 
             world.showTitle(startTitle)
         }
@@ -181,54 +183,65 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
             player.playSound(player.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
         }
     }
-    
+
     private fun setupEventListeners() {
         // Listen for SmashDamageEvent to apply damage and handle deaths
-        listeners.add(event<SmashDamageEvent> {
-            if (!isValid(this@TwoPlayerDuelsMinigameInstance)) return@event
-            if (state != MinigameState.ONGOING) return@event
+        listeners.add(
+            event<SmashDamageEvent> {
+                if (!isValid(this@TwoPlayerDuelsMinigameInstance)) return@event
+                if (state != MinigameState.ONGOING) return@event
 
-            val player = victim as? Player ?: return@event
-            if (deadPlayers.contains(player)) return@event
+                val player = victim as? Player ?: return@event
+                if (deadPlayers.contains(player)) return@event
 
-            // Apply damage to the player
-            val newHealth = (player.health - damage).coerceAtLeast(0.0)
-            player.health = newHealth
+                // Apply damage to the player
+                val newHealth = (player.health - damage).coerceAtLeast(0.0)
+                player.health = newHealth
 
-            // Apply knockback
-            if (knockbackMultiplier > 0.0 && damager is dev.betrix.superSmashMobsBrawl.events.Damager.LivingEntity) {
-                val damagerEntity = damager.livingEntity
-                val direction = player.location.toVector().subtract(damagerEntity.location.toVector()).normalize()
-                val knockback = direction.multiply(knockbackMultiplier)
-                player.velocity = player.velocity.add(knockback)
+                // Apply knockback
+                if (
+                    knockbackMultiplier > 0.0 &&
+                        damager is dev.betrix.superSmashMobsBrawl.events.Damager.LivingEntity
+                ) {
+                    val damagerEntity = damager.livingEntity
+                    val direction =
+                        player.location
+                            .toVector()
+                            .subtract(damagerEntity.location.toVector())
+                            .normalize()
+                    val knockback = direction.multiply(knockbackMultiplier)
+                    player.velocity = player.velocity.add(knockback)
+                }
+
+                // Check if player should die
+                if (newHealth <= 0.0) {
+                    handlePlayerDeath(player)
+                }
             }
+        )
 
-            // Check if player should die
-            if (newHealth <= 0.0) {
+        // Listen for PlayerDeathEvent to handle the death loop
+        listeners.add(
+            event<PlayerDeathEvent> {
+                val player = player
+                if (!isPlayerInMinigame(player)) return@event
+                if (state != MinigameState.ONGOING) return@event
+
+                // Cancel the default death behavior
+                isCancelled = true
+
                 handlePlayerDeath(player)
             }
-        })
-        
-        // Listen for PlayerDeathEvent to handle the death loop
-        listeners.add(event<PlayerDeathEvent> {
-            val player = player
-            if (!isPlayerInMinigame(player)) return@event
-            if (state != MinigameState.ONGOING) return@event
-
-            // Cancel the default death behavior
-            isCancelled = true
-
-            handlePlayerDeath(player)
-        })
+        )
     }
-    
+
     private fun handlePlayerDeath(player: Player) {
         if (deadPlayers.contains(player)) return
         deadPlayers.add(player)
 
         // Lightning strike to match other ssm versions
         world.strikeLightningEffect(player.location)
-        
+
         // Find the team this player belongs to
         val playerTeam = teams.find { it.players.contains(player) }
 
@@ -236,47 +249,44 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
         if (playerTeam != null) {
             playerTeam.stocks--
         }
-        
+
         // Set player to spectator mode
         player.gameMode = GameMode.SPECTATOR
-        
+
         // Remove kit and clear inventory
         KitService.unassignKit(player)
         player.inventory.clear()
-        
+
         // Teleport to spectator position (50 blocks above a random spawn point)
         val randomSpawnPoint = map.spawnPoints.random()
-        val spectatorLocation = createLocation(world, randomSpawnPoint).apply {
-            y += spectatorHeightAboveSpawn
-        }
+        val spectatorLocation =
+            createLocation(world, randomSpawnPoint).apply { y += spectatorHeightAboveSpawn }
         player.teleport(spectatorLocation)
 
         // Send death message and title
-        val deathTitle = Title.title(
-            mm("<red>You Died</red>"),
-            Component.empty(),
-            Title.Times.times(
-                Duration.ofMillis(0),
-                Duration.ofMillis(750),
-                Duration.ofMillis(250)
-            ))
+        val deathTitle =
+            Title.title(
+                mm("<red>You Died</red>"),
+                Component.empty(),
+                Title.Times.times(
+                    Duration.ofMillis(0),
+                    Duration.ofMillis(750),
+                    Duration.ofMillis(250),
+                ),
+            )
 
         Audience.audience(player).showTitle(deathTitle)
         player.sendMessage(mm("<red>Respawning in $deathSpectatorSeconds seconds...</red>"))
-        
+
         // Check if game should end after stock reduction
         if (shouldEndMinigame()) {
-            SuperSmashMobsBrawl.instance.launch {
-                onMinigameEnd()
-            }
+            SuperSmashMobsBrawl.instance.launch { onMinigameEnd() }
             return
         }
-        
+
         // Start respawn timer
         SuperSmashMobsBrawl.instance.launch {
-            withContext(plugin.asyncDispatcher) {
-                delay(deathSpectatorSeconds.seconds)
-            }
+            withContext(plugin.asyncDispatcher) { delay(deathSpectatorSeconds.seconds) }
 
             withContext(plugin.minecraftDispatcher) {
                 // Only respawn if player is still in the minigame and game is ongoing
@@ -286,7 +296,7 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
             }
         }
     }
-    
+
     private fun respawnPlayer(player: Player) {
         // Remove from dead players set
         deadPlayers.remove(player)
@@ -295,10 +305,14 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
         KitService.assignKit(player).onFailure {
             when (it) {
                 AssignKitError.PLAYER_HAS_KIT -> {
-                    plugin.logger.warning("Player ${player.name} already had a kit during respawn, reassigning...")
+                    plugin.logger.warning(
+                        "Player ${player.name} already had a kit during respawn, reassigning..."
+                    )
                     KitService.unassignKit(player)
                     KitService.assignKit(player).onFailure { error ->
-                        plugin.logger.severe("Failed to reassign kit to ${player.name} during respawn: $error")
+                        plugin.logger.severe(
+                            "Failed to reassign kit to ${player.name} during respawn: $error"
+                        )
                     }
                 }
             }
@@ -309,7 +323,7 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
 
         // Teleport to respawn location
         player.teleport(createLocation(world, furthestSpawnPoint))
-        
+
         // Reset player state
         player.gameMode = GameMode.SURVIVAL
         player.feed()
@@ -318,14 +332,15 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
         // Send respawn message
         player.sendMessage(mm("<green>You have respawned!</green>"))
     }
-    
+
     private fun findFurthestSpawnPointFromEnemies(respawningPlayer: Player): SpawnPoint {
         // Get all enemy players (players not on the same team)
         val respawningPlayerTeam = teams.find { it.players.contains(respawningPlayer) }
-        val enemyPlayers = teams
-            .filter { it != respawningPlayerTeam }
-            .flatMap { it.players }
-            .filter { !deadPlayers.contains(it) } // Only consider alive enemies
+        val enemyPlayers =
+            teams
+                .filter { it != respawningPlayerTeam }
+                .flatMap { it.players }
+                .filter { !deadPlayers.contains(it) } // Only consider alive enemies
 
         if (enemyPlayers.isEmpty()) {
             // If no enemies are alive, return any spawn point
@@ -335,9 +350,8 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
         // Calculate the spawn point with maximum distance from all enemies
         return map.spawnPoints.maxByOrNull { spawnPoint ->
             val spawnLocation = createLocation(world, spawnPoint)
-            enemyPlayers.minOfOrNull { enemy ->
-                spawnLocation.distance(enemy.location)
-            } ?: Double.MAX_VALUE
+            enemyPlayers.minOfOrNull { enemy -> spawnLocation.distance(enemy.location) }
+                ?: Double.MAX_VALUE
         } ?: map.spawnPoints.random()
     }
 }

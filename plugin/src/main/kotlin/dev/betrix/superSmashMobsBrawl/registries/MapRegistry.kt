@@ -37,21 +37,24 @@ object MapRegistry {
     fun getValidMapsForMinigame(definition: MinigameDefinition): List<SsmbMap> {
         val playerCount = definition.metadata.playersPerTeam * definition.metadata.amountOfTeams
 
-        return maps.filter { (mapId, map) ->
-            // Check player capacity and spawn points
-            if (map.maxPlayers != null && map.maxPlayers < playerCount) return@filter false
-            if (map.spawnPoints.size < playerCount) return@filter false
+        return maps
+            .filter { (mapId, map) ->
+                // Check player capacity and spawn points
+                if (map.maxPlayers != null && map.maxPlayers < playerCount) return@filter false
+                if (map.spawnPoints.size < playerCount) return@filter false
 
-            // Check blacklist
-            if (definition.metadata.mapBlackList.contains(mapId)) return@filter false
+                // Check blacklist
+                if (definition.metadata.mapBlackList.contains(mapId)) return@filter false
 
-            // Check whitelist - if whitelist exists, map must be in it
-            if (definition.metadata.mapWhitelist.isNotEmpty()) {
-                definition.metadata.mapWhitelist.contains(mapId)
-            } else {
-                true
+                // Check whitelist - if whitelist exists, map must be in it
+                if (definition.metadata.mapWhitelist.isNotEmpty()) {
+                    definition.metadata.mapWhitelist.contains(mapId)
+                } else {
+                    true
+                }
             }
-        }.values.toList()
+            .values
+            .toList()
     }
 
     fun getHubMaps(): List<SsmbMap> {

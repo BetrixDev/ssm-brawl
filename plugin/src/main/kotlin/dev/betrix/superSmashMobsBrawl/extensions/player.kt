@@ -3,9 +3,9 @@ package dev.betrix.superSmashMobsBrawl.extensions
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import org.bukkit.entity.Player
 
-/** 
+/**
  * Check if debug mode is enabled for this player.
- * 
+ *
  * Usage:
  * ```kotlin
  * if (player.hasDebugEnabled()) {

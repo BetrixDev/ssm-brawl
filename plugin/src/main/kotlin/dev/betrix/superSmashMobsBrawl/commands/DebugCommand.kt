@@ -27,13 +27,16 @@ class DebugCommand {
 
         // Toggle debug mode
         val debugEnabled = DebugService.toggleDebug(sender)
-        
-        val message = if (debugEnabled) {
-            mm("<green>Debug mode enabled! You will now see debug information.</green>")
-        } else {
-            mm("<yellow>Debug mode disabled. Debug information will no longer be shown.</yellow>")
-        }
-        
+
+        val message =
+            if (debugEnabled) {
+                mm("<green>Debug mode enabled! You will now see debug information.</green>")
+            } else {
+                mm(
+                    "<yellow>Debug mode disabled. Debug information will no longer be shown.</yellow>"
+                )
+            }
+
         sender.sendMessage(message)
     }
 }

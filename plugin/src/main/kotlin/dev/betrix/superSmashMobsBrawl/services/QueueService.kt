@@ -105,7 +105,10 @@ object QueueService {
         // Split into teams
         val teams =
             entriesToUse.chunked(playersPerTeam).map { chunk ->
-                MinigameTeam(chunk.map { it.player }.toMutableList(), minigameDefinition.metadata.stocks)
+                MinigameTeam(
+                    chunk.map { it.player }.toMutableList(),
+                    minigameDefinition.metadata.stocks,
+                )
             }
 
         // Remove these players from the queue
