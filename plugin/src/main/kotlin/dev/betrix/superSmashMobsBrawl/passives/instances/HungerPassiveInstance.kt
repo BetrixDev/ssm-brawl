@@ -5,6 +5,7 @@ import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import gg.flyte.twilight.event.event
+import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.GameMode
@@ -15,8 +16,7 @@ import kotlin.math.min
 
 class HungerPassiveInstance(definition: PassiveDefinition, player: Player) :
     PassiveInstance(definition, player) {
-    
-    private val secondsToDrain = 10.0
+        
     private val hungerRestoreDelayMs = 250L
     private var hungerTicks = 0L
     private var lastHungerRestoreMs = System.currentTimeMillis()
@@ -44,12 +44,12 @@ class HungerPassiveInstance(definition: PassiveDefinition, player: Player) :
             if (player != this@HungerPassiveInstance.player) return@event
             
             // Reset hunger on death
-            player.foodLevel = 20
+            player.feed()
             lastHungerRestoreMs = System.currentTimeMillis()
         }
         
         // Start the hunger task that runs every tick (20 times per second)
-        hungerTask = repeatingTask(1L) {
+        hungerTask = repeatingTask(1) {
             activate()
         }
     }
@@ -77,8 +77,6 @@ class HungerPassiveInstance(definition: PassiveDefinition, player: Player) :
                 damage = 1.0,
                 knockbackMultiplier = 0.0
             )
-            // Note: In the Java version they set damage cause, damager name, and reason
-            // but our SmashDamageEvent doesn't have those fields currently
             damageEvent.callEvent()
             return
         }
@@ -106,7 +104,7 @@ class HungerPassiveInstance(definition: PassiveDefinition, player: Player) :
     
     override fun teardown() {
         hungerTask?.cancel()
-        // Restore full hunger when passive is removed
-        player.foodLevel = 20
+
+        player.feed()
     }
 }

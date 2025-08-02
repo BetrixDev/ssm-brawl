@@ -73,7 +73,6 @@ object HubService {
                 return@event
             }
 
-            player.inventory.clear()
             teleportToHub(player, defaultLoadedHubWorld)
             giveHubPassives(player)
         }
@@ -91,11 +90,6 @@ object HubService {
 
             if (!fromHub && toHub) {
                 // Player entering hub
-                player.inventory.clear()
-                player.feed()
-                player.heal()
-                player.resetWalkSpeed()
-                player.resetFlySpeed()
                 playersInHub.add(player)
                 giveHubPassives(player)
             } else if (fromHub && !toHub) {
@@ -121,7 +115,12 @@ object HubService {
         if (loadedWorld.mapDefinition.spawnPoints.isNotEmpty()) {
             val spawnPoint = loadedWorld.mapDefinition.spawnPoints[0]
             player.teleport(createLocation(loadedWorld.world, spawnPoint))
-            player.gameMode = GameMode.ADVENTURE
+            player.inventory.clear()
+            player.feed()
+            player.heal()
+            player.resetWalkSpeed()
+            player.resetFlySpeed()
+            player.gameMode = GameMode.SURVIVAL
             player.fallDistance = 0f
             playersInHub.add(player)
         }
