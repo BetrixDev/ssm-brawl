@@ -43,11 +43,11 @@ COPY --from=builder /app/apps/server/dist ./dist
 # Copy only production dependencies
 COPY --from=builder /app/node_modules ./node_modules
 
-# Create a non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+# Use the official non-root bun user if available, otherwise create a non-root user
+RUN addgroup --system --gid 1001 appuser && \
+    adduser --system --uid 1001 --gid 1001 --disabled-password appuser
 
-USER nodejs
+USER appuser
 
 # Expose port
 EXPOSE 3000
