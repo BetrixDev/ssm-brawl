@@ -19,7 +19,15 @@ open class KitInstance(
     open fun setup() {
         // Filter out blacklisted abilities
         val allowedAbilities = definition.metadata.abilities.filter { ability ->
-            minigameDefinition?.blacklistedAbilities?.contains(ability) != true
+            when(minigameDefinition?.blacklistedAbilities?.contains(ability) == true) {
+                true -> {
+                    player.sendDebugMessage("[Kit] Ability <light_purple>${ability.name}</light_purple> was blacklisted from this minigame")
+                    false
+                }
+                false -> {
+                    true
+                }
+            }
         }
 
         allowedAbilities.forEach {
@@ -30,7 +38,15 @@ open class KitInstance(
 
         // Filter out blacklisted passives
         val allowedPassives = definition.metadata.passives.filter { passive ->
-            minigameDefinition?.blacklistedPassives?.contains(passive) != true
+            when(minigameDefinition?.blacklistedPassives?.contains(passive) == true) {
+                true -> {
+                    player.sendDebugMessage("[Kit] Passive <light_purple>${passive.name}</light_purple> was blacklisted from this minigame")
+                    false
+                }
+                false -> {
+                    true
+                }
+            }
         }
 
         allowedPassives.forEach {

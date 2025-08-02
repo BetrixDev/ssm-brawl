@@ -2,7 +2,6 @@ package dev.betrix.superSmashMobsBrawl.services
 
 import dev.betrix.superSmashMobsBrawl.extensions.isHubInteractable
 import gg.flyte.twilight.event.event
-import gg.flyte.twilight.extension.feed
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
@@ -11,7 +10,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.entity.EntityTargetEvent
-import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.weather.WeatherChangeEvent
@@ -95,17 +93,6 @@ object HubProtectionService {
             if (entity is Player) {
                 val player = entity as Player
                 if (HubService.isPlayerInHub(player)) {
-                    isCancelled = true
-                }
-            }
-        }
-
-        // Food level protection
-        event<FoodLevelChangeEvent> {
-            if (entity is Player) {
-                val player = entity as Player
-                if (HubService.isPlayerInHub(player)) {
-                    player.feed()
                     isCancelled = true
                 }
             }
