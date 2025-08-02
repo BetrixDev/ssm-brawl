@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
+import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
@@ -14,6 +15,7 @@ import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
+import kotlinx.coroutines.withContext
 import org.bukkit.World
 
 class TestingMinigameInstance(definition: MinigameDefinition, teams: List<MinigameTeam>) :
@@ -44,17 +46,22 @@ class TestingMinigameInstance(definition: MinigameDefinition, teams: List<Miniga
     }
 
     override suspend fun teardownMinigame() {
+        val playersToCleanup = teams.flatMap { it.players.toList() }
+        
         // Unassign kits from all players
-        players.forEach { player ->
-            HubService.teleportToDefaultHub(player)
-            KitService.unassignKit(player)
-        }
+        withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) {
+            playersToCleanup.forEach { player ->
+                HubService.teleportToDefaultHub(player)
+                KitService.unassignKit(player)
+            }
 
-        WorldService.deleteWorld(world)
-        MinigameService.removeMinigameInstance(this)
+            WorldService.deleteWorld(world)
+            MinigameService.removeMinigameInstance(this@TestingMinigameInstance)
+        }
     }
 
     override fun shouldEndMinigame(): Boolean {
-        return players.isEmpty()
+        // Create safe copy to avoid ConcurrentModificationException
+        return teams.flatMap { it.players }.isEmpty()
     }
 }

@@ -3,19 +3,24 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import org.bukkit.entity.Player
+import java.util.concurrent.ConcurrentHashMap
 
 enum class AssignKitError {
     PLAYER_HAS_KIT
 }
 
 object KitService {
-    private val playerSelectedKits = hashMapOf<Player, KitDefinition>()
-    private val assignedKits = hashMapOf<Player, KitInstance>()
+    private val playerSelectedKits = ConcurrentHashMap<Player, KitDefinition>()
+    private val assignedKits = ConcurrentHashMap<Player, KitInstance>()
+
+    private val plugin = SuperSmashMobsBrawl.instance
 
     fun playerSelectKit(player: Player, kitDefinition: KitDefinition) {
         playerSelectedKits[player] = kitDefinition
@@ -66,20 +71,42 @@ object KitService {
     }
 
     fun unassignKit(player: Player): KitInstance? {
+        // Remove the kit instance immediately to prevent concurrent access
         val kitInstance = assignedKits.remove(player)
-        kitInstance?.teardown()
+
+        // Run teardown asynchronously to prevent concurrent modification
+        kitInstance?.let { instance ->
+            // Assuming you have access to your plugin's coroutine scope
+            // You might need to adjust this based on your mccoroutine setup
+            plugin.launch {
+                try {
+                    instance.teardown()
+                } catch (e: Exception) {
+                    // Handle any exceptions during teardown
+                    plugin.logger.warning("Error during kit teardown for player ${player.name}: ${e.message}")
+                }
+            }
+        }
+
         return kitInstance
     }
 
     fun unassignKit(kitInstance: KitInstance) {
-        val entry = assignedKits.filterValues { it == kitInstance }.keys.firstOrNull()
+        // Thread-safe way to find and remove the kit instance
+        val playerToRemove = assignedKits.entries.find { it.value == kitInstance }?.key
 
-        if (entry == null) {
-            return
+        playerToRemove?.let { player ->
+            assignedKits.remove(player)
+
+            // Run teardown asynchronously
+            plugin.launch {
+                try {
+                    kitInstance.teardown()
+                } catch (e: Exception) {
+                    plugin.logger.warning("Error during kit teardown for player ${player.name}: ${e.message}")
+                }
+            }
         }
-
-        assignedKits.remove(entry)
-        kitInstance.teardown()
     }
 
     fun getKitInstance(player: Player): KitInstance? {
