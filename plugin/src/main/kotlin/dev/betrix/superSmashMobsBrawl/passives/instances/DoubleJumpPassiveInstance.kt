@@ -55,8 +55,8 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
                             player.sendDebugMessage("[DJ] You have hit the ground")
                             canDoubleJump = true
                             player.allowFlight = true
+
                             this.cancel()
-                            runnables.remove(this)
                         }
                     }
                 )
@@ -70,8 +70,6 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
                 }
 
                 player.sendDebugMessage("[DJ] Resetting double jump status due to death")
-                runnables.forEach { it.cancel() }
-                runnables.clear()
                 canDoubleJump = true
             }
         )
