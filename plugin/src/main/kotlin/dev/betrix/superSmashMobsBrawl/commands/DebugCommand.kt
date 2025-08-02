@@ -1,10 +1,10 @@
 package dev.betrix.superSmashMobsBrawl.commands
 
 import dev.betrix.superSmashMobsBrawl.services.DebugService
-import dev.betrix.superSmashMobsBrawl.utils.ONLY_PLAYERS_EXEC_MESSAGE
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
+import dev.rollczi.litecommands.annotations.description.Description
 import dev.rollczi.litecommands.annotations.execute.Execute
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -13,30 +13,26 @@ import org.bukkit.entity.Player
 class DebugCommand {
 
     @Execute
-    fun debug(@Context sender: CommandSender) {
+    @Description("Toggle debug mode on/off")
+    fun execute(@Context sender: CommandSender) {
         if (sender !is Player) {
-            sender.sendMessage(ONLY_PLAYERS_EXEC_MESSAGE)
+            sender.sendMessage(mm("<red>Only players can use this command!</red>"))
             return
         }
 
+        // Add permission check back when we have a backend
         // Check permission
-        if (!sender.hasPermission("ssmb.debug")) {
-            sender.sendMessage(mm("<red>You don't have permission to use this command!</red>"))
-            return
+        //        if (!sender.hasPermission("ssmb.debug")) {
+        //            sender.sendMessage(mm("<red>You don't have permission to use this
+        // command!</red>"))
+        //            return
+        //        }
+
+        val enabled = DebugService.toggleDebug(sender)
+        if (enabled) {
+            sender.sendMessage(mm("<green>Debug mode enabled!</green>"))
+        } else {
+            sender.sendMessage(mm("<red>Debug mode disabled!</red>"))
         }
-
-        // Toggle debug mode
-        val debugEnabled = DebugService.toggleDebug(sender)
-
-        val message =
-            if (debugEnabled) {
-                mm("<green>Debug mode enabled! You will now see debug information.</green>")
-            } else {
-                mm(
-                    "<yellow>Debug mode disabled. Debug information will no longer be shown.</yellow>"
-                )
-            }
-
-        sender.sendMessage(message)
     }
 }

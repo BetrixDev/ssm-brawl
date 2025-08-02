@@ -1,6 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.kits.instances
 
 import dev.betrix.superSmashMobsBrawl.abilities.instances.AbilityInstance
+import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
 import dev.betrix.superSmashMobsBrawl.passives.instances.PassiveInstance
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
@@ -25,6 +26,8 @@ open class KitInstance(val definition: KitDefinition, val player: Player) {
 
         // Setup hotbar items for abilities
         HotbarService.setupHotbarItems(this)
+
+        player.sendDebugMessage("You have been given the ${definition.name} kit")
     }
 
     open fun teardown() {
@@ -40,5 +43,7 @@ open class KitInstance(val definition: KitDefinition, val player: Player) {
             it.teardown()
             passiveInstances.remove(it)
         }
+
+        player.sendDebugMessage("The ${definition.name} kit has been removed")
     }
 }
