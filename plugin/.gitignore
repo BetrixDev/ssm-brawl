@@ -1,4 +1,5 @@
 # Gradle
+.gradle/**
 .gradle/
 build/
 bin/

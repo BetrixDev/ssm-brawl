@@ -54,6 +54,8 @@ class HungerPassiveInstance(definition: PassiveDefinition, player: Player) :
         // Start the hunger task that runs every tick (20 times per second)
         val hungerTask = repeatingTask(1) { activate() }
         runnables.add(hungerTask)
+
+        super.setup()
     }
 
     private fun activate() {
@@ -106,7 +108,7 @@ class HungerPassiveInstance(definition: PassiveDefinition, player: Player) :
     }
 
     override fun teardown() {
-        super.teardown()
         player.feed()
+        super.teardown()
     }
 }

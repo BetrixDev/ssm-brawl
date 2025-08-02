@@ -20,11 +20,13 @@ class DebugCommand {
             return
         }
 
+        // Add permission check back when we have a backend
         // Check permission
-//        if (!sender.hasPermission("ssmb.debug")) {
-//            sender.sendMessage(mm("<red>You don't have permission to use this command!</red>"))
-//            return
-//        }
+        //        if (!sender.hasPermission("ssmb.debug")) {
+        //            sender.sendMessage(mm("<red>You don't have permission to use this
+        // command!</red>"))
+        //            return
+        //        }
 
         val enabled = DebugService.toggleDebug(sender)
         if (enabled) {

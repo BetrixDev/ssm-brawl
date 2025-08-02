@@ -20,9 +20,7 @@ class RegenerationPassiveInstance(definition: PassiveDefinition, player: Player)
                 }
             }
         runnables.add(regenTask)
-    }
 
-    override fun teardown() {
-        super.teardown()
+        super.setup()
     }
 }

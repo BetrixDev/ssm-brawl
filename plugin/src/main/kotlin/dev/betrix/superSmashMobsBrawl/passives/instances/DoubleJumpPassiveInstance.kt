@@ -40,6 +40,8 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
                     return@ToggleFlightEvent
                 }
 
+                player.sendDebugMessage("[DJ] Double jump activated")
+
                 player.fallDistance = 0f
                 player.playSound(player.location, Sound.ENTITY_BLAZE_SHOOT, 1F, 1F)
                 player.setVelocity(player.location.direction, 0.9, true, 0.9, 0.0, 0.9, true)
@@ -58,21 +60,23 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
                         }
                     }
                 )
-
-                listeners.add(
-                    event<PlayerDeathEvent> DeathEvent@{
-                        if (player != this@ToggleFlightEvent.player) {
-                            return@DeathEvent
-                        }
-
-                        player.sendDebugMessage("[DJ] Resetting double jump status due to death")
-                        runnables.forEach { it.cancel() }
-                        runnables.clear()
-                        canDoubleJump = true
-                    }
-                )
             }
         )
+
+        listeners.add(
+            event<PlayerDeathEvent> DeathEvent@{
+                if (player != this@DeathEvent.player) {
+                    return@DeathEvent
+                }
+
+                player.sendDebugMessage("[DJ] Resetting double jump status due to death")
+                runnables.forEach { it.cancel() }
+                runnables.clear()
+                canDoubleJump = true
+            }
+        )
+
+        super.setup()
     }
 
     override fun teardown() {
