@@ -9,6 +9,10 @@ import dev.betrix.superSmashMobsBrawl.passives.instances.PassiveInstance
 import dev.betrix.superSmashMobsBrawl.registries.MapRegistry
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import gg.flyte.twilight.event.event
+import gg.flyte.twilight.extension.feed
+import gg.flyte.twilight.extension.heal
+import gg.flyte.twilight.extension.resetFlySpeed
+import gg.flyte.twilight.extension.resetWalkSpeed
 import java.util.UUID
 import org.bukkit.GameMode
 import org.bukkit.World
@@ -62,7 +66,7 @@ object HubService {
     private fun registerEvents() {
         // Player join event - teleport to hub and give double jump
         event<PlayerJoinEvent> {
-            plugin.logger.info("${player.name} joined in hub server right now")
+            plugin.logger.info("${player.name} joined")
 
             if (!::defaultLoadedHubWorld.isInitialized) {
                 plugin.logger.severe("No default hub world set")
@@ -88,6 +92,10 @@ object HubService {
             if (!fromHub && toHub) {
                 // Player entering hub
                 player.inventory.clear()
+                player.feed()
+                player.heal()
+                player.resetWalkSpeed()
+                player.resetFlySpeed()
                 playersInHub.add(player)
                 giveHubPassives(player)
             } else if (fromHub && !toHub) {
