@@ -38,11 +38,11 @@ services:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${SERVER_PORT:-3000}
     ports:
-      - "${SERVER_PORT:-3000}:3000"
+      - "${SERVER_PORT:-3000}:${SERVER_PORT:-3000}"
     networks:
       - ssmb-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      test: ["CMD-SHELL", "curl -f http://localhost:${SERVER_PORT:-3000}"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -67,7 +67,13 @@ services:
     networks:
       - ssmb-network
     healthcheck:
-      test: ["CMD", "sh", "-c", "curl -f http://localhost:$$PORT || exit 1"]
+      test:
+        [
+          "CMD",
+          "sh",
+          "-c",
+          "curl -f http://localhost:${WEB_PORT:-3001} || exit 1",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
