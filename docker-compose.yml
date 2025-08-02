@@ -48,26 +48,30 @@ services:
       retries: 3
       start_period: 40s
 
-  # Web Application (Vite + React)
+  # Web Application (TanStack Start + Bun)
   web:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
-      args:
-        VITE_SERVER_URL: ${VITE_SERVER_URL:-http://localhost:3000}
     container_name: ssmb-web
     restart: unless-stopped
     depends_on:
-      - server
+      server:
+        condition: service_healthy
+    environment:
+      VITE_SERVER_URL: ${VITE_SERVER_URL:-http://localhost:3000}
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${WEB_PORT:-3001}
     ports:
-      - "${WEB_PORT:-80}:80"
+      - "${WEB_PORT:-3001}:${WEB_PORT:-3001}"
     networks:
       - ssmb-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      test: ["CMD", "sh", "-c", "curl -f http://localhost:$$PORT || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
 
   # Minecraft Server with Plugin
   minecraft:

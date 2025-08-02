@@ -1,65 +1,70 @@
-import type { QueryClient } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/sonner";
+ 
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+ 
 import {
-  createRootRouteWithContext,
   HeadContent,
   Outlet,
+  Scripts,
+  createRootRouteWithContext,
   useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import Header from "../components/header";
+import appCss from "../index.css?url";
+import type { QueryClient } from "@tanstack/react-query";
 import Loader from "@/components/loader";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
-import type { trpc } from "@/utils/trpc";
-import "../index.css";
 
+import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
+import type { AppRouter } from "../../../server/src/routers";
 export interface RouterAppContext {
-  trpc: typeof trpc;
+  trpc: TRPCOptionsProxy<AppRouter>;
   queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
-  component: RootComponent,
   head: () => ({
     meta: [
       {
-        title: "Super Smash Mobs Brawl",
+        charSet: "utf-8",
       },
       {
-        name: "description",
-        content: "Super Smash Mobs Brawl",
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
+      },
+      {
+        title: "My App",
       },
     ],
     links: [
       {
-        rel: "icon",
-        href: "/favicon.ico",
+        rel: "stylesheet",
+        href: appCss,
       },
     ],
   }),
+
+  component: RootDocument,
 });
 
-function RootComponent() {
-  const isFetching = useRouterState({
-    select: (s) => s.isLoading,
-  });
+function RootDocument() {
+  const isFetching = useRouterState({ select: (s) => s.isLoading });
 
   return (
-    <>
-      <HeadContent />
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="dark"
-        disableTransitionOnChange
-        storageKey="vite-ui-theme"
-      >
+    <html lang="en" className="dark">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
         <div className="grid h-svh grid-rows-[auto_1fr]">
+          <Header />
           {isFetching ? <Loader /> : <Outlet />}
         </div>
         <Toaster richColors />
-      </ThemeProvider>
-      <TanStackRouterDevtools position="bottom-left" />
-      <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
-    </>
+        <TanStackRouterDevtools position="bottom-left" />
+        <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
+        <Scripts />
+      </body>
+    </html>
   );
 }

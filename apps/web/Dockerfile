@@ -1,94 +1,54 @@
-# Build stage
-FROM oven/bun:1 AS builder
-
+# Use Bun's official image as base
+FROM oven/bun:1 AS base
 WORKDIR /app
 
-# Copy root workspace files
-COPY package.json bun.lock turbo.json ./
-COPY biome.json ./
-
-# Copy all package.json files for workspace
-COPY apps/server/package.json ./apps/server/
+# Install dependencies stage
+FROM base AS deps
+# Copy package files for dependency installation
+COPY package.json bun.lock* ./
 COPY apps/web/package.json ./apps/web/
+# Install dependencies
+RUN bun install
 
-# Install all dependencies (needed for workspace)
-RUN bun install --frozen-lockfile
+# Build stage
+FROM base AS builder
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
 
-# Copy tsconfig files
-COPY apps/web/tsconfig.json ./apps/web/
-COPY apps/server/tsconfig.json ./apps/server/
+# Copy source code
+COPY . .
 
-# Copy web app specific files
-COPY apps/web/vite.config.ts ./apps/web/
-COPY apps/web/tailwind.config.ts ./apps/web/
-COPY apps/web/index.html ./apps/web/
-COPY apps/web/components.json ./apps/web/
-
-# Copy web source code and public assets
-COPY apps/web/src ./apps/web/src
-
-# Set build-time environment variable
-ARG VITE_SERVER_URL=http://localhost:3000
-ENV VITE_SERVER_URL=$VITE_SERVER_URL
-
-# Build the web app
+# Build the application
 WORKDIR /app/apps/web
-# Set NODE_ENV to production to avoid dev dependencies issues
-ENV NODE_ENV=production
-# Create a minimal tsconfig.json in parent directories if they don't exist to prevent scan errors
-RUN mkdir -p /app && echo '{}' > /app/tsconfig.json || true
 RUN bun run build
 
 # Production stage
-FROM nginx:alpine
+FROM base AS runner
+WORKDIR /app
 
 # Install curl for health checks
-RUN apk add --no-cache curl
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 web
 
 # Copy built application
-COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
+COPY --from=builder --chown=web:nodejs /app/apps/web/.output ./.output
 
-# Create nginx config for SPA routing with better caching and compression
-RUN echo 'server { \
-    listen 80; \
-    server_name localhost; \
-    root /usr/share/nginx/html; \
-    index index.html; \
-    \
-    # Enable gzip compression \
-    gzip on; \
-    gzip_vary on; \
-    gzip_min_length 1024; \
-    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json; \
-    \
-    # Security headers \
-    add_header X-Frame-Options "SAMEORIGIN" always; \
-    add_header X-Content-Type-Options "nosniff" always; \
-    add_header X-XSS-Protection "1; mode=block" always; \
-    \
-    # SPA routing \
-    location / { \
-        try_files $uri $uri/ /index.html; \
-    } \
-    \
-    # Cache static assets \
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ { \
-        expires 1y; \
-        add_header Cache-Control "public, immutable"; \
-    } \
-    \
-    # Don'\''t cache index.html \
-    location = /index.html { \
-        add_header Cache-Control "no-cache, no-store, must-revalidate"; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
+# Switch to non-root user
+USER web
 
-# Fix permissions for the existing nginx user
-RUN chown -R nginx:nginx /usr/share/nginx/html && \
-    chown -R nginx:nginx /var/cache/nginx && \
-    chown -R nginx:nginx /var/log/nginx && \
-    chown -R nginx:nginx /etc/nginx/conf.d
+# Expose port
+EXPOSE 3001
 
-EXPOSE 80
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3001
 
-CMD ["nginx", "-g", "daemon off;"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:$PORT || exit 1
+
+# Start the application
+CMD ["bun", "run", ".output/server/index.mjs"]

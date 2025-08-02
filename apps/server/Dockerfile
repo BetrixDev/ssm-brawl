@@ -12,7 +12,7 @@ COPY apps/server/package.json ./apps/server/
 COPY apps/web/package.json ./apps/web/
 
 # Install all dependencies (needed for workspace)
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Copy server specific files
 COPY apps/server/tsconfig.json ./apps/server/
