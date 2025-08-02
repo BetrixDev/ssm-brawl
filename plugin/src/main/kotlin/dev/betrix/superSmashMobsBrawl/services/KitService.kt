@@ -8,7 +8,6 @@ import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
-import kotlinx.coroutines.launch
 import org.bukkit.entity.Player
 import java.util.concurrent.ConcurrentHashMap
 
@@ -84,7 +83,7 @@ object KitService {
                 try {
                     kitInstance.teardown()
                 } catch (e: Exception) {
-                    plugin.logger.warning("Error during kit teardown: ${e.message}")
+                    plugin.logger.warning("Error during kit teardown for player ${player.name}: ${e.message}")
                 }
             }
         }

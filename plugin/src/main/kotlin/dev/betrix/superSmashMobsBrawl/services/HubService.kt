@@ -136,7 +136,7 @@ object HubService {
     /** Teleport a player to the default hub */
     fun teleportToDefaultHub(player: Player): Result<Unit, Exception> {
         if (!::defaultLoadedHubWorld.isInitialized) {
-            throw IllegalStateException("Default hub world is not yet initialized")
+            return Err(IllegalStateException("Default hub world is not yet initialized"))
         }
         return teleportToHub(player, defaultLoadedHubWorld)
     }
