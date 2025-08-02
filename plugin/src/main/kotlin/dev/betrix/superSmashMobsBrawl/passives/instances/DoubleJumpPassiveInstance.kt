@@ -65,7 +65,7 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
 
         listeners.add(
             event<PlayerDeathEvent> DeathEvent@{
-                if (player != this@DeathEvent.player) {
+                if (this@DoubleJumpPassiveInstance.player != player) {
                     return@DeathEvent
                 }
 
