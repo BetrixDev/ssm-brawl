@@ -73,10 +73,11 @@ object MinigameService {
                 .onPlayerLeave(player)
                 .onSuccess {
                     // Try to move player back to hub
-                    val hubResult = HubService.tryTeleportToDefaultHub(player)
-                    if (hubResult.isFailure) {
-                        return Err(MinigameLeaveError.HubNotReady)
-                    }
+                    HubService.tryTeleportToDefaultHub(player)
+                        .onFailure {
+                            // Log the teleportation failure but don't fail the leave operation
+                            SuperSmashMobsBrawl.instance.logger.warning("Failed to teleport ${player.name} to hub: ${it.message}")
+                        }
                 }
                 .onFailure {
                     return Err(MinigameLeaveError.NotAllowedToLeave)
