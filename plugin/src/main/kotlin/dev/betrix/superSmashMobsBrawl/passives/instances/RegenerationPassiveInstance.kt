@@ -12,12 +12,13 @@ class RegenerationPassiveInstance(definition: PassiveDefinition, player: Player)
 
     override fun setup() {
         // Start regeneration task
-        val regenTask = repeatingTask(healIntervalTicks) {
-            if (player.health < player.maxHealth) {
-                val newHealth = (player.health + healAmount).coerceAtMost(player.maxHealth)
-                player.health = newHealth
+        val regenTask =
+            repeatingTask(healIntervalTicks) {
+                if (player.health < player.maxHealth) {
+                    val newHealth = (player.health + healAmount).coerceAtMost(player.maxHealth)
+                    player.health = newHealth
+                }
             }
-        }
         runnables.add(regenTask)
     }
 
