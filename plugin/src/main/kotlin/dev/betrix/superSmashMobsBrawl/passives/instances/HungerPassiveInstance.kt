@@ -21,11 +21,9 @@ class HungerPassiveInstance(definition: PassiveDefinition, player: Player) :
     private var hungerTicks = 0L
     private var lastHungerRestoreMs = System.currentTimeMillis()
 
-    private var hungerTask: TwilightRunnable? = null
-
     override fun setup() {
         // Listen for when this player deals damage to restore hunger
-        event<SmashDamageEvent> {
+        val damageListener = event<SmashDamageEvent> {
             // Check if this player is the damager
             val isThisPlayerDamager =
                 when (damager) {
@@ -40,18 +38,21 @@ class HungerPassiveInstance(definition: PassiveDefinition, player: Player) :
             // Restore hunger based on damage dealt
             hungerRestore(damage)
         }
+        listeners.add(damageListener)
 
         // Listen for player death to reset
-        event<PlayerDeathEvent> {
+        val deathListener = event<PlayerDeathEvent> {
             if (player != this@HungerPassiveInstance.player) return@event
 
             // Reset hunger on death
             player.feed()
             lastHungerRestoreMs = System.currentTimeMillis()
         }
+        listeners.add(deathListener)
 
         // Start the hunger task that runs every tick (20 times per second)
-        hungerTask = repeatingTask(1) { activate() }
+        val hungerTask = repeatingTask(1) { activate() }
+        runnables.add(hungerTask)
     }
 
     private fun activate() {
@@ -104,8 +105,7 @@ class HungerPassiveInstance(definition: PassiveDefinition, player: Player) :
     }
 
     override fun teardown() {
-        hungerTask?.cancel()
-
+        super.teardown()
         player.feed()
     }
 }
