@@ -42,7 +42,7 @@ services:
     networks:
       - ssmb-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${SERVER_PORT:-3000}"]
+      test: ["CMD-SHELL", "curl -f http://localhost:${SERVER_PORT:-3000}"]
       interval: 30s
       timeout: 10s
       retries: 3
