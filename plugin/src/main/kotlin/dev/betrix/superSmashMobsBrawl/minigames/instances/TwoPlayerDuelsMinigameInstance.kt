@@ -70,7 +70,7 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
                 val playerNumber = teamIdx * definition.metadata.playersPerTeam + playerIdx
                 player.teleport(createLocation(world, spawnPoints[playerNumber]))
 
-                KitService.assignKit(player).onFailure {
+                KitService.assignKit(player, definition).onFailure {
                     when (it) {
                         AssignKitError.PLAYER_HAS_KIT ->
                             return Err(
@@ -302,14 +302,14 @@ class TwoPlayerDuelsMinigameInstance(definition: MinigameDefinition, teams: List
         deadPlayers.remove(player)
 
         // Reassign kit
-        KitService.assignKit(player).onFailure {
+        KitService.assignKit(player, definition).onFailure {
             when (it) {
                 AssignKitError.PLAYER_HAS_KIT -> {
                     plugin.logger.warning(
                         "Player ${player.name} already had a kit during respawn, reassigning..."
                     )
                     KitService.unassignKit(player)
-                    KitService.assignKit(player).onFailure { error ->
+                    KitService.assignKit(player, definition).onFailure { error ->
                         plugin.logger.severe(
                             "Failed to reassign kit to ${player.name} during respawn: $error"
                         )

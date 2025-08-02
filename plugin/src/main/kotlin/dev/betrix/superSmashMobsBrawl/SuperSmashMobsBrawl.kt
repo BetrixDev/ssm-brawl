@@ -6,7 +6,9 @@ import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
 import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinitionArgument
+import dev.betrix.superSmashMobsBrawl.extensions.hasPassive
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.passives.definitions.HungerPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
@@ -17,10 +19,13 @@ import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
 import gg.flyte.twilight.Twilight
 import gg.flyte.twilight.event.event
+import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.twilight
 import org.bukkit.GameMode
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityPickupItemEvent
+import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 
@@ -65,6 +70,16 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
             }
 
             isCancelled = true
+        }
+
+        event<FoodLevelChangeEvent> {
+            if (entity is Player) {
+                val player = entity as Player
+                if (!player.hasPassive(HungerPassiveDefinition)) {
+                    player.feed()
+                    isCancelled = true
+                }
+            }
         }
 
         event<EntityPickupItemEvent> { isCancelled = true }
