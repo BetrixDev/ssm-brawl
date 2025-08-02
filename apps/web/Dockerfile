@@ -14,9 +14,13 @@ COPY apps/web/package.json ./apps/web/
 # Install all dependencies (needed for workspace)
 RUN bun install --frozen-lockfile
 
-# Copy web app specific files
+# Copy tsconfig files
 COPY apps/web/tsconfig.json ./apps/web/
+COPY apps/server/tsconfig.json ./apps/server/
+
+# Copy web app specific files
 COPY apps/web/vite.config.ts ./apps/web/
+COPY apps/web/tailwind.config.ts ./apps/web/
 COPY apps/web/index.html ./apps/web/
 COPY apps/web/components.json ./apps/web/
 
@@ -29,6 +33,10 @@ ENV VITE_SERVER_URL=$VITE_SERVER_URL
 
 # Build the web app
 WORKDIR /app/apps/web
+# Set NODE_ENV to production to avoid dev dependencies issues
+ENV NODE_ENV=production
+# Create a minimal tsconfig.json in parent directories if they don't exist to prevent scan errors
+RUN mkdir -p /app && echo '{}' > /app/tsconfig.json || true
 RUN bun run build
 
 # Production stage
