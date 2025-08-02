@@ -1,0 +1,106 @@
+name: super-smash-mobs-brawl
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: ssmb-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-super-smash-mobs-brawl}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ssmb-network
+
+  # Server Application (Bun + TypeScript)
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    container_name: ssmb-server
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-super-smash-mobs-brawl}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${SERVER_PORT:-3000}
+    ports:
+      - "${SERVER_PORT:-3000}:3000"
+    networks:
+      - ssmb-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Web Application (Vite + React)
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_SERVER_URL: ${VITE_SERVER_URL:-http://localhost:3000}
+    container_name: ssmb-web
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "${WEB_PORT:-80}:80"
+    networks:
+      - ssmb-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Minecraft Server with Plugin
+  minecraft:
+    build:
+      context: .
+      dockerfile: plugin/Dockerfile
+    container_name: ssmb-minecraft
+    restart: unless-stopped
+    ports:
+      - "${MINECRAFT_PORT:-25565}:25565"
+      - "${RCON_PORT:-25575}:25575"
+    volumes:
+      - minecraft_data:/minecraft/world
+      - minecraft_plugins:/minecraft/plugins
+      - minecraft_logs:/minecraft/logs
+    networks:
+      - ssmb-network
+    environment:
+      MEMORY_SIZE: ${MINECRAFT_MEMORY:-2G}
+      RCON_PASSWORD: ${RCON_PASSWORD:-minecraft}
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:
+    driver: local
+  minecraft_data:
+    driver: local
+  minecraft_plugins:
+    driver: local
+  minecraft_logs:
+    driver: local
+
+networks:
+  ssmb-network:
+    driver: bridge
