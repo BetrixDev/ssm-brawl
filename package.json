@@ -1,14 +1,12 @@
 {
-	"name": "ssmb",
+	"name": "super-smash-mobs-brawl",
 	"private": true,
 	"workspaces": [
 		"apps/*",
 		"packages/*"
 	],
 	"scripts": {
-		"check:js": "biome check --write .",
-		"format:kt": "java -jar ktfmt.jar --kotlinlang-style plugin/src/**",
-		"check": "bun run check:js && bun run format:kt",
+		"check": "biome check --write .",
 		"dev": "turbo dev",
 		"build": "turbo build",
 		"check-types": "turbo check-types",
@@ -18,12 +16,16 @@
 		"db:push": "turbo -F server db:push",
 		"db:studio": "turbo -F server db:studio",
 		"db:generate": "turbo -F server db:generate",
-		"db:migrate": "turbo -F server db:migrate"
+		"db:migrate": "turbo -F server db:migrate",
+		"db:start": "turbo -F server db:start",
+		"db:watch": "turbo -F server db:watch",
+		"db:stop": "turbo -F server db:stop",
+		"db:down": "turbo -F server db:down"
 	},
 	"dependencies": {},
 	"devDependencies": {
 		"turbo": "^2.5.4",
-		"@biomejs/biome": "^2.0.0"
+		"@biomejs/biome": "^2.1.2"
 	},
-	"packageManager": "pnpm@9.1.0"
+	"packageManager": "bun@1.2.15"
 }
