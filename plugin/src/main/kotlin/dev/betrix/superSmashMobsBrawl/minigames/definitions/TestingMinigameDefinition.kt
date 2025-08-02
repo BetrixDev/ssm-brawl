@@ -4,6 +4,8 @@ import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
 import dev.betrix.superSmashMobsBrawl.minigames.instances.TestingMinigameInstance
 import dev.betrix.superSmashMobsBrawl.minigames.minigame
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
+import dev.betrix.superSmashMobsBrawl.passives.definitions.HungerPassiveDefinition
+import dev.betrix.superSmashMobsBrawl.passives.definitions.RegenerationPassiveDefinition
 
 object TestingMinigameDefinition : MinigameDefinition() {
     override val name = "Testing"
@@ -18,6 +20,11 @@ object TestingMinigameDefinition : MinigameDefinition() {
 
         whitelistMap("campsite")
     }
+
+    override val blacklistedPassives = listOf(
+        RegenerationPassiveDefinition,
+        HungerPassiveDefinition
+    )
 
     override fun createInstance(teams: List<MinigameTeam>): MinigameInstance {
         return TestingMinigameInstance(this, teams)
