@@ -1,5 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.services
 
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.mapBoth
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
@@ -111,40 +114,43 @@ object HubService {
     }
 
     /** Teleport a player to a specific hub */
-    fun teleportToHub(player: Player, loadedWorld: LoadedWorld) {
-        if (loadedWorld.mapDefinition.spawnPoints.isNotEmpty()) {
-            val spawnPoint = loadedWorld.mapDefinition.spawnPoints[0]
-            player.teleport(createLocation(loadedWorld.world, spawnPoint))
-            player.inventory.clear()
-            player.feed()
-            player.heal()
-            player.resetWalkSpeed()
-            player.resetFlySpeed()
-            player.gameMode = GameMode.SURVIVAL
-            player.fallDistance = 0f
-            playersInHub.add(player)
+    fun teleportToHub(player: Player, loadedWorld: LoadedWorld): Result<Unit, Exception> {
+        if (loadedWorld.mapDefinition.spawnPoints.isEmpty()) {
+            return Err(RuntimeException("Hub spawn points were empty"))
         }
+
+        val spawnPoint = loadedWorld.mapDefinition.spawnPoints[0]
+        player.teleport(createLocation(loadedWorld.world, spawnPoint))
+        player.inventory.clear()
+        player.feed()
+        player.heal()
+        player.resetWalkSpeed()
+        player.resetFlySpeed()
+        player.gameMode = GameMode.SURVIVAL
+        player.fallDistance = 0f
+        playersInHub.add(player)
+
+        return Ok(Unit)
     }
 
     /** Teleport a player to the default hub */
-    fun teleportToDefaultHub(player: Player) {
+    fun teleportToDefaultHub(player: Player): Result<Unit, Exception> {
         if (!::defaultLoadedHubWorld.isInitialized) {
             throw IllegalStateException("Default hub world is not yet initialized")
         }
-        teleportToHub(player, defaultLoadedHubWorld)
+        return teleportToHub(player, defaultLoadedHubWorld)
     }
 
     /** Teleport a player to the default hub with result handling */
-    fun tryTeleportToDefaultHub(player: Player): Result<Unit> {
+    fun tryTeleportToDefaultHub(player: Player): Result<Unit, Exception> {
         return if (::defaultLoadedHubWorld.isInitialized) {
             try {
                 teleportToHub(player, defaultLoadedHubWorld)
-                Result.success(Unit)
             } catch (e: Exception) {
-                Result.failure(e)
+                Err(e)
             }
         } else {
-            Result.failure(IllegalStateException("Default hub world is not yet initialized"))
+            Err(IllegalStateException("Default hub world is not yet initialized"))
         }
     }
 

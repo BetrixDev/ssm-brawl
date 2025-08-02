@@ -40,7 +40,7 @@ class LeaveCommand {
             .onFailure { err ->
                 when (err) {
                     MinigameLeaveError.PlayerNotInMinigame -> {
-                        return@onFailure
+                        sender.sendMessage(mm("<red>You are not in anything you can leave</red>"))
                     }
                     MinigameLeaveError.HubNotReady -> {
                         sender.sendMessage(
@@ -48,15 +48,14 @@ class LeaveCommand {
                                 "<red>Hub world is still loading, please try again in a moment</red>"
                             )
                         )
-                        return
+                    }
+                    MinigameLeaveError.Unknown -> {
+                        sender.sendMessage(mm("<red>An unknown error occurred which caused you to be unable to leave this minigame</red>"))
                     }
                     else -> {
                         sender.sendMessage(mm("<red>You cannot leave this minigame</red>"))
-                        return
                     }
                 }
             }
-
-        sender.sendMessage(mm("<red>You are not in anything you can leave</red>"))
     }
 }

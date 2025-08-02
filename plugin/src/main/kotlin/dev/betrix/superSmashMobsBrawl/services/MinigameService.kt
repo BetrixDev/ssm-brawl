@@ -10,6 +10,7 @@ import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
+import dev.betrix.superSmashMobsBrawl.utils.mm
 import org.bukkit.entity.Player
 
 sealed class MinigameInitError {
@@ -72,11 +73,13 @@ object MinigameService {
             minigameInstance
                 .onPlayerLeave(player)
                 .onSuccess {
+                    KitService.unassignKit(player)
                     // Try to move player back to hub
                     HubService.tryTeleportToDefaultHub(player)
                         .onFailure {
                             // Log the teleportation failure but don't fail the leave operation
-                            SuperSmashMobsBrawl.instance.logger.warning("Failed to teleport ${player.name} to hub: ${it.message}")
+                            player.kick(mm("<red>We couldn't put you back in the hub</red>"))
+                            SuperSmashMobsBrawl.instance.logger.severe("Failed to teleport ${player.name} to hub: ${it.message}")
                         }
                 }
                 .onFailure {
@@ -85,6 +88,7 @@ object MinigameService {
 
             return Ok(Unit)
         } catch (e: Exception) {
+            e.printStackTrace()
             Err(MinigameLeaveError.Unknown)
         }
     }

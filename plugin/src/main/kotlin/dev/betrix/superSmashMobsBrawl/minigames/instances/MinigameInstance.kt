@@ -74,9 +74,6 @@ abstract class MinigameInstance(val definition: MinigameDefinition, val teams: L
         // Remove the player from teams
         teams.forEach { team -> team.players.remove(player) }
 
-        // Unassign kit
-        KitService.unassignKit(player)
-
         // Check if minigame should end and clean up
         if (shouldEndMinigame()) {
             SuperSmashMobsBrawl.instance.launch { onMinigameEnd() }
