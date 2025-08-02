@@ -36,13 +36,13 @@ open class KitInstance(val definition: KitDefinition, val player: Player) {
 
         abilityInstances.forEach {
             it.teardown()
-            abilityInstances.remove(it)
         }
+        abilityInstances.clear()
 
         passiveInstances.forEach {
             it.teardown()
-            passiveInstances.remove(it)
         }
+        passiveInstances.clear()
 
         player.sendDebugMessage("The ${definition.name} kit has been removed")
     }

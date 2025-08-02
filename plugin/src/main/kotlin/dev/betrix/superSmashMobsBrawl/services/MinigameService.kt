@@ -74,6 +74,7 @@ object MinigameService {
                 .onPlayerLeave(player)
                 .onSuccess {
                     KitService.unassignKit(player)
+
                     // Try to move player back to hub
                     HubService.tryTeleportToDefaultHub(player)
                         .onFailure {
