@@ -6,6 +6,7 @@ import com.github.michaelbull.result.Result
 import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
+import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import org.bukkit.entity.Player
 
 enum class AssignKitError {
@@ -30,13 +31,32 @@ object KitService {
 
     fun assignKit(
         player: Player,
+        minigameDefinition: MinigameDefinition,
+    ): Result<KitInstance, AssignKitError> {
+        if (!playerSelectedKits.containsKey(player) || playerSelectedKits[player] == null) {
+            playerSelectedKits[player] = CreeperKitDefinition // Default kit for now
+        }
+
+        return assignKit(player, playerSelectedKits[player] ?: CreeperKitDefinition, minigameDefinition)
+    }
+
+    fun assignKit(
+        player: Player,
         kitDefinition: KitDefinition,
+    ): Result<KitInstance, AssignKitError> {
+        return assignKit(player, kitDefinition, null)
+    }
+
+    fun assignKit(
+        player: Player,
+        kitDefinition: KitDefinition,
+        minigameDefinition: MinigameDefinition?,
     ): Result<KitInstance, AssignKitError> {
         if (assignedKits.containsKey(player)) {
             return Err(AssignKitError.PLAYER_HAS_KIT)
         }
 
-        val kitInstance = kitDefinition.createInstance(player)
+        val kitInstance = kitDefinition.createInstance(player, minigameDefinition)
         assignedKits[player] = kitInstance
 
         // Set up the kit (which will also set up hotbar items)

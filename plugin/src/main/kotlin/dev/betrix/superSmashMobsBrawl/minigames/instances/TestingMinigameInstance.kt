@@ -31,7 +31,7 @@ class TestingMinigameInstance(definition: MinigameDefinition, teams: List<Miniga
                 player.heal()
                 player.teleport(createLocation(world, map.spawnPoints[0]))
 
-                KitService.assignKit(player).onFailure { error ->
+                KitService.assignKit(player, definition).onFailure { error ->
                     // Log error if kit assignment fails
                     SuperSmashMobsBrawl.instance.logger.warning(
                         "Failed to assign kit to ${player.name}: $error"
