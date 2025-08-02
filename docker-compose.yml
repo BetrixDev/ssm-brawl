@@ -64,7 +64,15 @@ services:
     networks:
       - ssmb-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:80",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -72,22 +80,22 @@ services:
   # Minecraft Server with Plugin
   minecraft:
     build:
-      context: .
-      dockerfile: plugin/Dockerfile
+      context: ./plugin
+      dockerfile: Dockerfile
     container_name: ssmb-minecraft
     restart: unless-stopped
     ports:
       - "${MINECRAFT_PORT:-25565}:25565"
       - "${RCON_PORT:-25575}:25575"
     volumes:
-      - minecraft_data:/minecraft/world
-      - minecraft_plugins:/minecraft/plugins
       - minecraft_logs:/minecraft/logs
     networks:
       - ssmb-network
     environment:
-      MEMORY_SIZE: ${MINECRAFT_MEMORY:-2G}
+      MEMORY_SIZE: ${MINECRAFT_MEMORY:-4G}
       RCON_PASSWORD: ${RCON_PASSWORD:-minecraft}
+      ONLINE_MODE: ${ONLINE_MODE:-TRUE}
+      MINECRAFT_PORT: ${MINECRAFT_PORT:-25565}
     stdin_open: true
     tty: true
 
