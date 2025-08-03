@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.abilities.instances
 
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import gg.flyte.twilight.event.TwilightListener
@@ -8,6 +9,7 @@ import kotlinx.coroutines.Job
 import org.bukkit.entity.Player
 
 abstract class AbilityInstance(val definition: AbilityDefinition, val player: Player) {
+    protected val plugin = SuperSmashMobsBrawl.instance
     private var lastUsed: Long = 0
     protected val listeners = arrayListOf<TwilightListener>()
     protected val runnables = arrayListOf<TwilightRunnable>()
@@ -21,7 +23,9 @@ abstract class AbilityInstance(val definition: AbilityDefinition, val player: Pl
         jobs.forEach { it.cancel() }
     }
 
-    abstract fun activate()
+    open fun activate() {
+        setCooldown()
+    }
 
     open fun canActivate(): Boolean {
         if (isOnCooldown()) {

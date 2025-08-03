@@ -2,21 +2,22 @@ plugins {
     kotlin("jvm") version "2.2.0-RC2"
     id("com.gradleup.shadow") version "8.3.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("com.ncorti.ktfmt.gradle") version "0.23.0"
 }
 
 group = "dev.betrix"
+
 version = "0.1.0"
 
 repositories {
     mavenCentral()
-    maven("https://repo.papermc.io/repository/maven-public/") {
-        name = "papermc-repo"
-    }
-    maven("https://oss.sonatype.org/content/groups/public/") {
-        name = "sonatype"
-    }
+    maven("https://repo.papermc.io/repository/maven-public/") { name = "papermc-repo" }
+    maven("https://oss.sonatype.org/content/groups/public/") { name = "sonatype" }
     maven("https://repo.flyte.gg/releases")
     maven { url = uri("https://repo.panda-lang.org/releases") }
+    maven("https://repo.md-5.net/content/groups/public/") {
+        content { includeGroup("me.libraryaddict.disguises") }
+    }
 }
 
 dependencies {
@@ -28,6 +29,7 @@ dependencies {
     implementation("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.22.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("com.michael-bull.kotlin-result:kotlin-result:2.0.1")
+    compileOnly("me.libraryaddict.disguises:libsdisguises:11.0.6")
 }
 
 tasks {
@@ -37,26 +39,21 @@ tasks {
         // Your plugin's jar (or shadowJar if present) will be used automatically.
         minecraftVersion("1.21.6")
     }
+
+    compileJava { options.compilerArgs.add("-parameters") }
+
+    build { dependsOn("shadowJar") }
+
+    processResources {
+        val props = mapOf("version" to version)
+        inputs.properties(props)
+        filteringCharset = "UTF-8"
+        filesMatching("plugin.yml") { expand(props) }
+    }
+
+    ktfmt { kotlinLangStyle() }
 }
 
 val targetJavaVersion = 21
-kotlin {
-    jvmToolchain(targetJavaVersion)
-}
 
-tasks.compileJava {
-    options.compilerArgs.add("-parameters")
-}
-
-tasks.build {
-    dependsOn("shadowJar")
-}
-
-tasks.processResources {
-    val props = mapOf("version" to version)
-    inputs.properties(props)
-    filteringCharset = "UTF-8"
-    filesMatching("plugin.yml") {
-        expand(props)
-    }
-}
+kotlin { jvmToolchain(targetJavaVersion) }

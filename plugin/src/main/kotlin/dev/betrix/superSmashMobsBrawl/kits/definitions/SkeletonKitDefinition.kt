@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.kits.definitions
 
-import dev.betrix.superSmashMobsBrawl.abilities.definitions.ExplosionAbilityDefinition
-import dev.betrix.superSmashMobsBrawl.abilities.definitions.SulphurBombAbilityDefinition
-import dev.betrix.superSmashMobsBrawl.kits.instances.CreeperKitInstance
+import dev.betrix.superSmashMobsBrawl.abilities.definitions.BoneExplosionAbilityDefinition
+import dev.betrix.superSmashMobsBrawl.abilities.definitions.RopedArrowAbilityDefinition
+import dev.betrix.superSmashMobsBrawl.kits.instances.SkeletonKitInstance
 import dev.betrix.superSmashMobsBrawl.kits.kit
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
@@ -10,26 +10,26 @@ import dev.betrix.superSmashMobsBrawl.passives.definitions.HungerPassiveDefiniti
 import dev.betrix.superSmashMobsBrawl.passives.definitions.RegenerationPassiveDefinition
 import org.bukkit.entity.Player
 
-object CreeperKitDefinition : KitDefinition() {
-    override val name = "Creeper"
-    override val id = "creeper"
+object SkeletonKitDefinition : KitDefinition() {
+    override val name = "Skeleton"
+    override val id = "skeleton"
 
     override val metadata = kit {
-        description = "He blow up"
-        meleeDamage = 6
+        description = "He got bones"
+        meleeDamage = 5
 
         passive(DoubleJumpPassiveDefinition)
         passive(RegenerationPassiveDefinition)
         passive(HungerPassiveDefinition)
 
-        ability(SulphurBombAbilityDefinition)
-        ability(ExplosionAbilityDefinition)
+        ability(BoneExplosionAbilityDefinition)
+        ability(RopedArrowAbilityDefinition)
     }
 
     override fun createInstance(
         player: Player,
         minigameDefinition: MinigameDefinition?,
-    ): CreeperKitInstance {
-        return CreeperKitInstance(this, player, minigameDefinition)
+    ): SkeletonKitInstance {
+        return SkeletonKitInstance(this, player, minigameDefinition)
     }
 }

@@ -1,17 +1,17 @@
 package dev.betrix.superSmashMobsBrawl.kits.instances
 
-import dev.betrix.superSmashMobsBrawl.disguises.CreeperDisguise
+import dev.betrix.superSmashMobsBrawl.disguises.SkeletonDisguise
 import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import org.bukkit.entity.Player
 
-class CreeperKitInstance(
+class SkeletonKitInstance(
     definition: KitDefinition,
     player: Player,
-    minigameDefinition: MinigameDefinition? = null,
+    minigameDefinition: MinigameDefinition?,
 ) : KitInstance(definition, player, minigameDefinition) {
     override fun setup() {
-        disguise = CreeperDisguise(player)
+        disguise = SkeletonDisguise(player)
         super.setup()
     }
 }

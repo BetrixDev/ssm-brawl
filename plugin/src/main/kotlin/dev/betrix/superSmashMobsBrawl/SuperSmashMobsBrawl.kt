@@ -26,6 +26,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
+import org.bukkit.event.entity.PotionSplashEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 
@@ -85,6 +86,11 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         event<EntityPickupItemEvent> { isCancelled = true }
 
         event<InventoryMoveItemEvent> { isCancelled = true }
+
+        event<PotionSplashEvent> {
+            entity.remove()
+            isCancelled = true
+        }
 
         logger.info("SSMB started!")
     }

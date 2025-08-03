@@ -10,5 +10,8 @@ abstract class KitDefinition {
     abstract val id: String
     abstract val metadata: KitMetadata
 
-    abstract fun createInstance(player: Player, minigameDefinition: MinigameDefinition? = null): KitInstance
+    abstract fun createInstance(
+        player: Player,
+        minigameDefinition: MinigameDefinition? = null,
+    ): KitInstance
 }

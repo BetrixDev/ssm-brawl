@@ -2,20 +2,26 @@ package dev.betrix.superSmashMobsBrawl.abilities
 
 import org.bukkit.inventory.ItemStack
 
+enum class AbilityType {
+    PROJECTILE,
+    TELEPORT,
+    AOE,
+    STEALTH,
+}
+
+enum class AbilityUsageType {
+    RIGHT_CLICK,
+    LEFT_CLICK,
+}
+
 data class AbilityMetadata(
     val description: String = "",
     val type: AbilityType = AbilityType.PROJECTILE,
     val cooldown: Int = 0,
     val hotbarItem: ItemStack,
     var hotbarItemSlot: Int,
+    val usageType: AbilityUsageType,
 )
-
-enum class AbilityType {
-    PROJECTILE,
-    TELEPORT,
-    SELF_DESTRUCT,
-    STEALTH,
-}
 
 class AbilityBuilder {
     var description = ""
@@ -23,6 +29,7 @@ class AbilityBuilder {
     var cooldown = 0
     var hotbarItemSlot: Int = 0
     lateinit var hotbarItem: ItemStack
+    var usageType = AbilityUsageType.LEFT_CLICK
 
     fun build(): AbilityMetadata {
         if (!::hotbarItem.isInitialized) {
@@ -37,6 +44,7 @@ class AbilityBuilder {
             cooldown = cooldown,
             hotbarItem = hotbarItem,
             hotbarItemSlot = hotbarItemSlot,
+            usageType = usageType,
         )
     }
 }

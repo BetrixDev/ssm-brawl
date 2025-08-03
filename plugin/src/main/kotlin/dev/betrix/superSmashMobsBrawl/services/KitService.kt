@@ -9,8 +9,8 @@ import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
-import org.bukkit.entity.Player
 import java.util.concurrent.ConcurrentHashMap
+import org.bukkit.entity.Player
 
 enum class AssignKitError {
     PLAYER_HAS_KIT
@@ -42,7 +42,11 @@ object KitService {
             playerSelectedKits[player] = CreeperKitDefinition // Default kit for now
         }
 
-        return assignKit(player, playerSelectedKits[player] ?: CreeperKitDefinition, minigameDefinition)
+        return assignKit(
+            player,
+            playerSelectedKits[player] ?: CreeperKitDefinition,
+            minigameDefinition,
+        )
     }
 
     fun assignKit(
@@ -83,7 +87,9 @@ object KitService {
                     instance.teardown()
                 } catch (e: Exception) {
                     // Handle any exceptions during teardown
-                    plugin.logger.warning("Error during kit teardown for player ${player.name}: ${e.message}")
+                    plugin.logger.warning(
+                        "Error during kit teardown for player ${player.name}: ${e.message}"
+                    )
                 }
             }
         }
@@ -103,7 +109,9 @@ object KitService {
                 try {
                     kitInstance.teardown()
                 } catch (e: Exception) {
-                    plugin.logger.warning("Error during kit teardown for player ${player.name}: ${e.message}")
+                    plugin.logger.warning(
+                        "Error during kit teardown for player ${player.name}: ${e.message}"
+                    )
                 }
             }
         }

@@ -13,8 +13,8 @@ import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.getNearbyEntities
-import gg.flyte.twilight.extension.resetWalkSpeed
 import gg.flyte.twilight.scheduler.repeatingTask
+import kotlin.math.min
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -23,6 +23,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerToggleSneakEvent
+import org.bukkit.util.Vector
 
 class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
     AbilityInstance(definition, player) {
@@ -67,7 +68,7 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
 
         isExplodeActive = true
 
-        player.walkSpeed = 0.05f
+        player.velocity = Vector()
         player.level = 0
         player.exp = 0f
 
@@ -76,9 +77,11 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
             repeatingTask(1) {
                 if (iteration == fuseTimeTicks || !isExplodeActive) {
                     cancel()
+
+                    return@repeatingTask
                 }
 
-                player.exp = (iteration + 1) / fuseTimeTicks.toFloat()
+                player.exp = min((iteration + 1) / fuseTimeTicks.toFloat(), 1f)
 
                 val volume = 0.5f + iteration / 20
 
@@ -143,7 +146,6 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
     }
 
     private fun resetPlayerData() {
-        player.resetWalkSpeed()
         player.level = 0
         player.exp = 0f
     }

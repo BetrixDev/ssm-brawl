@@ -47,7 +47,7 @@ class TestingMinigameInstance(definition: MinigameDefinition, teams: List<Miniga
 
     override suspend fun teardownMinigame() {
         val playersToCleanup = teams.flatMap { it.players.toList() }
-        
+
         // Unassign kits from all players
         withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) {
             playersToCleanup.forEach { player ->

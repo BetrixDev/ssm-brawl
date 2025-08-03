@@ -1,13 +1,12 @@
 package dev.betrix.superSmashMobsBrawl.extensions
 
 import gg.flyte.twilight.extension.add
+import kotlin.math.abs
+import kotlin.math.log10
 import org.bukkit.Material
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Projectile
 import org.bukkit.util.Vector
-import kotlin.math.abs
-import kotlin.math.log10
-
 
 fun Entity.setVelocity(strength: Double, yAdd: Double, yMax: Double, groundBoost: Boolean) {
     setVelocity(this.location.direction, strength, false, 0.0, yAdd, yMax, groundBoost)
@@ -122,7 +121,7 @@ fun Entity.isOnBlock(): Boolean {
         xMin = -1
     }
     if (xMod > 0.7) {
-       xMax = 1
+        xMax = 1
     }
     if (zMod < 0.3) {
         zMin = -1
@@ -131,18 +130,21 @@ fun Entity.isOnBlock(): Boolean {
         zMax = 1
     }
 
-
     for (x in xMin..xMax) {
         for (z in zMin..zMax) {
-            if (location.add(x, -0.5, z).block.type != Material.AIR && !location.add(x, -0.5, z).block.isLiquid
-            ) return true
+            if (
+                location.add(x, -0.5, z).block.type != Material.AIR &&
+                    !location.add(x, -0.5, z).block.isLiquid
+            )
+                return true
             if (location.add(x, 0, z).block.type == Material.LILY_PAD) return true
             val beneath: Material = location.add(x, -1.5, z).block.type
-            if (location.y % 0.5 == 0.0 &&
-                (beneath.toString().contains("FENCE") || beneath == Material.COBBLESTONE_WALL)
-            ) return true
+            if (
+                location.y % 0.5 == 0.0 &&
+                    (beneath.toString().contains("FENCE") || beneath == Material.COBBLESTONE_WALL)
+            )
+                return true
         }
     }
     return false
-
 }

@@ -50,7 +50,11 @@ class LeaveCommand {
                         )
                     }
                     MinigameLeaveError.Unknown -> {
-                        sender.sendMessage(mm("<red>An unknown error occurred which caused you to be unable to leave this minigame</red>"))
+                        sender.sendMessage(
+                            mm(
+                                "<red>An unknown error occurred which caused you to be unable to leave this minigame</red>"
+                            )
+                        )
                     }
                     else -> {
                         sender.sendMessage(mm("<red>You cannot leave this minigame</red>"))
