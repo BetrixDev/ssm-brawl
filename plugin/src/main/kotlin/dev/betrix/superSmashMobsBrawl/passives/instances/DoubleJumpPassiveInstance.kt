@@ -29,7 +29,7 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
         )
 
         runnables.add(
-            repeatingTask(1) {
+            repeatingTask(0) {
                 if (player.isOnBlock() || canDoubleJump) {
                     player.sendDebugMessage("[DJ] You have hit the ground")
                     canDoubleJump = true
