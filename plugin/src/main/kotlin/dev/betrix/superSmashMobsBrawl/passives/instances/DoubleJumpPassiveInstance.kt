@@ -28,6 +28,16 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
             }
         )
 
+        runnables.add(
+            repeatingTask(1) {
+                if (player.isOnBlock() || canDoubleJump) {
+                    player.sendDebugMessage("[DJ] You have hit the ground")
+                    canDoubleJump = true
+                    player.allowFlight = true
+                }
+            }
+        )
+
         listeners.add(
             event<PlayerToggleFlightEvent> ToggleFlightEvent@{
                 if (player != this@DoubleJumpPassiveInstance.player) {
@@ -50,18 +60,6 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
                 player.setVelocity(player.location.direction, 0.9, true, 0.9, 0.0, 0.9, true)
 
                 canDoubleJump = false
-
-                runnables.add(
-                    repeatingTask(1) {
-                        if (player.isOnBlock() || canDoubleJump) {
-                            player.sendDebugMessage("[DJ] You have hit the ground")
-                            canDoubleJump = true
-                            player.allowFlight = true
-
-                            this.cancel()
-                        }
-                    }
-                )
             }
         )
 
