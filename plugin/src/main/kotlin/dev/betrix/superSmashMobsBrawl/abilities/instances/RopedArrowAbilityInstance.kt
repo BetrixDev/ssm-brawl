@@ -47,8 +47,8 @@ class RopedArrowAbilityInstance(definition: AbilityDefinition, player: Player) :
         val trajectory = pre.normalize()
         val mult = velocity.length() / 3.0
 
-        player.setVelocity(trajectory, 0.4 + mult, false, 0.0, 0.6 * mult, 1.2 * mult, true)
+        player.setVelocity(trajectory, 0.4 + mult, false, 0.0, 0.2 * mult, 1.2 * mult, true)
 
-        location.world.playSound(location, Sound.ENTITY_ARROW_HIT, 2.5f, 0.75f)
+        location.world.playSound(location, Sound.ENTITY_ARROW_HIT, 2.5f, 0.6f)
     }
 }
