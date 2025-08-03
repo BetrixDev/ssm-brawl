@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.passives.instances
 
+import dev.betrix.superSmashMobsBrawl.extensions.isOnBlock
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
 import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
@@ -51,7 +52,7 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
 
                 runnables.add(
                     repeatingTask(1) {
-                        if (isOnGround(player) || canDoubleJump) {
+                        if (player.isOnBlock() || canDoubleJump) {
                             player.sendDebugMessage("[DJ] You have hit the ground")
                             canDoubleJump = true
                             player.allowFlight = true
