@@ -91,6 +91,17 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
                     return@repeatingTask
                 }
 
+                // Spawn black particle trail behind the projectile
+                player.world.spawnParticle(
+                    Particle.SMOKE,
+                    projectile.location,
+                    3,
+                    0.1,
+                    0.1,
+                    0.1,
+                    0.01
+                )
+
                 val nearbyEntities =
                     projectile
                         .getNearbyEntities(projectileCollisionSize)
