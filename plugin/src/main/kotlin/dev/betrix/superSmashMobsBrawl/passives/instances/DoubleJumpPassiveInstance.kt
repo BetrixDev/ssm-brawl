@@ -35,6 +35,9 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
                 }
 
                 isCancelled = true
+                player.isFlying = false
+                player.allowFlight = false
+                player.fallDistance = 0f
 
                 if (!canDoubleJump) {
                     player.sendDebugMessage("[DJ] You cannot double jump right now")
@@ -43,11 +46,9 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
 
                 player.sendDebugMessage("[DJ] Double jump activated")
 
-                player.fallDistance = 0f
                 player.playSound(player.location, Sound.ENTITY_BLAZE_SHOOT, 1F, 1F)
                 player.setVelocity(player.location.direction, 0.9, true, 0.9, 0.0, 0.9, true)
 
-                player.allowFlight = false
                 canDoubleJump = false
 
                 runnables.add(
