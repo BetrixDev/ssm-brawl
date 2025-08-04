@@ -40,7 +40,7 @@ class SulphurBombAbilityInstance(definition: AbilityDefinition, player: Player) 
                         projectileKnockbackModifier,
                         projectileDamage,
                         hitEntity.health,
-                        projectile?.velocity?.normalize(),
+                        projectile?.location?.toVector(),
                         null,
                     )
                 }
