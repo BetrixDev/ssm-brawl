@@ -14,7 +14,7 @@ import org.bukkit.util.Vector
 class RopedArrowAbilityInstance(definition: AbilityDefinition, player: Player) :
     AbilityInstance(definition, player) {
 
-        private val arrowDamage = 6.0
+    private val arrowDamage = 6.0
     private val arrowVelocityMultiplier = 2.4
 
     override fun activate() {
@@ -29,7 +29,13 @@ class RopedArrowAbilityInstance(definition: AbilityDefinition, player: Player) :
                 .onHitLivingEntity { entity, projectile ->
                     pullPlayerToLocation(entity.location, velocityBeforeImpact)
 
-                    val damageEvent = SmashDamageEvent(entity, Damager.LivingEntity(player), arrowDamage, damageType = SmashDamageType.Projectile)
+                    val damageEvent =
+                        SmashDamageEvent(
+                            entity,
+                            Damager.LivingEntity(player),
+                            arrowDamage,
+                            damageType = SmashDamageType.Projectile,
+                        )
 
                     damageEvent.callEvent()
 

@@ -6,6 +6,7 @@ import dev.betrix.superSmashMobsBrawl.kits.instances.SkeletonKitInstance
 import dev.betrix.superSmashMobsBrawl.kits.kit
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.ArrowRechargePassiveDefinition
+import dev.betrix.superSmashMobsBrawl.passives.definitions.BarragePassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.HungerPassiveDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.RegenerationPassiveDefinition
@@ -23,6 +24,7 @@ object SkeletonKitDefinition : KitDefinition() {
         passive(RegenerationPassiveDefinition)
         passive(HungerPassiveDefinition)
         passive(ArrowRechargePassiveDefinition)
+        passive(BarragePassiveDefinition)
 
         ability(BoneExplosionAbilityDefinition)
         ability(RopedArrowAbilityDefinition)

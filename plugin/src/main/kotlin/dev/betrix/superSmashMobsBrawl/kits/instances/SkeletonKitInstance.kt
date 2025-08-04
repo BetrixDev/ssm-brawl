@@ -20,9 +20,7 @@ class SkeletonKitInstance(
 
         super.setup()
 
-        val arrows = ItemStack.of(Material.ARROW).apply {
-            amount = maximumArrowCount
-        }
+        val arrows = ItemStack.of(Material.ARROW).apply { amount = maximumArrowCount }
 
         player.inventory.setItem(arrowHotbarSlot, arrows)
     }

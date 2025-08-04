@@ -5,26 +5,39 @@ import org.bukkit.entity.Arrow
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
+import org.bukkit.util.Vector
 
 class ArrowProjectile(
     override val owner: Player,
     override val name: String = "Arrow",
     private val velocityMultiplier: Double,
+    private val velocityAddend: Vector? = null,
 ) : BrawlProjectile(owner, name) {
     override var projectileSize = 0.5 // Default arrow hitbox
 
-    private var onHitLivingEntityListener: (ArrowProjectile.(entity: LivingEntity, projectile: Projectile) -> Boolean)? = null
-    private var onBlockListener: (ArrowProjectile.(block: Block, projectile: Projectile) -> Boolean)? = null
+    private var onHitLivingEntityListener:
+        (ArrowProjectile.(entity: LivingEntity, projectile: Projectile) -> Boolean)? =
+        null
+    private var onBlockListener:
+        (ArrowProjectile.(block: Block, projectile: Projectile) -> Boolean)? =
+        null
 
     override fun createProjectileEntity(): Projectile {
         return owner.world.spawn(owner.eyeLocation, Arrow::class.java).apply { shooter = owner }
     }
 
     override fun doVelocity() {
-        projectile?.velocity = owner.eyeLocation.direction.multiply(velocityMultiplier)
+        if (velocityAddend != null) {
+            projectile?.velocity =
+                owner.eyeLocation.direction.add(velocityAddend).multiply(velocityMultiplier)
+        } else {
+            projectile?.velocity = owner.eyeLocation.direction.multiply(velocityMultiplier)
+        }
     }
 
-    fun onHitLivingEntity(cb: ArrowProjectile.(entity: LivingEntity, projectile: Projectile) -> Boolean): ArrowProjectile {
+    fun onHitLivingEntity(
+        cb: ArrowProjectile.(entity: LivingEntity, projectile: Projectile) -> Boolean
+    ): ArrowProjectile {
         onHitLivingEntityListener = cb
 
         return this
@@ -34,7 +47,9 @@ class ArrowProjectile(
         return onHitLivingEntityListener?.invoke(this, entity, projectile!!) ?: false
     }
 
-    fun onHitBlock(cb: ArrowProjectile.(block: Block, projectile: Projectile) -> Boolean): ArrowProjectile {
+    fun onHitBlock(
+        cb: ArrowProjectile.(block: Block, projectile: Projectile) -> Boolean
+    ): ArrowProjectile {
         onBlockListener = cb
 
         return this

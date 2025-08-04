@@ -93,9 +93,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
             isCancelled = true
         }
 
-        event<InventoryInteractEvent> {
-            isCancelled = true
-        }
+        event<InventoryInteractEvent> { isCancelled = true }
 
         logger.info("SSMB started!")
     }

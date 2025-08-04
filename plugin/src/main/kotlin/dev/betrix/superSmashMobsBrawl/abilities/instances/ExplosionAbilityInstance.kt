@@ -81,7 +81,7 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
                     return@repeatingTask
                 }
 
-                player.exp = min((iteration + 1) / fuseTimeTicks.toFloat(), 1f)
+                player.exp = min((iteration + 1) / fuseTimeTicks.toFloat(), 0.9999f)
 
                 val volume = 0.5f + iteration / 20
 
