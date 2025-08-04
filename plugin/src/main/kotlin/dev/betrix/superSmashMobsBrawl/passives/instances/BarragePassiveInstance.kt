@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.passives.instances
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
+import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
 import dev.betrix.superSmashMobsBrawl.projectiles.ArrowProjectile
 import gg.flyte.twilight.event.event
@@ -119,7 +120,7 @@ class BarragePassiveInstance(definition: PassiveDefinition, player: Player) :
 
     private fun incrementCharge() {
         charge++
-        player.exp = min(0.9999F, (charge / maxCharge).toFloat())
+        player.exp = min(0.9999F, charge.toFloat() / maxCharge.toFloat())
         player.playSound(player.eyeLocation, Sound.BLOCK_DISPENSER_FAIL, 1f, 1 + 0.1f * charge)
     }
 
