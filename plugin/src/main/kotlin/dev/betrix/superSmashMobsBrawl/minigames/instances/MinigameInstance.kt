@@ -13,7 +13,6 @@ import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.registries.MapRegistry
 import dev.betrix.superSmashMobsBrawl.services.HubService
-import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
 import java.util.UUID
 import org.bukkit.World

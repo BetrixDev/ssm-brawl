@@ -2,6 +2,7 @@ package dev.betrix.superSmashMobsBrawl.registries
 
 import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
+import dev.betrix.superSmashMobsBrawl.kits.definitions.SkeletonKitDefinition
 
 object KitRegistry {
     private val definitions = mutableMapOf<String, KitDefinition>()
@@ -16,5 +17,6 @@ object KitRegistry {
 
     init {
         register(CreeperKitDefinition)
+        register(SkeletonKitDefinition)
     }
 }

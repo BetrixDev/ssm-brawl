@@ -15,7 +15,7 @@ object CreeperKitDefinition : KitDefinition() {
     override val id = "creeper"
 
     override val metadata = kit {
-        description = "Explosive assassin with stealth and teleportation abilities"
+        description = "He blow up"
         meleeDamage = 6
 
         passive(DoubleJumpPassiveDefinition)
@@ -26,7 +26,10 @@ object CreeperKitDefinition : KitDefinition() {
         ability(ExplosionAbilityDefinition)
     }
 
-    override fun createInstance(player: Player, minigameDefinition: MinigameDefinition?): CreeperKitInstance {
+    override fun createInstance(
+        player: Player,
+        minigameDefinition: MinigameDefinition?,
+    ): CreeperKitInstance {
         return CreeperKitInstance(this, player, minigameDefinition)
     }
 }

@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.services
 
+import dev.betrix.superSmashMobsBrawl.abilities.AbilityUsageType
 import dev.betrix.superSmashMobsBrawl.abilities.instances.AbilityInstance
 import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
 import gg.flyte.twilight.scheduler.repeatingTask
@@ -126,11 +127,6 @@ object HotbarService : Listener {
     fun onPlayerInteract(event: PlayerInteractEvent) {
         val player = event.player
 
-        // Only handle right-click actions
-        if (event.action != Action.RIGHT_CLICK_AIR && event.action != Action.RIGHT_CLICK_BLOCK) {
-            return
-        }
-
         // Only handle players with kits
         if (!playersWithKits.contains(player)) {
             return
@@ -139,13 +135,30 @@ object HotbarService : Listener {
         val item = event.item ?: return
         val abilityId = getAbilityId(item) ?: return
 
-        // Cancel the event to prevent normal item behavior
-        event.isCancelled = true
-
-        // Find the kit instance and corresponding ability
         val kitInstance = getKitInstance(player) ?: return
         val abilityInstance =
             kitInstance.abilityInstances.find { it.definition.id == abilityId } ?: return
+
+        when (abilityInstance.definition.metadata.usageType) {
+            AbilityUsageType.LEFT_CLICK -> {
+                if (
+                    event.action != Action.LEFT_CLICK_AIR && event.action != Action.LEFT_CLICK_BLOCK
+                ) {
+                    return
+                }
+            }
+            AbilityUsageType.RIGHT_CLICK -> {
+                if (
+                    event.action != Action.RIGHT_CLICK_AIR &&
+                        event.action != Action.RIGHT_CLICK_BLOCK
+                ) {
+                    return
+                }
+            }
+        }
+
+        // Cancel the event to prevent normal item behavior
+        event.isCancelled = true
 
         // Attempt to activate the ability
         if (abilityInstance.canActivate()) {

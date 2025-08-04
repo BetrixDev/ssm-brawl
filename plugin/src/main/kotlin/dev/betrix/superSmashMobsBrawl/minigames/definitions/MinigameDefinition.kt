@@ -12,14 +12,14 @@ abstract class MinigameDefinition {
     abstract val metadata: MinigameMetadata
 
     /**
-     * List of passive definitions that are blacklisted in this minigame.
-     * These passives will not be enabled for any kit in this minigame.
+     * List of passive definitions that are blacklisted in this minigame. These passives will not be
+     * enabled for any kit in this minigame.
      */
     open val blacklistedPassives: List<PassiveDefinition> = emptyList()
 
     /**
-     * List of ability definitions that are blacklisted in this minigame.
-     * These abilities will not be enabled for any kit in this minigame.
+     * List of ability definitions that are blacklisted in this minigame. These abilities will not
+     * be enabled for any kit in this minigame.
      */
     open val blacklistedAbilities: List<AbilityDefinition> = emptyList()
 

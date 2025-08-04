@@ -3,10 +3,8 @@ package dev.betrix.superSmashMobsBrawl.extensions
 import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.KitService
-import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import org.bukkit.entity.Player
-import org.checkerframework.checker.units.qual.min
 
 /**
  * Check if debug mode is enabled for this player.

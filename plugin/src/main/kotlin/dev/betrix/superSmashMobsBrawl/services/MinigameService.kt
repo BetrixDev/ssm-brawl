@@ -76,12 +76,13 @@ object MinigameService {
                     KitService.unassignKit(player)
 
                     // Try to move player back to hub
-                    HubService.tryTeleportToDefaultHub(player)
-                        .onFailure {
-                            // Log the teleportation failure but don't fail the leave operation
-                            player.kick(mm("<red>We couldn't put you back in the hub</red>"))
-                            SuperSmashMobsBrawl.instance.logger.severe("Failed to teleport ${player.name} to hub: ${it.message}")
-                        }
+                    HubService.tryTeleportToDefaultHub(player).onFailure {
+                        // Log the teleportation failure but don't fail the leave operation
+                        player.kick(mm("<red>We couldn't put you back in the hub</red>"))
+                        SuperSmashMobsBrawl.instance.logger.severe(
+                            "Failed to teleport ${player.name} to hub: ${it.message}"
+                        )
+                    }
                 }
                 .onFailure {
                     return Err(MinigameLeaveError.NotAllowedToLeave)

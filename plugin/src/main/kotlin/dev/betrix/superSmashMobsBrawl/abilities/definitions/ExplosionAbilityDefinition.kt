@@ -1,6 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.abilities.definitions
 
 import dev.betrix.superSmashMobsBrawl.abilities.AbilityType
+import dev.betrix.superSmashMobsBrawl.abilities.AbilityUsageType
 import dev.betrix.superSmashMobsBrawl.abilities.ability
 import dev.betrix.superSmashMobsBrawl.abilities.instances.ExplosionAbilityInstance
 import gg.flyte.twilight.extension.name
@@ -14,9 +15,10 @@ object ExplosionAbilityDefinition : AbilityDefinition() {
 
     override val metadata = ability {
         description = "Detonate yourself dealing massive damage and knockback to nearby enemies"
-        type = AbilityType.SELF_DESTRUCT
+        type = AbilityType.AOE
         cooldown = 8
-        hotbarItemSlot = 2
+        hotbarItemSlot = 1
+        usageType = AbilityUsageType.RIGHT_CLICK
 
         val hotbarItemStack = ItemStack.of(Material.IRON_SHOVEL)
         hotbarItemStack.name(name)
