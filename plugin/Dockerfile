@@ -60,9 +60,9 @@ COPY ./server/ /data/
 
 # Copy the built plugin from the build stage
 # Use *.jar to catch any jar file, or specify the exact name if you know it
-COPY --from=build /app/build/libs/*-all.jar /plugins/
+COPY --from=build /app/build/libs/*-all.jar /data/plugins/
 
 # Ensure plugins directory has correct permissions
 USER root
-RUN chown -R minecraft:minecraft /plugins
+RUN chown -R minecraft:minecraft /data/plugins
 USER minecraft
