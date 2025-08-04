@@ -5,6 +5,7 @@ import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.itemEffect
+import kotlin.math.max
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -24,7 +25,11 @@ class BoneExplosionAbilityInstance(definition: AbilityDefinition, player: Player
             player.location.getNearbyPlayers(explosionRadius).filter { it != player }
 
         validEntities.forEach { entity ->
-            val damage = baseDamage * entity.location.distance(player.location)
+            val damage =
+                max(
+                    0.0,
+                    baseDamage * 1 - (entity.location.distance(player.location) / explosionRadius),
+                )
 
             val damageEvent =
                 SmashDamageEvent(

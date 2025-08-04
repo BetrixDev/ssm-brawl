@@ -21,13 +21,13 @@ class RopedArrowAbilityInstance(definition: AbilityDefinition, player: Player) :
         super.activate()
 
         val projectile =
-            ArrowProjectile(player, "Sulphur Bomb", arrowVelocityMultiplier)
+            ArrowProjectile(player, "Roped Arrow", arrowVelocityMultiplier)
                 .onHitBlock { block, projectile ->
-                    pullPlayerToLocation(block.location, velocityBeforeImpact)
+                    pullPlayerToLocation(block.location, projectile.velocityBeforeImpact)
                     true
                 }
                 .onHitLivingEntity { entity, projectile ->
-                    pullPlayerToLocation(entity.location, velocityBeforeImpact)
+                    pullPlayerToLocation(entity.location, projectile.velocityBeforeImpact)
 
                     val damageEvent =
                         SmashDamageEvent(

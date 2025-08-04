@@ -1,6 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.projectiles
 
-import dev.betrix.superSmashMobsBrawl.IManageable
+import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.extensions.getDisguise
 import dev.betrix.superSmashMobsBrawl.extensions.isAirOrFoliage
 import dev.betrix.superSmashMobsBrawl.utils.mm
@@ -8,6 +8,7 @@ import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.FluidCollisionMode
+import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Item
@@ -19,10 +20,13 @@ import org.bukkit.util.BoundingBox
 import org.bukkit.util.RayTraceResult
 import org.bukkit.util.Vector
 
-abstract class BrawlProjectile(open val owner: Player, open val name: String) : IManageable {
+abstract class BrawlProjectile(open val owner: Player, open val name: String) : Manageable() {
     private var job: TwilightRunnable? = null
 
-    protected var projectile: Projectile? = null
+    @Volatile
+    var projectile: Projectile? = null
+        protected set
+
     protected var maxLifetimeTicks = 20L * 30L // 30 seconds in ticks
     protected open var doEntityDetection = true
     protected open var doBlockDetection = true
@@ -32,9 +36,17 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) : 
     var velocityBeforeImpact = Vector()
         private set
 
+    private var cachedBoundingBox: BoundingBox? = null
+    private var lastProjectileLocation: Location? = null
+
     val projectileBoundingBox: BoundingBox
         get() {
             val projectile = projectile ?: return BoundingBox(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+
+            val currentLocation = projectile.location
+            if (cachedBoundingBox != null && lastProjectileLocation == currentLocation) {
+                return cachedBoundingBox!!
+            }
 
             val location = projectile.location
             val centerX = location.x
@@ -43,12 +55,18 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) : 
 
             val halfSize = projectileSize
 
-            return BoundingBox.of(
-                location.toVector().setX(centerX).setY(centerY).setZ(centerZ),
-                halfSize,
-                halfSize,
-                halfSize,
-            )
+            val boundingBox =
+                BoundingBox.of(
+                    location.toVector().setX(centerX).setY(centerY).setZ(centerZ),
+                    halfSize,
+                    halfSize,
+                    halfSize,
+                )
+
+            cachedBoundingBox = boundingBox
+            lastProjectileLocation = currentLocation.clone()
+
+            return boundingBox
         }
 
     fun launch() {
@@ -62,11 +80,13 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) : 
 
         doVelocity()
 
-        event<ProjectileHitEvent> {
-            if (entity == projectile) {
-                isCancelled = true
+        listeners.add(
+            event<ProjectileHitEvent> {
+                if (entity == projectile) {
+                    isCancelled = true
+                }
             }
-        }
+        )
 
         job =
             repeatingTask(1) {
@@ -139,27 +159,21 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) : 
         val projectile = projectile ?: return null
 
         val possibleLivingEntities =
-            projectile.world.livingEntities
-                .filter { entity ->
-                    if (entity == owner) {
-                        return@filter false
-                    }
-
-                    if (entity is Player) {
-                        entity.getDisguise()?.let { disguise ->
-                            return@filter disguise.boundingBox.overlaps(projectileBoundingBox)
-                        }
-                    }
-
-                    return@filter entity.boundingBox.overlaps(projectileBoundingBox)
+            projectile.world.livingEntities.filter { entity ->
+                if (entity == owner) {
+                    return@filter false
                 }
-                .sortedBy { it.location.distance(projectile.location) }
 
-        if (possibleLivingEntities.isEmpty()) {
-            return null
-        }
+                if (entity is Player) {
+                    entity.getDisguise()?.let { disguise ->
+                        return@filter disguise.boundingBox.overlaps(projectileBoundingBox)
+                    }
+                }
 
-        return possibleLivingEntities[0]
+                return@filter entity.boundingBox.overlaps(projectileBoundingBox)
+            }
+
+        return possibleLivingEntities.minByOrNull { it.location.distance(projectile.location) }
     }
 
     private fun checkHitBlock(): Block? {
@@ -213,7 +227,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) : 
 
         val checkBlock = projectile.location.block.getRelative(BlockFace.DOWN)
 
-        return projectile.velocity.length() < 0 &&
+        return projectile.velocity.length() <= 0.01 &&
             (projectile.isOnGround || checkBlock.isAirOrFoliage())
     }
 }

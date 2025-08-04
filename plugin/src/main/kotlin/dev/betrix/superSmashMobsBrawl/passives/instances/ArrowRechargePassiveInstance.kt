@@ -22,30 +22,34 @@ class ArrowRechargePassiveInstance(definition: PassiveDefinition, player: Player
                     return@event
                 }
 
-                runnables.forEach { it.cancel() }
-                runnables.clear()
+                synchronized(runnables) {
+                    runnables.forEach { it.cancel() }
+                    runnables.clear()
+                }
 
-                runnables.add(
-                    repeatingTask(arrowRechargeDelayTicks, arrowRechargeDelayTicks) {
-                        val arrowItemStack = player.inventory.getItem(arrowHotbarSlot)
+                synchronized(runnables) {
+                    runnables.add(
+                        repeatingTask(arrowRechargeDelayTicks, arrowRechargeDelayTicks) {
+                            val arrowItemStack = player.inventory.getItem(arrowHotbarSlot)
 
-                        if (arrowItemStack == null) {
-                            val arrows = ItemStack.of(Material.ARROW).apply { amount = 1 }
+                            if (arrowItemStack == null) {
+                                val arrows = ItemStack.of(Material.ARROW).apply { amount = 1 }
 
-                            player.inventory.setItem(arrowHotbarSlot, arrows)
+                                player.inventory.setItem(arrowHotbarSlot, arrows)
+                                playPickupSound()
+
+                                return@repeatingTask
+                            }
+
+                            if (arrowItemStack.amount >= maximumArrowCount) {
+                                return@repeatingTask
+                            }
+
+                            arrowItemStack.amount += 1
                             playPickupSound()
-
-                            return@repeatingTask
                         }
-
-                        if (arrowItemStack.amount >= maximumArrowCount) {
-                            return@repeatingTask
-                        }
-
-                        arrowItemStack.amount += 1
-                        playPickupSound()
-                    }
-                )
+                    )
+                }
             }
         )
 

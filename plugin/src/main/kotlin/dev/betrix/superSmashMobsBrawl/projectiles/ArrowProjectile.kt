@@ -16,11 +16,9 @@ class ArrowProjectile(
     override var projectileSize = 0.5 // Default arrow hitbox
 
     private var onHitLivingEntityListener:
-        (ArrowProjectile.(entity: LivingEntity, projectile: Projectile) -> Boolean)? =
+        ((entity: LivingEntity, projectile: BrawlProjectile) -> Boolean)? =
         null
-    private var onBlockListener:
-        (ArrowProjectile.(block: Block, projectile: Projectile) -> Boolean)? =
-        null
+    private var onBlockListener: ((block: Block, projectile: BrawlProjectile) -> Boolean)? = null
 
     override fun createProjectileEntity(): Projectile {
         return owner.world.spawn(owner.eyeLocation, Arrow::class.java).apply { shooter = owner }
@@ -36,7 +34,7 @@ class ArrowProjectile(
     }
 
     fun onHitLivingEntity(
-        cb: ArrowProjectile.(entity: LivingEntity, projectile: Projectile) -> Boolean
+        cb: (entity: LivingEntity, projectile: BrawlProjectile) -> Boolean
     ): ArrowProjectile {
         onHitLivingEntityListener = cb
 
@@ -44,18 +42,16 @@ class ArrowProjectile(
     }
 
     override fun onHitLivingEntity(entity: LivingEntity): Boolean {
-        return onHitLivingEntityListener?.invoke(this, entity, projectile!!) ?: false
+        return onHitLivingEntityListener?.invoke(entity, this) ?: false
     }
 
-    fun onHitBlock(
-        cb: ArrowProjectile.(block: Block, projectile: Projectile) -> Boolean
-    ): ArrowProjectile {
+    fun onHitBlock(cb: (block: Block, projectile: BrawlProjectile) -> Boolean): ArrowProjectile {
         onBlockListener = cb
 
         return this
     }
 
     override fun onHitBlock(block: Block): Boolean {
-        return onBlockListener?.invoke(this, block, projectile!!) ?: false
+        return onBlockListener?.invoke(block, this) ?: false
     }
 }

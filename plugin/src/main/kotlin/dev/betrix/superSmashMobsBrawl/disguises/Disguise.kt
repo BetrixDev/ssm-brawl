@@ -2,14 +2,17 @@ package dev.betrix.superSmashMobsBrawl.disguises
 
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.models.Hitbox
+import gg.flyte.twilight.event.event
+import java.util.concurrent.ConcurrentHashMap
 import me.libraryaddict.disguise.DisguiseAPI
 import me.libraryaddict.disguise.disguisetypes.MobDisguise
 import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.util.BoundingBox
 
-open class Disguise(private val player: Player) : Manageable() {
-    protected lateinit var disguise: MobDisguise
-    protected lateinit var hitbox: Hitbox
+abstract class Disguise(private val player: Player) : Manageable() {
+    protected abstract val disguise: MobDisguise
+    protected abstract val hitbox: Hitbox
 
     val boundingBox: BoundingBox
         get() {
@@ -30,7 +33,7 @@ open class Disguise(private val player: Player) : Manageable() {
         }
 
     companion object {
-        private val playerDisguises = mutableMapOf<Player, Disguise>()
+        private val playerDisguises = ConcurrentHashMap<Player, Disguise>()
 
         fun getDisguise(player: Player): Disguise? {
             return playerDisguises[player]
@@ -52,14 +55,6 @@ open class Disguise(private val player: Player) : Manageable() {
     }
 
     override fun setup() {
-        if (!::disguise.isInitialized) {
-            throw RuntimeException("The inheritor of this class should set the disguise property")
-        }
-
-        if (!::hitbox.isInitialized) {
-            throw RuntimeException("The inheritor of this class should set the hitbox property")
-        }
-
         registerDisguise(player, this)
 
         disguise.entity = player
@@ -67,6 +62,16 @@ open class Disguise(private val player: Player) : Manageable() {
 
         DisguiseAPI.disguiseToAll(player, disguise)
         disguise.startDisguise()
+
+        listeners.add(
+            event<PlayerQuitEvent> {
+                if (player != this@Disguise.player) {
+                    return@event
+                }
+
+                getDisguise(player)?.teardown()
+            }
+        )
     }
 
     override fun teardown() {

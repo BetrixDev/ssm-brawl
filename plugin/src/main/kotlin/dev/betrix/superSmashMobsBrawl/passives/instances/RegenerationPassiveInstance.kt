@@ -15,8 +15,10 @@ class RegenerationPassiveInstance(definition: PassiveDefinition, player: Player)
         // Start regeneration task
         val regenTask =
             repeatingTask(healIntervalTicks) {
-                if (player.health < (player.getAttribute(Attribute.MAX_HEALTH)?.value ?: 20.0)) {
-                    val newHealth = (player.health + healAmount).coerceAtMost(player.maxHealth)
+                val playerMaxHealth = player.getAttribute(Attribute.MAX_HEALTH)?.value ?: 20.0
+
+                if (player.health < playerMaxHealth) {
+                    val newHealth = (player.health + healAmount).coerceAtMost(playerMaxHealth)
                     player.health = newHealth
                 }
             }

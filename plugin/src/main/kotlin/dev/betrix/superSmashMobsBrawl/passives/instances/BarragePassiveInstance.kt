@@ -86,6 +86,8 @@ class BarragePassiveInstance(definition: PassiveDefinition, player: Player) :
     private fun onBowFired() {
         repeat(charge) { idx ->
             delay((idx + 1).toLong()) {
+                if (!player.isOnline) return@delay
+
                 val spread =
                     Vector(
                         (Math.random() - 0.5) / 10,
@@ -97,7 +99,7 @@ class BarragePassiveInstance(definition: PassiveDefinition, player: Player) :
                     ArrowProjectile(player, "Barrage Arrow", 3.0, spread).onHitLivingEntity {
                         entity,
                         arrow ->
-                        arrow.remove()
+                        arrow.projectile?.remove()
 
                         SmashDamageEvent(
                                 entity,
