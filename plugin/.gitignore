@@ -83,6 +83,7 @@ temp/
 
 # Plugin specific
 *.jar
+!server/**/*
 !gradle/wrapper/gradle-wrapper.jar
 run
 .kotlin

@@ -3,7 +3,6 @@ package dev.betrix.superSmashMobsBrawl.passives.instances
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
-import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
 import dev.betrix.superSmashMobsBrawl.projectiles.ArrowProjectile
 import gg.flyte.twilight.event.event
