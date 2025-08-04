@@ -169,7 +169,9 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) : 
         val currentLocation = projectile.location
         val velocity = projectile.velocity
 
-        val nextLocation = currentLocation.clone().add(velocity)
+        if (velocity.length() <= 0.0) {
+            return null
+        }
 
         val rayTraceResult: RayTraceResult? =
             world.rayTraceBlocks(
