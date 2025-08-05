@@ -31,6 +31,9 @@ import org.bukkit.event.entity.PotionSplashEvent
 import org.bukkit.event.inventory.InventoryInteractEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import dev.betrix.superSmashMobsBrawl.di.appModule
 
 class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var liteCommands: LiteCommands<CommandSender>
@@ -43,6 +46,11 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     override suspend fun onEnableAsync() {
         instance = this
         twilight = twilight(this)
+
+        // Initialize Koin
+        startKoin {
+            modules(appModule)
+        }
 
         // Initialize services
         DataService.readData()
@@ -104,6 +112,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         HubService.teardown()
         WorldService.teardown()
         DebugService.teardown()
+        stopKoin()
         logger.info("SSMB shutting down")
     }
 }

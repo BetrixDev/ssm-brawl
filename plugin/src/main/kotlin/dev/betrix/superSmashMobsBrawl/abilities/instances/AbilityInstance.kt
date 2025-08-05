@@ -7,9 +7,13 @@ import gg.flyte.twilight.event.TwilightListener
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import kotlinx.coroutines.Job
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import dev.betrix.superSmashMobsBrawl.services.DataService
 
-abstract class AbilityInstance(val definition: AbilityDefinition, val player: Player) {
+abstract class AbilityInstance(val definition: AbilityDefinition, val player: Player) : KoinComponent {
     protected val plugin = SuperSmashMobsBrawl.instance
+    protected val dataService: DataService by inject()
     private var lastUsed: Long = 0
     protected val listeners = arrayListOf<TwilightListener>()
     protected val runnables = arrayListOf<TwilightRunnable>()
