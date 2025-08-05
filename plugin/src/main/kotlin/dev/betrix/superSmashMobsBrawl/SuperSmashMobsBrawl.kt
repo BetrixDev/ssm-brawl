@@ -9,6 +9,7 @@ import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinit
 import dev.betrix.superSmashMobsBrawl.extensions.hasPassive
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.passives.definitions.HungerPassiveDefinition
+import dev.betrix.superSmashMobsBrawl.services.DataService
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
@@ -44,6 +45,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         twilight = twilight(this)
 
         // Initialize services
+        DataService.readData()
         HotbarService.initialize(this)
         HubService.initialize(this)
         HubProtectionService.registerEvents()

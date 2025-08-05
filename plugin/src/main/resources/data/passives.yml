@@ -1,0 +1,19 @@
+passives:
+  - id: double_jump
+    userFacing: false
+
+  - id: hunger
+    userFacing: false
+
+  - id: regeneration
+    userFacing: false
+
+  - id: arrow_recharge
+    displayItem: bundle
+    userFacing: true
+    metadata:
+      arrowIntervalTicks: 20.0
+
+  - id: barrage
+    displayItem: spectral_arrow
+    userFacing: true

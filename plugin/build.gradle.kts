@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "2.2.0-RC2"
+    kotlin("plugin.serialization") version "2.2.0"
     id("com.gradleup.shadow") version "8.3.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("com.ncorti.ktfmt.gradle") version "0.23.0"
@@ -30,6 +31,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("com.michael-bull.kotlin-result:kotlin-result:2.0.1")
     compileOnly("me.libraryaddict.disguises:libsdisguises:11.0.6")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation("com.charleskorn.kaml:kaml:0.85.0")
+    implementation("com.squareup.okio:okio:3.10.2")
 }
 
 tasks {

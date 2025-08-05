@@ -1,0 +1,31 @@
+gameMaps:
+  - id: campsite
+    voidLevel: 80.0
+    maxPlayers: 4
+    worldBorderSize: 300.0
+    creators: [8ebcc57e-89df-4454-95b0-e7edc0071ac0]
+    spawnPoints:
+      - x: 13.0
+        y: 106.0
+        z: 33.0
+      - x: 18.0
+        y: 104.0
+        z: 62.0
+      - x: -31.0
+        y: 106.0
+        z: 59.0
+      - x: -15.0
+        y: 107.0
+        z: 27.0
+
+hubMaps:
+  - id: blue_forest
+    voidLevel: -10.0
+    worldBorderSize: 500.0
+    creators: null
+    spawnPoints:
+      - x: 29.5
+        y: 58.0
+        z: 1.5
+        yaw: 90.0
+        pitch: 0.0

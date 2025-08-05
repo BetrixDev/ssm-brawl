@@ -1,0 +1,14 @@
+minigames:
+  - id: prototyping
+    type: ffa
+    isHidden: false
+    minPlayers: 1
+    maxPlayers: 4
+    allowKitSwitching: true
+
+  - id: two_player_duels
+    type: team_based_stocks
+    isHidden: false
+    playersPerTeam: 1
+    amountOfTeams: 2
+    stocks: 4
