@@ -14,6 +14,7 @@ import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
 import dev.betrix.superSmashMobsBrawl.services.HubService
+import dev.betrix.superSmashMobsBrawl.services.RegistryService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import dev.rollczi.litecommands.LiteCommands
@@ -54,6 +55,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
 
         // Initialize services
         DataService.readData()
+        RegistryService.initializeRegistries()
         HotbarService.initialize(this)
         HubService.initialize(this)
         HubProtectionService.registerEvents()

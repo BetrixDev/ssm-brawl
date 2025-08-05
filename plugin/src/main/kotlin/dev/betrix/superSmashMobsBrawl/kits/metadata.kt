@@ -7,6 +7,8 @@ data class KitMetadata(
     val description: String = "",
     val type: KitType = KitType.DEFAULT,
     val meleeDamage: Int = 0,
+    val armor: Double = 0.0,
+    val knockbackMultiplier: Double = 1.0,
     val passives: List<PassiveDefinition>,
     val abilities: List<AbilityDefinition>,
 )
@@ -19,6 +21,8 @@ class Kit {
     var description = ""
     var type = KitType.DEFAULT
     var meleeDamage = 0
+    var armor = 0.0
+    var knockbackMultiplier = 1.0
     val passives = arrayListOf<PassiveDefinition>()
     val abilities = arrayListOf<AbilityDefinition>()
 
@@ -41,6 +45,8 @@ class Kit {
             description = description,
             type = type,
             meleeDamage = meleeDamage,
+            armor = armor,
+            knockbackMultiplier = knockbackMultiplier,
             passives = passives.toList(),
             abilities = abilities.toList(),
         )

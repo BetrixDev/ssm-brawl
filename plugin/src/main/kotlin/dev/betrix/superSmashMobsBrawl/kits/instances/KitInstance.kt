@@ -8,12 +8,16 @@ import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.passives.instances.PassiveInstance
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import dev.betrix.superSmashMobsBrawl.services.DataService
 
 open class KitInstance(
     val definition: KitDefinition,
     val player: Player,
     private val minigameDefinition: MinigameDefinition? = null,
-) {
+) : KoinComponent {
+    protected val dataService: DataService by inject()
     val abilityInstances = arrayListOf<AbilityInstance>()
     val passiveInstances = arrayListOf<PassiveInstance>()
     protected lateinit var disguise: Disguise

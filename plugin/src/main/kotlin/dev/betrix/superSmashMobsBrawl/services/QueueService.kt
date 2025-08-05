@@ -9,6 +9,8 @@ import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 // This will be easy to add party data to in the future if we want
 data class QueueEntry(val player: Player, val minigame: MinigameDefinition) {
@@ -31,7 +33,8 @@ data class QueueEntry(val player: Player, val minigame: MinigameDefinition) {
     }
 }
 
-object QueueService {
+object QueueService : KoinComponent {
+    private val dataService: DataService by inject()
     private val queue = hashSetOf<QueueEntry>()
 
     fun addPlayer(

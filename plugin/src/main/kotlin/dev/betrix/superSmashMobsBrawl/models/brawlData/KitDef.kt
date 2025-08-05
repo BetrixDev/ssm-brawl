@@ -11,14 +11,15 @@ data class KitDef(
     val meleeDamage: Double,
     val armor: Double,
     val knockbackMultiplier: Double,
-    val passives: KitPassiveDef,
-    val abilities: KitAbilityDef,
+    val passives: List<KitPassiveDef>,
+    val abilities: List<KitAbilityDef>,
+    val metadata: Map<String, JsonElement>? = null,
 )
 
-@Serializable data class KitPassiveDef(val id: String, val overrides: KitPassiveDefOverride?)
+@Serializable data class KitPassiveDef(val id: String, val overrides: KitPassiveDefOverride? = null, val metadata: Map<String, JsonElement>? = null)
 
 @Serializable data class KitPassiveDefOverride(val metadata: Map<String, JsonElement>?)
 
-@Serializable data class KitAbilityDef(val id: String, val overrides: KitAbilityDefOverride?)
+@Serializable data class KitAbilityDef(val id: String, val overrides: KitAbilityDefOverride? = null)
 
 @Serializable data class KitAbilityDefOverride(val metadata: Map<String, JsonElement>?)

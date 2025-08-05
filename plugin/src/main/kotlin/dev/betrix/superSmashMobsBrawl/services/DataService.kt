@@ -95,4 +95,12 @@ object DataService {
 
     fun getMinigame(id: String): MinigameDef? =
         if (::minigameDefs.isInitialized) minigameDefs[id] else null
+    
+    fun getAllKitIds(): List<String> = if (::kitDefs.isInitialized) kitDefs.keys.toList() else emptyList()
+    
+    fun getAllAbilityIds(): List<String> = if (::abilityDefs.isInitialized) abilityDefs.keys.toList() else emptyList()
+    
+    fun getAllPassiveIds(): List<String> = if (::passiveDefs.isInitialized) passiveDefs.keys.toList() else emptyList()
+    
+    fun getAllMinigameIds(): List<String> = if (::minigameDefs.isInitialized) minigameDefs.keys.toList() else emptyList()
 }

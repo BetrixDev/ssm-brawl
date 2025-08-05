@@ -1,14 +1,17 @@
 package dev.betrix.superSmashMobsBrawl.di
 
 import dev.betrix.superSmashMobsBrawl.services.DataService
+import dev.betrix.superSmashMobsBrawl.services.QueueService
+import dev.betrix.superSmashMobsBrawl.services.KitService
+import dev.betrix.superSmashMobsBrawl.services.MinigameService
+import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import org.koin.dsl.module
 
 val appModule = module {
-    // Provide DataService as a singleton
+    // Provide services as singletons
     single { DataService }
-    
-    // You can add other services here as needed
-    // For example:
-    // single { HotbarService }
-    // single { KitService }
+    single { QueueService }
+    single { KitService }
+    single { MinigameService }
+    single { HotbarService }
 }

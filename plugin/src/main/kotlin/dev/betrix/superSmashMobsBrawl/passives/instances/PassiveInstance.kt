@@ -4,9 +4,13 @@ import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import dev.betrix.superSmashMobsBrawl.services.DataService
 
 abstract class PassiveInstance(val definition: PassiveDefinition, val player: Player) :
-    Manageable() {
+    Manageable(), KoinComponent {
+    protected val dataService: DataService by inject()
 
     override fun setup() {
         super.setup()

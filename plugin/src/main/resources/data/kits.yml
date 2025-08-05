@@ -12,7 +12,7 @@ kits:
       - id: hunger
     abilities:
       - id: sulphur_bomb
-      - id: explosion
+      - id: explode
 
   # Skeleton Kit
   - id: skeleton

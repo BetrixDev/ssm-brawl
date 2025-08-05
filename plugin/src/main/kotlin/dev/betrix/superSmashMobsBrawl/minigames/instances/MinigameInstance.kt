@@ -17,9 +17,13 @@ import dev.betrix.superSmashMobsBrawl.services.WorldService
 import java.util.UUID
 import org.bukkit.World
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import dev.betrix.superSmashMobsBrawl.services.DataService
 
 abstract class MinigameInstance(val definition: MinigameDefinition, val teams: List<MinigameTeam>) :
-    Manageable() {
+    Manageable(), KoinComponent {
+    protected val dataService: DataService by inject()
     open lateinit var world: World
         protected set
 
