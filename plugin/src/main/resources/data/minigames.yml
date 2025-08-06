@@ -5,6 +5,7 @@ minigames:
     minPlayers: 1
     maxPlayers: 4
     allowKitSwitching: true
+    allowParties: true
 
   - id: two_player_duels
     type: team_based_stocks
@@ -12,3 +13,4 @@ minigames:
     playersPerTeam: 1
     amountOfTeams: 2
     stocks: 4
+    allowParties: false

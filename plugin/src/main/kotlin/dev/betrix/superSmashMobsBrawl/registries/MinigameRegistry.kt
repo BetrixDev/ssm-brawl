@@ -4,10 +4,15 @@ import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.TestingMinigameDefinition
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.TwoPlayerDuelsMinigameDefinition
 
-object MinigameRegistry {
+class MinigameRegistry {
     private val definitions = mutableMapOf<String, MinigameDefinition>()
 
-    fun register(definition: MinigameDefinition) {
+    init {
+        register(TestingMinigameDefinition)
+        register(TwoPlayerDuelsMinigameDefinition)
+    }
+
+    private fun register(definition: MinigameDefinition) {
         definitions[definition.id] = definition
     }
 
@@ -32,10 +37,5 @@ object MinigameRegistry {
 
         // Finally try partial match (contains)
         return definitions.values.find { it.id.contains(id, ignoreCase = true) }
-    }
-
-    init {
-        register(TestingMinigameDefinition)
-        register(TwoPlayerDuelsMinigameDefinition)
     }
 }

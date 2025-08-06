@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.commands
 import com.github.michaelbull.result.mapBoth
 import dev.betrix.superSmashMobsBrawl.extensions.hasDebugEnabled
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.services.QueueService
 import dev.betrix.superSmashMobsBrawl.utils.ONLY_PLAYERS_EXEC_MESSAGE
 import dev.betrix.superSmashMobsBrawl.utils.mm
@@ -29,7 +30,8 @@ class QueueCommand() {
             when (queueEntry) {
                 null -> "<gray>You are not currently in any queue.</gray>"
                 else ->
-                    "<gold>You are currently in the queue for ${queueEntry.minigame.name}!</gold>"
+                    "<gold>You are currently in the queue for TODO!</gold>"
+//                "<gold>You are currently in the queue for ${queueEntry.minigame.name}!</gold>"
             }
 
         sender.sendMessage(playerMessage)
@@ -43,7 +45,7 @@ class QueueCommand() {
     }
 
     @Execute
-    fun queue(@Context sender: CommandSender, @Arg minigame: MinigameDefinition) {
+    fun queue(@Context sender: CommandSender, @Arg minigame: MinigameDef) {
         if (sender !is Player) {
             sender.sendMessage(ONLY_PLAYERS_EXEC_MESSAGE)
             return
@@ -53,11 +55,13 @@ class QueueCommand() {
             QueueService.addPlayer(sender, minigame)
                 .mapBoth(
                     success = {
-                        mm("<gold>You have joined the queue for ${it.minigame.name}!</gold>")
+                        mm("<gold>You have joined the queue for TODO!</gold>")
+//                        mm("<gold>You have joined the queue for ${it.minigame.name}!</gold>")
                     },
                     failure = {
                         mm(
-                            "<red>You are currently in a queue for ${it.minigame.name}.<newline>Please leave that queue before joining a new one</red>"
+                            "<red>You are currently in a queue for TODO.<newline>Please leave that queue before joining a new one</red>"
+//                            "<red>You are currently in a queue for ${it.minigame.name}.<newline>Please leave that queue before joining a new one</red>"
                         )
                     },
                 )
@@ -77,7 +81,8 @@ class QueueCommand() {
                 .mapBoth(
                     success = {
                         mm(
-                            "<gold>You have been removed from the queue for ${it.minigame.name}</gold>"
+                            "<gold>You have been removed from the queue for TODO</gold>"
+//                            "<gold>You have been removed from the queue for ${it.minigame.name}</gold>"
                         )
                     },
                     failure = { mm("<red>You are not currently in a queue</red>") },

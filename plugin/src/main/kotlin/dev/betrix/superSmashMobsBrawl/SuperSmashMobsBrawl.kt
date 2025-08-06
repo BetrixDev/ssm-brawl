@@ -5,15 +5,18 @@ import dev.betrix.superSmashMobsBrawl.commands.DebugCommand
 import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
-import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinitionArgument
+import dev.betrix.superSmashMobsBrawl.commands.resolvers.MinigameDefinitionArgument
 import dev.betrix.superSmashMobsBrawl.extensions.hasPassive
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.passives.definitions.HungerPassiveDefinition
+import dev.betrix.superSmashMobsBrawl.registries.MinigameRegistry
 import dev.betrix.superSmashMobsBrawl.services.DataService
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
 import dev.betrix.superSmashMobsBrawl.services.HubService
+import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import dev.rollczi.litecommands.LiteCommands
@@ -31,6 +34,8 @@ import org.bukkit.event.entity.PotionSplashEvent
 import org.bukkit.event.inventory.InventoryInteractEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
 
 class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var liteCommands: LiteCommands<CommandSender>
@@ -41,11 +46,19 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     }
 
     override suspend fun onEnableAsync() {
+        startKoin {
+            modules(module {
+                single<SuperSmashMobsBrawl> { this@SuperSmashMobsBrawl }
+                single { logger }
+                single { DataService() }
+                single { MinigameService() }
+            })
+        }
+
         instance = this
         twilight = twilight(this)
 
         // Initialize services
-        DataService.readData()
         HotbarService.initialize(this)
         HubService.initialize(this)
         HubProtectionService.registerEvents()
@@ -59,7 +72,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
 
         liteCommands =
             LiteBukkitFactory.builder(this)
-                .argument(MinigameDefinition::class.java, MinigameDefinitionArgument())
+                .argument(MinigameDef::class.java, MinigameDefinitionArgument())
                 .commands(QueueCommand())
                 .commands(KitCommand())
                 .commands(LeaveCommand())

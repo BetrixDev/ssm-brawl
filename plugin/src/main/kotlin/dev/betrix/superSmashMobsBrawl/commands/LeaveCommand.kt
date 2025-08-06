@@ -26,40 +26,41 @@ class LeaveCommand {
         // First try to leave queue
         QueueService.removePlayer(sender).onSuccess { queueEntry ->
             sender.sendMessage(
-                mm("<green>You have left the queue for ${queueEntry.minigame.name}</green>")
+                mm("<green>You have left the queue for TODO</green>")
+//                        mm("<green>You have left the queue for ${queueEntry.minigame.name}</green>")
             )
             return
         }
 
-        // If not in queue, try to leave minigame
-        MinigameService.handlePlayerLeave(sender)
-            .onSuccess {
-                sender.sendMessage(mm("<green>You have left the minigame</green>"))
-                return
-            }
-            .onFailure { err ->
-                when (err) {
-                    MinigameLeaveError.PlayerNotInMinigame -> {
-                        sender.sendMessage(mm("<red>You are not in anything you can leave</red>"))
-                    }
-                    MinigameLeaveError.HubNotReady -> {
-                        sender.sendMessage(
-                            mm(
-                                "<red>Hub world is still loading, please try again in a moment</red>"
-                            )
-                        )
-                    }
-                    MinigameLeaveError.Unknown -> {
-                        sender.sendMessage(
-                            mm(
-                                "<red>An unknown error occurred which caused you to be unable to leave this minigame</red>"
-                            )
-                        )
-                    }
-                    else -> {
-                        sender.sendMessage(mm("<red>You cannot leave this minigame</red>"))
-                    }
-                }
-            }
+//        // If not in queue, try to leave minigame
+//        MinigameService.handlePlayerLeave(sender)
+//            .onSuccess {
+//                sender.sendMessage(mm("<green>You have left the minigame</green>"))
+//                return
+//            }
+//            .onFailure { err ->
+//                when (err) {
+//                    MinigameLeaveError.PlayerNotInMinigame -> {
+//                        sender.sendMessage(mm("<red>You are not in anything you can leave</red>"))
+//                    }
+//                    MinigameLeaveError.HubNotReady -> {
+//                        sender.sendMessage(
+//                            mm(
+//                                "<red>Hub world is still loading, please try again in a moment</red>"
+//                            )
+//                        )
+//                    }
+//                    MinigameLeaveError.Unknown -> {
+//                        sender.sendMessage(
+//                            mm(
+//                                "<red>An unknown error occurred which caused you to be unable to leave this minigame</red>"
+//                            )
+//                        )
+//                    }
+//                    else -> {
+//                        sender.sendMessage(mm("<red>You cannot leave this minigame</red>"))
+//                    }
+//                }
+//            }
     }
 }

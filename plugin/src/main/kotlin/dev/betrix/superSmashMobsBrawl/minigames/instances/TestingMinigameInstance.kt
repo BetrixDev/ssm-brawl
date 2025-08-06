@@ -48,16 +48,16 @@ class TestingMinigameInstance(definition: MinigameDefinition, teams: List<Miniga
     override suspend fun teardownMinigame() {
         val playersToCleanup = teams.flatMap { it.players.toList() }
 
-        // Unassign kits from all players
-        withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) {
-            playersToCleanup.forEach { player ->
-                HubService.teleportToDefaultHub(player)
-                KitService.unassignKit(player)
-            }
-
-            WorldService.deleteWorld(world)
-            MinigameService.removeMinigameInstance(this@TestingMinigameInstance)
-        }
+//        // Unassign kits from all players
+//        withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) {
+//            playersToCleanup.forEach { player ->
+//                HubService.teleportToDefaultHub(player)
+//                KitService.unassignKit(player)
+//            }
+//
+//            WorldService.deleteWorld(world)
+//            MinigameService.removeMinigameInstance(this@TestingMinigameInstance)
+//        }
     }
 
     override fun shouldEndMinigame(): Boolean {

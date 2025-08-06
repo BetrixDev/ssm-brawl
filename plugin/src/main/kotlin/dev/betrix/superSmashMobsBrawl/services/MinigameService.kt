@@ -10,8 +10,11 @@ import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
+import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 sealed class MinigameInitError {
     data class PlayerAlreadyInMinigame(val players: List<Player>) : MinigameInitError()
@@ -24,27 +27,57 @@ enum class MinigameLeaveError {
     Unknown,
 }
 
-object MinigameService {
+class MinigameService : KoinComponent {
+    private val dataService: DataService by inject()
+
     private val inFlightMinigames = arrayListOf<MinigameInstance>()
 
-    fun initializeMinigameInstance(
-        minigameDefinition: MinigameDefinition,
-        teams: List<MinigameTeam>,
-    ): Result<MinigameInstance, MinigameInitError> {
-        val playersInAMinigame =
-            teams
-                .map { team -> team.players.filter { player -> isPlayerInMinigame(player) } }
-                .flatten()
+    fun getMinigameData(id: String): MinigameDef? {
+        return dataService.getMinigame(id)
+    }
 
-        if (!playersInAMinigame.isEmpty()) {
-            return Err(MinigameInitError.PlayerAlreadyInMinigame(playersInAMinigame))
+    fun getAllMinigameData(): List<MinigameDef> {
+        return dataService.getAllMinigames()
+    }
+
+    fun findClosestMinigameById(id: String): MinigameDef? {
+        if (id.isBlank()) return null
+
+        // First try exact match
+        getMinigameData(id)?.let {
+            return it
         }
 
-        val minigameInstance = minigameDefinition.createInstance(teams)
+        // Then try case-insensitive match
+        getAllMinigameData()
+            .find { it.id.equals(id, ignoreCase = true) }
+            ?.let {
+                return it
+            }
 
-        inFlightMinigames.add(minigameInstance)
+        // Finally try partial match (contains)
+        return getAllMinigameData().find { it.id.contains(id, ignoreCase = true) }
+    }
 
-        return Ok(minigameInstance)
+    fun initializeMinigameInstance(
+        minigameDefinition: MinigameDef,
+        teams: List<MinigameTeam>,
+    ): Result<MinigameInstance, MinigameInitError> {
+        TODO("Implement new flow")
+//        val playersInAMinigame =
+//            teams
+//                .map { team -> team.players.filter { player -> isPlayerInMinigame(player) } }
+//                .flatten()
+//
+//        if (!playersInAMinigame.isEmpty()) {
+//            return Err(MinigameInitError.PlayerAlreadyInMinigame(playersInAMinigame))
+//        }
+//
+//        val minigameInstance = minigameDefinition.createInstance(teams)
+//
+//        inFlightMinigames.add(minigameInstance)
+//
+//        return Ok(minigameInstance)
     }
 
     fun handleMinigameSetup(minigameInstance: MinigameInstance) {

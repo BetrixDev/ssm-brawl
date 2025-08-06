@@ -34,6 +34,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
     implementation("com.charleskorn.kaml:kaml:0.85.0")
     implementation("com.squareup.okio:okio:3.10.2")
+    implementation("io.insert-koin:koin-core:3.5.6")
 }
 
 tasks {
