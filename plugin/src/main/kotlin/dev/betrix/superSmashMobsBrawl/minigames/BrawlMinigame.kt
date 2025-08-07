@@ -28,7 +28,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     protected val dataService: DataService by inject()
     private val kitService: KitService by inject()
 
-    protected val minigameData = dataService.getMinigame(minigameId) as TMinigameDef
+    protected val minigameData = (dataService.getMinigame(minigameId) as TMinigameDef?) ?: throw RuntimeException("")
     protected val assignedKits = mutableListOf<Pair<Player, KitInstance>>()
 
     var state = MinigameState.PREFLIGHT

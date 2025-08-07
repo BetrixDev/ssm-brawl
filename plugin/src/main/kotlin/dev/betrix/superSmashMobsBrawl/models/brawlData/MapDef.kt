@@ -11,7 +11,7 @@ data class GameMapDef(
     val voidLevel: Double,
     val maxPlayers: Int,
     val worldBorderSize: Double,
-    val creators: List<String>,
+    val creators: List<String>?,
     val spawnPoints: List<SpawnPoint>,
 )
 

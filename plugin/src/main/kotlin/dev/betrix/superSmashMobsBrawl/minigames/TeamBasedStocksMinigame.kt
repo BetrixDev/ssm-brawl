@@ -16,11 +16,7 @@ class TeamBasedStocksMinigame(
         brawlWorld,
         teams.flatMap { it.players },
     ) {
-
-    private val minigameData =
-        dataService.getMinigame(minigameId)
-            ?: throw RuntimeException("Couldn't find minigame with id $minigameId in DataService")
-
+        
     override fun setup() {
         super.setup()
     }
