@@ -1,0 +1,25 @@
+kits:
+  creeper:
+    name: Creeper
+    description: He's a creeper
+  skeleton:
+    name: Skeleton
+    description: He got bones
+maps:
+  blue_forest:
+    name: Blue Forest
+    description: The pirates have taken over!
+  campsite:
+    name: Campsite
+    description: A cozy getaway
+minigames:
+  prototyping:
+    name: Prototyping
+    description: For all of your testing needs
+  two_player_duels:
+    name: 1v1 Duels
+    descriptions: A competitive 1v1 game mode
+messages:
+  queue:
+    leave:
+      success: You have left the queue for {lang:minigames.{minigameId}.name}

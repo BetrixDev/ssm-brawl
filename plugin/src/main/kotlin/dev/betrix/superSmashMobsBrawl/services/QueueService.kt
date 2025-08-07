@@ -3,13 +3,9 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.onFailure
-import com.github.michaelbull.result.onSuccess
-import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
-import dev.betrix.superSmashMobsBrawl.utils.mm
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -40,10 +36,7 @@ object QueueService : KoinComponent {
 
     private val queue = hashSetOf<QueueEntry>()
 
-    fun addPlayer(
-        player: Player,
-        minigameDefinition: MinigameDef,
-    ): Result<QueueEntry, QueueEntry> {
+    fun addPlayer(player: Player, minigameDefinition: MinigameDef): Result<QueueEntry, QueueEntry> {
         val newEntry = QueueEntry(player, minigameDefinition)
 
         val existingEntry = queue.find { it.player == player }
@@ -103,56 +96,56 @@ object QueueService : KoinComponent {
         onMinigameCanStart(minigame, playersToStart)
     }
 
-    private fun onMinigameCanStart(
-        minigame: MinigameDef,
-        queuedPlayers: List<QueueEntry>,
-    ) {
-        val entriesToUse = when (minigame) {
-            is TeamBasedStocksMinigameDef -> {
-                val playersPerTeam = minigame.playersPerTeam
-                val amountOfTeams = minigame.amountOfTeams
+    private fun onMinigameCanStart(minigame: MinigameDef, queuedPlayers: List<QueueEntry>) {
+        val entriesToUse =
+            when (minigame) {
+                is TeamBasedStocksMinigameDef -> {
+                    val playersPerTeam = minigame.playersPerTeam
+                    val amountOfTeams = minigame.amountOfTeams
 
-                // Take only the required number of players for all teams
-                val totalPlayersNeeded = playersPerTeam * amountOfTeams
-                queuedPlayers.take(totalPlayersNeeded)
+                    // Take only the required number of players for all teams
+                    val totalPlayersNeeded = playersPerTeam * amountOfTeams
+                    queuedPlayers.take(totalPlayersNeeded)
+                }
+                is FfaMinigameDef -> {
+                    queuedPlayers.take(minigame.maxPlayers)
+                }
             }
-            is FfaMinigameDef -> {
-                queuedPlayers.take(minigame.maxPlayers)
-            }
-        }
 
         // TODO: Figure out new minigame flow
 
-//        // Split into teams
-//        val teams =
-//            entriesToUse.chunked(playersPerTeam).map { chunk ->
-//                MinigameTeam(
-//                    chunk.map { it.player }.toMutableList(),
-//                    minigame.metadata.stocks,
-//                )
-//            }
-//
-//        // Remove these players from the queue
-//        entriesToUse.forEach { removePlayer(it.player) }
-//
-//        minigameService.initializeMinigameInstance(minigame, teams)
-//            .onFailure { err ->
-//                when (err) {
-//                    is MinigameInitError.PlayerAlreadyInMinigame -> {
-//                        val playersToAddBackToQueue =
-//                            entriesToUse.map { it.player }.filter { !err.players.contains(it) }
-//
-//                        playersToAddBackToQueue.forEach { player ->
-//                            player.sendMessage(
-//                                mm(
-//                                    "<light_gray>There was an error. You have been added back to the queue for ${minigame.name}</light_gray>"
-//                                )
-//                            )
-//                            addPlayer(player, minigame)
-//                        }
-//                    }
-//                }
-//            }
-//            .onSuccess { MinigameService.handleMinigameSetup(it) }
+        //        // Split into teams
+        //        val teams =
+        //            entriesToUse.chunked(playersPerTeam).map { chunk ->
+        //                MinigameTeam(
+        //                    chunk.map { it.player }.toMutableList(),
+        //                    minigame.metadata.stocks,
+        //                )
+        //            }
+        //
+        //        // Remove these players from the queue
+        //        entriesToUse.forEach { removePlayer(it.player) }
+        //
+        //        minigameService.initializeMinigameInstance(minigame, teams)
+        //            .onFailure { err ->
+        //                when (err) {
+        //                    is MinigameInitError.PlayerAlreadyInMinigame -> {
+        //                        val playersToAddBackToQueue =
+        //                            entriesToUse.map { it.player }.filter {
+        // !err.players.contains(it) }
+        //
+        //                        playersToAddBackToQueue.forEach { player ->
+        //                            player.sendMessage(
+        //                                mm(
+        //                                    "<light_gray>There was an error. You have been added
+        // back to the queue for ${minigame.name}</light_gray>"
+        //                                )
+        //                            )
+        //                            addPlayer(player, minigame)
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //            .onSuccess { MinigameService.handleMinigameSetup(it) }
     }
 }

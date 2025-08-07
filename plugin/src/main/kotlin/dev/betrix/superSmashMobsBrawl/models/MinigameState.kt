@@ -1,4 +1,4 @@
-package dev.betrix.superSmashMobsBrawl.minigames
+package dev.betrix.superSmashMobsBrawl.models
 
 enum class MinigameState {
     PREFLIGHT,

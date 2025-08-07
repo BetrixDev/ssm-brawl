@@ -4,18 +4,13 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
-import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
-import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.KitService
-import dev.betrix.superSmashMobsBrawl.services.MinigameService
-import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
-import kotlinx.coroutines.withContext
 import org.bukkit.World
 
 class TestingMinigameInstance(definition: MinigameDefinition, teams: List<MinigameTeam>) :
@@ -48,16 +43,16 @@ class TestingMinigameInstance(definition: MinigameDefinition, teams: List<Miniga
     override suspend fun teardownMinigame() {
         val playersToCleanup = teams.flatMap { it.players.toList() }
 
-//        // Unassign kits from all players
-//        withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) {
-//            playersToCleanup.forEach { player ->
-//                HubService.teleportToDefaultHub(player)
-//                KitService.unassignKit(player)
-//            }
-//
-//            WorldService.deleteWorld(world)
-//            MinigameService.removeMinigameInstance(this@TestingMinigameInstance)
-//        }
+        //        // Unassign kits from all players
+        //        withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) {
+        //            playersToCleanup.forEach { player ->
+        //                HubService.teleportToDefaultHub(player)
+        //                KitService.unassignKit(player)
+        //            }
+        //
+        //            WorldService.deleteWorld(world)
+        //            MinigameService.removeMinigameInstance(this@TestingMinigameInstance)
+        //        }
     }
 
     override fun shouldEndMinigame(): Boolean {

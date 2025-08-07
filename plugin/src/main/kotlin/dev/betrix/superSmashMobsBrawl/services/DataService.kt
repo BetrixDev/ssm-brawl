@@ -57,12 +57,13 @@ class DataService : KoinComponent {
     private lateinit var minigameDefs: Map<String, MinigameDef>
 
     init {
-        plugin.launch { 
+        plugin.launch {
             withContext(Dispatchers.IO) {
                 kitDefs = readFile<KitDefFile>("kits").kits.associateBy { it.id }
                 passiveDefs = readFile<PassiveFileDef>("passives").passives.associateBy { it.id }
                 abilityDefs = readFile<AbilityDefFile>("abilities").abilities.associateBy { it.id }
-                minigameDefs = readFile<MinigameDefFile>("minigames").minigames.associateBy { it.id }
+                minigameDefs =
+                    readFile<MinigameDefFile>("minigames").minigames.associateBy { it.id }
                 val mapDefs = readFile<MapDefFile>("maps")
                 gameMapDefs = mapDefs.gameMaps.associateBy { it.id }
                 hubMapDefs = mapDefs.hubMaps.associateBy { it.id }
@@ -86,7 +87,8 @@ class DataService : KoinComponent {
     fun getMinigame(id: String): MinigameDef? =
         if (::minigameDefs.isInitialized) minigameDefs[id] else null
 
-    fun getAllMinigames(): List<MinigameDef> = if (::minigameDefs.isInitialized) minigameDefs.values.toList() else listOf()
+    fun getAllMinigames(): List<MinigameDef> =
+        if (::minigameDefs.isInitialized) minigameDefs.values.toList() else listOf()
 
     private suspend inline fun <reified T> readFile(path: String): T =
         withContext(Dispatchers.IO) {

@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.commands.resolvers
 
-import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.rollczi.litecommands.argument.Argument

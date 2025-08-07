@@ -7,7 +7,6 @@ import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
@@ -64,20 +63,21 @@ class MinigameService : KoinComponent {
         teams: List<MinigameTeam>,
     ): Result<MinigameInstance, MinigameInitError> {
         TODO("Implement new flow")
-//        val playersInAMinigame =
-//            teams
-//                .map { team -> team.players.filter { player -> isPlayerInMinigame(player) } }
-//                .flatten()
-//
-//        if (!playersInAMinigame.isEmpty()) {
-//            return Err(MinigameInitError.PlayerAlreadyInMinigame(playersInAMinigame))
-//        }
-//
-//        val minigameInstance = minigameDefinition.createInstance(teams)
-//
-//        inFlightMinigames.add(minigameInstance)
-//
-//        return Ok(minigameInstance)
+        //        val playersInAMinigame =
+        //            teams
+        //                .map { team -> team.players.filter { player -> isPlayerInMinigame(player)
+        // } }
+        //                .flatten()
+        //
+        //        if (!playersInAMinigame.isEmpty()) {
+        //            return Err(MinigameInitError.PlayerAlreadyInMinigame(playersInAMinigame))
+        //        }
+        //
+        //        val minigameInstance = minigameDefinition.createInstance(teams)
+        //
+        //        inFlightMinigames.add(minigameInstance)
+        //
+        //        return Ok(minigameInstance)
     }
 
     fun handleMinigameSetup(minigameInstance: MinigameInstance) {
