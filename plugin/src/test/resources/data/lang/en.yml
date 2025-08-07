@@ -1,0 +1,34 @@
+simple:
+  greeting: "Hello, World!"
+  with_variable: "Hello, {name}!"
+  with_number: "You have {count} items"
+
+references:
+  nested_reference: "Welcome to {lang:simple.greeting}"
+  complex_reference: "Player {name} says: {lang:simple.with_variable}"
+  variable_in_reference: "Game: {lang:games.{gameId}.name}"
+
+games:
+  test_game:
+    name: "Test Game"
+    description: "A game for testing"
+  another_game:
+    name: "Another Game"
+    description: "Another test game"
+
+cycles:
+  cycle_a: "This references {lang:cycles.cycle_b}"
+  cycle_b: "This references {lang:cycles.cycle_a}"
+
+missing:
+  partial: "This references {lang:does.not.exist}"
+
+complex:
+  multi_var: "Player {player} has {count} {item_type} in {location}"
+  multi_ref: "Status: {lang:simple.greeting} - {lang:games.{gameType}.name}"
+
+edge_cases:
+  empty_placeholder: "This has {}"
+  nested_braces: "This has {{nested}} braces"
+  special_chars: "Special chars: !@#$%^&*()"
+  unicode: "Unicode: 你好 🌍"

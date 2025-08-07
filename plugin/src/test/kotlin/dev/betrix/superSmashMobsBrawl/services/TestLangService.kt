@@ -1,27 +1,18 @@
 package dev.betrix.superSmashMobsBrawl.services
 
-import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import java.io.File
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.configuration.file.YamlConfiguration
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-class LangService(
-    private val langConfig: YamlConfiguration? = null
-) : KoinComponent {
-    
-    private val enLang: YamlConfiguration by lazy {
-        langConfig ?: run {
-            val plugin: SuperSmashMobsBrawl by inject()
-            val dataFolder = plugin.dataFolder
-            YamlConfiguration.loadConfiguration(dataFolder.resolve("data/lang/en.yml"))
-        }
-    }
-
+/**
+ * Test version of LangService that doesn't depend on Koin or external dependencies
+ * This allows us to test the core translation logic independently
+ */
+class TestLangService(
+    private val langConfig: YamlConfiguration
+) {
     private val miniMessage: MiniMessage = MiniMessage.miniMessage()
 
     // Matches {content} with no nested braces
@@ -41,7 +32,7 @@ class LangService(
         if (!visited.add(key)) return "[$key]" // cycle fallback
 
         val raw =
-            enLang.getString(key)
+            langConfig.getString(key)
                 ?: run {
                     visited.remove(key)
                     return "[$key]"

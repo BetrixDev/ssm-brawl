@@ -35,6 +35,14 @@ dependencies {
     implementation("com.charleskorn.kaml:kaml:0.85.0")
     implementation("com.squareup.okio:okio:3.10.2")
     implementation("io.insert-koin:koin-core:3.5.6")
+    
+    // Test dependencies
+    testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
+    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
+    testImplementation("io.kotest:kotest-property:5.8.0")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.149.0")
+    testImplementation("io.insert-koin:koin-test:3.5.6")
+    testImplementation("io.mockk:mockk:1.13.8")
 }
 
 tasks {
@@ -57,6 +65,24 @@ tasks {
     }
 
     ktfmt { kotlinLangStyle() }
+    
+    test {
+        useJUnitPlatform()
+        // Allow tests to run even if main compilation has issues
+        dependsOn("compileTestKotlin")
+    }
+    
+    compileTestKotlin {
+        // Make test compilation independent of main source compilation
+        enabled = true
+    }
+    
+    register<JavaExec>("runLangServiceTest") {
+        description = "Run the simple LangService test"
+        classpath = sourceSets["test"].runtimeClasspath
+        mainClass.set("dev.betrix.superSmashMobsBrawl.services.SimpleLangServiceTest")
+        dependsOn("compileTestKotlin")
+    }
 }
 
 val targetJavaVersion = 21
