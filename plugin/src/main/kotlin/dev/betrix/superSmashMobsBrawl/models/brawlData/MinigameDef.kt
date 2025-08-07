@@ -11,6 +11,8 @@ sealed class MinigameDef {
     abstract val type: String
     abstract val isHidden: Boolean
     abstract val allowParties: Boolean
+    abstract val mapBlacklist: List<String>?
+    abstract val mapWhitelist: List<String>?
 }
 
 @Serializable
@@ -20,6 +22,8 @@ data class FfaMinigameDef(
     override val type: String,
     override val isHidden: Boolean,
     override val allowParties: Boolean,
+    override val mapBlacklist: List<String>? = null,
+    override val mapWhitelist: List<String>? = null,
     val minPlayers: Int,
     val maxPlayers: Int,
     val allowKitSwitching: Boolean,
@@ -32,6 +36,8 @@ data class TeamBasedStocksMinigameDef(
     override val type: String,
     override val isHidden: Boolean,
     override val allowParties: Boolean,
+    override val mapBlacklist: List<String>? = null,
+    override val mapWhitelist: List<String>? = null,
     val playersPerTeam: Int,
     val amountOfTeams: Int,
     val stocks: Int,

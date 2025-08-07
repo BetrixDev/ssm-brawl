@@ -55,6 +55,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
                     single { DataService() }
                     single { MinigameService() }
                     single { KitService }
+                    single { WorldService }
                 }
             )
         }

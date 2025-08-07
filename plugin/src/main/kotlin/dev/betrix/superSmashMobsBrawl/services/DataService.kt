@@ -76,6 +76,9 @@ class DataService : KoinComponent {
     fun getGameMap(id: String): GameMapDef? =
         if (::gameMapDefs.isInitialized) gameMapDefs[id] else null
 
+    fun getAllGameMaps(): List<GameMapDef> =
+        if (::gameMapDefs.isInitialized) gameMapDefs.values.toList() else listOf()
+
     fun getHubMap(id: String): HubMapDef? = if (::hubMapDefs.isInitialized) hubMapDefs[id] else null
 
     fun getPassive(id: String): PassiveDef? =

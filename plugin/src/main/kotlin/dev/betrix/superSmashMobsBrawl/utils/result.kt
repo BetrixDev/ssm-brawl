@@ -1,10 +1,10 @@
-package dev.betrix.superSmashMobsBrawl.extensions
+package dev.betrix.superSmashMobsBrawl.utils
 
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 
-fun <T> Result.Companion.runCatching(cb: () -> T): Result<T, Exception> {
+fun <T> resultRunCatching(cb: () -> T): Result<T, Exception> {
     return try {
         Ok(cb())
     } catch (e: Exception) {
@@ -12,7 +12,7 @@ fun <T> Result.Companion.runCatching(cb: () -> T): Result<T, Exception> {
     }
 }
 
-fun <T, E> Result.Companion.runCatching(
+fun <T, E> resultRunCatching(
     parseError: (e: Exception) -> E,
     cb: () -> T,
 ): Result<T, E> {

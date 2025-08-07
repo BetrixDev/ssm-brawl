@@ -8,6 +8,12 @@ import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
+import dev.betrix.superSmashMobsBrawl.models.BrawlGameWorld
+import dev.betrix.superSmashMobsBrawl.models.BrawlHubWorld
+import dev.betrix.superSmashMobsBrawl.models.BrawlWorld
+import dev.betrix.superSmashMobsBrawl.models.brawlData.GameMapDef
+import dev.betrix.superSmashMobsBrawl.models.brawlData.HubMapDef
+import dev.betrix.superSmashMobsBrawl.models.brawlData.MapDef
 import java.io.IOException
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -25,7 +31,7 @@ import org.bukkit.WorldCreator
 data class LoadedWorld(val world: World, val mapDefinition: SsmbMap)
 
 object WorldService {
-    private val loadedWorlds = hashMapOf<String, LoadedWorld>()
+    private val loadedWorlds = hashMapOf<String, BrawlWorld>()
 
     private const val WORLD_PREFIX = "ssmbworld_"
 
@@ -39,10 +45,10 @@ object WorldService {
         }
     }
 
-    suspend fun copyAndLoadWorld(
-        map: SsmbMap,
+    suspend fun <T : BrawlWorld> copyAndLoadWorld(
+        map: MapDef,
         customWorldName: String = UUID.randomUUID().toString(),
-    ): Result<LoadedWorld, Exception> =
+    ): Result<T, Exception> =
         withContext(SuperSmashMobsBrawl.instance.asyncDispatcher) {
             val copyResult = runCatching {
                 val serverFolder = Bukkit.getWorldContainer().toPath()
@@ -88,11 +94,15 @@ object WorldService {
                             }
                             .fold(
                                 onSuccess = { world ->
-                                    val loadedWorld = LoadedWorld(world, map)
+                                    val loadedWorld =
+                                        when (map) {
+                                            is GameMapDef -> BrawlGameWorld(world, map)
+                                            is HubMapDef -> BrawlHubWorld(world, map)
+                                        }
 
                                     loadedWorlds[customWorldName] = loadedWorld
 
-                                    Ok(loadedWorld)
+                                    Ok(loadedWorld as T)
                                 },
                                 onFailure = { Err(RuntimeException(it.message, it)) },
                             )
@@ -114,7 +124,7 @@ object WorldService {
         return deleteWorld(loadedWorld)
     }
 
-    suspend fun deleteWorld(loadedWorld: LoadedWorld): Result<Unit, Exception> =
+    suspend fun deleteWorld(loadedWorld: BrawlWorld): Result<Unit, Exception> =
         withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) mainContext@{
             val loadedWorldEntry = loadedWorlds.entries.find { it.value == loadedWorld }
 
@@ -172,7 +182,7 @@ object WorldService {
                 )
         }
 
-    private fun setupWorld(world: World, map: SsmbMap) {
+    private fun setupWorld(world: World, map: MapDef) {
         world.worldBorder.size = map.worldBorderSize
         world.setStorm(false)
         world.isVoidDamageEnabled = false

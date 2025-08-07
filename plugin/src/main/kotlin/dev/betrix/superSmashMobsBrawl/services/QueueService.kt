@@ -3,15 +3,17 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import dev.betrix.superSmashMobsBrawl.minigames.PrototypingMinigame
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
+import java.util.UUID
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 // This will be easy to add party data to in the future if we want
-data class QueueEntry(val player: Player, val minigame: MinigameDef) {
+data class QueueEntry(val player: Player, val minigame: MinigameDef, val partyId: String? = null) {
     override fun equals(other: Any?): Boolean {
         if (this === other) {
             return true
@@ -67,24 +69,24 @@ object QueueService : KoinComponent {
         return queue.find { it.player == player }
     }
 
-    fun getPlayersInQueue(minigame: MinigameDef): List<QueueEntry> {
-        return queue.filter { it.minigame.id == minigame.id }
+    fun getPlayersInQueue(minigameDef: MinigameDef): List<QueueEntry> {
+        return queue.filter { it.minigame.id == minigameDef.id }
     }
 
-    private fun getRequiredPlayersForMinigame(minigame: MinigameDef): Int {
-        return when (minigame) {
+    private fun getRequiredPlayersForMinigame(minigameDef: MinigameDef): Int {
+        return when (minigameDef) {
             is TeamBasedStocksMinigameDef -> {
-                minigame.playersPerTeam * minigame.amountOfTeams
+                minigameDef.playersPerTeam * minigameDef.amountOfTeams
             }
             is FfaMinigameDef -> {
-                minigame.maxPlayers
+                minigameDef.maxPlayers
             }
         }
     }
 
-    private fun checkMinigameCanStart(minigame: MinigameDef): Unit {
-        val playersInQueue = getPlayersInQueue(minigame)
-        val requiredPlayers = getRequiredPlayersForMinigame(minigame)
+    private fun checkMinigameCanStart(minigameDef: MinigameDef): Unit {
+        val playersInQueue = getPlayersInQueue(minigameDef)
+        val requiredPlayers = getRequiredPlayersForMinigame(minigameDef)
 
         if (playersInQueue.size < requiredPlayers) {
             return
@@ -93,24 +95,45 @@ object QueueService : KoinComponent {
         val playersToStart = playersInQueue.take(requiredPlayers)
         playersToStart.forEach { queue.remove(it) }
 
-        onMinigameCanStart(minigame, playersToStart)
+        onMinigameCanStart(minigameDef, playersToStart)
     }
 
-    private fun onMinigameCanStart(minigame: MinigameDef, queuedPlayers: List<QueueEntry>) {
+    private fun onMinigameCanStart(minigameDef: MinigameDef, queuedPlayers: List<QueueEntry>) {
         val entriesToUse =
-            when (minigame) {
+            when (minigameDef) {
                 is TeamBasedStocksMinigameDef -> {
-                    val playersPerTeam = minigame.playersPerTeam
-                    val amountOfTeams = minigame.amountOfTeams
+                    val playersPerTeam = minigameDef.playersPerTeam
+                    val amountOfTeams = minigameDef.amountOfTeams
 
                     // Take only the required number of players for all teams
                     val totalPlayersNeeded = playersPerTeam * amountOfTeams
                     queuedPlayers.take(totalPlayersNeeded)
                 }
                 is FfaMinigameDef -> {
-                    queuedPlayers.take(minigame.maxPlayers)
+                    queuedPlayers.take(minigameDef.maxPlayers)
                 }
             }
+
+        val gameId = UUID.randomUUID().toString()
+
+        when (minigameDef) {
+            is TeamBasedStocksMinigameDef -> {
+                val playersPerTeam = minigameDef.playersPerTeam
+                val amountOfTeams = minigameDef.amountOfTeams
+
+                // Take only the required number of players for all teams
+                val totalPlayersNeeded = playersPerTeam * amountOfTeams
+                val entriesToUse = queuedPlayers.take(totalPlayersNeeded)
+            }
+            is FfaMinigameDef -> {
+                val entriesToUse = queuedPlayers.take(minigameDef.maxPlayers)
+
+                val minigame =
+                    when (minigameDef.id) {
+                        "prototyping" -> PrototypingMinigame(minigameDef.id, gameId)
+                    }
+            }
+        }
 
         // TODO: Figure out new minigame flow
 

@@ -6,20 +6,26 @@ import kotlinx.serialization.Serializable
 @Serializable data class MapDefFile(val gameMaps: List<GameMapDef>, val hubMaps: List<HubMapDef>)
 
 @Serializable
+sealed class MapDef {
+    abstract val id: String
+    abstract val worldBorderSize: Double
+}
+
+@Serializable
 data class GameMapDef(
-    val id: String,
+    override val id: String,
+    override val worldBorderSize: Double,
     val voidLevel: Double,
     val maxPlayers: Int,
-    val worldBorderSize: Double,
     val creators: List<String>?,
     val spawnPoints: List<SpawnPoint>,
-)
+) : MapDef()
 
 @Serializable
 data class HubMapDef(
-    val id: String,
+    override val id: String,
+    override val worldBorderSize: Double,
     val voidLevel: Double,
-    val worldBorderSize: Double,
     val creators: List<String>,
     val spawnPoints: List<SpawnPoint>,
-)
+) : MapDef()
