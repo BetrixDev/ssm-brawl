@@ -5,9 +5,9 @@ import java.util.regex.Pattern
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.bukkit.plugin.java.JavaPlugin
 
 class LangService : KoinComponent {
     private val plugin: JavaPlugin by inject()
@@ -65,7 +65,8 @@ class LangService : KoinComponent {
             val token = matcher.group(1).trim()
 
             if (token.startsWith("lang:")) {
-                // token like "lang:minigames.test.name" (any nested vars should already be interpolated)
+                // token like "lang:minigames.test.name" (any nested vars should already be
+                // interpolated)
                 val resolvedPath = token.removePrefix("lang:").trim()
 
                 // Resolve that key recursively

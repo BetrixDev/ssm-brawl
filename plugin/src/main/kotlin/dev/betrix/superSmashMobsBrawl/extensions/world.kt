@@ -1,7 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.extensions
 
-import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
 import dev.betrix.superSmashMobsBrawl.maps.SpawnPoint as MapSpawnPoint
+import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
 import org.bukkit.Location
 import org.bukkit.World
 
@@ -18,12 +18,5 @@ fun World.location(spawnPoint: SpawnPoint): Location {
 
 fun World.location(spawnPoint: MapSpawnPoint): Location {
     val pos = spawnPoint.position
-    return Location(
-        this,
-        pos.x,
-        pos.y,
-        pos.z,
-        spawnPoint.yaw ?: 0f,
-        spawnPoint.pitch ?: 90f,
-    )
+    return Location(this, pos.x, pos.y, pos.z, spawnPoint.yaw ?: 0f, spawnPoint.pitch ?: 90f)
 }

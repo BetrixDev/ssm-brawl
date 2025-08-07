@@ -7,7 +7,6 @@ import com.github.michaelbull.result.onFailure
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import dev.betrix.superSmashMobsBrawl.models.BrawlGameWorld
 import dev.betrix.superSmashMobsBrawl.models.BrawlHubWorld
 import dev.betrix.superSmashMobsBrawl.models.BrawlWorld
@@ -27,8 +26,6 @@ import org.bukkit.Bukkit
 import org.bukkit.GameRule
 import org.bukkit.World
 import org.bukkit.WorldCreator
-
-data class LoadedWorld(val world: World, val mapDefinition: SsmbMap)
 
 object WorldService {
     private val loadedWorlds = hashMapOf<String, BrawlWorld>()
@@ -110,61 +107,6 @@ object WorldService {
                     onFailure = {
                         return@withContext Err(RuntimeException(it.message, it))
                     },
-                )
-            }
-        }
-
-    // Overload for the builder-based SsmbMap
-    suspend fun copyAndLoadWorld(
-        map: SsmbMap,
-        customWorldName: String = UUID.randomUUID().toString(),
-    ): Result<LoadedWorld, Exception> =
-        withContext(SuperSmashMobsBrawl.instance.asyncDispatcher) {
-            val copyResult = runCatching {
-                val serverFolder = Bukkit.getWorldContainer().toPath()
-                val worldsFolder = serverFolder.resolve("worlds")
-                val sourceWorldPath = worldsFolder.resolve(map.id)
-
-                require(Files.exists(sourceWorldPath)) {
-                    "Source world '${map.id}' does not exist in ./worlds directory!"
-                }
-
-                require(Files.isDirectory(sourceWorldPath)) {
-                    "Source '${map.id}' is not a directory!"
-                }
-
-                val prefixedWorldName = addWorldPrefix(customWorldName)
-
-                val targetWorldPath = serverFolder.resolve(prefixedWorldName)
-                require(
-                    !Files.exists(targetWorldPath) && Bukkit.getWorld(prefixedWorldName) == null
-                ) {
-                    "World with name '$prefixedWorldName' already exists!"
-                }
-
-                // Copy the world folder
-                copyWorldFolder(sourceWorldPath, targetWorldPath).getOrThrow()
-                prefixedWorldName
-            }
-
-            withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) {
-                copyResult.fold(
-                    onSuccess = { worldName ->
-                        runCatching {
-                                val worldCreator = WorldCreator(worldName)
-                                val world = Bukkit.createWorld(worldCreator)
-
-                                if (world == null) error("Failed to create world: $worldName")
-
-                                setupWorld(world, map)
-                                world
-                            }
-                            .fold(
-                                onSuccess = { world -> Ok(LoadedWorld(world, map)) },
-                                onFailure = { Err(RuntimeException(it.message, it)) },
-                            )
-                    },
-                    onFailure = { Err(RuntimeException(it.message, it)) },
                 )
             }
         }
@@ -251,20 +193,6 @@ object WorldService {
         world.setGameRule(GameRule.MOB_GRIEFING, false)
     }
 
-    private fun setupWorld(world: World, map: SsmbMap) {
-        world.worldBorder.size = map.worldBorderSize
-        world.setStorm(false)
-        world.isVoidDamageEnabled = false
-        world.time = 5000L
-        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
-        world.setGameRule(GameRule.DO_WEATHER_CYCLE, false)
-        world.setGameRule(GameRule.DO_MOB_SPAWNING, false)
-        world.setGameRule(GameRule.ALLOW_FIRE_TICKS_AWAY_FROM_PLAYER, false)
-        world.setGameRule(GameRule.DO_MOB_LOOT, false)
-        world.setGameRule(GameRule.DO_VINES_SPREAD, false)
-        world.setGameRule(GameRule.MOB_GRIEFING, false)
-    }
-
     /**
      * Gets the actual world name that might be prefixed, checking both prefixed and non-prefixed
      * versions
@@ -331,7 +259,10 @@ object WorldService {
                         return FileVisitResult.CONTINUE
                     }
 
-                    override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
+                    override fun visitFile(
+                        file: Path,
+                        attrs: BasicFileAttributes,
+                    ): FileVisitResult {
                         val targetFile = target.resolve(source.relativize(file))
                         Files.createDirectories(targetFile.parent)
                         Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING)
@@ -344,6 +275,5 @@ object WorldService {
 
     private fun addWorldPrefix(worldName: String): String = "$WORLD_PREFIX$worldName"
 
-    private fun removeWorldPrefix(worldName: String): String =
-        worldName.removePrefix(WORLD_PREFIX)
+    private fun removeWorldPrefix(worldName: String): String = worldName.removePrefix(WORLD_PREFIX)
 }

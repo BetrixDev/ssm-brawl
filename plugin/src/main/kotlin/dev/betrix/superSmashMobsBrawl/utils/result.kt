@@ -12,10 +12,7 @@ fun <T> resultRunCatching(cb: () -> T): Result<T, Exception> {
     }
 }
 
-fun <T, E> resultRunCatching(
-    parseError: (e: Exception) -> E,
-    cb: () -> T,
-): Result<T, E> {
+fun <T, E> resultRunCatching(parseError: (e: Exception) -> E, cb: () -> T): Result<T, E> {
     return try {
         Ok(cb())
     } catch (e: Exception) {
