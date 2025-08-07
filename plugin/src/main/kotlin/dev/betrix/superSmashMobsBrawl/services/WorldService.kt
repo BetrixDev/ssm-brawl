@@ -114,6 +114,61 @@ object WorldService {
             }
         }
 
+    // Overload for the builder-based SsmbMap
+    suspend fun copyAndLoadWorld(
+        map: SsmbMap,
+        customWorldName: String = UUID.randomUUID().toString(),
+    ): Result<LoadedWorld, Exception> =
+        withContext(SuperSmashMobsBrawl.instance.asyncDispatcher) {
+            val copyResult = runCatching {
+                val serverFolder = Bukkit.getWorldContainer().toPath()
+                val worldsFolder = serverFolder.resolve("worlds")
+                val sourceWorldPath = worldsFolder.resolve(map.id)
+
+                require(Files.exists(sourceWorldPath)) {
+                    "Source world '${map.id}' does not exist in ./worlds directory!"
+                }
+
+                require(Files.isDirectory(sourceWorldPath)) {
+                    "Source '${map.id}' is not a directory!"
+                }
+
+                val prefixedWorldName = addWorldPrefix(customWorldName)
+
+                val targetWorldPath = serverFolder.resolve(prefixedWorldName)
+                require(
+                    !Files.exists(targetWorldPath) && Bukkit.getWorld(prefixedWorldName) == null
+                ) {
+                    "World with name '$prefixedWorldName' already exists!"
+                }
+
+                // Copy the world folder
+                copyWorldFolder(sourceWorldPath, targetWorldPath).getOrThrow()
+                prefixedWorldName
+            }
+
+            withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) {
+                copyResult.fold(
+                    onSuccess = { worldName ->
+                        runCatching {
+                                val worldCreator = WorldCreator(worldName)
+                                val world = Bukkit.createWorld(worldCreator)
+
+                                if (world == null) error("Failed to create world: $worldName")
+
+                                setupWorld(world, map)
+                                world
+                            }
+                            .fold(
+                                onSuccess = { world -> Ok(LoadedWorld(world, map)) },
+                                onFailure = { Err(RuntimeException(it.message, it)) },
+                            )
+                    },
+                    onFailure = { Err(RuntimeException(it.message, it)) },
+                )
+            }
+        }
+
     suspend fun deleteWorld(world: World): Result<Unit, Exception> {
         val loadedWorld = loadedWorlds.entries.find { it.value.world == world }?.value
 
@@ -196,6 +251,20 @@ object WorldService {
         world.setGameRule(GameRule.MOB_GRIEFING, false)
     }
 
+    private fun setupWorld(world: World, map: SsmbMap) {
+        world.worldBorder.size = map.worldBorderSize
+        world.setStorm(false)
+        world.isVoidDamageEnabled = false
+        world.time = 5000L
+        world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false)
+        world.setGameRule(GameRule.DO_WEATHER_CYCLE, false)
+        world.setGameRule(GameRule.DO_MOB_SPAWNING, false)
+        world.setGameRule(GameRule.ALLOW_FIRE_TICKS_AWAY_FROM_PLAYER, false)
+        world.setGameRule(GameRule.DO_MOB_LOOT, false)
+        world.setGameRule(GameRule.DO_VINES_SPREAD, false)
+        world.setGameRule(GameRule.MOB_GRIEFING, false)
+    }
+
     /**
      * Gets the actual world name that might be prefixed, checking both prefixed and non-prefixed
      * versions
@@ -258,30 +327,14 @@ object WorldService {
                             return FileVisitResult.SKIP_SUBTREE
                         }
 
-                        runCatching { Files.createDirectories(targetDir) }
-                            .onFailure { exception ->
-                                if (!Files.exists(targetDir)) {
-                                    throw exception
-                                }
-                            }
-
+                        Files.createDirectories(targetDir)
                         return FileVisitResult.CONTINUE
                     }
 
-                    override fun visitFile(
-                        file: Path,
-                        attrs: BasicFileAttributes,
-                    ): FileVisitResult {
-                        val fileName = file.fileName.toString()
-
-                        // Skip problematic files
-                        if (fileName == "session.lock" || fileName == "uid.dat") {
-                            return FileVisitResult.CONTINUE
-                        }
-
+                    override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
                         val targetFile = target.resolve(source.relativize(file))
+                        Files.createDirectories(targetFile.parent)
                         Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING)
-
                         return FileVisitResult.CONTINUE
                     }
                 },
@@ -289,20 +342,8 @@ object WorldService {
         }
     }
 
-    /** Removes the SSMB world prefix from a world name if present */
-    private fun removeWorldPrefix(worldName: String): String {
-        return if (worldName.startsWith(WORLD_PREFIX)) {
-            worldName.removePrefix(WORLD_PREFIX)
-        } else {
-            worldName
-        }
-    }
+    private fun addWorldPrefix(worldName: String): String = "$WORLD_PREFIX$worldName"
 
-    private fun addWorldPrefix(worldName: String): String {
-        return if (worldName.startsWith(WORLD_PREFIX)) {
-            worldName
-        } else {
-            "$WORLD_PREFIX$worldName"
-        }
-    }
+    private fun removeWorldPrefix(worldName: String): String =
+        worldName.removePrefix(WORLD_PREFIX)
 }

@@ -11,23 +11,27 @@ import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
 import dev.betrix.superSmashMobsBrawl.models.MinigameState
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
+import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import dev.betrix.superSmashMobsBrawl.registries.MapRegistry
 import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
+import dev.betrix.superSmashMobsBrawl.services.LoadedWorld
 import java.util.UUID
 import org.bukkit.World
 import org.bukkit.entity.Player
 
 abstract class MinigameInstance(val definition: MinigameDefinition, val teams: List<MinigameTeam>) :
     Manageable() {
-    open lateinit var world: World
-        protected set
+    private lateinit var loadedWorld: LoadedWorld
+
+    val world: World
+        get() = loadedWorld.world
 
     var state = MinigameState.PREFLIGHT
         protected set
 
     val gameId = UUID.randomUUID().toString()
-    val map = MapRegistry.getValidMapsForMinigame(definition).random()
+    val map: SsmbMap = MapRegistry.getValidMapsForMinigame(definition).random()
 
     protected val players: List<Player>
         get() = teams.flatMap { it.players }
@@ -42,31 +46,27 @@ abstract class MinigameInstance(val definition: MinigameDefinition, val teams: L
                 }
             }
 
-            WorldService.copyAndLoadWorld(map, gameId)
+            WorldService.copyAndLoadWorld(map)
                 .onFailure {
                     return Err(it)
                 }
-                .onSuccess { world = it.world }
+                .onSuccess { loadedWorld = it }
         } catch (e: Exception) {
             return Err(e)
         }
 
-        setupAsync()
+        setup()
         return Ok(Unit)
     }
 
-    override suspend fun teardownAsync() {
+    open suspend fun teardownMinigame() {
         WorldService.deleteWorld(world).onFailure {
             SuperSmashMobsBrawl.instance.logger.severe("Unable to delete world $world")
         }
 
         players.forEach { player -> HubService.teleportToDefaultHub(player) }
 
-        super.teardownAsync()
-    }
-
-    open suspend fun teardownMinigame() {
-        teardownAsync()
+        teardown()
     }
 
     open fun onPlayerLeave(player: Player): Result<Unit, String> {

@@ -118,57 +118,25 @@ object QueueService : KoinComponent {
 
         when (minigameDef) {
             is TeamBasedStocksMinigameDef -> {
-                val playersPerTeam = minigameDef.playersPerTeam
-                val amountOfTeams = minigameDef.amountOfTeams
-
-                // Take only the required number of players for all teams
-                val totalPlayersNeeded = playersPerTeam * amountOfTeams
-                val entriesToUse = queuedPlayers.take(totalPlayersNeeded)
+                // TODO: Implement team-based start
+                // val playersPerTeam = minigameDef.playersPerTeam
+                // val amountOfTeams = minigameDef.amountOfTeams
             }
             is FfaMinigameDef -> {
-                val entriesToUse = queuedPlayers.take(minigameDef.maxPlayers)
+                val players = entriesToUse.map { it.player }
 
-                val minigame =
-                    when (minigameDef.id) {
-                        "prototyping" -> PrototypingMinigame(minigameDef.id, gameId)
+                when (minigameDef.id) {
+                    "prototyping" -> {
+                        // Initialize and start the FFA minigame asynchronously in future edits
+                        PrototypingMinigame(minigameDef.id, gameId, players)
                     }
+                    else -> {
+                        // No-op for unknown ids for now
+                    }
+                }
             }
         }
 
         // TODO: Figure out new minigame flow
-
-        //        // Split into teams
-        //        val teams =
-        //            entriesToUse.chunked(playersPerTeam).map { chunk ->
-        //                MinigameTeam(
-        //                    chunk.map { it.player }.toMutableList(),
-        //                    minigame.metadata.stocks,
-        //                )
-        //            }
-        //
-        //        // Remove these players from the queue
-        //        entriesToUse.forEach { removePlayer(it.player) }
-        //
-        //        minigameService.initializeMinigameInstance(minigame, teams)
-        //            .onFailure { err ->
-        //                when (err) {
-        //                    is MinigameInitError.PlayerAlreadyInMinigame -> {
-        //                        val playersToAddBackToQueue =
-        //                            entriesToUse.map { it.player }.filter {
-        // !err.players.contains(it) }
-        //
-        //                        playersToAddBackToQueue.forEach { player ->
-        //                            player.sendMessage(
-        //                                mm(
-        //                                    "<light_gray>There was an error. You have been added
-        // back to the queue for ${minigame.name}</light_gray>"
-        //                                )
-        //                            )
-        //                            addPlayer(player, minigame)
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //            .onSuccess { MinigameService.handleMinigameSetup(it) }
     }
 }

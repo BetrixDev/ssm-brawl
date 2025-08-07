@@ -11,11 +11,9 @@ import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
-import org.bukkit.World
 
 class TestingMinigameInstance(definition: MinigameDefinition, teams: List<MinigameTeam>) :
     MinigameInstance(definition, teams) {
-    override lateinit var world: World
 
     override suspend fun initMinigame(): Result<Unit, Exception> {
         super.initMinigame().onFailure {

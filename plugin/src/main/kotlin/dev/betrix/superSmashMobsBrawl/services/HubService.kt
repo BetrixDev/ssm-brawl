@@ -50,7 +50,8 @@ object HubService {
         plugin.logger.info("Trying to load default world hub with id $defaultHubId")
 
         plugin.launch {
-            WorldService.copyAndLoadWorld(blueForestHub)
+            val hubMap: SsmbMap = MapRegistry.getDefaultHub() ?: blueForestHub
+            WorldService.copyAndLoadWorld(hubMap)
                 .mapBoth(
                     success = { loadedWorld ->
                         plugin.logger.info("Successfully loaded default hub world")

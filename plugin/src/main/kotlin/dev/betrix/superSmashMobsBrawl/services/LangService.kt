@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.services
 
-import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import net.kyori.adventure.text.Component
@@ -8,9 +7,10 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.configuration.file.YamlConfiguration
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.bukkit.plugin.java.JavaPlugin
 
 class LangService : KoinComponent {
-    private val plugin: SuperSmashMobsBrawl by inject()
+    private val plugin: JavaPlugin by inject()
 
     private val dataFolder = plugin.dataFolder
     private val enLang = YamlConfiguration.loadConfiguration(dataFolder.resolve("data/lang/en.yml"))
@@ -40,14 +40,17 @@ class LangService : KoinComponent {
                     return "[$key]"
                 }
 
-        // Expand lang references; allow variables inside the lang path
-        val expandedRefs = expandLangReferences(raw, vars, visited)
+        // First interpolate simple variables so nested placeholders inside lang: paths are resolved
+        val withVarsFirst = interpolateVariables(raw, vars)
 
-        // Interpolate remaining variables in the final text
-        val withVars = interpolateVariables(expandedRefs, vars)
+        // Then expand lang references (which may now include previously nested variables)
+        val expandedRefs = expandLangReferences(withVarsFirst, vars, visited)
+
+        // Finally, interpolate any remaining variables from referenced strings
+        val withVarsFinal = interpolateVariables(expandedRefs, vars)
 
         visited.remove(key)
-        return withVars
+        return withVarsFinal
     }
 
     private fun expandLangReferences(
@@ -62,13 +65,10 @@ class LangService : KoinComponent {
             val token = matcher.group(1).trim()
 
             if (token.startsWith("lang:")) {
-                // token like "lang:minigames.{minigameId}.name"
-                val rawPath = token.removePrefix("lang:").trim()
+                // token like "lang:minigames.test.name" (any nested vars should already be interpolated)
+                val resolvedPath = token.removePrefix("lang:").trim()
 
-                // First, interpolate variables inside the lang path itself
-                val resolvedPath = interpolateVariables(rawPath, vars)
-
-                // Then resolve that key recursively
+                // Resolve that key recursively
                 val replacement = resolveAndFormat(resolvedPath, vars, visited)
 
                 matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement))
@@ -90,7 +90,7 @@ class LangService : KoinComponent {
             val token = matcher.group(1).trim()
 
             if (token.startsWith("lang:")) {
-                // Should have been handled in expandLangReferences; leave as-is if any remain
+                // Leave lang references untouched in this phase
                 matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group()))
                 continue
             }
