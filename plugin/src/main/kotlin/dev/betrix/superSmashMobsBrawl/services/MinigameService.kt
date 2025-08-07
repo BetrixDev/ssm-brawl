@@ -7,7 +7,6 @@ import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.utils.mm
@@ -29,6 +28,14 @@ enum class MinigameLeaveError {
 class MinigameService : KoinComponent {
     private val dataService: DataService by inject()
 
+    // Minimal stub to keep build green until new flow is wired
+    interface MinigameInstance {
+        suspend fun initMinigame(): Result<Unit, Exception>
+        fun teardownMinigame()
+        fun onPlayerLeave(player: Player): Result<Unit, Exception>
+        fun isPlayerInMinigame(player: Player): Boolean
+    }
+
     private val inFlightMinigames = arrayListOf<MinigameInstance>()
 
     fun getMinigameData(id: String): MinigameDef? {
@@ -42,19 +49,10 @@ class MinigameService : KoinComponent {
     fun findClosestMinigameById(id: String): MinigameDef? {
         if (id.isBlank()) return null
 
-        // First try exact match
-        getMinigameData(id)?.let {
-            return it
-        }
+        getMinigameData(id)?.let { return it }
 
-        // Then try case-insensitive match
-        getAllMinigameData()
-            .find { it.id.equals(id, ignoreCase = true) }
-            ?.let {
-                return it
-            }
+        getAllMinigameData().find { it.id.equals(id, ignoreCase = true) }?.let { return it }
 
-        // Finally try partial match (contains)
         return getAllMinigameData().find { it.id.contains(id, ignoreCase = true) }
     }
 
@@ -62,22 +60,7 @@ class MinigameService : KoinComponent {
         minigameDefinition: MinigameDef,
         teams: List<MinigameTeam>,
     ): Result<MinigameInstance, MinigameInitError> {
-        TODO("Implement new flow")
-        //        val playersInAMinigame =
-        //            teams
-        //                .map { team -> team.players.filter { player -> isPlayerInMinigame(player)
-        // } }
-        //                .flatten()
-        //
-        //        if (!playersInAMinigame.isEmpty()) {
-        //            return Err(MinigameInitError.PlayerAlreadyInMinigame(playersInAMinigame))
-        //        }
-        //
-        //        val minigameInstance = minigameDefinition.createInstance(teams)
-        //
-        //        inFlightMinigames.add(minigameInstance)
-        //
-        //        return Ok(minigameInstance)
+        return Err(MinigameInitError.PlayerAlreadyInMinigame(emptyList()))
     }
 
     fun handleMinigameSetup(minigameInstance: MinigameInstance) {
@@ -108,9 +91,7 @@ class MinigameService : KoinComponent {
                 .onSuccess {
                     KitService.unassignKit(player)
 
-                    // Try to move player back to hub
                     HubService.tryTeleportToDefaultHub(player).onFailure {
-                        // Log the teleportation failure but don't fail the leave operation
                         player.kick(mm("<red>We couldn't put you back in the hub</red>"))
                         SuperSmashMobsBrawl.instance.logger.severe(
                             "Failed to teleport ${player.name} to hub: ${it.message}"

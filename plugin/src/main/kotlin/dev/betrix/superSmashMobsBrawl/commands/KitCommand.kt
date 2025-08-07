@@ -1,7 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.commands
 
-import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
-import dev.betrix.superSmashMobsBrawl.kits.definitions.SkeletonKitDefinition
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import dev.rollczi.litecommands.annotations.command.Command
@@ -15,14 +13,14 @@ class KitCommand {
 
     @Execute(name = "creeper")
     fun creeperKit(@Context player: Player) {
-        KitService.playerSelectKit(player, CreeperKitDefinition)
+        KitService.playerSelectKit(player, "creeper")
 
         onSuccess(player, "Creeper")
     }
 
     @Execute(name = "skeleton")
     fun skeletonKit(@Context player: Player) {
-        KitService.playerSelectKit(player, SkeletonKitDefinition)
+        KitService.playerSelectKit(player, "skeleton")
 
         onSuccess(player, "Skeleton")
     }
