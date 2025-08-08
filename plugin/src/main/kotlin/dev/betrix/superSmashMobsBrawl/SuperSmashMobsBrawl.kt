@@ -55,11 +55,11 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
                 module {
                     single { this@SuperSmashMobsBrawl }
                     single<JavaPlugin> { this@SuperSmashMobsBrawl }
-                    single { logger }
+                    single { this@SuperSmashMobsBrawl.logger }
                     single(createdAtStart = true) { DataService() }
                     single { MinigameService() }
                     single { KitService }
-                    single(createdAtStart = true)  { LangService() }
+                    single(createdAtStart = true) { LangService() }
                     single { WorldService }
                 }
             )

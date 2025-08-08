@@ -9,7 +9,7 @@ open class FfaMinigame(minigameId: String, gameId: String, players: List<Player>
     BrawlMinigame<FfaMinigameDef>(minigameId, gameId, players) {
 
     override suspend fun initMinigame(): Result<Unit, Exception> {
-        return Ok(Unit)
+        return super.initMinigame()
     }
 
     override fun canPlayerLeaveMinigame(player: Player): Boolean {

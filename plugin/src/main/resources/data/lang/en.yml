@@ -21,8 +21,15 @@ minigames:
     descriptions: "A competitive 1v1game mode"
 prefix: "<#585b70>[<gradient:#cba6f7:#585b70>Brawl</gradient><#585b70>]<reset>"
 messages:
+  commands:
+    onlyPlayers: "<red>On players can execute this command</red>"
   queue:
     leave:
-        success: "{lang:prefix} <#e8edff>You have left the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}<#e8edff>"
+      notInQueue: "{lang:prefix} <#f2b8c6>You are not currently in a queue<#e8edff>"
+      success: "{lang:prefix} <#e8edff>You have left the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}"
     join:
-      success: "{lang:prefix} <#e8edff>You have joined the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}<#e8edff>!"
+      success: "{lang:prefix} <#e8edff>You have joined the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}"
+      alreadyInQueue: "{lang:prefix} <#f2b8c6>You are already in a queue<newline>leave that one before joining a new one<#e8edff>"
+    status:
+      inQueue: "{lang:prefix} <#e8edff>You are currently in the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}"
+      notInQueue: "{lang:messages.queue.leave.notInQueue}"
