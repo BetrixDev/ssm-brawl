@@ -49,8 +49,6 @@ class DataService : KoinComponent {
                 ),
         )
 
-    private val dataFolder = plugin.dataFolder.resolve("data")
-
     private lateinit var kitDefs: Map<String, KitDef>
     private lateinit var gameMapDefs: Map<String, GameMapDef>
     private lateinit var hubMapDefs: Map<String, HubMapDef>
@@ -97,18 +95,20 @@ class DataService : KoinComponent {
 
     private suspend inline fun <reified T> readFile(path: String): T =
         withContext(Dispatchers.IO) {
-            val file = dataFolder.resolve("$path.yml")
-            plugin.logger.info("Reading data file: ${file.absolutePath}")
+            val resourcePath = "data/$path.yml"
+            plugin.logger.info("Reading bundled data resource: $resourcePath")
 
-            require(file.exists()) { "File not found: ${file.absolutePath}" }
+            val inputStream =
+                plugin.getResource(resourcePath)
+                    ?: throw IllegalStateException("Bundled resource not found: $resourcePath")
 
             try {
-                file.source().buffer().use { source ->
+                inputStream.source().buffer().use { source ->
                     val text = source.readUtf8()
                     yaml.decodeFromString<T>(text)
                 }
             } catch (e: Exception) {
-                plugin.logger.severe("Failed to read/parse ${file.absolutePath}: ${e.message}")
+                plugin.logger.severe("Failed to read/parse $resourcePath: ${e.message}")
                 throw e
             }
         }
