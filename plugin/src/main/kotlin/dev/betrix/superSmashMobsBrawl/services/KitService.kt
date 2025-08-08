@@ -6,7 +6,6 @@ import com.github.michaelbull.result.Result
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.abilities.AbilityMetadata
-import dev.betrix.superSmashMobsBrawl.abilities.AbilitySpec
 import dev.betrix.superSmashMobsBrawl.abilities.AbilityType
 import dev.betrix.superSmashMobsBrawl.abilities.AbilityUsageType
 import dev.betrix.superSmashMobsBrawl.brawl.BrawlAbility
@@ -15,14 +14,8 @@ import dev.betrix.superSmashMobsBrawl.brawl.registries.BrawlAbilityRegistry
 import dev.betrix.superSmashMobsBrawl.brawl.registry.BrawlPassiveRegistry
 import dev.betrix.superSmashMobsBrawl.disguises.CreeperDisguise
 import dev.betrix.superSmashMobsBrawl.disguises.SkeletonDisguise
-import dev.betrix.superSmashMobsBrawl.kits.KitSpec
-import dev.betrix.superSmashMobsBrawl.kits.KitType
-import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
-import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
 import dev.betrix.superSmashMobsBrawl.models.brawlData.AbilityDef
-import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
 import dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata
-import dev.betrix.superSmashMobsBrawl.passives.PassiveSpec
 import dev.betrix.superSmashMobsBrawl.utils.itemFromString
 import java.util.concurrent.ConcurrentHashMap
 import org.bukkit.Material
@@ -36,7 +29,6 @@ enum class AssignKitError {
 
 object KitService : KoinComponent {
     private val playerSelectedKits = ConcurrentHashMap<Player, String>() // kit id
-    private val assignedKits = ConcurrentHashMap<Player, KitInstance>()
     private val assignedBrawlKits = ConcurrentHashMap<Player, BrawlKit>()
 
     private val plugin = SuperSmashMobsBrawl.instance
@@ -44,10 +36,6 @@ object KitService : KoinComponent {
 
     fun playerSelectKit(player: Player, kitId: String) {
         playerSelectedKits[player] = kitId
-    }
-
-    fun playerSelectKit(player: Player, kitDefinition: KitDefinition) {
-        playerSelectedKits[player] = kitDefinition.id
     }
 
     private fun defaultKitId(): String {
@@ -67,16 +55,13 @@ object KitService : KoinComponent {
         }
 
         val kitData = dataService.getKit(kitId) ?: dataService.getKit(defaultKitId())!!
-
         val brawlKit = BrawlKit(kitData.id, player)
 
-        // Assign disguise based on kit id
         when (kitData.id.lowercase()) {
             "skeleton" -> brawlKit.applyDisguise(SkeletonDisguise(player))
             "creeper" -> brawlKit.applyDisguise(CreeperDisguise(player))
         }
 
-        // Build abilities from data
         kitData.abilities.forEach { kitAbilityDef ->
             val abilityDef = dataService.getAbility(kitAbilityDef.id) ?: return@forEach
             val abilityMeta = buildAbilityMetadata(abilityDef)
@@ -89,7 +74,6 @@ object KitService : KoinComponent {
             }
         }
 
-        // Build passives from data
         kitData.passives.forEach { kitPassiveDef ->
             val passiveDef = dataService.getPassive(kitPassiveDef.id) ?: return@forEach
             val metadata =
@@ -108,15 +92,12 @@ object KitService : KoinComponent {
         }
 
         assignedBrawlKits[player] = brawlKit
-
         brawlKit.setup()
-
         return Ok(brawlKit)
     }
 
     fun unassignKit(player: Player): BrawlKit? {
         val kit = assignedBrawlKits.remove(player)
-
         kit?.let { instance ->
             plugin.launch {
                 try {
@@ -128,14 +109,10 @@ object KitService : KoinComponent {
                 }
             }
         }
-
         return kit
     }
 
     fun getBrawlKit(player: Player): BrawlKit? = assignedBrawlKits[player]
-
-    // Legacy accessors kept for compatibility
-    fun getKitInstance(player: Player): KitInstance? = assignedKits[player]
 
     fun hasKit(player: Player): Boolean = assignedBrawlKits.containsKey(player)
 
@@ -158,61 +135,6 @@ object KitService : KoinComponent {
             hotbarItem = hotbarItem,
             hotbarItemSlot = ability.itemSlot,
             usageType = usage,
-        )
-    }
-
-    // Old Spec builder retained for debug/inspection
-    private fun buildKitSpec(kit: KitDef): KitSpec {
-        val name =
-            kit.id.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-
-        fun yamlNodeToString(value: Any?): String? {
-            return when (val v = value) {
-                null -> null
-                is com.charleskorn.kaml.YamlScalar -> v.content
-                else -> v.toString()
-            }
-        }
-
-        val passiveSpecs: List<PassiveSpec> =
-            kit.passives.mapNotNull { kitPassiveDef ->
-                val passive = dataService.getPassive(kitPassiveDef.id) ?: return@mapNotNull null
-
-                val descriptionOverride =
-                    yamlNodeToString(kitPassiveDef.overrides?.metadata?.get("description"))
-                val descriptionDefault = yamlNodeToString(passive.metadata?.get("description"))
-
-                PassiveSpec(
-                    id = passive.id,
-                    name = passive.id,
-                    metadata =
-                        dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata(
-                            description = descriptionOverride ?: descriptionDefault ?: "",
-                            userFacing = passive.userFacing,
-                        ),
-                )
-            }
-
-        val abilitySpecs: List<AbilitySpec> =
-            kit.abilities.mapNotNull { kitAbilityDef ->
-                val ability = dataService.getAbility(kitAbilityDef.id) ?: return@mapNotNull null
-
-                AbilitySpec(
-                    id = ability.id,
-                    name = ability.id,
-                    metadata = buildAbilityMetadata(ability),
-                    displayItem = ability.displayItem,
-                )
-            }
-
-        return KitSpec(
-            id = kit.id,
-            name = name,
-            description = "",
-            type = KitType.DEFAULT,
-            meleeDamage = kit.meleeDamage.toInt(),
-            passives = passiveSpecs,
-            abilities = abilitySpecs,
         )
     }
 }

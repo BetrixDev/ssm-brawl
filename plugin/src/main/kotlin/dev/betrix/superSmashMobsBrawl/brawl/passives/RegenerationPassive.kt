@@ -2,6 +2,8 @@ package dev.betrix.superSmashMobsBrawl.brawl.passives
 
 import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
 import dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata
+import gg.flyte.twilight.scheduler.repeatingTask
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 
 class RegenerationPassive(
@@ -11,21 +13,20 @@ class RegenerationPassive(
     config: Map<String, Any?> = emptyMap(),
 ) : BrawlPassive(id, player, metadata, config) {
 
-    private var legacy:
-        dev.betrix.superSmashMobsBrawl.passives.instances.RegenerationPassiveInstance? =
-        null
+    private val healAmount = 1.0
+    private val healIntervalTicks = 60L
 
     override fun setup() {
-        legacy =
-            dev.betrix.superSmashMobsBrawl.passives.definitions.RegenerationPassiveDefinition
-                .createInstance(player)
-        legacy?.setup()
-        super.setup()
-    }
+        val regenTask =
+            repeatingTask(healIntervalTicks) {
+                val playerMaxHealth = player.getAttribute(Attribute.MAX_HEALTH)?.value ?: 20.0
+                if (player.health < playerMaxHealth) {
+                    val newHealth = (player.health + healAmount).coerceAtMost(playerMaxHealth)
+                    player.health = newHealth
+                }
+            }
+        runnables.add(regenTask)
 
-    override fun teardown() {
-        legacy?.teardown()
-        legacy = null
-        super.teardown()
+        super.setup()
     }
 }
