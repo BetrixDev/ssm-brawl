@@ -29,7 +29,13 @@ fun Player.sendDebugMessage(message: String) {
 }
 
 fun Player.hasPassive(definition: PassiveDefinition): Boolean {
-    val kit = KitService.getKitInstance(this)
+    // New data-driven kits
+    val brawlKit = KitService.getBrawlKit(this)
+    if (brawlKit != null) {
+        return brawlKit.passives.any { it.id == definition.id }
+    }
 
+    // Legacy kits
+    val kit = KitService.getKitInstance(this)
     return kit?.passiveInstances?.find { it.definition.id == definition.id } != null
 }

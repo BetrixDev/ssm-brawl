@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.minigames
 
-import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import org.bukkit.entity.Player

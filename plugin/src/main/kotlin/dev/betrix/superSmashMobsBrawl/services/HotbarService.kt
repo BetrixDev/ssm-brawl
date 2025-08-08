@@ -2,6 +2,8 @@ package dev.betrix.superSmashMobsBrawl.services
 
 import dev.betrix.superSmashMobsBrawl.abilities.AbilityUsageType
 import dev.betrix.superSmashMobsBrawl.abilities.instances.AbilityInstance
+import dev.betrix.superSmashMobsBrawl.brawl.BrawlAbility
+import dev.betrix.superSmashMobsBrawl.brawl.BrawlKit
 import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.NamespacedKey
@@ -47,6 +49,18 @@ object HotbarService : Listener {
         player.updateInventory()
     }
 
+    /** Sets up hotbar items for a brawl kit */
+    fun setupHotbarItems(kit: BrawlKit) {
+        val player = kit.player
+        playersWithKits.add(player)
+
+        clearHotbar(player)
+
+        kit.abilities.forEach { ability -> addAbilityToHotbar(player, ability) }
+
+        player.updateInventory()
+    }
+
     /** Clears hotbar items for a player when their kit is removed */
     fun clearHotbarItems(player: Player) {
         playersWithKits.remove(player)
@@ -54,7 +68,7 @@ object HotbarService : Listener {
         player.updateInventory()
     }
 
-    /** Adds an ability item to the player's hotbar */
+    /** Adds an ability item to the player's hotbar (legacy AbilityInstance) */
     private fun addAbilityToHotbar(player: Player, abilityInstance: AbilityInstance) {
         val metadata = abilityInstance.definition.metadata
         val slot = metadata.hotbarItemSlot
@@ -89,6 +103,31 @@ object HotbarService : Listener {
         player.inventory.setItem(slot, item)
     }
 
+    /** Adds an ability item to the player's hotbar (new BrawlAbility) */
+    private fun addAbilityToHotbar(player: Player, ability: BrawlAbility) {
+        val metadata = ability.metadata
+        val slot = metadata.hotbarItemSlot
+        val item = metadata.hotbarItem.clone()
+
+        val meta = item.itemMeta
+        if (meta != null) {
+            meta.persistentDataContainer.set(abilityKey, PersistentDataType.STRING, ability.id)
+
+            val lore = mutableListOf<String>()
+            lore.add("§7${metadata.description}")
+            if (ability.isOnCooldown()) {
+                lore.add("§cCooldown: ${ability.getRemainingCooldown()}s")
+            } else {
+                lore.add("§aReady to use!")
+            }
+            lore.add("§eRight-click to activate")
+            meta.lore = lore
+            item.itemMeta = meta
+        }
+
+        player.inventory.setItem(slot, item)
+    }
+
     /** Clears the player's hotbar (slots 0-8) */
     private fun clearHotbar(player: Player) {
         for (i in 0..8) {
@@ -108,6 +147,16 @@ object HotbarService : Listener {
         player.updateInventory()
     }
 
+    /** Updates hotbar items to reflect current cooldown states for BrawlKit */
+    fun updateHotbarItems(kit: BrawlKit) {
+        val player = kit.player
+        if (!playersWithKits.contains(player)) return
+
+        kit.abilities.forEach { ability -> addAbilityToHotbar(player, ability) }
+
+        player.updateInventory()
+    }
+
     /** Gets the ability ID from an item's persistent data */
     private fun getAbilityId(item: ItemStack?): String? {
         if (item == null || !item.hasItemMeta()) return null
@@ -116,11 +165,14 @@ object HotbarService : Listener {
         return meta.persistentDataContainer.get(abilityKey, PersistentDataType.STRING)
     }
 
-    /** Finds a kit instance for a player */
-    private fun getKitInstance(player: Player): KitInstance? {
-        // We need to get this from wherever kit instances are stored
-        // For now, let's add a method to get it from KitService
+    /** Finds a kit instance for a player (legacy) */
+    private fun getLegacyKitInstance(player: Player): KitInstance? {
         return KitService.getKitInstance(player)
+    }
+
+    /** Finds a brawl kit for a player */
+    private fun getBrawlKit(player: Player): BrawlKit? {
+        return KitService.getBrawlKit(player)
     }
 
     @EventHandler
@@ -135,7 +187,42 @@ object HotbarService : Listener {
         val item = event.item ?: return
         val abilityId = getAbilityId(item) ?: return
 
-        val kitInstance = getKitInstance(player) ?: return
+        // Prefer new data-driven kit
+        val brawlKit = getBrawlKit(player)
+        if (brawlKit != null) {
+            val ability = brawlKit.abilities.find { it.id == abilityId } ?: return
+
+            when (ability.metadata.usageType) {
+                AbilityUsageType.LEFT_CLICK -> {
+                    if (
+                        event.action != Action.LEFT_CLICK_AIR &&
+                            event.action != Action.LEFT_CLICK_BLOCK
+                    ) {
+                        return
+                    }
+                }
+                AbilityUsageType.RIGHT_CLICK -> {
+                    if (
+                        event.action != Action.RIGHT_CLICK_AIR &&
+                            event.action != Action.RIGHT_CLICK_BLOCK
+                    ) {
+                        return
+                    }
+                }
+            }
+
+            event.isCancelled = true
+
+            if (ability.canActivate()) {
+                ability.activate()
+                updateHotbarItems(brawlKit)
+            }
+
+            return
+        }
+
+        // Fallback to legacy
+        val kitInstance = getLegacyKitInstance(player) ?: return
         val abilityInstance =
             kitInstance.abilityInstances.find { it.definition.id == abilityId } ?: return
 
@@ -178,9 +265,15 @@ object HotbarService : Listener {
     /** Updates hotbar items for all players with kits */
     private fun updateAllPlayerHotbars() {
         playersWithKits.toList().forEach { player ->
-            val kitInstance = getKitInstance(player)
-            if (kitInstance != null) {
-                updateHotbarItems(kitInstance)
+            val kit = getBrawlKit(player)
+            if (kit != null) {
+                updateHotbarItems(kit)
+                return@forEach
+            }
+
+            val legacy = getLegacyKitInstance(player)
+            if (legacy != null) {
+                updateHotbarItems(legacy)
             } else {
                 // Player no longer has a kit, remove from tracking
                 playersWithKits.remove(player)

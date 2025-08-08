@@ -7,9 +7,9 @@ import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.github.michaelbull.result.unwrap
 import dev.betrix.superSmashMobsBrawl.Manageable
+import dev.betrix.superSmashMobsBrawl.brawl.BrawlKit
 import dev.betrix.superSmashMobsBrawl.extensions.getEquidistant
 import dev.betrix.superSmashMobsBrawl.extensions.location
-import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
 import dev.betrix.superSmashMobsBrawl.models.BrawlGameWorld
 import dev.betrix.superSmashMobsBrawl.models.MinigameState
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
@@ -39,7 +39,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     lateinit var brawlWorld: BrawlGameWorld
         protected set
 
-    protected val assignedKits = mutableListOf<Pair<Player, KitInstance>>()
+    protected val assignedKits = mutableListOf<Pair<Player, BrawlKit>>()
 
     var state = MinigameState.PREFLIGHT
         protected set
