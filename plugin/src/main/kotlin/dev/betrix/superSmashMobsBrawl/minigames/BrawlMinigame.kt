@@ -38,15 +38,23 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
     lateinit var brawlWorld: BrawlGameWorld
         protected set
+
     protected val assignedKits = mutableListOf<Pair<Player, KitInstance>>()
 
     var state = MinigameState.PREFLIGHT
         protected set
 
     open suspend fun initMinigame(): Result<Unit, Exception> {
-        brawlWorld = findAndCreateWorld().onFailure { return Err(it) }.unwrap()
+        brawlWorld =
+            findAndCreateWorld()
+                .onFailure {
+                    return Err(it)
+                }
+                .unwrap()
 
-        createVoidDeathListener().onFailure { return Err(it) }
+        createVoidDeathListener().onFailure {
+            return Err(it)
+        }
 
         val spawnPoints = brawlWorld.data.spawnPoints.getEquidistant(players.size)
 
@@ -73,13 +81,19 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         return Ok(Unit)
     }
 
+    fun isPlayerInMinigame(player: Player): Boolean {
+        return players.contains(player)
+    }
+
     abstract fun canPlayerLeaveMinigame(player: Player): Boolean
 
     abstract fun onPlayerLeave(player: Player)
 
     private fun createVoidDeathListener(): Result<Unit, Exception> {
         if (!::brawlWorld.isInitialized) {
-            return Err(RuntimeException("This function was called before brawlWorld finished loading"))
+            return Err(
+                RuntimeException("This function was called before brawlWorld finished loading")
+            )
         }
 
         val voidLevel = brawlWorld.data.voidLevel

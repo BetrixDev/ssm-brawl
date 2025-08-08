@@ -3,10 +3,14 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.Manageable
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.PrototypingMinigame
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
+import gg.flyte.twilight.scheduler.repeatingTask
 import java.util.UUID
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
@@ -33,10 +37,19 @@ data class QueueEntry(val player: Player, val minigame: MinigameDef, val partyId
     }
 }
 
-object QueueService : KoinComponent {
+object QueueService : Manageable(), KoinComponent {
     private val minigameService: MinigameService by inject()
 
     private val queue = hashSetOf<QueueEntry>()
+
+    init {
+        runnables.add(
+            repeatingTask(20) {
+                // Periodically check if any queued minigame can start
+                checkAllMinigamesCanStart()
+            }
+        )
+    }
 
     fun addPlayer(player: Player, minigameDefinition: MinigameDef): Result<QueueEntry, QueueEntry> {
         val newEntry = QueueEntry(player, minigameDefinition)
@@ -48,8 +61,6 @@ object QueueService : KoinComponent {
         }
 
         queue.add(newEntry)
-
-        checkMinigameCanStart(minigameDefinition)
 
         return Ok(newEntry)
     }
@@ -79,23 +90,42 @@ object QueueService : KoinComponent {
                 minigameDef.playersPerTeam * minigameDef.amountOfTeams
             }
             is FfaMinigameDef -> {
-                minigameDef.maxPlayers
+                // Use the minimum to allow starting when the game defines it can
+                minigameDef.minPlayers
             }
         }
     }
 
-    private fun checkMinigameCanStart(minigameDef: MinigameDef): Unit {
-        val playersInQueue = getPlayersInQueue(minigameDef)
+    private fun checkAllMinigamesCanStart() {
+        // Snapshot the queue to determine which minigame types are present
+        val snapshot = queue.toList()
+
+        // Map unique minigame id -> definition
+        val defsById = snapshot.groupBy { it.minigame.id }.mapValues { it.value.first().minigame }
+
+        defsById.values.forEach { def -> tryStartMinigamesFor(def) }
+    }
+
+    private fun tryStartMinigamesFor(minigameDef: MinigameDef) {
         val requiredPlayers = getRequiredPlayersForMinigame(minigameDef)
 
-        if (playersInQueue.size < requiredPlayers) {
-            return
+        // Filter out any players who may have entered a minigame meanwhile
+        var available =
+            getPlayersInQueue(minigameDef)
+                .filter { !minigameService.isPlayerInMinigame(it.player) }
+                .toMutableList()
+
+        while (available.size >= requiredPlayers) {
+            val playersToStart = available.take(requiredPlayers)
+
+            // Remove chosen entries from the master queue
+            playersToStart.forEach { queue.remove(it) }
+
+            onMinigameCanStart(minigameDef, playersToStart)
+
+            // Drop the used players from the local list and continue if we can start more
+            available = available.drop(requiredPlayers).toMutableList()
         }
-
-        val playersToStart = playersInQueue.take(requiredPlayers)
-        playersToStart.forEach { queue.remove(it) }
-
-        onMinigameCanStart(minigameDef, playersToStart)
     }
 
     private fun onMinigameCanStart(minigameDef: MinigameDef, queuedPlayers: List<QueueEntry>) {
@@ -118,57 +148,25 @@ object QueueService : KoinComponent {
 
         when (minigameDef) {
             is TeamBasedStocksMinigameDef -> {
-                val playersPerTeam = minigameDef.playersPerTeam
-                val amountOfTeams = minigameDef.amountOfTeams
-
-                // Take only the required number of players for all teams
-                val totalPlayersNeeded = playersPerTeam * amountOfTeams
-                val entriesToUse = queuedPlayers.take(totalPlayersNeeded)
+                // TODO: Implement team-based start
+                // val playersPerTeam = minigameDef.playersPerTeam
+                // val amountOfTeams = minigameDef.amountOfTeams
             }
             is FfaMinigameDef -> {
-                val entriesToUse = queuedPlayers.take(minigameDef.maxPlayers)
+                val players = entriesToUse.map { it.player }
 
-                val minigame =
-                    when (minigameDef.id) {
-                        "prototyping" -> PrototypingMinigame(minigameDef.id, gameId)
+                when (minigameDef.id) {
+                    "prototyping" -> {
+                        val minigame = PrototypingMinigame(minigameDef.id, gameId, players)
+                        SuperSmashMobsBrawl.instance.launch { minigame.initMinigame() }
                     }
+                    else -> {
+                        // No-op for unknown ids for now
+                    }
+                }
             }
         }
 
         // TODO: Figure out new minigame flow
-
-        //        // Split into teams
-        //        val teams =
-        //            entriesToUse.chunked(playersPerTeam).map { chunk ->
-        //                MinigameTeam(
-        //                    chunk.map { it.player }.toMutableList(),
-        //                    minigame.metadata.stocks,
-        //                )
-        //            }
-        //
-        //        // Remove these players from the queue
-        //        entriesToUse.forEach { removePlayer(it.player) }
-        //
-        //        minigameService.initializeMinigameInstance(minigame, teams)
-        //            .onFailure { err ->
-        //                when (err) {
-        //                    is MinigameInitError.PlayerAlreadyInMinigame -> {
-        //                        val playersToAddBackToQueue =
-        //                            entriesToUse.map { it.player }.filter {
-        // !err.players.contains(it) }
-        //
-        //                        playersToAddBackToQueue.forEach { player ->
-        //                            player.sendMessage(
-        //                                mm(
-        //                                    "<light_gray>There was an error. You have been added
-        // back to the queue for ${minigame.name}</light_gray>"
-        //                                )
-        //                            )
-        //                            addPlayer(player, minigame)
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //            .onSuccess { MinigameService.handleMinigameSetup(it) }
     }
 }

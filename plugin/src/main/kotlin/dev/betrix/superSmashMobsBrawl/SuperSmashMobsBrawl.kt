@@ -15,6 +15,7 @@ import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
 import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.KitService
+import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.utils.mm
@@ -46,15 +47,19 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     }
 
     override suspend fun onEnableAsync() {
+        // Ensure data folder and default resource files exist before anything tries to read them
+        installDefaultResources()
+
         startKoin {
             modules(
                 module {
                     single { this@SuperSmashMobsBrawl }
                     single<JavaPlugin> { this@SuperSmashMobsBrawl }
-                    single { logger }
-                    single { DataService() }
+                    single { this@SuperSmashMobsBrawl.logger }
+                    single(createdAtStart = true) { DataService() }
                     single { MinigameService() }
                     single { KitService }
+                    single(createdAtStart = true) { LangService() }
                     single { WorldService }
                 }
             )
@@ -123,5 +128,39 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         WorldService.teardown()
         DebugService.teardown()
         logger.info("SSMB shutting down")
+    }
+
+    private fun installDefaultResources() {
+        // Create base data folder
+        if (!dataFolder.exists()) {
+            dataFolder.mkdirs()
+        }
+
+        // Ensure nested folders exist
+        val nestedDirs = listOf(dataFolder.resolve("data"), dataFolder.resolve("data/lang"))
+        nestedDirs.forEach { dir -> if (!dir.exists()) dir.mkdirs() }
+
+        // Copy default resource files if they do not yet exist
+        val resources =
+            listOf(
+                "data/abilities.yml",
+                "data/passives.yml",
+                "data/kits.yml",
+                "data/maps.yml",
+                "data/minigames.yml",
+                "data/lang/en.yml",
+            )
+
+        resources.forEach { path ->
+            val outFile = dataFolder.resolve(path)
+            if (!outFile.exists()) {
+                // saveResource creates parent folders as needed and writes from jar resources
+                try {
+                    saveResource(path, false)
+                } catch (t: Throwable) {
+                    logger.warning("Failed to save default resource '$path': ${t.message}")
+                }
+            }
+        }
     }
 }

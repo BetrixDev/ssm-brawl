@@ -35,6 +35,15 @@ dependencies {
     implementation("com.charleskorn.kaml:kaml:0.85.0")
     implementation("com.squareup.okio:okio:3.10.2")
     implementation("io.insert-koin:koin-core:3.5.6")
+
+    // Testing
+    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
+    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
+    testImplementation("io.kotest:kotest-property:5.9.1")
+
+    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.20.0")
+    testImplementation("io.insert-koin:koin-test:3.5.6")
+    testImplementation("io.insert-koin:koin-test-junit5:3.5.6")
 }
 
 tasks {
@@ -57,6 +66,11 @@ tasks {
     }
 
     ktfmt { kotlinLangStyle() }
+
+    withType<Test>().configureEach {
+        useJUnitPlatform()
+        systemProperty("junit.jupiter.testinstance.lifecycle.default", "per_class")
+    }
 }
 
 val targetJavaVersion = 21

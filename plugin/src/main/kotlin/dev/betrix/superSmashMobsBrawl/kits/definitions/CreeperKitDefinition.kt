@@ -4,10 +4,6 @@ import dev.betrix.superSmashMobsBrawl.abilities.definitions.ExplosionAbilityDefi
 import dev.betrix.superSmashMobsBrawl.abilities.definitions.SulphurBombAbilityDefinition
 import dev.betrix.superSmashMobsBrawl.kits.instances.CreeperKitInstance
 import dev.betrix.superSmashMobsBrawl.kits.kit
-import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
-import dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition
-import dev.betrix.superSmashMobsBrawl.passives.definitions.HungerPassiveDefinition
-import dev.betrix.superSmashMobsBrawl.passives.definitions.RegenerationPassiveDefinition
 import org.bukkit.entity.Player
 
 object CreeperKitDefinition : KitDefinition() {
@@ -18,18 +14,15 @@ object CreeperKitDefinition : KitDefinition() {
         description = "He blow up"
         meleeDamage = 6
 
-        passive(DoubleJumpPassiveDefinition)
-        passive(RegenerationPassiveDefinition)
-        passive(HungerPassiveDefinition)
+        passive(dev.betrix.superSmashMobsBrawl.passives.definitions.DoubleJumpPassiveDefinition)
+        passive(dev.betrix.superSmashMobsBrawl.passives.definitions.RegenerationPassiveDefinition)
+        passive(dev.betrix.superSmashMobsBrawl.passives.definitions.HungerPassiveDefinition)
 
         ability(SulphurBombAbilityDefinition)
         ability(ExplosionAbilityDefinition)
     }
 
-    override fun createInstance(
-        player: Player,
-        minigameDefinition: MinigameDefinition?,
-    ): CreeperKitInstance {
-        return CreeperKitInstance(this, player, minigameDefinition)
+    override fun createInstance(player: Player): CreeperKitInstance {
+        return CreeperKitInstance(this, player)
     }
 }

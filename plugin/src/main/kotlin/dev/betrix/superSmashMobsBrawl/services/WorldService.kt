@@ -7,7 +7,6 @@ import com.github.michaelbull.result.onFailure
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import dev.betrix.superSmashMobsBrawl.models.BrawlGameWorld
 import dev.betrix.superSmashMobsBrawl.models.BrawlHubWorld
 import dev.betrix.superSmashMobsBrawl.models.BrawlWorld
@@ -27,8 +26,6 @@ import org.bukkit.Bukkit
 import org.bukkit.GameRule
 import org.bukkit.World
 import org.bukkit.WorldCreator
-
-data class LoadedWorld(val world: World, val mapDefinition: SsmbMap)
 
 object WorldService {
     private val loadedWorlds = hashMapOf<String, BrawlWorld>()
@@ -258,13 +255,7 @@ object WorldService {
                             return FileVisitResult.SKIP_SUBTREE
                         }
 
-                        runCatching { Files.createDirectories(targetDir) }
-                            .onFailure { exception ->
-                                if (!Files.exists(targetDir)) {
-                                    throw exception
-                                }
-                            }
-
+                        Files.createDirectories(targetDir)
                         return FileVisitResult.CONTINUE
                     }
 
@@ -272,16 +263,9 @@ object WorldService {
                         file: Path,
                         attrs: BasicFileAttributes,
                     ): FileVisitResult {
-                        val fileName = file.fileName.toString()
-
-                        // Skip problematic files
-                        if (fileName == "session.lock" || fileName == "uid.dat") {
-                            return FileVisitResult.CONTINUE
-                        }
-
                         val targetFile = target.resolve(source.relativize(file))
+                        Files.createDirectories(targetFile.parent)
                         Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING)
-
                         return FileVisitResult.CONTINUE
                     }
                 },
@@ -289,20 +273,7 @@ object WorldService {
         }
     }
 
-    /** Removes the SSMB world prefix from a world name if present */
-    private fun removeWorldPrefix(worldName: String): String {
-        return if (worldName.startsWith(WORLD_PREFIX)) {
-            worldName.removePrefix(WORLD_PREFIX)
-        } else {
-            worldName
-        }
-    }
+    private fun addWorldPrefix(worldName: String): String = "$WORLD_PREFIX$worldName"
 
-    private fun addWorldPrefix(worldName: String): String {
-        return if (worldName.startsWith(WORLD_PREFIX)) {
-            worldName
-        } else {
-            "$WORLD_PREFIX$worldName"
-        }
-    }
+    private fun removeWorldPrefix(worldName: String): String = worldName.removePrefix(WORLD_PREFIX)
 }

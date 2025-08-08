@@ -1,19 +1,21 @@
 package dev.betrix.superSmashMobsBrawl.services
 
-import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class LangService : KoinComponent {
-    private val plugin: SuperSmashMobsBrawl by inject()
+    private val plugin: JavaPlugin by inject()
 
     private val dataFolder = plugin.dataFolder
-    private val enLang = YamlConfiguration.loadConfiguration(dataFolder.resolve("data/lang/en.yml"))
+    private val enLang: YamlConfiguration = loadLangWithDefaults("data/lang/en.yml")
 
     private val miniMessage: MiniMessage = MiniMessage.miniMessage()
 
@@ -35,19 +37,23 @@ class LangService : KoinComponent {
 
         val raw =
             enLang.getString(key)
+                ?: enLang.defaults?.getString(key)
                 ?: run {
                     visited.remove(key)
                     return "[$key]"
                 }
 
-        // Expand lang references; allow variables inside the lang path
-        val expandedRefs = expandLangReferences(raw, vars, visited)
+        // First interpolate simple variables so nested placeholders inside lang: paths are resolved
+        val withVarsFirst = interpolateVariables(raw, vars)
 
-        // Interpolate remaining variables in the final text
-        val withVars = interpolateVariables(expandedRefs, vars)
+        // Then expand lang references (which may now include previously nested variables)
+        val expandedRefs = expandLangReferences(withVarsFirst, vars, visited)
+
+        // Finally, interpolate any remaining variables from referenced strings
+        val withVarsFinal = interpolateVariables(expandedRefs, vars)
 
         visited.remove(key)
-        return withVars
+        return withVarsFinal
     }
 
     private fun expandLangReferences(
@@ -62,13 +68,11 @@ class LangService : KoinComponent {
             val token = matcher.group(1).trim()
 
             if (token.startsWith("lang:")) {
-                // token like "lang:minigames.{minigameId}.name"
-                val rawPath = token.removePrefix("lang:").trim()
+                // token like "lang:minigames.test.name" (any nested vars should already be
+                // interpolated)
+                val resolvedPath = token.removePrefix("lang:").trim()
 
-                // First, interpolate variables inside the lang path itself
-                val resolvedPath = interpolateVariables(rawPath, vars)
-
-                // Then resolve that key recursively
+                // Resolve that key recursively
                 val replacement = resolveAndFormat(resolvedPath, vars, visited)
 
                 matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement))
@@ -90,7 +94,7 @@ class LangService : KoinComponent {
             val token = matcher.group(1).trim()
 
             if (token.startsWith("lang:")) {
-                // Should have been handled in expandLangReferences; leave as-is if any remain
+                // Leave lang references untouched in this phase
                 matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group()))
                 continue
             }
@@ -112,5 +116,28 @@ class LangService : KoinComponent {
         }
 
         fun build(): Map<String, Any?> = map.toMap()
+    }
+
+    private fun loadLangWithDefaults(relativePath: String): YamlConfiguration {
+        val file = dataFolder.resolve(relativePath)
+
+        // Load existing file (may be empty or partial)
+        val config = YamlConfiguration.loadConfiguration(file)
+
+        // If we have a bundled default, merge it as defaults and persist missing keys
+        plugin.getResource(relativePath)?.use { inputStream ->
+            val reader = InputStreamReader(inputStream, StandardCharsets.UTF_8)
+            val defaults = YamlConfiguration.loadConfiguration(reader)
+            config.setDefaults(defaults)
+            config.options().copyDefaults(true)
+            // Best-effort save to ensure missing keys are written for visibility/editing
+            try {
+                config.save(file)
+            } catch (_: Throwable) {
+                // ignore IO issues here; runtime reads will still use merged defaults
+            }
+        }
+
+        return config
     }
 }

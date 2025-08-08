@@ -26,6 +26,6 @@ data class HubMapDef(
     override val id: String,
     override val worldBorderSize: Double,
     val voidLevel: Double,
-    val creators: List<String>,
+    val creators: List<String>?,
     val spawnPoints: List<SpawnPoint>,
 ) : MapDef()
