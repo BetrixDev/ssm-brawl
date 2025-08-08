@@ -12,8 +12,10 @@ import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
 import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
 import dev.betrix.superSmashMobsBrawl.passives.PassiveSpec
+import org.bukkit.Material
 import java.util.concurrent.ConcurrentHashMap
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -179,7 +181,7 @@ object KitService : KoinComponent {
                                             .PROJECTILE
                                 },
                             cooldown = ability.cooldown.toInt(),
-                            hotbarItem = def?.metadata?.hotbarItem ?: def!!.metadata.hotbarItem,
+                            hotbarItem = def?.metadata?.hotbarItem ?: ItemStack.of(Material.IRON_AXE),
                             hotbarItemSlot = ability.itemSlot,
                             usageType =
                                 when (ability.usage.name) {

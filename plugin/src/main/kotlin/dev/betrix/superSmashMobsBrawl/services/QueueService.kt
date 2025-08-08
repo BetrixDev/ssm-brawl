@@ -15,7 +15,6 @@ import java.util.UUID
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.logging.Logger
 
 // This will be easy to add party data to in the future if we want
 data class QueueEntry(val player: Player, val minigame: MinigameDef, val partyId: String? = null) {
@@ -40,7 +39,6 @@ data class QueueEntry(val player: Player, val minigame: MinigameDef, val partyId
 
 object QueueService : Manageable(), KoinComponent {
     private val minigameService: MinigameService by inject()
-    private val logger: Logger by inject()
 
     private val queue = hashSetOf<QueueEntry>()
 
@@ -102,20 +100,14 @@ object QueueService : Manageable(), KoinComponent {
         // Snapshot the queue to determine which minigame types are present
         val snapshot = queue.toList()
 
-        logger.info(snapshot.toString())
-
         // Map unique minigame id -> definition
         val defsById = snapshot.groupBy { it.minigame.id }.mapValues { it.value.first().minigame }
-
-        logger.info(defsById.toString())
 
         defsById.values.forEach { def -> tryStartMinigamesFor(def) }
     }
 
     private fun tryStartMinigamesFor(minigameDef: MinigameDef) {
         val requiredPlayers = getRequiredPlayersForMinigame(minigameDef)
-
-        logger.info("Required players $requiredPlayers for ${minigameDef.id}")
 
         // Filter out any players who may have entered a minigame meanwhile
         var available =
