@@ -1,0 +1,29 @@
+{
+  "name": "@brawl/schemas",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./plugin": {
+      "types": "./dist/plugin/index.d.ts",
+      "import": "./dist/plugin/index.js"
+    }
+  },
+  "scripts": {
+    "build": "npx --yes tsdown",
+    "check-types": "npx --yes tsc -b"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "tsdown": "^0.12.9"
+  },
+  "dependencies": {
+    "zod": "^4.0.2"
+  }
+}

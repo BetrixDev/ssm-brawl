@@ -1,0 +1,1 @@
+export * as plugin from "./plugin/index.js";
