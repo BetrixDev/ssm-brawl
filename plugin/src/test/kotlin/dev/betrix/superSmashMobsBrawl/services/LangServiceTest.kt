@@ -28,9 +28,9 @@ class LangServiceTest :
             yml.set("greeting", "<green>Hello, {name}!")
             yml.set("farewell", "<red>Bye, {name}!")
             yml.set("minigames.test.name", "Test Minigame")
-            yml.set("withRef", "Welcome to {lang:minigames.{minigameId}.name}, {name}!")
-            yml.set("cycle.a", "{lang:cycle.b}")
-            yml.set("cycle.b", "{lang:cycle.a}")
+            yml.set("withRef", "Welcome to ${'$'}{minigames.{minigameId}.name}, {name}!")
+            yml.set("cycle.a", "${'$'}{cycle.b}")
+            yml.set("cycle.b", "${'$'}{cycle.a}")
             yml.save(enPath.toFile())
 
             startKoin { modules(module { single { plugin as JavaPlugin } }) }

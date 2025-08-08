@@ -5,7 +5,11 @@ import java.nio.charset.StandardCharsets
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.minimessage.MiniMessage
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
@@ -19,13 +23,19 @@ class LangService : KoinComponent {
 
     private val miniMessage: MiniMessage = MiniMessage.miniMessage()
 
-    // Matches {content} with no nested braces
-    private val placeholderPattern: Pattern = Pattern.compile("\\{([^{}]+)}")
+    // Matches {content} with no nested braces (variables)
+    private val variablePattern: Pattern = Pattern.compile("\\{([^{}]+)}")
+
+    // Matches ${content} with no nested braces (lang references)
+    private val langRefPattern: Pattern = Pattern.compile("\\$\\{([^{}]+)}")
+
+    // Built once from the current language file; contains style placeholders for palette entries
+    private val paletteResolver: TagResolver by lazy { buildPaletteResolver() }
 
     fun t(key: String, varsBuilder: VarsBuilder.() -> Unit = {}): Component {
         val vars = VarsBuilder().apply(varsBuilder).build()
         val resolved = resolveAndFormat(key, vars, visited = mutableSetOf())
-        return miniMessage.deserialize(resolved)
+        return miniMessage.deserialize(resolved, paletteResolver)
     }
 
     private fun resolveAndFormat(
@@ -43,10 +53,10 @@ class LangService : KoinComponent {
                     return "[$key]"
                 }
 
-        // First interpolate simple variables so nested placeholders inside lang: paths are resolved
+        // First interpolate simple variables so nested placeholders inside reference keys are resolved
         val withVarsFirst = interpolateVariables(raw, vars)
 
-        // Then expand lang references (which may now include previously nested variables)
+        // Then expand ${...} references (which may now include previously nested variables)
         val expandedRefs = expandLangReferences(withVarsFirst, vars, visited)
 
         // Finally, interpolate any remaining variables from referenced strings
@@ -61,25 +71,19 @@ class LangService : KoinComponent {
         vars: Map<String, Any?>,
         visited: MutableSet<String>,
     ): String {
-        val matcher = placeholderPattern.matcher(text)
+        val matcher = langRefPattern.matcher(text)
         val sb = StringBuffer()
 
         while (matcher.find()) {
             val token = matcher.group(1).trim()
 
-            if (token.startsWith("lang:")) {
-                // token like "lang:minigames.test.name" (any nested vars should already be
-                // interpolated)
-                val resolvedPath = token.removePrefix("lang:").trim()
+            // token like "minigames.test.name" (any nested vars should already be interpolated)
+            val resolvedPath = token
 
-                // Resolve that key recursively
-                val replacement = resolveAndFormat(resolvedPath, vars, visited)
+            // Resolve that key recursively
+            val replacement = resolveAndFormat(resolvedPath, vars, visited)
 
-                matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement))
-            } else {
-                // Keep other placeholders (variables) for later interpolation
-                matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group()))
-            }
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement))
         }
 
         matcher.appendTail(sb)
@@ -87,14 +91,14 @@ class LangService : KoinComponent {
     }
 
     private fun interpolateVariables(text: String, vars: Map<String, Any?>): String {
-        val matcher = placeholderPattern.matcher(text)
+        val matcher = variablePattern.matcher(text)
         val sb = StringBuffer()
 
         while (matcher.find()) {
             val token = matcher.group(1).trim()
 
-            if (token.startsWith("lang:")) {
-                // Leave lang references untouched in this phase
+            // If this is actually a ${...} reference, leave untouched for the reference phase
+            if (token.startsWith("$")) {
                 matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group()))
                 continue
             }
@@ -106,6 +110,29 @@ class LangService : KoinComponent {
 
         matcher.appendTail(sb)
         return sb.toString()
+    }
+
+    private fun buildPaletteResolver(): TagResolver {
+        val section: ConfigurationSection? = enLang.getConfigurationSection("palette")
+            ?: enLang.defaults?.getConfigurationSection("palette")
+
+        if (section == null) return TagResolver.empty()
+
+        val builder = TagResolver.builder()
+        for (name in section.getKeys(false)) {
+            val value = section.getString(name)?.trim().orEmpty()
+            val color = parseTextColor(value) ?: continue
+            builder.resolver(Placeholder.styling(name, color))
+        }
+        return builder.build()
+    }
+
+    private fun parseTextColor(value: String): TextColor? {
+        if (value.isEmpty()) return null
+        return when {
+            value.startsWith("#") -> TextColor.fromHexString(value)
+            else -> TextColor.fromCSSHexString(value) // attempt parse common formats/names if supported
+        }
     }
 
     class VarsBuilder {
