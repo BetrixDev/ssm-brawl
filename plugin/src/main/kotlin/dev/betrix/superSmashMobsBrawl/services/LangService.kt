@@ -1,5 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.services
 
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import net.kyori.adventure.text.Component
@@ -13,7 +15,7 @@ class LangService : KoinComponent {
     private val plugin: JavaPlugin by inject()
 
     private val dataFolder = plugin.dataFolder
-    private val enLang = YamlConfiguration.loadConfiguration(dataFolder.resolve("data/lang/en.yml"))
+    private val enLang: YamlConfiguration = loadLangWithDefaults("data/lang/en.yml")
 
     private val miniMessage: MiniMessage = MiniMessage.miniMessage()
 
@@ -35,6 +37,7 @@ class LangService : KoinComponent {
 
         val raw =
             enLang.getString(key)
+                ?: enLang.defaults?.getString(key)
                 ?: run {
                     visited.remove(key)
                     return "[$key]"
@@ -113,5 +116,28 @@ class LangService : KoinComponent {
         }
 
         fun build(): Map<String, Any?> = map.toMap()
+    }
+
+    private fun loadLangWithDefaults(relativePath: String): YamlConfiguration {
+        val file = dataFolder.resolve(relativePath)
+
+        // Load existing file (may be empty or partial)
+        val config = YamlConfiguration.loadConfiguration(file)
+
+        // If we have a bundled default, merge it as defaults and persist missing keys
+        plugin.getResource(relativePath)?.use { inputStream ->
+            val reader = InputStreamReader(inputStream, StandardCharsets.UTF_8)
+            val defaults = YamlConfiguration.loadConfiguration(reader)
+            config.setDefaults(defaults)
+            config.options().copyDefaults(true)
+            // Best-effort save to ensure missing keys are written for visibility/editing
+            try {
+                config.save(file)
+            } catch (_: Throwable) {
+                // ignore IO issues here; runtime reads will still use merged defaults
+            }
+        }
+
+        return config
     }
 }

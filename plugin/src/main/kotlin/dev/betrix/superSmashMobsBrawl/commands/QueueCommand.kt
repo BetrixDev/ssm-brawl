@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.commands
 import com.github.michaelbull.result.mapBoth
 import dev.betrix.superSmashMobsBrawl.extensions.hasDebugEnabled
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
+import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.QueueService
 import dev.betrix.superSmashMobsBrawl.utils.ONLY_PLAYERS_EXEC_MESSAGE
 import dev.betrix.superSmashMobsBrawl.utils.mm
@@ -12,9 +13,13 @@ import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 @Command(name = "queue")
-class QueueCommand() {
+class QueueCommand() : KoinComponent {
+
+    private val lang: LangService by inject()
 
     @Execute
     fun queue(@Context sender: CommandSender) {
@@ -54,9 +59,9 @@ class QueueCommand() {
             QueueService.addPlayer(sender, minigame)
                 .mapBoth(
                     success = {
-                        mm("<gold>You have joined the queue for TODO!</gold>")
-                        //                        mm("<gold>You have joined the queue for
-                        // ${it.minigame.name}!</gold>")
+                        lang.t("messages.queue.join.success") {
+                            "minigameId" to minigame.id
+                        }
                     },
                     failure = {
                         mm(

@@ -15,6 +15,7 @@ import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
 import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.KitService
+import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.utils.mm
@@ -58,6 +59,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
                     single(createdAtStart = true) { DataService() }
                     single { MinigameService() }
                     single { KitService }
+                    single(createdAtStart = true)  { LangService() }
                     single { WorldService }
                 }
             )

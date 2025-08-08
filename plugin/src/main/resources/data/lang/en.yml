@@ -1,25 +1,28 @@
 kits:
   creeper:
     name: Creeper
-    description: He's a creeper
+    description: "He's a creeper"
   skeleton:
     name: Skeleton
-    description: He got bones
+    description: "He got bones"
 maps:
   blue_forest:
     name: Blue Forest
-    description: The pirates have taken over!
+    description: "The pirates have taken over!"
   campsite:
     name: Campsite
-    description: A cozy getaway
+    description: "A cozy getaway"
 minigames:
   prototyping:
     name: Prototyping
-    description: For all of your testing needs
+    description: "For all of your testing needs"
   two_player_duels:
-    name: 1v1 Duels
-    descriptions: A competitive 1v1 game mode
+    name: "1v1 Duels"
+    descriptions: "A competitive 1v1game mode"
+prefix: "<#585b70>[<gradient:#cba6f7:#585b70>Brawl</gradient><#585b70>]<reset>"
 messages:
   queue:
     leave:
-      success: You have left the queue for {lang:minigames.{minigameId}.name}
+        success: "{lang:prefix} <#e8edff>You have left the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}<#e8edff>"
+    join:
+      success: "{lang:prefix} <#e8edff>You have joined the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}<#e8edff>!"
