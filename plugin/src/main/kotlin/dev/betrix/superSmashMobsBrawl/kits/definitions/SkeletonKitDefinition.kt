@@ -24,9 +24,7 @@ object SkeletonKitDefinition : KitDefinition() {
         ability(RopedArrowAbilityDefinition)
     }
 
-    override fun createInstance(
-        player: Player,
-    ): SkeletonKitInstance {
+    override fun createInstance(player: Player): SkeletonKitInstance {
         return SkeletonKitInstance(this, player)
     }
 }

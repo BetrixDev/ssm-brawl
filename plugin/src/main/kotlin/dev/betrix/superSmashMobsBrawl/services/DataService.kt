@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.services
 
+import com.charleskorn.kaml.PolymorphismStyle
 import com.charleskorn.kaml.Yaml
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
@@ -42,12 +43,13 @@ class DataService : KoinComponent {
             configuration =
                 Yaml.default.configuration.copy(
                     polymorphismPropertyName = "type",
+                    polymorphismStyle = PolymorphismStyle.Property,
                     strictMode = false,
                     decodeEnumCaseInsensitive = true,
                 ),
         )
 
-    private val dataFolder = plugin.dataFolder
+    private val dataFolder = plugin.dataFolder.resolve("data")
 
     private lateinit var kitDefs: Map<String, KitDef>
     private lateinit var gameMapDefs: Map<String, GameMapDef>

@@ -1,7 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.models.brawlData
 
+import com.charleskorn.kaml.YamlNode
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
 
 @Serializable data class PassiveFileDef(val passives: List<PassiveDef>)
 
@@ -9,6 +9,6 @@ import kotlinx.serialization.json.JsonElement
 data class PassiveDef(
     val id: String,
     val userFacing: Boolean,
-    val metadata: Map<String, JsonElement>? = null,
-    val displayItem: String,
+    val metadata: Map<String, YamlNode>? = null,
+    val displayItem: String? = null,
 )

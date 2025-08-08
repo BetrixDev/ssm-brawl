@@ -8,7 +8,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class MinigameDef {
     abstract val id: String
-    abstract val type: String
     abstract val isHidden: Boolean
     abstract val allowParties: Boolean
     abstract val mapBlacklist: List<String>?
@@ -19,7 +18,6 @@ sealed class MinigameDef {
 @SerialName("ffa")
 data class FfaMinigameDef(
     override val id: String,
-    override val type: String,
     override val isHidden: Boolean,
     override val allowParties: Boolean,
     override val mapBlacklist: List<String>? = null,
@@ -33,7 +31,6 @@ data class FfaMinigameDef(
 @SerialName("team_based_stocks")
 data class TeamBasedStocksMinigameDef(
     override val id: String,
-    override val type: String,
     override val isHidden: Boolean,
     override val allowParties: Boolean,
     override val mapBlacklist: List<String>? = null,

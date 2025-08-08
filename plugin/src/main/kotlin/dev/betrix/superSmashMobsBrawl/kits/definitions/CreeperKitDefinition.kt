@@ -22,9 +22,7 @@ object CreeperKitDefinition : KitDefinition() {
         ability(ExplosionAbilityDefinition)
     }
 
-    override fun createInstance(
-        player: Player,
-    ): CreeperKitInstance {
+    override fun createInstance(player: Player): CreeperKitInstance {
         return CreeperKitInstance(this, player)
     }
 }

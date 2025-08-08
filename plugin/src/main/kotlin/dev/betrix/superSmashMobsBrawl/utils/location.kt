@@ -19,7 +19,10 @@ fun createLocation(world: World, spawnPoint: SpawnPoint): Location {
     )
 }
 
-fun createLocation(world: World, spawnPoint: dev.betrix.superSmashMobsBrawl.models.SpawnPoint): Location {
+fun createLocation(
+    world: World,
+    spawnPoint: dev.betrix.superSmashMobsBrawl.models.SpawnPoint,
+): Location {
     return Location(
         world,
         spawnPoint.x,

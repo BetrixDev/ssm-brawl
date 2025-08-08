@@ -8,10 +8,7 @@ import dev.betrix.superSmashMobsBrawl.passives.instances.PassiveInstance
 import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import org.bukkit.entity.Player
 
-open class KitInstance(
-    val definition: KitDefinition,
-    val player: Player,
-) {
+open class KitInstance(val definition: KitDefinition, val player: Player) {
     val abilityInstances = arrayListOf<AbilityInstance>()
     val passiveInstances = arrayListOf<PassiveInstance>()
     protected lateinit var disguise: Disguise

@@ -50,21 +50,23 @@ object HubService {
 
         plugin.launch {
             val hubMap: SsmbMap = MapRegistry.getDefaultHub() ?: blueForestHub
-            val mapDef = HubMapDef(
-                id = hubMap.id,
-                worldBorderSize = hubMap.worldBorderSize,
-                voidLevel = hubMap.voidLevel.toDouble(),
-                creators = hubMap.creatorUuids,
-                spawnPoints = hubMap.spawnPoints.map { sp ->
-                    dev.betrix.superSmashMobsBrawl.models.SpawnPoint(
-                        x = sp.position.x,
-                        y = sp.position.y,
-                        z = sp.position.z,
-                        yaw = sp.yaw,
-                        pitch = sp.pitch,
-                    )
-                },
-            )
+            val mapDef =
+                HubMapDef(
+                    id = hubMap.id,
+                    worldBorderSize = hubMap.worldBorderSize,
+                    voidLevel = hubMap.voidLevel.toDouble(),
+                    creators = hubMap.creatorUuids,
+                    spawnPoints =
+                        hubMap.spawnPoints.map { sp ->
+                            dev.betrix.superSmashMobsBrawl.models.SpawnPoint(
+                                x = sp.position.x,
+                                y = sp.position.y,
+                                z = sp.position.z,
+                                yaw = sp.yaw,
+                                pitch = sp.pitch,
+                            )
+                        },
+                )
 
             WorldService.copyAndLoadWorld<BrawlHubWorld>(mapDef)
                 .mapBoth(
@@ -164,7 +166,8 @@ object HubService {
         return isWorldHub(player.world)
     }
 
-    fun isWorldHub(world: World): Boolean = ::defaultHubWorld.isInitialized && defaultHubWorld.world == world
+    fun isWorldHub(world: World): Boolean =
+        ::defaultHubWorld.isInitialized && defaultHubWorld.world == world
 
     fun getDefaultHub(): SsmbMap? {
         return MapRegistry.getDefaultHub()

@@ -48,10 +48,7 @@ object KitService : KoinComponent {
         return assignKit(player, playerSelectedKits[player] ?: defaultKitId())
     }
 
-    fun assignKit(
-        player: Player,
-        kitId: String,
-    ): Result<KitInstance, AssignKitError> {
+    fun assignKit(player: Player, kitId: String): Result<KitInstance, AssignKitError> {
         if (assignedKits.containsKey(player)) {
             return Err(AssignKitError.PLAYER_HAS_KIT)
         }
@@ -73,7 +70,10 @@ object KitService : KoinComponent {
         return Ok(kitInstance)
     }
 
-    fun assignKit(player: Player, kitDefinition: KitDefinition): Result<KitInstance, AssignKitError> {
+    fun assignKit(
+        player: Player,
+        kitDefinition: KitDefinition,
+    ): Result<KitInstance, AssignKitError> {
         return assignKit(player, kitDefinition.id)
     }
 
@@ -122,43 +122,77 @@ object KitService : KoinComponent {
     }
 
     private fun buildKitSpec(kit: KitDef): KitSpec {
-        val name = kit.id.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        val name =
+            kit.id.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
 
-        val passive = dataService.getPassive(kit.passives.id)
-        val passiveSpec = if (passive != null) {
-            val def = dev.betrix.superSmashMobsBrawl.registries.PassiveRegistry.getDefinition(passive.id)
-            PassiveSpec(
-                id = passive.id,
-                name = def?.name ?: passive.id,
-                metadata = dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata(
-                    description = passive.metadata?.get("description")?.toString() ?: "",
-                    userFacing = passive.userFacing,
-                ),
-            )
-        } else null
+        fun yamlNodeToString(value: Any?): String? {
+            return when (val v = value) {
+                null -> null
+                is com.charleskorn.kaml.YamlScalar -> v.content
+                else -> v.toString()
+            }
+        }
 
-        val ability = dataService.getAbility(kit.abilities.id)
-        val abilitySpec = if (ability != null) {
-            val def = dev.betrix.superSmashMobsBrawl.registries.AbilityRegistry.getDefinition(ability.id)
-            AbilitySpec(
-                id = ability.id,
-                name = def?.name ?: ability.id,
-                metadata = dev.betrix.superSmashMobsBrawl.abilities.AbilityMetadata(
-                    description = "",
-                    type = when (ability.type.name) {
-                        "AOE" -> dev.betrix.superSmashMobsBrawl.abilities.AbilityType.AOE
-                        else -> dev.betrix.superSmashMobsBrawl.abilities.AbilityType.PROJECTILE
-                    },
-                    cooldown = ability.cooldown.toInt(),
-                    hotbarItem = def?.metadata?.hotbarItem ?: def!!.metadata.hotbarItem,
-                    hotbarItemSlot = ability.itemSlot,
-                    usageType = when (ability.usage.name) {
-                        "RIGHT_CLICK" -> dev.betrix.superSmashMobsBrawl.abilities.AbilityUsageType.RIGHT_CLICK
-                        else -> dev.betrix.superSmashMobsBrawl.abilities.AbilityUsageType.LEFT_CLICK
-                    },
-                ),
-            )
-        } else null
+        val passiveSpecs: List<PassiveSpec> =
+            kit.passives.mapNotNull { kitPassiveDef ->
+                val passive = dataService.getPassive(kitPassiveDef.id) ?: return@mapNotNull null
+                val def =
+                    dev.betrix.superSmashMobsBrawl.registries.PassiveRegistry.getDefinition(
+                        passive.id
+                    )
+
+                val descriptionOverride =
+                    yamlNodeToString(kitPassiveDef.overrides?.metadata?.get("description"))
+                val descriptionDefault = yamlNodeToString(passive.metadata?.get("description"))
+
+                PassiveSpec(
+                    id = passive.id,
+                    name = def?.name ?: passive.id,
+                    metadata =
+                        dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata(
+                            description = descriptionOverride ?: descriptionDefault ?: "",
+                            userFacing = passive.userFacing,
+                        ),
+                )
+            }
+
+        val abilitySpecs: List<AbilitySpec> =
+            kit.abilities.mapNotNull { kitAbilityDef ->
+                val ability = dataService.getAbility(kitAbilityDef.id) ?: return@mapNotNull null
+                val def =
+                    dev.betrix.superSmashMobsBrawl.registries.AbilityRegistry.getDefinition(
+                        ability.id
+                    )
+
+                AbilitySpec(
+                    id = ability.id,
+                    name = def?.name ?: ability.id,
+                    metadata =
+                        dev.betrix.superSmashMobsBrawl.abilities.AbilityMetadata(
+                            description = "",
+                            type =
+                                when (ability.type.name) {
+                                    "AOE" ->
+                                        dev.betrix.superSmashMobsBrawl.abilities.AbilityType.AOE
+                                    else ->
+                                        dev.betrix.superSmashMobsBrawl.abilities.AbilityType
+                                            .PROJECTILE
+                                },
+                            cooldown = ability.cooldown.toInt(),
+                            hotbarItem = def?.metadata?.hotbarItem ?: def!!.metadata.hotbarItem,
+                            hotbarItemSlot = ability.itemSlot,
+                            usageType =
+                                when (ability.usage.name) {
+                                    "RIGHT_CLICK" ->
+                                        dev.betrix.superSmashMobsBrawl.abilities.AbilityUsageType
+                                            .RIGHT_CLICK
+                                    else ->
+                                        dev.betrix.superSmashMobsBrawl.abilities.AbilityUsageType
+                                            .LEFT_CLICK
+                                },
+                        ),
+                )
+            }
 
         return KitSpec(
             id = kit.id,
@@ -166,8 +200,8 @@ object KitService : KoinComponent {
             description = "",
             type = KitType.DEFAULT,
             meleeDamage = kit.meleeDamage.toInt(),
-            passives = listOfNotNull(passiveSpec),
-            abilities = listOfNotNull(abilitySpec),
+            passives = passiveSpecs,
+            abilities = abilitySpecs,
         )
     }
 }

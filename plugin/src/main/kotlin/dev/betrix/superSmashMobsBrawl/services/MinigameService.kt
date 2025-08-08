@@ -31,8 +31,11 @@ class MinigameService : KoinComponent {
     // Minimal stub to keep build green until new flow is wired
     interface MinigameInstance {
         suspend fun initMinigame(): Result<Unit, Exception>
+
         fun teardownMinigame()
+
         fun onPlayerLeave(player: Player): Result<Unit, Exception>
+
         fun isPlayerInMinigame(player: Player): Boolean
     }
 
@@ -49,9 +52,15 @@ class MinigameService : KoinComponent {
     fun findClosestMinigameById(id: String): MinigameDef? {
         if (id.isBlank()) return null
 
-        getMinigameData(id)?.let { return it }
+        getMinigameData(id)?.let {
+            return it
+        }
 
-        getAllMinigameData().find { it.id.equals(id, ignoreCase = true) }?.let { return it }
+        getAllMinigameData()
+            .find { it.id.equals(id, ignoreCase = true) }
+            ?.let {
+                return it
+            }
 
         return getAllMinigameData().find { it.id.contains(id, ignoreCase = true) }
     }
