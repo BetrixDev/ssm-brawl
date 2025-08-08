@@ -6,7 +6,9 @@ import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
+import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.projectiles.SulphurBombProjectile
+import gg.flyte.twilight.extension.round
 import org.bukkit.entity.Player
 
 class SulphurBombAbility(id: String, player: Player, metadata: AbilityMetadata) :
@@ -25,7 +27,17 @@ class SulphurBombAbility(id: String, player: Player, metadata: AbilityMetadata) 
     private fun throwProjectile() {
         val projectile =
             SulphurBombProjectile(player) { hitEntity, projectile ->
+                player.sendDebugMessage(
+                    "[SB] Sulphur bomb exploded at ${projectile?.x?.round(1)}, ${
+                        projectile?.y?.round(
+                            1
+                        )
+                    }, ${projectile?.z?.round(1)} after ${projectile?.ticksLived} ticks"
+                )
+
                 if (hitEntity != null) {
+                    player.sendDebugMessage("[SB] ${hitEntity.name} was hit")
+
                     val damageEvent =
                         SmashDamageEvent(
                             hitEntity,
@@ -44,6 +56,8 @@ class SulphurBombAbility(id: String, player: Player, metadata: AbilityMetadata) 
                         projectile?.location?.toVector(),
                         null,
                     )
+                } else {
+                    player.sendDebugMessage("[SB] No entity was hit")
                 }
 
                 true

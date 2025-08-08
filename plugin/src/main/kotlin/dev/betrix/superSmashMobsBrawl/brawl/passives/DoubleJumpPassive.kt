@@ -35,7 +35,7 @@ class DoubleJumpPassive(
 
         runnables.add(
             repeatingTask(0) {
-                if (player.isOnBlock() || canDoubleJump) {
+                if ((player.isOnBlock() || canDoubleJump) && (!canDoubleJump || !player.allowFlight)) {
                     player.sendDebugMessage("[DJ] You have hit the ground")
                     canDoubleJump = true
                     player.allowFlight = true

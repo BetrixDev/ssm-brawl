@@ -7,7 +7,7 @@ abilities:
     hotbarItem: iron_axe
     displayItem: coal
 
-  - id: explosion
+  - id: explode
     cooldown: 8.0
     type: aoe
     itemSlot: 1

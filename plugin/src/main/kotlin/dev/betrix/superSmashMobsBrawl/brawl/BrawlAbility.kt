@@ -35,10 +35,7 @@ abstract class BrawlAbility(val id: String, val player: Player, val metadata: Ab
         if (isOnCooldown()) {
             val component =
                 lang.t("messages.abilities.cooldown") {
-                    "abilityName" to
-                        id.replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase() else it.toString()
-                        }
+                    "abilityId" to id
                     "seconds" to getRemainingCooldown()
                 }
             player.sendMessage(component)

@@ -62,7 +62,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             player.teleport(brawlWorld.world.location(spawnPoints[idx]))
 
             kitService
-                .assignKit(player)
+                .assignKit(player, minigameData)
                 .onFailure { err ->
                     return when (err) {
                         AssignKitError.PLAYER_HAS_KIT ->

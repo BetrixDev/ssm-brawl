@@ -15,6 +15,7 @@ import dev.betrix.superSmashMobsBrawl.brawl.registry.BrawlPassiveRegistry
 import dev.betrix.superSmashMobsBrawl.disguises.CreeperDisguise
 import dev.betrix.superSmashMobsBrawl.disguises.SkeletonDisguise
 import dev.betrix.superSmashMobsBrawl.models.brawlData.AbilityDef
+import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata
 import dev.betrix.superSmashMobsBrawl.utils.itemFromString
 import java.util.concurrent.ConcurrentHashMap
@@ -42,14 +43,14 @@ object KitService : KoinComponent {
         return dataService.getKit("creeper")?.id ?: dataService.getKit("skeleton")?.id ?: "creeper"
     }
 
-    fun assignKit(player: Player): Result<BrawlKit, AssignKitError> {
+    fun assignKit(player: Player, minigameDef: MinigameDef? = null): Result<BrawlKit, AssignKitError> {
         if (!playerSelectedKits.containsKey(player) || playerSelectedKits[player] == null) {
             playerSelectedKits[player] = defaultKitId()
         }
-        return assignKit(player, playerSelectedKits[player] ?: defaultKitId())
+        return assignKit(player, playerSelectedKits[player] ?: defaultKitId(), minigameDef)
     }
 
-    fun assignKit(player: Player, kitId: String): Result<BrawlKit, AssignKitError> {
+    fun assignKit(player: Player, kitId: String, minigameDef: MinigameDef? = null): Result<BrawlKit, AssignKitError> {
         if (assignedBrawlKits.containsKey(player)) {
             return Err(AssignKitError.PLAYER_HAS_KIT)
         }
@@ -75,6 +76,10 @@ object KitService : KoinComponent {
         }
 
         kitData.passives.forEach { kitPassiveDef ->
+            if (!canPassiveBeUsedInMinigame(kitPassiveDef.id, minigameDef)) {
+                return@forEach
+            }
+
             val passiveDef = dataService.getPassive(kitPassiveDef.id) ?: return@forEach
             val metadata =
                 PassiveMetadata(
@@ -115,6 +120,22 @@ object KitService : KoinComponent {
     fun getBrawlKit(player: Player): BrawlKit? = assignedBrawlKits[player]
 
     fun hasKit(player: Player): Boolean = assignedBrawlKits.containsKey(player)
+
+    private fun canPassiveBeUsedInMinigame(id: String, minigameDef: MinigameDef? = null): Boolean {
+        if (minigameDef == null) {
+            return true
+        }
+
+        if (minigameDef.passiveBlacklist != null && minigameDef.passiveBlacklist?.contains(id) == true) {
+            return false
+        }
+
+        if (minigameDef.passiveWhitelist != null && minigameDef.passiveWhitelist?.contains(id) == false) {
+            return false
+        }
+
+        return true
+    }
 
     private fun buildAbilityMetadata(ability: AbilityDef): AbilityMetadata {
         val usage =
