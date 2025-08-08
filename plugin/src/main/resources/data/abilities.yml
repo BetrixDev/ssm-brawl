@@ -7,12 +7,12 @@ abilities:
     hotbarItem: iron_axe
     displayItem: coal
 
-  - id: explode
+  - id: explosion
     cooldown: 8.0
     type: aoe
     itemSlot: 1
     usage: right_click
-    hotbarItem: right_click
+    hotbarItem: iron_shovel
     displayItem: creeper_spawn_egg
 
   - id: bone_explosion
