@@ -13,7 +13,7 @@ kits:
     meleeDamage: 6.0
     armor: 4.0
     knockbackMultiplier: 1.65
-    disguiseId: creeper
+    disguiseId: "creeper"
     passives:
       - id: double_jump
       - id: regeneration
@@ -30,7 +30,7 @@ kits:
     meleeDamage: 5.0
     armor: 6.0
     knockbackMultiplier: 1.25
-    disguiseId: skeleton
+    disguiseId: "skeleton"
     metadata:
       arrowKnockbackMultiplier: 1.50
     passives:

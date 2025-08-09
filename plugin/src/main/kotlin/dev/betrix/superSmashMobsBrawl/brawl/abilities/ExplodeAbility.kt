@@ -58,6 +58,8 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
                 resetPlayerData()
             }
         )
+
+        super.setup()
     }
 
     override fun activate() {

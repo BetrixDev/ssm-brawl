@@ -1,32 +1,36 @@
 kits:
   hub:
-    name: Hub
+    name: "Hub"
     description: "This is the hub kit"
   creeper:
-    name: Creeper
+    name: "Creeper"
     description: "He's a creeper"
   skeleton:
-    name: Skeleton
+    name: "Skeleton"
     description: "He got bones"
 abilities:
   sulphur_bomb:
     name: "Sulphur Bomb"
+    description: ""
   explode:
     name: "Explode"
+    description: ""
   bone_explosion:
     name: "Bone Explosion"
+    description: ""
   roped_arrow:
     name: "Roped Arrow"
+    description: ""
 maps:
   blue_forest:
-    name: Blue Forest
+    name: "Blue Forest"
     description: "The pirates have taken over!"
   campsite:
-    name: Campsite
+    name: "Campsite"
     description: "A cozy getaway"
 minigames:
   prototyping:
-    name: Prototyping
+    name: "Prototyping"
     description: "For all of your testing needs"
   two_player_duels:
     name: "1v1 Duels"
@@ -49,7 +53,13 @@ messages:
       inQueue: "{lang:prefix} <#e8edff>You are currently in the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}"
       notInQueue: "{lang:messages.queue.leave.notInQueue}"
   abilities:
+    hotbarItemTitle: "<#91d7e3>{lang:abilities.{abilityId}.name}"
+    hotbarItemDescription: "<#cad3f5>{lang:abilities.{abilityId}.description}"
     cooldown: "{lang:prefix} <red>{lang:abilities.{abilityId}.name}</red> <#e8edff>is on cooldown for</#e8edff> <yellow>{seconds}s</yellow>!"
+    readyToActivate: "{lang:prefix} <#8bd5ff>{lang:abilities.{abilityId}.name} <#e8edff>is ready to activate"
+    use:
+      success: "{lang:prefix} <#e8edff>Activated <#8bd5ff>{lang:abilities.{abilityId}.name}"
+      cooldown: "{lang:prefix} <red>{lang:abilities.{abilityId}.name}</red> <#e8edff>is on cooldown for</#e8edff> <yellow>{seconds}s</yellow>!"
   kits:
     select:
       success: "{lang:prefix} <#e8edff>You have selected kit <#8bd5ff>{lang:kits.{kitId}.name}"

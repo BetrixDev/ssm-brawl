@@ -49,7 +49,10 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                 }
             }
 
+        logger.info(kitData.abilities.toString())
+
         kitData.abilities.forEach {
+            logger.info(it.toString())
             abilities.add(
                 when (it.id) {
                     "sulphur_bomb" -> SulphurBombAbility(player)
@@ -98,7 +101,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
     }
 
     open fun teardown() {
-//        HotbarService.clearHotbarItems(player)
+        //        HotbarService.clearHotbarItems(player)
 
         disguise?.teardown()
 

@@ -228,6 +228,6 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) : 
         val checkBlock = projectile.location.block.getRelative(BlockFace.DOWN)
 
         return projectile.velocity.length() <= 0.01 &&
-                (projectile.isOnGround || checkBlock.isAirOrFoliage())
+            (projectile.isOnGround || checkBlock.isAirOrFoliage())
     }
 }

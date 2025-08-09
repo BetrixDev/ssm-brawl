@@ -27,7 +27,7 @@ fun Player.sendDebugMessage(message: String) {
 
     val lang: LangService = GlobalContext.get().get()
 
-    sendMessage(lang.t("message.debug") { "message" to message })
+    sendMessage(lang.t("messages.debug") { "message" to message })
 }
 
 fun Player.hasPassive(passiveId: String): Boolean {
