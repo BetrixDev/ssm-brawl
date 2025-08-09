@@ -3,8 +3,7 @@ package dev.betrix.superSmashMobsBrawl.models.brawlData
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class MinigameDefFile(val minigames: List<MinigameDef>)
+@Serializable data class MinigameDefFile(val minigames: List<MinigameDef>)
 
 @Serializable
 sealed class MinigameDef {
@@ -15,6 +14,7 @@ sealed class MinigameDef {
     abstract val mapWhitelist: List<String>?
     abstract val passiveBlacklist: List<String>?
     abstract val passiveWhitelist: List<String>?
+    abstract val respawnDelaySeconds: Int?
 }
 
 @Serializable
@@ -27,6 +27,7 @@ data class FfaMinigameDef(
     override val mapWhitelist: List<String>? = null,
     override val passiveBlacklist: List<String>? = null,
     override val passiveWhitelist: List<String>? = null,
+    override val respawnDelaySeconds: Int? = null,
     val minPlayers: Int,
     val maxPlayers: Int,
     val allowKitSwitching: Boolean,
@@ -42,6 +43,7 @@ data class TeamBasedStocksMinigameDef(
     override val mapWhitelist: List<String>? = null,
     override val passiveBlacklist: List<String>? = null,
     override val passiveWhitelist: List<String>? = null,
+    override val respawnDelaySeconds: Int? = null,
     val playersPerTeam: Int,
     val amountOfTeams: Int,
     val stocks: Int,

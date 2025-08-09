@@ -32,7 +32,7 @@ class ArrowRechargePassive(
                 synchronized(runnables) {
                     runnables.forEach { it.cancel() }
                     runnables.clear()
-                    
+
                     runnables.add(
                         repeatingTask(arrowRechargeDelayTicks, arrowRechargeDelayTicks) {
                             val inv = player.inventory
@@ -49,7 +49,8 @@ class ArrowRechargePassive(
                                 return@repeatingTask
                             }
 
-                            val newAmount = (arrowItemStack.amount + 1).coerceAtMost(maximumArrowCount)
+                            val newAmount =
+                                (arrowItemStack.amount + 1).coerceAtMost(maximumArrowCount)
 
                             if (newAmount == arrowItemStack.amount) {
                                 return@repeatingTask

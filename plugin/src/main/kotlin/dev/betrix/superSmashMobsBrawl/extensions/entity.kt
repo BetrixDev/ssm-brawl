@@ -1,12 +1,18 @@
 package dev.betrix.superSmashMobsBrawl.extensions
 
+import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
 import gg.flyte.twilight.extension.add
 import kotlin.math.abs
 import kotlin.math.log10
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Projectile
 import org.bukkit.util.Vector
+
+fun Entity.teleport(spawnPoint: SpawnPoint) {
+    teleport(Location(world, spawnPoint.x, spawnPoint.y, spawnPoint.z))
+}
 
 fun Entity.setVelocity(strength: Double, yAdd: Double, yMax: Double, groundBoost: Boolean) {
     setVelocity(this.location.direction, strength, false, 0.0, yAdd, yMax, groundBoost)

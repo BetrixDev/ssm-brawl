@@ -7,13 +7,13 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
 sealed class SmashDamageType {
-    object Projectile : SmashDamageType()
+    data object Projectile : SmashDamageType()
 
-    object Explosion : SmashDamageType()
+    data object Explosion : SmashDamageType()
 }
 
 sealed class Damager {
-    object System : Damager()
+    data object System : Damager()
 
     data class LivingEntity(val livingEntity: org.bukkit.entity.LivingEntity) : Damager()
 }

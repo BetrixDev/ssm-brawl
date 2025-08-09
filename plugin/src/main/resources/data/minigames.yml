@@ -8,6 +8,7 @@ minigames:
     allowKitSwitching: true
     allowParties: true
     passiveBlacklist: [hunger]
+    respawnDelaySeconds: 5
 
   - id: two_player_duels
     countdown: 5
@@ -17,3 +18,4 @@ minigames:
     amountOfTeams: 2
     stocks: 4
     allowParties: false
+    respawnDelaySeconds: 5

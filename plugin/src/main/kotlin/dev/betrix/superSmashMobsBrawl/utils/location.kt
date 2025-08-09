@@ -4,10 +4,7 @@ import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
 import org.bukkit.Location
 import org.bukkit.World
 
-fun createLocation(
-    world: World,
-    spawnPoint: SpawnPoint,
-): Location {
+fun createLocation(world: World, spawnPoint: SpawnPoint): Location {
     return Location(
         world,
         spawnPoint.x,

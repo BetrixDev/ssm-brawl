@@ -19,6 +19,7 @@ data class GameMapDef(
     val maxPlayers: Int,
     val creators: List<String>?,
     val spawnPoints: List<SpawnPoint>,
+    val spectatorSpawnPoint: SpawnPoint,
 ) : MapDef()
 
 @Serializable

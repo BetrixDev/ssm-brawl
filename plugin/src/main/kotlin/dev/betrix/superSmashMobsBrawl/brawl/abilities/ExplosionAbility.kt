@@ -117,7 +117,7 @@ class ExplosionAbility(id: String, player: Player, metadata: AbilityMetadata) :
                         val distance = player.location.distance(entity.location)
                         val damage =
                             ((0.1 + 0.9 * ((explosionRadius - distance) / explosionRadius)) * 20) *
-                                    0.75
+                                0.75
 
                         entity.doKnockback(
                             explosionKnockbackMultiplier,

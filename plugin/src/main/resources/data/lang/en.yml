@@ -51,3 +51,6 @@ messages:
       success: "{lang:prefix} <#e8edff>You have selected kit <#8bd5ff>{lang:kits.{kitId}.name}"
   players:
     joinServer: "{lang:prefix} <#8bd5ff>{playerName} <#e8edff>has joined the server"
+  minigames:
+    respawn:
+      timeLeft: "<#8bd5ff>{secondsLeft}"

@@ -4,6 +4,10 @@ gameMaps:
     maxPlayers: 4
     worldBorderSize: 300.0
     creators: [8ebcc57e-89df-4454-95b0-e7edc0071ac0]
+    spectatorSpawnPoint:
+      x: 0.0
+      y: 150.0
+      z: 45.0
     spawnPoints:
       - x: 13.0
         y: 106.0

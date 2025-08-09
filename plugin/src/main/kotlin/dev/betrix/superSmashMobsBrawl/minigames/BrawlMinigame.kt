@@ -6,22 +6,35 @@ import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.github.michaelbull.result.unwrap
+import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.Manageable
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.brawl.BrawlKit
+import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
+import dev.betrix.superSmashMobsBrawl.events.DeathReason
 import dev.betrix.superSmashMobsBrawl.extensions.getEquidistant
+import dev.betrix.superSmashMobsBrawl.extensions.getFarthestFromPlayers
 import dev.betrix.superSmashMobsBrawl.extensions.location
+import dev.betrix.superSmashMobsBrawl.extensions.teleport
 import dev.betrix.superSmashMobsBrawl.models.BrawlGameWorld
 import dev.betrix.superSmashMobsBrawl.models.MinigameState
+import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
-import dev.betrix.superSmashMobsBrawl.services.AssignKitError
-import dev.betrix.superSmashMobsBrawl.services.DataService
-import dev.betrix.superSmashMobsBrawl.services.KitService
-import dev.betrix.superSmashMobsBrawl.services.WorldService
-import gg.flyte.twilight.extension.kill
+import dev.betrix.superSmashMobsBrawl.services.*
+import gg.flyte.twilight.extension.feed
+import gg.flyte.twilight.extension.heal
 import gg.flyte.twilight.scheduler.repeatingTask
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.title.Title
+import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.time.Duration
 
 abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     minigameId: String,
@@ -31,6 +44,8 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     protected val dataService: DataService by inject()
     private val kitService: KitService by inject()
     private val worldService: WorldService by inject()
+    private val langService: LangService by inject()
+    private val plugin: SuperSmashMobsBrawl by inject()
 
     protected val minigameData =
         (dataService.getMinigame(minigameId) as TMinigameDef?)
@@ -44,7 +59,18 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     var state = MinigameState.PREFLIGHT
         protected set
 
+    fun hasPlayer(player: Player): Boolean {
+        return players.contains(player)
+    }
+
     open suspend fun initMinigame(): Result<Unit, Exception> {
+        listeners.add(BrawlDeathEvent.listen(this) {
+            plugin.logger.info("Player $player died")
+            plugin.launch {
+                onPlayerDeath(player)
+            }
+        })
+
         brawlWorld =
             findAndCreateWorld()
                 .onFailure {
@@ -60,25 +86,54 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
         players.forEachIndexed { idx, player ->
             player.teleport(brawlWorld.world.location(spawnPoints[idx]))
-
-            kitService
-                .assignKit(player, minigameData)
-                .onFailure { err ->
-                    return when (err) {
-                        AssignKitError.PLAYER_HAS_KIT ->
-                            Err(
-                                RuntimeException(
-                                    "Player $player already has a kit assigned to them"
-                                )
-                            )
-                    }
-                }
-                .onSuccess { kit -> assignedKits.add(Pair(player, kit)) }
+            assignPlayerKit(player)
         }
 
         state = MinigameState.STARTING
 
         return Ok(Unit)
+    }
+
+    open suspend fun onPlayerDeath(player: Player) {
+        kitService.unassignKit(player)?.let { assignedKits.removeIf { it.first == player } }
+
+        if (minigameData.respawnDelaySeconds != null) {
+            player.teleport(brawlWorld.data.spectatorSpawnPoint)
+            player.gameMode = GameMode.SPECTATOR
+            player.allowFlight = true
+            player.isFlying = true
+
+            val respawnDelay = minigameData.respawnDelaySeconds ?: 0
+
+            repeat(respawnDelay) { iteration ->
+                val secondsLeft = respawnDelay - iteration
+
+                val title =
+                    Title.title(
+                        langService.t("messages.minigames.respawn.timeLeft") { "secondsLeft" to secondsLeft },
+                        Component.empty(),
+                        Title.Times.times(
+                            Duration.ofMillis(250), Duration.ofMillis(500), Duration.ofMillis(250)
+                        )
+                    )
+
+                player.showTitle(title)
+
+                withContext(Dispatchers.IO) { delay(1.seconds) }
+            }
+        }
+
+        val spawnPoint =
+            brawlWorld.data.spawnPoints.getFarthestFromPlayers(
+                players.filter { it != player },
+                brawlWorld.world,
+            ) ?: SpawnPoint(100.0, 100.0, 100.0)
+
+        player.teleport(spawnPoint)
+        player.feed()
+        player.heal()
+        player.gameMode = GameMode.SURVIVAL
+        assignPlayerKit(player)
     }
 
     fun isPlayerInMinigame(player: Player): Boolean {
@@ -88,6 +143,20 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     abstract fun canPlayerLeaveMinigame(player: Player): Boolean
 
     abstract fun onPlayerLeave(player: Player)
+
+    private fun assignPlayerKit(player: Player) {
+        kitService
+            .assignKit(player, minigameData)
+            .onFailure { err ->
+                when (err) {
+                    AssignKitError.PLAYER_HAS_KIT -> {
+                        kitService.unassignKit(player)
+                        kitService.assignKit(player, minigameData)
+                    }
+                }
+            }
+            .onSuccess { kit -> assignedKits.add(Pair(player, kit)) }
+    }
 
     private fun createVoidDeathListener(): Result<Unit, Exception> {
         if (!::brawlWorld.isInitialized) {
@@ -101,8 +170,9 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         runnables.add(
             repeatingTask(5) {
                 players.forEach { player ->
-                    if (player.location.y <= voidLevel) {
-                        player.kill()
+                    if (player.gameMode == GameMode.SURVIVAL && player.location.y <= voidLevel) {
+                        plugin.logger.info("Player $player fell into the void")
+                        BrawlDeathEvent.call(player, DeathReason.Void)
                     }
                 }
             }

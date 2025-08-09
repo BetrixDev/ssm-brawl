@@ -43,14 +43,21 @@ object KitService : KoinComponent {
         return dataService.getKit("creeper")?.id ?: dataService.getKit("skeleton")?.id ?: "creeper"
     }
 
-    fun assignKit(player: Player, minigameDef: MinigameDef? = null): Result<BrawlKit, AssignKitError> {
+    fun assignKit(
+        player: Player,
+        minigameDef: MinigameDef? = null,
+    ): Result<BrawlKit, AssignKitError> {
         if (!playerSelectedKits.containsKey(player) || playerSelectedKits[player] == null) {
             playerSelectedKits[player] = defaultKitId()
         }
         return assignKit(player, playerSelectedKits[player] ?: defaultKitId(), minigameDef)
     }
 
-    fun assignKit(player: Player, kitId: String, minigameDef: MinigameDef? = null): Result<BrawlKit, AssignKitError> {
+    fun assignKit(
+        player: Player,
+        kitId: String,
+        minigameDef: MinigameDef? = null,
+    ): Result<BrawlKit, AssignKitError> {
         if (assignedBrawlKits.containsKey(player)) {
             return Err(AssignKitError.PLAYER_HAS_KIT)
         }
@@ -126,11 +133,17 @@ object KitService : KoinComponent {
             return true
         }
 
-        if (minigameDef.passiveBlacklist != null && minigameDef.passiveBlacklist?.contains(id) == true) {
+        if (
+            minigameDef.passiveBlacklist != null &&
+                minigameDef.passiveBlacklist?.contains(id) == true
+        ) {
             return false
         }
 
-        if (minigameDef.passiveWhitelist != null && minigameDef.passiveWhitelist?.contains(id) == false) {
+        if (
+            minigameDef.passiveWhitelist != null &&
+                minigameDef.passiveWhitelist?.contains(id) == false
+        ) {
             return false
         }
 
