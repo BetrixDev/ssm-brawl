@@ -8,6 +8,7 @@ import dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata
 import dev.betrix.superSmashMobsBrawl.utils.isOnGround
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.repeatingTask
+import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.PlayerDeathEvent
@@ -45,7 +46,7 @@ class DoubleJumpPassive(
 
         listeners.add(
             event<PlayerToggleFlightEvent> ToggleFlightEvent@{
-                if (player != this@DoubleJumpPassive.player) {
+                if (player != this@DoubleJumpPassive.player || player.gameMode == GameMode.CREATIVE) {
                     return@ToggleFlightEvent
                 }
 

@@ -84,7 +84,7 @@ class ExplosionAbility(id: String, player: Player, metadata: AbilityMetadata) :
 
                 player.exp = min((iteration + 1) / fuseTimeTicks.toFloat(), 0.9999f)
 
-                val volume = 0.5f + iteration / 20
+                val volume = 0.5f + iteration / 20f
 
                 player.world.playSound(player.location, Sound.ENTITY_CREEPER_PRIMED, volume, volume)
 
@@ -117,7 +117,7 @@ class ExplosionAbility(id: String, player: Player, metadata: AbilityMetadata) :
                         val distance = player.location.distance(entity.location)
                         val damage =
                             ((0.1 + 0.9 * ((explosionRadius - distance) / explosionRadius)) * 20) *
-                                0.75
+                                    0.75
 
                         entity.doKnockback(
                             explosionKnockbackMultiplier,

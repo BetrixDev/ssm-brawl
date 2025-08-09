@@ -29,7 +29,7 @@ class BoneExplosionAbility(id: String, player: Player, metadata: AbilityMetadata
             val damage =
                 max(
                     0.0,
-                    baseDamage * 1 - (entity.location.distance(player.location) / explosionRadius),
+                    baseDamage * (1.0 - (entity.location.distance(player.location) / explosionRadius)),
                 )
 
             val damageEvent =

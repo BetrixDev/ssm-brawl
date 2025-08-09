@@ -51,7 +51,7 @@ abstract class BrawlAbility(val id: String, val player: Player, val metadata: Ab
     }
 
     fun getRemainingCooldown(): Int {
-        val cooldownMs = metadata.cooldown * 1000L
+        val cooldownMs = (metadata.cooldown * 1000).toLong()
         val elapsed = System.currentTimeMillis() - lastUsed
         return ((cooldownMs - elapsed) / 1000).coerceAtLeast(0).toInt()
     }

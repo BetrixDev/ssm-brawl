@@ -24,7 +24,6 @@ object BrawlAbilityRegistry {
         register("sulphur_bomb") { player, meta ->
             SulphurBombAbility("sulphur_bomb", player, meta)
         }
-        register("explosion") { player, meta -> ExplosionAbility("explosion", player, meta) }
         register("bone_explosion") { player, meta ->
             BoneExplosionAbility("bone_explosion", player, meta)
         }

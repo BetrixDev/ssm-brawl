@@ -49,7 +49,7 @@ class HungerPassive(
             }
         listeners.add(deathListener)
 
-        val hungerTask = repeatingTask(1) { activate() }
+        val hungerTask = repeatingTask(10) { activate() }
         runnables.add(hungerTask)
 
         super.setup()

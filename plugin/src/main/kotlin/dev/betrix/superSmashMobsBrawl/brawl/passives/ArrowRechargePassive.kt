@@ -32,25 +32,31 @@ class ArrowRechargePassive(
                 synchronized(runnables) {
                     runnables.forEach { it.cancel() }
                     runnables.clear()
-                }
-
-                synchronized(runnables) {
+                    
                     runnables.add(
                         repeatingTask(arrowRechargeDelayTicks, arrowRechargeDelayTicks) {
-                            val arrowItemStack = player.inventory.getItem(arrowHotbarSlot)
+                            val inv = player.inventory
+                            val arrowItemStack = inv.getItem(arrowHotbarSlot)
 
                             if (arrowItemStack == null) {
                                 val arrows = ItemStack.of(Material.ARROW).apply { amount = 1 }
-                                player.inventory.setItem(arrowHotbarSlot, arrows)
+                                inv.setItem(arrowHotbarSlot, arrows)
                                 playPickupSound()
                                 return@repeatingTask
                             }
 
-                            if (arrowItemStack.amount >= maximumArrowCount) {
+                            if (arrowItemStack.type != Material.ARROW) {
                                 return@repeatingTask
                             }
 
-                            arrowItemStack.amount += 1
+                            val newAmount = (arrowItemStack.amount + 1).coerceAtMost(maximumArrowCount)
+
+                            if (newAmount == arrowItemStack.amount) {
+                                return@repeatingTask
+                            }
+
+                            arrowItemStack.amount = newAmount
+                            inv.setItem(arrowHotbarSlot, arrowItemStack)
                             playPickupSound()
                         }
                     )
