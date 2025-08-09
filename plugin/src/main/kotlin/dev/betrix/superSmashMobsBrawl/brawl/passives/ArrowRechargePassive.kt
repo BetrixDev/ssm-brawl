@@ -16,6 +16,12 @@ class ArrowRechargePassive(player: Player) : BrawlPassive("arrow_recharge", play
     private val arrowRechargeDelayTicks = 40L
 
     override fun setup() {
+        val inv = player.inventory
+
+        val initialArrows = ItemStack.of(Material.ARROW).apply { amount = maximumArrowCount }
+
+        inv.setItem(arrowHotbarSlot, initialArrows)
+
         listeners.add(
             event<EntityShootBowEvent> {
                 if (entity != player) {
@@ -28,9 +34,8 @@ class ArrowRechargePassive(player: Player) : BrawlPassive("arrow_recharge", play
 
                     runnables.add(
                         repeatingTask(arrowRechargeDelayTicks, arrowRechargeDelayTicks) {
-                            val inv = player.inventory
                             val arrowItemStack = inv.getItem(arrowHotbarSlot)
-
+                            
                             if (arrowItemStack == null) {
                                 val arrows = ItemStack.of(Material.ARROW).apply { amount = 1 }
                                 inv.setItem(arrowHotbarSlot, arrows)
