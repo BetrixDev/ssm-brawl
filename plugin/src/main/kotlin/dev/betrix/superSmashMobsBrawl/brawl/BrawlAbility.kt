@@ -1,18 +1,23 @@
 package dev.betrix.superSmashMobsBrawl.brawl
 
-import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.abilities.AbilityMetadata
+import dev.betrix.superSmashMobsBrawl.services.DataService
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import gg.flyte.twilight.event.TwilightListener
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import kotlinx.coroutines.Job
 import org.bukkit.entity.Player
+import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-abstract class BrawlAbility(val id: String, val player: Player, val metadata: AbilityMetadata) :
-    KoinComponent {
-    protected val plugin = SuperSmashMobsBrawl.instance
+abstract class BrawlAbility(val id: String, val player: Player) : KoinComponent {
+    protected val plugin: JavaPlugin by inject()
+    private val dataService: DataService by inject()
+
+    protected val abilityData =
+        dataService.getAbility(id)
+            ?: throw RuntimeException("No ability found in DataService with id $id")
+
     private var lastUsed: Long = 0
     protected val listeners = arrayListOf<TwilightListener>()
     protected val runnables = arrayListOf<TwilightRunnable>()
@@ -46,12 +51,12 @@ abstract class BrawlAbility(val id: String, val player: Player, val metadata: Ab
     }
 
     fun isOnCooldown(): Boolean {
-        val cooldownMs = metadata.cooldown * 1000L
+        val cooldownMs = abilityData.cooldown * 1000L
         return System.currentTimeMillis() - lastUsed < cooldownMs
     }
 
     fun getRemainingCooldown(): Int {
-        val cooldownMs = (metadata.cooldown * 1000).toLong()
+        val cooldownMs = (abilityData.cooldown * 1000).toLong()
         val elapsed = System.currentTimeMillis() - lastUsed
         return ((cooldownMs - elapsed) / 1000).coerceAtLeast(0).toInt()
     }

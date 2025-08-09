@@ -4,7 +4,6 @@ import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
-import dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata
 import dev.betrix.superSmashMobsBrawl.projectiles.ArrowProjectile
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.TwilightRunnable
@@ -21,12 +20,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.util.Vector
 
-class BarragePassive(
-    id: String,
-    player: Player,
-    metadata: PassiveMetadata,
-    config: Map<String, Any?> = emptyMap(),
-) : BrawlPassive(id, player, metadata, config) {
+class BarragePassive(player: Player) : BrawlPassive("barrage", player) {
 
     private val maxCharge = 5
     private var charge = 0

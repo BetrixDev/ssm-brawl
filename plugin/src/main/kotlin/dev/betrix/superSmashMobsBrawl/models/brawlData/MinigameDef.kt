@@ -15,6 +15,22 @@ sealed class MinigameDef {
     abstract val passiveBlacklist: List<String>?
     abstract val passiveWhitelist: List<String>?
     abstract val respawnDelaySeconds: Int?
+
+    fun isPasiveValid(id: String): Boolean {
+        if (passiveBlacklist?.contains(id) == true) {
+            return false
+        }
+
+        if (passiveWhitelist != null) {
+            if (passiveWhitelist?.contains(id) == true) {
+                return true
+            }
+
+            return false
+        }
+
+        return true
+    }
 }
 
 @Serializable

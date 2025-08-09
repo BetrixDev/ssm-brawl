@@ -4,7 +4,6 @@ import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
 import dev.betrix.superSmashMobsBrawl.extensions.isOnBlock
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
-import dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata
 import dev.betrix.superSmashMobsBrawl.utils.isOnGround
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.repeatingTask
@@ -14,12 +13,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerToggleFlightEvent
 
-class DoubleJumpPassive(
-    id: String,
-    player: Player,
-    metadata: PassiveMetadata,
-    config: Map<String, Any?> = emptyMap(),
-) : BrawlPassive(id, player, metadata, config) {
+class DoubleJumpPassive(player: Player) : BrawlPassive("double_jump", player) {
 
     private var canDoubleJump = true
 

@@ -24,6 +24,7 @@ import dev.betrix.superSmashMobsBrawl.services.*
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
 import gg.flyte.twilight.scheduler.repeatingTask
+import java.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -34,10 +35,9 @@ import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.time.Duration
 
 abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
-    minigameId: String,
+    public val minigameId: String,
     protected val gameId: String,
     protected val players: List<Player>,
 ) : Manageable(), KoinComponent {
@@ -59,17 +59,22 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     var state = MinigameState.PREFLIGHT
         protected set
 
+    /** Determine if a passive can be used in a minigame */
+    fun isPassiveValid(id: String): Boolean {
+        return minigameData.isPasiveValid(id)
+    }
+
     fun hasPlayer(player: Player): Boolean {
         return players.contains(player)
     }
 
     open suspend fun initMinigame(): Result<Unit, Exception> {
-        listeners.add(BrawlDeathEvent.listen(this) {
-            plugin.logger.info("Player $player died")
-            plugin.launch {
-                onPlayerDeath(player)
+        listeners.add(
+            BrawlDeathEvent.listen(this) {
+                plugin.logger.info("Player $player died")
+                plugin.launch { onPlayerDeath(player) }
             }
-        })
+        )
 
         brawlWorld =
             findAndCreateWorld()
@@ -110,11 +115,15 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 val title =
                     Title.title(
-                        langService.t("messages.minigames.respawn.timeLeft") { "secondsLeft" to secondsLeft },
+                        langService.t("messages.minigames.respawn.timeLeft") {
+                            "secondsLeft" to secondsLeft
+                        },
                         Component.empty(),
                         Title.Times.times(
-                            Duration.ofMillis(250), Duration.ofMillis(500), Duration.ofMillis(250)
-                        )
+                            Duration.ofMillis(250),
+                            Duration.ofMillis(500),
+                            Duration.ofMillis(250),
+                        ),
                     )
 
                 player.showTitle(title)
@@ -140,18 +149,22 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         return players.contains(player)
     }
 
-    abstract fun canPlayerLeaveMinigame(player: Player): Boolean
+    open fun canPlayerLeaveMinigame(player: Player): Boolean {
+        return true
+    }
 
-    abstract fun onPlayerLeave(player: Player)
+    open fun onPlayerLeave(player: Player) {
+        kitService.unassignKit(player)
+    }
 
     private fun assignPlayerKit(player: Player) {
         kitService
-            .assignKit(player, minigameData)
+            .assignKit(player)
             .onFailure { err ->
                 when (err) {
                     AssignKitError.PLAYER_HAS_KIT -> {
                         kitService.unassignKit(player)
-                        kitService.assignKit(player, minigameData)
+                        kitService.assignKit(player)
                     }
                 }
             }
@@ -201,6 +214,6 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
         val selectedMap = validMaps.random()
 
-        return worldService.copyAndLoadWorld<BrawlGameWorld>(selectedMap, gameId)
+        return worldService.copyAndLoadWorld(selectedMap, gameId)
     }
 }

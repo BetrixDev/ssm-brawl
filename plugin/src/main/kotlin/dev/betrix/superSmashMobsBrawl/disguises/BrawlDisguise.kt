@@ -10,7 +10,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.util.BoundingBox
 
-abstract class Disguise(private val player: Player) : Manageable() {
+abstract class BrawlDisguise(private val player: Player) : Manageable() {
     protected abstract val disguise: MobDisguise
     protected abstract val hitbox: Hitbox
 
@@ -33,9 +33,9 @@ abstract class Disguise(private val player: Player) : Manageable() {
         }
 
     companion object {
-        private val playerDisguises = ConcurrentHashMap<Player, Disguise>()
+        private val playerDisguises = ConcurrentHashMap<Player, BrawlDisguise>()
 
-        fun getDisguise(player: Player): Disguise? {
+        fun getDisguise(player: Player): BrawlDisguise? {
             return playerDisguises[player]
         }
 
@@ -49,7 +49,7 @@ abstract class Disguise(private val player: Player) : Manageable() {
         }
 
         /** Registers a disguise in the registry (internal use only) */
-        internal fun registerDisguise(player: Player, disguise: Disguise) {
+        internal fun registerDisguise(player: Player, disguise: BrawlDisguise) {
             playerDisguises[player] = disguise
         }
     }
@@ -65,7 +65,7 @@ abstract class Disguise(private val player: Player) : Manageable() {
 
         listeners.add(
             event<PlayerQuitEvent> {
-                if (player != this@Disguise.player) {
+                if (player != this@BrawlDisguise.player) {
                     return@event
                 }
 

@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.brawl.abilities
 
-import dev.betrix.superSmashMobsBrawl.abilities.AbilityMetadata
 import dev.betrix.superSmashMobsBrawl.brawl.BrawlAbility
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
@@ -11,8 +10,7 @@ import dev.betrix.superSmashMobsBrawl.projectiles.SulphurBombProjectile
 import gg.flyte.twilight.extension.round
 import org.bukkit.entity.Player
 
-class SulphurBombAbility(id: String, player: Player, metadata: AbilityMetadata) :
-    BrawlAbility(id, player, metadata) {
+class SulphurBombAbility(player: Player) : BrawlAbility("sulphur_bomb", player) {
 
     private val projectileKnockbackModifier = 2.5
     private val projectileDamage = 6.5

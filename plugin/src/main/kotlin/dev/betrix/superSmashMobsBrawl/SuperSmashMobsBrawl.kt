@@ -6,11 +6,10 @@ import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
 import dev.betrix.superSmashMobsBrawl.commands.resolvers.MinigameDefinitionArgument
-import dev.betrix.superSmashMobsBrawl.extensions.hasPassiveId
+import dev.betrix.superSmashMobsBrawl.extensions.hasPassive
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.services.DataService
 import dev.betrix.superSmashMobsBrawl.services.DebugService
-import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
 import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.KitService
@@ -65,7 +64,6 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         twilight = twilight(this)
 
         // Initialize services
-        HotbarService.initialize(this)
         HubService.initialize(this)
         HubProtectionService.registerEvents()
         DebugService.initialize(this)
@@ -98,7 +96,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         event<FoodLevelChangeEvent> {
             if (entity is Player) {
                 val player = entity as Player
-                if (!player.hasPassiveId("hunger")) {
+                if (!player.hasPassive("hunger")) {
                     player.feed()
                     isCancelled = true
                 }

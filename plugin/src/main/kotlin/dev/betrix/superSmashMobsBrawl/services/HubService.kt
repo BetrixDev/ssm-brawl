@@ -2,13 +2,11 @@ package dev.betrix.superSmashMobsBrawl.services
 
 import com.github.michaelbull.result.*
 import com.github.shynixn.mccoroutine.bukkit.launch
-import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
-import dev.betrix.superSmashMobsBrawl.brawl.registry.BrawlPassiveRegistry
+import dev.betrix.superSmashMobsBrawl.brawl.BrawlKit
 import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
 import dev.betrix.superSmashMobsBrawl.maps.blueForestHub
 import dev.betrix.superSmashMobsBrawl.models.BrawlHubWorld
 import dev.betrix.superSmashMobsBrawl.models.brawlData.HubMapDef
-import dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata
 import dev.betrix.superSmashMobsBrawl.registries.MapRegistry
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import gg.flyte.twilight.event.event
@@ -35,11 +33,11 @@ object HubService : KoinComponent {
     private val dataService: DataService by inject()
     private val lang: LangService by inject()
     private val playersInHub = mutableSetOf<Player>()
-    private val playerPassives = mutableMapOf<Player, BrawlPassive>()
+    private val playerHubKits = mutableMapOf<Player, BrawlKit>()
 
     fun teardown() {
-        playerPassives.values.forEach { it.teardown() }
-        playerPassives.clear()
+        playerHubKits.values.forEach { it.teardown() }
+        playerHubKits.clear()
         playersInHub.clear()
         plugin.logger.info("Hub service cleaned up")
     }
@@ -186,26 +184,19 @@ object HubService : KoinComponent {
     }
 
     private fun giveHubPassives(player: Player) {
-        if (playerPassives.containsKey(player)) {
+        if (playerHubKits.containsKey(player)) {
             return
         }
 
-        val passiveDef = dataService.getPassive("double_jump")
-        val passiveMetadata = PassiveMetadata(userFacing = false)
-        val passive =
-            BrawlPassiveRegistry.create("double_jump", player, passiveMetadata, emptyMap())
-        if (passive != null) {
-            passive.setup()
-            playerPassives[player] = passive
-            plugin.logger.info("Gave double jump passive to player: ${player.name}")
-        } else {
-            plugin.logger.warning("Failed to create double jump passive for player: ${player.name}")
-        }
+        val hubKit = BrawlKit("hub", player)
+        hubKit.setup()
+
+        playerHubKits[player] = hubKit
     }
 
     private fun removeHubPassives(player: Player) {
-        val passive = playerPassives.remove(player)
-        passive?.teardown()
+        val hubKit = playerHubKits.remove(player)
+        hubKit?.teardown()
 
         plugin.logger.info("Removed hub passives from player: ${player.name}")
     }

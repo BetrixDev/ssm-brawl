@@ -4,19 +4,7 @@ import com.charleskorn.kaml.PolymorphismStyle
 import com.charleskorn.kaml.Yaml
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.models.brawlData.AbilityDef
-import dev.betrix.superSmashMobsBrawl.models.brawlData.AbilityDefFile
-import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
-import dev.betrix.superSmashMobsBrawl.models.brawlData.GameMapDef
-import dev.betrix.superSmashMobsBrawl.models.brawlData.HubMapDef
-import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
-import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDefFile
-import dev.betrix.superSmashMobsBrawl.models.brawlData.MapDefFile
-import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
-import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDefFile
-import dev.betrix.superSmashMobsBrawl.models.brawlData.PassiveDef
-import dev.betrix.superSmashMobsBrawl.models.brawlData.PassiveFileDef
-import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
+import dev.betrix.superSmashMobsBrawl.models.brawlData.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -55,6 +43,7 @@ class DataService : KoinComponent {
     private lateinit var passiveDefs: Map<String, PassiveDef>
     private lateinit var abilityDefs: Map<String, AbilityDef>
     private lateinit var minigameDefs: Map<String, MinigameDef>
+    private lateinit var disguiseDefs: Map<String, DisguiseDef>
 
     init {
         plugin.launch {
@@ -64,6 +53,8 @@ class DataService : KoinComponent {
                 abilityDefs = readFile<AbilityDefFile>("abilities").abilities.associateBy { it.id }
                 minigameDefs =
                     readFile<MinigameDefFile>("minigames").minigames.associateBy { it.id }
+                disguiseDefs =
+                    readFile<DisguiseDefFile>("disguises").disguises.associateBy { it.id }
                 val mapDefs = readFile<MapDefFile>("maps")
                 gameMapDefs = mapDefs.gameMaps.associateBy { it.id }
                 hubMapDefs = mapDefs.hubMaps.associateBy { it.id }

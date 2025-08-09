@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.brawl.abilities
 
-import dev.betrix.superSmashMobsBrawl.abilities.AbilityMetadata
 import dev.betrix.superSmashMobsBrawl.brawl.BrawlAbility
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
 import org.bukkit.Location
@@ -8,8 +7,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
 
-class RopedArrowAbility(id: String, player: Player, metadata: AbilityMetadata) :
-    BrawlAbility(id, player, metadata) {
+class RopedArrowAbility(player: Player) : BrawlAbility("roped_arrow", player) {
 
     override fun activate() {
         super.activate()

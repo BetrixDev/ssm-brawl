@@ -3,7 +3,6 @@ package dev.betrix.superSmashMobsBrawl.brawl.passives
 import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
-import dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.feed
@@ -14,13 +13,7 @@ import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.PlayerDeathEvent
 
-class HungerPassive(
-    id: String,
-    player: Player,
-    metadata: PassiveMetadata,
-    config: Map<String, Any?> = emptyMap(),
-) : BrawlPassive(id, player, metadata, config) {
-
+class HungerPassive(player: Player) : BrawlPassive("hunger", player) {
     private val hungerRestoreDelayMs = 250L
     private var hungerTicks = 0L
     private var lastHungerRestoreMs = System.currentTimeMillis()

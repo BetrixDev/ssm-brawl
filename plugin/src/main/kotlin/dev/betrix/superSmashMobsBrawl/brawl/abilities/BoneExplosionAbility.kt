@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.brawl.abilities
 
-import dev.betrix.superSmashMobsBrawl.abilities.AbilityMetadata
 import dev.betrix.superSmashMobsBrawl.brawl.BrawlAbility
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
@@ -11,8 +10,7 @@ import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 
-class BoneExplosionAbility(id: String, player: Player, metadata: AbilityMetadata) :
-    BrawlAbility(id, player, metadata) {
+class BoneExplosionAbility(player: Player) : BrawlAbility("bone_explosion", player) {
 
     private val explosionRadius = 7.0
     private val baseDamage = 6.0

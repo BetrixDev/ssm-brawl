@@ -4,12 +4,12 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
-import com.github.michaelbull.result.onSuccess
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
+import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
-import dev.betrix.superSmashMobsBrawl.utils.mm
+import dev.betrix.superSmashMobsBrawl.utils.resultRunCatching
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -26,20 +26,11 @@ enum class MinigameLeaveError {
 }
 
 class MinigameService : KoinComponent {
+    private val plugin: SuperSmashMobsBrawl by inject()
     private val dataService: DataService by inject()
+    private val hubService: HubService by inject()
 
-    // Minimal stub to keep build green until new flow is wired
-    interface MinigameInstance {
-        suspend fun initMinigame(): Result<Unit, Exception>
-
-        fun teardownMinigame()
-
-        fun onPlayerLeave(player: Player): Result<Unit, Exception>
-
-        fun isPlayerInMinigame(player: Player): Boolean
-    }
-
-    private val inFlightMinigames = arrayListOf<MinigameInstance>()
+    private val inFlightMinigames = arrayListOf<BrawlMinigame<*>>()
 
     fun getMinigameData(id: String): MinigameDef? {
         return dataService.getMinigame(id)
@@ -68,53 +59,44 @@ class MinigameService : KoinComponent {
     fun initializeMinigameInstance(
         minigameDefinition: MinigameDef,
         teams: List<MinigameTeam>,
-    ): Result<MinigameInstance, MinigameInitError> {
+    ): Result<BrawlMinigame<*>, MinigameInitError> {
         return Err(MinigameInitError.PlayerAlreadyInMinigame(emptyList()))
     }
 
-    fun handleMinigameSetup(minigameInstance: MinigameInstance) {
-        SuperSmashMobsBrawl.instance.launch {
-            minigameInstance.initMinigame().onFailure { minigameInstance.teardownMinigame() }
-        }
+    fun handleMinigameSetup(minigameInstance: BrawlMinigame<*>) {
+        plugin.launch { minigameInstance.initMinigame().onFailure { minigameInstance.teardown() } }
     }
 
-    fun removeMinigameInstance(minigameInstance: MinigameInstance): Boolean {
+    fun removeMinigameInstance(minigameInstance: BrawlMinigame<*>): Boolean {
         return inFlightMinigames.remove(minigameInstance)
     }
 
     fun isPlayerInMinigame(player: Player): Boolean {
-        return inFlightMinigames.find { it.isPlayerInMinigame(player) } != null
+        return getMinigameForPlayer(player) != null
     }
 
-    fun getMinigameForPlayer(player: Player): MinigameInstance? {
+    fun getMinigameForPlayer(player: Player): BrawlMinigame<*>? {
         return inFlightMinigames.find { it.isPlayerInMinigame(player) }
     }
 
-    fun handlePlayerLeave(player: Player): Result<Unit, MinigameLeaveError> {
+    fun handlePlayerLeave(player: Player): Result<BrawlMinigame<*>, MinigameLeaveError> {
         val minigameInstance =
             getMinigameForPlayer(player) ?: return Err(MinigameLeaveError.PlayerNotInMinigame)
 
-        return try {
-            minigameInstance
-                .onPlayerLeave(player)
-                .onSuccess {
-                    KitService.unassignKit(player)
+        val canPlayerLeave = minigameInstance.canPlayerLeaveMinigame(player)
 
-                    HubService.tryTeleportToDefaultHub(player).onFailure {
-                        player.kick(mm("<red>We couldn't put you back in the hub</red>"))
-                        SuperSmashMobsBrawl.instance.logger.severe(
-                            "Failed to teleport ${player.name} to hub: ${it.message}"
-                        )
-                    }
-                }
-                .onFailure {
-                    return Err(MinigameLeaveError.NotAllowedToLeave)
-                }
-
-            return Ok(Unit)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Err(MinigameLeaveError.Unknown)
+        if (!canPlayerLeave) {
+            return Err(MinigameLeaveError.NotAllowedToLeave)
         }
+
+        resultRunCatching { minigameInstance.onPlayerLeave(player) }
+            .onFailure { err ->
+                plugin.logger.severe("Error calling minigame.onPlayerLeave $err")
+                return Err(MinigameLeaveError.NotAllowedToLeave)
+            }
+
+        hubService.teleportToDefaultHub(player)
+
+        return Ok(minigameInstance)
     }
 }

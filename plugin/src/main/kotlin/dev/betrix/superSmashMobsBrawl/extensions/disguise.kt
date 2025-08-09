@@ -1,6 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.extensions
 
-import dev.betrix.superSmashMobsBrawl.disguises.Disguise
+import dev.betrix.superSmashMobsBrawl.disguises.BrawlDisguise
 import org.bukkit.entity.Player
 
 /**
@@ -8,6 +8,6 @@ import org.bukkit.entity.Player
  *
  * @return The player's active disguise, or null if none exists
  */
-fun Player.getDisguise(): Disguise? {
-    return Disguise.getDisguise(this)
+fun Player.getDisguise(): BrawlDisguise? {
+    return BrawlDisguise.getDisguise(this)
 }

@@ -1,7 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.brawl.passives
 
 import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
-import dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.Material
@@ -10,17 +9,11 @@ import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.inventory.ItemStack
 
-class ArrowRechargePassive(
-    id: String,
-    player: Player,
-    metadata: PassiveMetadata,
-    config: Map<String, Any?> = emptyMap(),
-) : BrawlPassive(id, player, metadata, config) {
+class ArrowRechargePassive(player: Player) : BrawlPassive("arrow_recharge", player) {
 
     private val arrowHotbarSlot = 2
     private val maximumArrowCount = 3
-    private val arrowRechargeDelayTicks: Long =
-        ((config["arrowIntervalTicks"] as? String)?.toDouble()?.toLong()) ?: 40L
+    private val arrowRechargeDelayTicks = 40L
 
     override fun setup() {
         listeners.add(

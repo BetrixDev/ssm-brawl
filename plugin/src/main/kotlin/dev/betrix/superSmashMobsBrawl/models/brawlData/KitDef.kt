@@ -11,8 +11,10 @@ data class KitDef(
     val meleeDamage: Double,
     val armor: Double,
     val knockbackMultiplier: Double,
-    val passives: List<KitPassiveDef>,
-    val abilities: List<KitAbilityDef>,
+    val disguiseId: String? = null,
+    val passives: List<KitPassiveDef> = listOf(),
+    val abilities: List<KitAbilityDef> = listOf(),
+    val userFacing: Boolean = true,
 )
 
 @Serializable

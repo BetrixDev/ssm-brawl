@@ -1,9 +1,19 @@
 kits:
+  # Hub Kit
+  - id: hub
+    userFacing: false
+    meleeDamage: 0.0
+    armor: 1.0
+    knockbackMultiplier: 1.0
+    passives:
+      - id: double_jump
+
   # Creeper Kit
   - id: creeper
     meleeDamage: 6.0
     armor: 4.0
     knockbackMultiplier: 1.65
+    disguiseId: creeper
     passives:
       - id: double_jump
       - id: regeneration
@@ -20,6 +30,7 @@ kits:
     meleeDamage: 5.0
     armor: 6.0
     knockbackMultiplier: 1.25
+    disguiseId: skeleton
     metadata:
       arrowKnockbackMultiplier: 1.50
     passives:

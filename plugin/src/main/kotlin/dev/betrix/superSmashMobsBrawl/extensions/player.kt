@@ -2,8 +2,9 @@ package dev.betrix.superSmashMobsBrawl.extensions
 
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.KitService
-import dev.betrix.superSmashMobsBrawl.utils.mm
+import dev.betrix.superSmashMobsBrawl.services.LangService
 import org.bukkit.entity.Player
+import org.koin.core.context.GlobalContext
 
 /**
  * Check if debug mode is enabled for this player.
@@ -11,7 +12,7 @@ import org.bukkit.entity.Player
  * Usage:
  * ```kotlin
  * if (player.hasDebugEnabled()) {
- *     player.sendMessage("Debug: Some debug information")
+ *     player.sendMessage("Some debug information")
  * }
  * ```
  */
@@ -24,16 +25,15 @@ fun Player.sendDebugMessage(message: String) {
         return
     }
 
-    sendMessage(mm("<gray>[DEBUG] $message</gray>"))
+    val lang: LangService = GlobalContext.get().get()
+
+    sendMessage(lang.t("message.debug") { "message" to message })
 }
 
-fun Player.hasPassiveId(passiveId: String): Boolean {
-    // New data-driven kits
-    val brawlKit = KitService.getBrawlKit(this)
-    if (brawlKit != null) {
-        return brawlKit.passives.any { it.id == passiveId }
-    }
+fun Player.hasPassive(passiveId: String): Boolean {
+    val kitService: KitService = GlobalContext.get().get()
 
-    // Legacy kits (none now)
-    return false
+    val brawlKit = kitService.getBrawlKit(this) ?: return false
+
+    return brawlKit.getPassive(passiveId) != null
 }

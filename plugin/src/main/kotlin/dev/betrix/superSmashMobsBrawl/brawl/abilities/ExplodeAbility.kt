@@ -4,7 +4,6 @@ import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.ticks
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.abilities.AbilityMetadata
 import dev.betrix.superSmashMobsBrawl.brawl.BrawlAbility
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
@@ -26,8 +25,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.util.Vector
 
-class ExplosionAbility(id: String, player: Player, metadata: AbilityMetadata) :
-    BrawlAbility(id, player, metadata) {
+class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
 
     private var isExplodeActive = false
     private val fuseTimeTicks = 30
@@ -51,7 +49,7 @@ class ExplosionAbility(id: String, player: Player, metadata: AbilityMetadata) :
     override fun setup() {
         listeners.add(
             event<PlayerToggleSneakEvent> {
-                if (this@ExplosionAbility.player != player || !isExplodeActive) {
+                if (this@ExplodeAbility.player != player || !isExplodeActive) {
                     return@event
                 }
 
