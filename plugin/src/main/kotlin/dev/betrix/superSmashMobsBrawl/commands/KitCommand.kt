@@ -1,28 +1,32 @@
 package dev.betrix.superSmashMobsBrawl.commands
 
 import dev.betrix.superSmashMobsBrawl.services.KitService
+import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 @Command(name = "kit")
-class KitCommand {
+class KitCommand : KoinComponent {
+    private val lang: LangService by inject()
 
     @Execute(name = "creeper")
     fun creeperKit(@Context player: Player) {
         KitService.playerSelectKit(player, "creeper")
 
-        onSuccess(player, "Creeper")
+        onSuccess(player, "creeper")
     }
 
     @Execute(name = "skeleton")
     fun skeletonKit(@Context player: Player) {
         KitService.playerSelectKit(player, "skeleton")
 
-        onSuccess(player, "Skeleton")
+        onSuccess(player, "skeleton")
     }
 
     @Execute(name = "clear")
@@ -35,8 +39,8 @@ class KitCommand {
         }
     }
 
-    private fun onSuccess(player: Player, kitName: String) {
-        player.sendMessage(mm("<light_purple>You have selected kit $kitName</light_purple>"))
+    private fun onSuccess(player: Player, kitId: String) {
+        player.sendMessage(lang.t("messages.kits.select.success") { "kitId" to kitId })
         player.playSound(player.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
     }
 }

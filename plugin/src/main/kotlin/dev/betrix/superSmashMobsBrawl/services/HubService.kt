@@ -89,6 +89,8 @@ object HubService : KoinComponent {
         event<PlayerJoinEvent> {
             plugin.logger.info("${player.name} joined")
 
+            joinMessage(lang.t("messages.players.joinServer") { "playerName" to player.name })
+
             if (!::defaultHubWorld.isInitialized) {
                 plugin.logger.severe("No default hub world set")
                 player.kick(lang.t("messages.kick.serverStarting"))
