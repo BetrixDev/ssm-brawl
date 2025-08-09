@@ -1,6 +1,5 @@
-package dev.betrix.superSmashMobsBrawl.brawl.passives
+package dev.betrix.superSmashMobsBrawl.passives
 
-import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.Material
@@ -35,7 +34,7 @@ class ArrowRechargePassive(player: Player) : BrawlPassive("arrow_recharge", play
                     runnables.add(
                         repeatingTask(arrowRechargeDelayTicks, arrowRechargeDelayTicks) {
                             val arrowItemStack = inv.getItem(arrowHotbarSlot)
-                            
+
                             if (arrowItemStack == null) {
                                 val arrows = ItemStack.of(Material.ARROW).apply { amount = 1 }
                                 inv.setItem(arrowHotbarSlot, arrows)

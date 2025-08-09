@@ -4,7 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.shynixn.mccoroutine.bukkit.launch
-import dev.betrix.superSmashMobsBrawl.brawl.BrawlKit
+import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
 import java.util.concurrent.ConcurrentHashMap
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin

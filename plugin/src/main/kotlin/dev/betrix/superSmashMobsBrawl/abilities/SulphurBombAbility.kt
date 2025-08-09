@@ -1,6 +1,5 @@
-package dev.betrix.superSmashMobsBrawl.brawl.abilities
+package dev.betrix.superSmashMobsBrawl.abilities
 
-import dev.betrix.superSmashMobsBrawl.brawl.BrawlAbility
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType

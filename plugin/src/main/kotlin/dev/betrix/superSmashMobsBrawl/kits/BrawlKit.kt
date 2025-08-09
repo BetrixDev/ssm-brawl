@@ -1,11 +1,20 @@
-package dev.betrix.superSmashMobsBrawl.brawl
+package dev.betrix.superSmashMobsBrawl.kits
 
-import dev.betrix.superSmashMobsBrawl.brawl.abilities.*
-import dev.betrix.superSmashMobsBrawl.brawl.passives.*
+import dev.betrix.superSmashMobsBrawl.abilities.BoneExplosionAbility
+import dev.betrix.superSmashMobsBrawl.abilities.BrawlAbility
+import dev.betrix.superSmashMobsBrawl.abilities.ExplodeAbility
+import dev.betrix.superSmashMobsBrawl.abilities.RopedArrowAbility
+import dev.betrix.superSmashMobsBrawl.abilities.SulphurBombAbility
 import dev.betrix.superSmashMobsBrawl.disguises.BrawlDisguise
 import dev.betrix.superSmashMobsBrawl.disguises.CreeperDisguise
 import dev.betrix.superSmashMobsBrawl.disguises.SkeletonDisguise
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
+import dev.betrix.superSmashMobsBrawl.passives.ArrowRechargePassive
+import dev.betrix.superSmashMobsBrawl.passives.BarragePassive
+import dev.betrix.superSmashMobsBrawl.passives.BrawlPassive
+import dev.betrix.superSmashMobsBrawl.passives.DoubleJumpPassive
+import dev.betrix.superSmashMobsBrawl.passives.HungerPassive
+import dev.betrix.superSmashMobsBrawl.passives.RegenerationPassive
 import dev.betrix.superSmashMobsBrawl.services.DataService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import java.util.logging.Logger

@@ -1,11 +1,10 @@
-package dev.betrix.superSmashMobsBrawl.brawl
+package dev.betrix.superSmashMobsBrawl.abilities
 
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.extensions.event
 import dev.betrix.superSmashMobsBrawl.models.brawlData.AbilityUsage
 import dev.betrix.superSmashMobsBrawl.services.DataService
 import dev.betrix.superSmashMobsBrawl.services.LangService
-import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -58,7 +57,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
                 )
                 meta.lore(
                     listOf(
-                        lang.t("messages.abilties.hotbarItemDescription") {
+                        lang.t("messages.abilities.hotbarItemDescription") {
                             "abilityId" to abilityData.id
                         }
                     )
@@ -83,7 +82,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
 
         runnables.add(
             repeatingTask(1) {
-                if (lastCheckForCanActivate == false && canActivate()) {
+                if (!lastCheckForCanActivate && canActivate()) {
                     lastCheckForCanActivate = true
 
                     player.sendMessage(

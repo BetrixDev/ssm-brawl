@@ -1,10 +1,9 @@
-package dev.betrix.superSmashMobsBrawl.brawl.abilities
+package dev.betrix.superSmashMobsBrawl.abilities
 
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.ticks
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.brawl.BrawlAbility
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
@@ -93,8 +92,8 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
         )
 
         jobs.add(
-            SuperSmashMobsBrawl.instance.launch {
-                withContext(SuperSmashMobsBrawl.instance.asyncDispatcher) {
+            SuperSmashMobsBrawl.Companion.instance.launch {
+                withContext(SuperSmashMobsBrawl.Companion.instance.asyncDispatcher) {
                     delay(fuseTimeTicks.ticks)
                 }
 

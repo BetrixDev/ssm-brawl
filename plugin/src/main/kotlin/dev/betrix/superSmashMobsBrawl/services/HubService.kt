@@ -2,7 +2,7 @@ package dev.betrix.superSmashMobsBrawl.services
 
 import com.github.michaelbull.result.*
 import com.github.shynixn.mccoroutine.bukkit.launch
-import dev.betrix.superSmashMobsBrawl.brawl.BrawlKit
+import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
 import dev.betrix.superSmashMobsBrawl.models.BrawlHubWorld
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import gg.flyte.twilight.event.event

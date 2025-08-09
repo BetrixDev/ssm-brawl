@@ -1,7 +1,10 @@
-package dev.betrix.superSmashMobsBrawl.brawl.abilities
+package dev.betrix.superSmashMobsBrawl.abilities
 
-import dev.betrix.superSmashMobsBrawl.brawl.BrawlAbility
+import dev.betrix.superSmashMobsBrawl.events.Damager
+import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
+import dev.betrix.superSmashMobsBrawl.projectiles.ArrowProjectile
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -13,8 +16,7 @@ class RopedArrowAbility(player: Player) : BrawlAbility("roped_arrow", player) {
         super.activate()
 
         val projectile =
-            dev.betrix.superSmashMobsBrawl.projectiles
-                .ArrowProjectile(player, "Roped Arrow", 2.4)
+            ArrowProjectile(player, "Roped Arrow", 2.4)
                 .onHitBlock { block, projectile ->
                     pullPlayerToLocation(block.location, projectile.velocityBeforeImpact)
                     true
@@ -23,12 +25,11 @@ class RopedArrowAbility(player: Player) : BrawlAbility("roped_arrow", player) {
                     pullPlayerToLocation(entity.location, projectile.velocityBeforeImpact)
 
                     val damageEvent =
-                        dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent(
+                        SmashDamageEvent(
                             entity,
-                            dev.betrix.superSmashMobsBrawl.events.Damager.LivingEntity(player),
+                            Damager.LivingEntity(player),
                             6.0,
-                            damageType =
-                                dev.betrix.superSmashMobsBrawl.events.SmashDamageType.Projectile,
+                            damageType = SmashDamageType.Projectile,
                         )
 
                     damageEvent.callEvent()

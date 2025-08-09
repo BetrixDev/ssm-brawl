@@ -9,13 +9,13 @@ import com.github.michaelbull.result.unwrap
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.brawl.BrawlKit
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
 import dev.betrix.superSmashMobsBrawl.extensions.getEquidistant
 import dev.betrix.superSmashMobsBrawl.extensions.getFarthestFromPlayers
 import dev.betrix.superSmashMobsBrawl.extensions.location
 import dev.betrix.superSmashMobsBrawl.extensions.teleport
+import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
 import dev.betrix.superSmashMobsBrawl.models.BrawlGameWorld
 import dev.betrix.superSmashMobsBrawl.models.MinigameState
 import dev.betrix.superSmashMobsBrawl.models.SpawnPoint

@@ -1,6 +1,5 @@
-package dev.betrix.superSmashMobsBrawl.brawl.passives
+package dev.betrix.superSmashMobsBrawl.passives
 
-import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player

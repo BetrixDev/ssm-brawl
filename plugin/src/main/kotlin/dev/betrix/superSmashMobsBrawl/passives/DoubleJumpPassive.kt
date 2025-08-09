@@ -1,6 +1,5 @@
-package dev.betrix.superSmashMobsBrawl.brawl.passives
+package dev.betrix.superSmashMobsBrawl.passives
 
-import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
 import dev.betrix.superSmashMobsBrawl.extensions.isOnBlock
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity

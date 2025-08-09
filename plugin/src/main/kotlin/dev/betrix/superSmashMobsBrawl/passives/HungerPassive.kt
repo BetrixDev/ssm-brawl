@@ -1,6 +1,5 @@
-package dev.betrix.superSmashMobsBrawl.brawl.passives
+package dev.betrix.superSmashMobsBrawl.passives
 
-import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.utils.mm

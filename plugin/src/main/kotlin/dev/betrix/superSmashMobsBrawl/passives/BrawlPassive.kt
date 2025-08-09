@@ -1,4 +1,4 @@
-package dev.betrix.superSmashMobsBrawl.brawl
+package dev.betrix.superSmashMobsBrawl.passives
 
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
