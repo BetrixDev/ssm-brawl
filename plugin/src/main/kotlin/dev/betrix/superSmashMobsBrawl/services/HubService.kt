@@ -1,9 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.services
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.mapBoth
+import com.github.michaelbull.result.*
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
 import dev.betrix.superSmashMobsBrawl.brawl.registry.BrawlPassiveRegistry
@@ -36,6 +33,7 @@ object HubService : KoinComponent {
     private lateinit var defaultHubWorld: BrawlHubWorld
     private lateinit var plugin: JavaPlugin
     private val dataService: DataService by inject()
+    private val lang: LangService by inject()
     private val playersInHub = mutableSetOf<Player>()
     private val playerPassives = mutableMapOf<Player, BrawlPassive>()
 
@@ -93,10 +91,14 @@ object HubService : KoinComponent {
 
             if (!::defaultHubWorld.isInitialized) {
                 plugin.logger.severe("No default hub world set")
+                player.kick(lang.t("messages.kick.serverStarting"))
                 return@event
             }
 
-            teleportToHub(player, defaultHubWorld)
+            teleportToHub(player, defaultHubWorld).onFailure {
+                player.kick(lang.t("messages.kick.serverStarting"))
+                return@event
+            }
             giveHubPassives(player)
         }
 

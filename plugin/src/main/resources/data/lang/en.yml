@@ -30,6 +30,8 @@ minigames:
     descriptions: "A competitive 1v1game mode"
 prefix: "<#585b70>[<gradient:#cba6f7:#585b70>Brawl</gradient><#585b70>]<reset>"
 messages:
+  kick:
+    serverStarting: "Server is still starting! Please come back in a moment"
   commands:
     onlyPlayers: "<red>On players can execute this command</red>"
   queue:
