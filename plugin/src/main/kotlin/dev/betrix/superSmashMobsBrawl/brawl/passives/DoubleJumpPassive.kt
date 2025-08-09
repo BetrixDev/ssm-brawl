@@ -1,25 +1,31 @@
-package dev.betrix.superSmashMobsBrawl.passives.instances
+package dev.betrix.superSmashMobsBrawl.brawl.passives
 
+import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
 import dev.betrix.superSmashMobsBrawl.extensions.isOnBlock
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
-import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
+import dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata
 import dev.betrix.superSmashMobsBrawl.utils.isOnGround
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.repeatingTask
+import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerToggleFlightEvent
 
-class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
-    PassiveInstance(definition, player) {
+class DoubleJumpPassive(
+    id: String,
+    player: Player,
+    metadata: PassiveMetadata,
+    config: Map<String, Any?> = emptyMap(),
+) : BrawlPassive(id, player, metadata, config) {
+
     private var canDoubleJump = true
 
     override fun setup() {
         player.allowFlight = true
 
-        // Add a periodic check to monitor flight status
         runnables.add(
             repeatingTask(20) {
                 if (!player.allowFlight && canDoubleJump && isOnGround(player)) {
@@ -30,7 +36,7 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
 
         runnables.add(
             repeatingTask(0) {
-                if (player.isOnBlock() || canDoubleJump) {
+                if ((player.isOnBlock() || canDoubleJump) && (!canDoubleJump || !player.allowFlight)) {
                     player.sendDebugMessage("[DJ] You have hit the ground")
                     canDoubleJump = true
                     player.allowFlight = true
@@ -40,7 +46,7 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
 
         listeners.add(
             event<PlayerToggleFlightEvent> ToggleFlightEvent@{
-                if (player != this@DoubleJumpPassiveInstance.player) {
+                if (player != this@DoubleJumpPassive.player || player.gameMode == GameMode.CREATIVE) {
                     return@ToggleFlightEvent
                 }
 
@@ -65,7 +71,7 @@ class DoubleJumpPassiveInstance(definition: PassiveDefinition, player: Player) :
 
         listeners.add(
             event<PlayerDeathEvent> DeathEvent@{
-                if (this@DoubleJumpPassiveInstance.player != player) {
+                if (this@DoubleJumpPassive.player != player) {
                     return@DeathEvent
                 }
 

@@ -1,6 +1,7 @@
-package dev.betrix.superSmashMobsBrawl.abilities.instances
+package dev.betrix.superSmashMobsBrawl.brawl.abilities
 
-import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
+import dev.betrix.superSmashMobsBrawl.abilities.AbilityMetadata
+import dev.betrix.superSmashMobsBrawl.brawl.BrawlAbility
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
@@ -10,8 +11,8 @@ import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 
-class BoneExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
-    AbilityInstance(definition, player) {
+class BoneExplosionAbility(id: String, player: Player, metadata: AbilityMetadata) :
+    BrawlAbility(id, player, metadata) {
 
     private val explosionRadius = 7.0
     private val baseDamage = 6.0
@@ -28,7 +29,7 @@ class BoneExplosionAbilityInstance(definition: AbilityDefinition, player: Player
             val damage =
                 max(
                     0.0,
-                    baseDamage * 1 - (entity.location.distance(player.location) / explosionRadius),
+                    baseDamage * (1.0 - (entity.location.distance(player.location) / explosionRadius)),
                 )
 
             val damageEvent =

@@ -1,10 +1,11 @@
-package dev.betrix.superSmashMobsBrawl.abilities.instances
+package dev.betrix.superSmashMobsBrawl.brawl.abilities
 
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.ticks
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
+import dev.betrix.superSmashMobsBrawl.abilities.AbilityMetadata
+import dev.betrix.superSmashMobsBrawl.brawl.BrawlAbility
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
@@ -25,8 +26,8 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.util.Vector
 
-class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
-    AbilityInstance(definition, player) {
+class ExplosionAbility(id: String, player: Player, metadata: AbilityMetadata) :
+    BrawlAbility(id, player, metadata) {
 
     private var isExplodeActive = false
     private val fuseTimeTicks = 30
@@ -50,7 +51,7 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
     override fun setup() {
         listeners.add(
             event<PlayerToggleSneakEvent> {
-                if (this@ExplosionAbilityInstance.player != player || !isExplodeActive) {
+                if (this@ExplosionAbility.player != player || !isExplodeActive) {
                     return@event
                 }
 
@@ -83,7 +84,7 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
 
                 player.exp = min((iteration + 1) / fuseTimeTicks.toFloat(), 0.9999f)
 
-                val volume = 0.5f + iteration / 20
+                val volume = 0.5f + iteration / 20f
 
                 player.world.playSound(player.location, Sound.ENTITY_CREEPER_PRIMED, volume, volume)
 
@@ -116,7 +117,7 @@ class ExplosionAbilityInstance(definition: AbilityDefinition, player: Player) :
                         val distance = player.location.distance(entity.location)
                         val damage =
                             ((0.1 + 0.9 * ((explosionRadius - distance) / explosionRadius)) * 20) *
-                                0.75
+                                    0.75
 
                         entity.doKnockback(
                             explosionKnockbackMultiplier,

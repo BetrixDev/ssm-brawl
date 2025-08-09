@@ -12,7 +12,7 @@ abilities:
     type: aoe
     itemSlot: 1
     usage: right_click
-    hotbarItem: right_click
+    hotbarItem: iron_shovel
     displayItem: creeper_spawn_egg
 
   - id: bone_explosion

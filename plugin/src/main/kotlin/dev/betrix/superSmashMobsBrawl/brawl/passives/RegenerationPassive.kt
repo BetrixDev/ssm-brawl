@@ -1,22 +1,25 @@
-package dev.betrix.superSmashMobsBrawl.passives.instances
+package dev.betrix.superSmashMobsBrawl.brawl.passives
 
-import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
+import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
+import dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 
-class RegenerationPassiveInstance(definition: PassiveDefinition, player: Player) :
-    PassiveInstance(definition, player) {
+class RegenerationPassive(
+    id: String,
+    player: Player,
+    metadata: PassiveMetadata,
+    config: Map<String, Any?> = emptyMap(),
+) : BrawlPassive(id, player, metadata, config) {
 
-    private val healAmount = 1.0 // Half a heart
-    private val healIntervalTicks = 60L // 3 seconds (20 ticks per second)
+    private val healAmount = 1.0
+    private val healIntervalTicks = 60L
 
     override fun setup() {
-        // Start regeneration task
         val regenTask =
             repeatingTask(healIntervalTicks) {
                 val playerMaxHealth = player.getAttribute(Attribute.MAX_HEALTH)?.value ?: 20.0
-
                 if (player.health < playerMaxHealth) {
                     val newHealth = (player.health + healAmount).coerceAtMost(playerMaxHealth)
                     player.health = newHealth

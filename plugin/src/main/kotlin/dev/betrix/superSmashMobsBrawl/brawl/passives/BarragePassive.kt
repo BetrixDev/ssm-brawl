@@ -1,9 +1,10 @@
-package dev.betrix.superSmashMobsBrawl.passives.instances
+package dev.betrix.superSmashMobsBrawl.brawl.passives
 
+import dev.betrix.superSmashMobsBrawl.brawl.BrawlPassive
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
-import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
+import dev.betrix.superSmashMobsBrawl.passives.PassiveMetadata
 import dev.betrix.superSmashMobsBrawl.projectiles.ArrowProjectile
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.TwilightRunnable
@@ -20,45 +21,53 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.util.Vector
 
-class BarragePassiveInstance(definition: PassiveDefinition, player: Player) :
-    PassiveInstance(definition, player) {
+class BarragePassive(
+    id: String,
+    player: Player,
+    metadata: PassiveMetadata,
+    config: Map<String, Any?> = emptyMap(),
+) : BrawlPassive(id, player, metadata, config) {
+
     private val maxCharge = 5
     private var charge = 0
-
     private var chargeRunnable: TwilightRunnable? = null
 
     override fun setup() {
         listeners.add(
             event<PlayerInteractEvent> {
                 if (
-                    player != this@BarragePassiveInstance.player ||
-                        player.inventory.itemInMainHand.type != Material.BOW ||
-                        !player.inventory.contains(Material.ARROW) ||
-                        (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK)
+                    player != this@BarragePassive.player ||
+                    player.inventory.itemInMainHand.type != Material.BOW ||
+                    !player.inventory.contains(Material.ARROW) ||
+                    (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK)
                 ) {
                     return@event
                 }
 
                 finishFiring()
 
-                chargeRunnable =
+                val newChargeRunnable =
                     repeatingTask(20, 6) {
                         if (charge < maxCharge) {
                             incrementCharge()
                         }
                     }
+
+                chargeRunnable = newChargeRunnable
+                runnables.add(newChargeRunnable)
             }
         )
 
         listeners.add(
             event<PlayerItemHeldEvent> {
-                if (player != this@BarragePassiveInstance.player) {
+                if (player != this@BarragePassive.player) {
                     return@event
                 }
 
                 val storedCharge = charge
                 finishFiring()
                 charge = storedCharge
+                player.exp = min(0.9999F, charge.toFloat() / maxCharge.toFloat())
             }
         )
 
@@ -83,6 +92,11 @@ class BarragePassiveInstance(definition: PassiveDefinition, player: Player) :
         super.setup()
     }
 
+    override fun teardown() {
+        finishFiring()
+        super.teardown()
+    }
+
     private fun onBowFired() {
         repeat(charge) { idx ->
             delay((idx + 1).toLong()) {
@@ -96,17 +110,16 @@ class BarragePassiveInstance(definition: PassiveDefinition, player: Player) :
                     )
 
                 val arrow =
-                    ArrowProjectile(player, "Barrage Arrow", 3.0, spread).onHitLivingEntity {
-                        entity,
-                        arrow ->
+                    ArrowProjectile(player, "Barrage Arrow", 3.0, spread).onHitLivingEntity { entity,
+                                                                                              arrow ->
                         arrow.projectile?.remove()
 
                         SmashDamageEvent(
-                                entity,
-                                Damager.LivingEntity(player),
-                                6.0,
-                                damageType = SmashDamageType.Projectile,
-                            )
+                            entity,
+                            Damager.LivingEntity(player),
+                            6.0,
+                            damageType = SmashDamageType.Projectile,
+                        )
                             .callEvent()
 
                         true
@@ -126,6 +139,7 @@ class BarragePassiveInstance(definition: PassiveDefinition, player: Player) :
     }
 
     private fun finishFiring() {
+        runnables.remove(chargeRunnable)
         chargeRunnable?.cancel()
         chargeRunnable = null
         player.exp = 0f

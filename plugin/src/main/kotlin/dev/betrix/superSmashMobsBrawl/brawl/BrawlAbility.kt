@@ -1,19 +1,23 @@
-package dev.betrix.superSmashMobsBrawl.abilities.instances
+package dev.betrix.superSmashMobsBrawl.brawl
 
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
-import dev.betrix.superSmashMobsBrawl.utils.mm
+import dev.betrix.superSmashMobsBrawl.abilities.AbilityMetadata
+import dev.betrix.superSmashMobsBrawl.services.LangService
 import gg.flyte.twilight.event.TwilightListener
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import kotlinx.coroutines.Job
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-abstract class AbilityInstance(val definition: AbilityDefinition, val player: Player) {
+abstract class BrawlAbility(val id: String, val player: Player, val metadata: AbilityMetadata) :
+    KoinComponent {
     protected val plugin = SuperSmashMobsBrawl.instance
     private var lastUsed: Long = 0
     protected val listeners = arrayListOf<TwilightListener>()
     protected val runnables = arrayListOf<TwilightRunnable>()
     protected val jobs = arrayListOf<Job>()
+    private val lang: LangService by inject()
 
     open fun setup() {}
 
@@ -29,9 +33,12 @@ abstract class AbilityInstance(val definition: AbilityDefinition, val player: Pl
 
     open fun canActivate(): Boolean {
         if (isOnCooldown()) {
-            player.sendMessage(
-                mm("<red>${definition.name} is on cooldown for ${getRemainingCooldown()}s!</red>")
-            )
+            val component =
+                lang.t("messages.abilities.cooldown") {
+                    "abilityId" to id
+                    "seconds" to getRemainingCooldown()
+                }
+            player.sendMessage(component)
             return false
         }
 
@@ -39,12 +46,12 @@ abstract class AbilityInstance(val definition: AbilityDefinition, val player: Pl
     }
 
     fun isOnCooldown(): Boolean {
-        val cooldownMs = definition.metadata.cooldown * 1000L
+        val cooldownMs = metadata.cooldown * 1000L
         return System.currentTimeMillis() - lastUsed < cooldownMs
     }
 
     fun getRemainingCooldown(): Int {
-        val cooldownMs = definition.metadata.cooldown * 1000L
+        val cooldownMs = (metadata.cooldown * 1000).toLong()
         val elapsed = System.currentTimeMillis() - lastUsed
         return ((cooldownMs - elapsed) / 1000).coerceAtLeast(0).toInt()
     }

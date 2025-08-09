@@ -1,27 +1,22 @@
-package dev.betrix.superSmashMobsBrawl.abilities.instances
+package dev.betrix.superSmashMobsBrawl.brawl.abilities
 
-import dev.betrix.superSmashMobsBrawl.abilities.definitions.AbilityDefinition
-import dev.betrix.superSmashMobsBrawl.events.Damager
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
+import dev.betrix.superSmashMobsBrawl.abilities.AbilityMetadata
+import dev.betrix.superSmashMobsBrawl.brawl.BrawlAbility
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
-import dev.betrix.superSmashMobsBrawl.projectiles.ArrowProjectile
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
 
-class RopedArrowAbilityInstance(definition: AbilityDefinition, player: Player) :
-    AbilityInstance(definition, player) {
-
-    private val arrowDamage = 6.0
-    private val arrowVelocityMultiplier = 2.4
+class RopedArrowAbility(id: String, player: Player, metadata: AbilityMetadata) :
+    BrawlAbility(id, player, metadata) {
 
     override fun activate() {
         super.activate()
 
         val projectile =
-            ArrowProjectile(player, "Roped Arrow", arrowVelocityMultiplier)
+            dev.betrix.superSmashMobsBrawl.projectiles
+                .ArrowProjectile(player, "Roped Arrow", 2.4)
                 .onHitBlock { block, projectile ->
                     pullPlayerToLocation(block.location, projectile.velocityBeforeImpact)
                     true
@@ -30,11 +25,12 @@ class RopedArrowAbilityInstance(definition: AbilityDefinition, player: Player) :
                     pullPlayerToLocation(entity.location, projectile.velocityBeforeImpact)
 
                     val damageEvent =
-                        SmashDamageEvent(
+                        dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent(
                             entity,
-                            Damager.LivingEntity(player),
-                            arrowDamage,
-                            damageType = SmashDamageType.Projectile,
+                            dev.betrix.superSmashMobsBrawl.events.Damager.LivingEntity(player),
+                            6.0,
+                            damageType =
+                                dev.betrix.superSmashMobsBrawl.events.SmashDamageType.Projectile,
                         )
 
                     damageEvent.callEvent()

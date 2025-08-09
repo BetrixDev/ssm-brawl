@@ -5,6 +5,15 @@ kits:
   skeleton:
     name: Skeleton
     description: "He got bones"
+abilities:
+  sulphur_bomb:
+    name: "Sulphur Bomb"
+  explode:
+    name: "Explode"
+  bone_explosion:
+    name: "Bone Explosion"
+  roped_arrow:
+    name: "Roped Arrow"
 maps:
   blue_forest:
     name: Blue Forest
@@ -33,3 +42,5 @@ messages:
     status:
       inQueue: "{lang:prefix} <#e8edff>You are currently in the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}"
       notInQueue: "{lang:messages.queue.leave.notInQueue}"
+  abilities:
+    cooldown: "{lang:prefix} <red>{lang:abilities.{abilityId}.name}</red> <#e8edff>is on cooldown for</#e8edff> <yellow>{seconds}s</yellow>!"
