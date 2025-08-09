@@ -3,11 +3,7 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.*
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.brawl.BrawlKit
-import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
-import dev.betrix.superSmashMobsBrawl.maps.blueForestHub
 import dev.betrix.superSmashMobsBrawl.models.BrawlHubWorld
-import dev.betrix.superSmashMobsBrawl.models.brawlData.HubMapDef
-import dev.betrix.superSmashMobsBrawl.registries.MapRegistry
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.feed
@@ -49,24 +45,7 @@ object HubService : KoinComponent {
         plugin.logger.info("Trying to load default world hub with id $defaultHubId")
 
         plugin.launch {
-            val hubMap: SsmbMap = MapRegistry.getDefaultHub() ?: blueForestHub
-            val mapDef =
-                HubMapDef(
-                    id = hubMap.id,
-                    worldBorderSize = hubMap.worldBorderSize,
-                    voidLevel = hubMap.voidLevel.toDouble(),
-                    creators = hubMap.creatorUuids,
-                    spawnPoints =
-                        hubMap.spawnPoints.map { sp ->
-                            dev.betrix.superSmashMobsBrawl.models.SpawnPoint(
-                                x = sp.position.x,
-                                y = sp.position.y,
-                                z = sp.position.z,
-                                yaw = sp.yaw,
-                                pitch = sp.pitch,
-                            )
-                        },
-                )
+            val mapDef = dataService.getHubMap("blue_forest")!!
 
             WorldService.copyAndLoadWorld<BrawlHubWorld>(mapDef)
                 .mapBoth(
@@ -174,14 +153,6 @@ object HubService : KoinComponent {
 
     fun isWorldHub(world: World): Boolean =
         ::defaultHubWorld.isInitialized && defaultHubWorld.world == world
-
-    fun getDefaultHub(): SsmbMap? {
-        return MapRegistry.getDefaultHub()
-    }
-
-    fun getHubWorlds(): List<SsmbMap> {
-        return MapRegistry.getHubMaps()
-    }
 
     private fun giveHubPassives(player: Player) {
         if (playerHubKits.containsKey(player)) {
