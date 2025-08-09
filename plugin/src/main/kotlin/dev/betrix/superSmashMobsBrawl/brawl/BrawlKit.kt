@@ -1,9 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.brawl
 
-import dev.betrix.superSmashMobsBrawl.brawl.abilities.BoneExplosionAbility
-import dev.betrix.superSmashMobsBrawl.brawl.abilities.ExplodeAbility
-import dev.betrix.superSmashMobsBrawl.brawl.abilities.RopedArrowAbility
-import dev.betrix.superSmashMobsBrawl.brawl.abilities.SulphurBombAbility
+import dev.betrix.superSmashMobsBrawl.brawl.abilities.*
 import dev.betrix.superSmashMobsBrawl.brawl.passives.*
 import dev.betrix.superSmashMobsBrawl.disguises.BrawlDisguise
 import dev.betrix.superSmashMobsBrawl.disguises.CreeperDisguise
