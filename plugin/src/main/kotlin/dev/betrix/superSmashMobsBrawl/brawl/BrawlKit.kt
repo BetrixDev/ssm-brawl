@@ -92,14 +92,10 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
         passives.forEach { passive -> passive.setup() }
         disguise?.setup()
 
-        //        HotbarService.setupHotbarItems(this)
-
         player.sendDebugMessage("You have been given the $id kit")
     }
 
     open fun teardown() {
-        //        HotbarService.clearHotbarItems(player)
-
         disguise?.teardown()
 
         abilities.forEach { it.teardown() }
