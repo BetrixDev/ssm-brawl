@@ -34,6 +34,7 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 
 class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
@@ -117,6 +118,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         HubService.teardown()
         WorldService.teardown()
         DebugService.teardown()
+        stopKoin()
         logger.info("SSMB shutting down")
     }
 }
