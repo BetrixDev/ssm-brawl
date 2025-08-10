@@ -4,124 +4,73 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.shynixn.mccoroutine.bukkit.launch
-import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.kits.definitions.CreeperKitDefinition
-import dev.betrix.superSmashMobsBrawl.kits.definitions.KitDefinition
-import dev.betrix.superSmashMobsBrawl.kits.instances.KitInstance
-import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
 import java.util.concurrent.ConcurrentHashMap
 import org.bukkit.entity.Player
+import org.bukkit.plugin.java.JavaPlugin
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 enum class AssignKitError {
     PLAYER_HAS_KIT
 }
 
-object KitService {
-    private val playerSelectedKits = ConcurrentHashMap<Player, KitDefinition>()
-    private val assignedKits = ConcurrentHashMap<Player, KitInstance>()
+object KitService : KoinComponent {
+    private val playerSelectedKits = ConcurrentHashMap<Player, String>() // kit id
+    private val assignedBrawlKits = ConcurrentHashMap<Player, BrawlKit>()
 
-    private val plugin = SuperSmashMobsBrawl.instance
+    private val plugin: JavaPlugin by inject()
+    private val dataService: DataService by inject()
 
-    fun playerSelectKit(player: Player, kitDefinition: KitDefinition) {
-        playerSelectedKits[player] = kitDefinition
+    fun playerSelectKit(player: Player, kitId: String) {
+        playerSelectedKits[player] = kitId
     }
 
-    fun assignKit(player: Player): Result<KitInstance, AssignKitError> {
+    private fun defaultKitId(): String {
+        return dataService.getKit("creeper")?.id ?: dataService.getKit("skeleton")?.id ?: "creeper"
+    }
+
+    fun assignKit(player: Player): Result<BrawlKit, AssignKitError> {
         if (!playerSelectedKits.containsKey(player) || playerSelectedKits[player] == null) {
-            playerSelectedKits[player] = CreeperKitDefinition // Default kit for now
+            playerSelectedKits[player] = defaultKitId()
         }
-
-        return assignKit(player, playerSelectedKits[player] ?: CreeperKitDefinition)
+        return assignKit(player, playerSelectedKits[player] ?: defaultKitId())
     }
 
-    fun assignKit(
-        player: Player,
-        minigameDefinition: MinigameDefinition,
-    ): Result<KitInstance, AssignKitError> {
-        if (!playerSelectedKits.containsKey(player) || playerSelectedKits[player] == null) {
-            playerSelectedKits[player] = CreeperKitDefinition // Default kit for now
-        }
-
-        return assignKit(
-            player,
-            playerSelectedKits[player] ?: CreeperKitDefinition,
-            minigameDefinition,
-        )
-    }
-
-    fun assignKit(
-        player: Player,
-        kitDefinition: KitDefinition,
-    ): Result<KitInstance, AssignKitError> {
-        return assignKit(player, kitDefinition, null)
-    }
-
-    fun assignKit(
-        player: Player,
-        kitDefinition: KitDefinition,
-        minigameDefinition: MinigameDefinition?,
-    ): Result<KitInstance, AssignKitError> {
-        if (assignedKits.containsKey(player)) {
+    fun assignKit(player: Player, kitId: String): Result<BrawlKit, AssignKitError> {
+        if (assignedBrawlKits.containsKey(player)) {
             return Err(AssignKitError.PLAYER_HAS_KIT)
         }
 
-        val kitInstance = kitDefinition.createInstance(player, minigameDefinition)
-        assignedKits[player] = kitInstance
+        val kitData = dataService.getKit(kitId) ?: dataService.getKit(defaultKitId())!!
 
-        // Set up the kit (which will also set up hotbar items)
-        kitInstance.setup()
+        val brawlKit =
+            when (kitData.id) {
+                else -> BrawlKit(kitData.id, player)
+            }
 
-        return Ok(kitInstance)
+        assignedBrawlKits[player] = brawlKit
+        brawlKit.setup()
+        return Ok(brawlKit)
     }
 
-    fun unassignKit(player: Player): KitInstance? {
-        // Remove the kit instance immediately to prevent concurrent access
-        val kitInstance = assignedKits.remove(player)
-
-        // Run teardown asynchronously to prevent concurrent modification
-        kitInstance?.let { instance ->
-            // Assuming you have access to your plugin's coroutine scope
-            // You might need to adjust this based on your mccoroutine setup
+    fun unassignKit(player: Player): BrawlKit? {
+        val kit = assignedBrawlKits.remove(player)
+        kit?.let { instance ->
             plugin.launch {
                 try {
                     instance.teardown()
                 } catch (e: Exception) {
-                    // Handle any exceptions during teardown
                     plugin.logger.warning(
                         "Error during kit teardown for player ${player.name}: ${e.message}"
                     )
                 }
             }
         }
-
-        return kitInstance
+        return kit
     }
 
-    fun unassignKit(kitInstance: KitInstance) {
-        // Thread-safe way to find and remove the kit instance
-        val playerToRemove = assignedKits.entries.find { it.value == kitInstance }?.key
+    fun getKitForPlayer(player: Player): BrawlKit? = assignedBrawlKits[player]
 
-        playerToRemove?.let { player ->
-            assignedKits.remove(player)
-
-            // Run teardown asynchronously
-            plugin.launch {
-                try {
-                    kitInstance.teardown()
-                } catch (e: Exception) {
-                    plugin.logger.warning(
-                        "Error during kit teardown for player ${player.name}: ${e.message}"
-                    )
-                }
-            }
-        }
-    }
-
-    fun getKitInstance(player: Player): KitInstance? {
-        return assignedKits[player]
-    }
-
-    fun hasKit(player: Player): Boolean {
-        return assignedKits.containsKey(player)
-    }
+    fun hasKit(player: Player): Boolean = assignedBrawlKits.containsKey(player)
 }

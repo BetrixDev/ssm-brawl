@@ -2,9 +2,9 @@ package dev.betrix.superSmashMobsBrawl.commands
 
 import com.github.michaelbull.result.mapBoth
 import dev.betrix.superSmashMobsBrawl.extensions.hasDebugEnabled
-import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
+import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
+import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.QueueService
-import dev.betrix.superSmashMobsBrawl.utils.ONLY_PLAYERS_EXEC_MESSAGE
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
@@ -12,14 +12,18 @@ import dev.rollczi.litecommands.annotations.context.Context
 import dev.rollczi.litecommands.annotations.execute.Execute
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 @Command(name = "queue")
-class QueueCommand() {
+class QueueCommand : KoinComponent {
+
+    private val lang: LangService by inject()
 
     @Execute
     fun queue(@Context sender: CommandSender) {
         if (sender !is Player) {
-            sender.sendMessage(ONLY_PLAYERS_EXEC_MESSAGE)
+            sender.sendMessage(lang.t("messages.commands.onPlayers"))
             return
         }
 
@@ -27,9 +31,11 @@ class QueueCommand() {
 
         val playerMessage =
             when (queueEntry) {
-                null -> "<gray>You are not currently in any queue.</gray>"
+                null -> lang.t("messages.queue.status.notInQueue")
                 else ->
-                    "<gold>You are currently in the queue for ${queueEntry.minigame.name}!</gold>"
+                    lang.t("messages.queue.status.inQueue") {
+                        "minigameId" to queueEntry.minigame.id
+                    }
             }
 
         sender.sendMessage(playerMessage)
@@ -43,9 +49,9 @@ class QueueCommand() {
     }
 
     @Execute
-    fun queue(@Context sender: CommandSender, @Arg minigame: MinigameDefinition) {
+    fun queue(@Context sender: CommandSender, @Arg minigame: MinigameDef) {
         if (sender !is Player) {
-            sender.sendMessage(ONLY_PLAYERS_EXEC_MESSAGE)
+            sender.sendMessage(lang.t("messages.commands.onPlayers"))
             return
         }
 
@@ -53,13 +59,9 @@ class QueueCommand() {
             QueueService.addPlayer(sender, minigame)
                 .mapBoth(
                     success = {
-                        mm("<gold>You have joined the queue for ${it.minigame.name}!</gold>")
+                        lang.t("messages.queue.join.success") { "minigameId" to minigame.id }
                     },
-                    failure = {
-                        mm(
-                            "<red>You are currently in a queue for ${it.minigame.name}.<newline>Please leave that queue before joining a new one</red>"
-                        )
-                    },
+                    failure = { lang.t("messages.queue.join.alreadyInQueue") },
                 )
 
         sender.sendMessage(playerMessage)
@@ -68,7 +70,7 @@ class QueueCommand() {
     @Execute(name = "leave")
     fun queueLeave(@Context sender: CommandSender) {
         if (sender !is Player) {
-            sender.sendMessage(ONLY_PLAYERS_EXEC_MESSAGE)
+            sender.sendMessage(lang.t("messages.commands.onPlayers"))
             return
         }
 
@@ -76,11 +78,9 @@ class QueueCommand() {
             QueueService.removePlayer(sender)
                 .mapBoth(
                     success = {
-                        mm(
-                            "<gold>You have been removed from the queue for ${it.minigame.name}</gold>"
-                        )
+                        lang.t("messages.queue.leave.success") { "minigameId" to it.minigame.id }
                     },
-                    failure = { mm("<red>You are not currently in a queue</red>") },
+                    failure = { lang.t("messages.queue.leave.notInQueue") },
                 )
 
         sender.sendMessage(playerMessage)

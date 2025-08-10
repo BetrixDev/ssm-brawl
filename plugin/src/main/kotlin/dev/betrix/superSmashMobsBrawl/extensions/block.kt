@@ -10,18 +10,6 @@ fun Block.isAirOrFoliage(): Boolean {
         Material.VOID_AIR,
         Material.CAVE_AIR,
 
-        // Leaves
-        Material.OAK_LEAVES,
-        Material.SPRUCE_LEAVES,
-        Material.BIRCH_LEAVES,
-        Material.JUNGLE_LEAVES,
-        Material.ACACIA_LEAVES,
-        Material.DARK_OAK_LEAVES,
-        Material.MANGROVE_LEAVES,
-        Material.CHERRY_LEAVES,
-        Material.AZALEA_LEAVES,
-        Material.FLOWERING_AZALEA_LEAVES,
-
         // Grass and ferns
         Material.FERN,
         Material.DEAD_BUSH,
@@ -114,18 +102,6 @@ fun Block.isAirOrFoliage(): Boolean {
         Material.BIG_DRIPLEAF,
         Material.BIG_DRIPLEAF_STEM,
         Material.SMALL_DRIPLEAF,
-
-        // Bamboo
-        Material.BAMBOO,
-        Material.BAMBOO_SAPLING,
-
-        // Chorus plants
-        Material.CHORUS_PLANT,
-        Material.CHORUS_FLOWER,
-
-        // Sugar cane and cactus (often considered foliage)
-        Material.SUGAR_CANE,
-        Material.CACTUS,
 
         // Pink petals
         Material.PINK_PETALS -> true

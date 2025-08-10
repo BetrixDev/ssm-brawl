@@ -1,7 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.projectiles
 
 import dev.betrix.superSmashMobsBrawl.Manageable
-import dev.betrix.superSmashMobsBrawl.extensions.getDisguise
+import dev.betrix.superSmashMobsBrawl.extensions.disguise
 import dev.betrix.superSmashMobsBrawl.extensions.isAirOrFoliage
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import gg.flyte.twilight.event.event
@@ -164,13 +164,9 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) : 
                     return@filter false
                 }
 
-                if (entity is Player) {
-                    entity.getDisguise()?.let { disguise ->
-                        return@filter disguise.boundingBox.overlaps(projectileBoundingBox)
-                    }
-                }
+                val candidateBox = (entity as? Player)?.disguise?.boundingBox ?: entity.boundingBox
 
-                return@filter entity.boundingBox.overlaps(projectileBoundingBox)
+                return@filter candidateBox.overlaps(projectileBoundingBox)
             }
 
         return possibleLivingEntities.minByOrNull { it.location.distance(projectile.location) }

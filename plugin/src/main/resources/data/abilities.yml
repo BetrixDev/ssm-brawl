@@ -1,0 +1,32 @@
+abilities:
+  - id: sulphur_bomb
+    cooldown: 3.0
+    type: projectile
+    itemSlot: 0
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: coal
+
+  - id: explode
+    cooldown: 8.0
+    type: aoe
+    itemSlot: 1
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: creeper_spawn_egg
+
+  - id: bone_explosion
+    cooldown: 10.0
+    itemSlot: 0
+    type: aoe
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: bone
+
+  - id: roped_arrow
+    cooldown: 5.0
+    itemSlot: 1
+    type: projectile
+    usage: left_click
+    hotbarItem: bow
+    displayItem: arrow

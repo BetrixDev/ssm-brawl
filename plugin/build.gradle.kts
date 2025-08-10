@@ -1,5 +1,6 @@
 plugins {
-    kotlin("jvm") version "2.2.0-RC2"
+    kotlin("jvm") version "2.2.0"
+    kotlin("plugin.serialization") version "2.2.0"
     id("com.gradleup.shadow") version "8.3.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("com.ncorti.ktfmt.gradle") version "0.23.0"
@@ -30,6 +31,19 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("com.michael-bull.kotlin-result:kotlin-result:2.0.1")
     compileOnly("me.libraryaddict.disguises:libsdisguises:11.0.6")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation("com.charleskorn.kaml:kaml:0.85.0")
+    implementation("com.squareup.okio:okio:3.10.2")
+    implementation("io.insert-koin:koin-core:3.5.6")
+
+    // Testing
+    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
+    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
+    testImplementation("io.kotest:kotest-property:5.9.1")
+
+    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.20.0")
+    testImplementation("io.insert-koin:koin-test:3.5.6")
+    testImplementation("io.insert-koin:koin-test-junit5:3.5.6")
 }
 
 tasks {
@@ -52,6 +66,11 @@ tasks {
     }
 
     ktfmt { kotlinLangStyle() }
+
+    withType<Test>().configureEach {
+        useJUnitPlatform()
+        systemProperty("junit.jupiter.testinstance.lifecycle.default", "per_class")
+    }
 }
 
 val targetJavaVersion = 21

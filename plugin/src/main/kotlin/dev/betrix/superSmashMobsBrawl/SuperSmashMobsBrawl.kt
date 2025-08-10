@@ -5,14 +5,16 @@ import dev.betrix.superSmashMobsBrawl.commands.DebugCommand
 import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
-import dev.betrix.superSmashMobsBrawl.commands.argumentResolvers.MinigameDefinitionArgument
+import dev.betrix.superSmashMobsBrawl.commands.resolvers.MinigameDefinitionArgument
 import dev.betrix.superSmashMobsBrawl.extensions.hasPassive
-import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
-import dev.betrix.superSmashMobsBrawl.passives.definitions.HungerPassiveDefinition
+import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
+import dev.betrix.superSmashMobsBrawl.services.DataService
 import dev.betrix.superSmashMobsBrawl.services.DebugService
-import dev.betrix.superSmashMobsBrawl.services.HotbarService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
 import dev.betrix.superSmashMobsBrawl.services.HubService
+import dev.betrix.superSmashMobsBrawl.services.KitService
+import dev.betrix.superSmashMobsBrawl.services.LangService
+import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import dev.rollczi.litecommands.LiteCommands
@@ -30,34 +32,43 @@ import org.bukkit.event.entity.PotionSplashEvent
 import org.bukkit.event.inventory.InventoryInteractEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
+import org.bukkit.plugin.java.JavaPlugin
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
 
 class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var liteCommands: LiteCommands<CommandSender>
     lateinit var twilight: Twilight
 
-    companion object {
-        lateinit var instance: SuperSmashMobsBrawl
-    }
-
     override suspend fun onEnableAsync() {
-        instance = this
+        startKoin {
+            modules(
+                module {
+                    single { this@SuperSmashMobsBrawl }
+                    single<JavaPlugin> { this@SuperSmashMobsBrawl }
+                    single { this@SuperSmashMobsBrawl.logger }
+                    single(createdAtStart = true) { DataService() }
+                    single { MinigameService() }
+                    single { KitService }
+                    single(createdAtStart = true) { LangService() }
+                    single { WorldService }
+                }
+            )
+        }
+
         twilight = twilight(this)
 
         // Initialize services
-        HotbarService.initialize(this)
         HubService.initialize(this)
         HubProtectionService.registerEvents()
         DebugService.initialize(this)
 
-        server.motd(
-            mm(
-                "<gradient:#ff6b6b:#4ecdc4>⚔ <bold>SUPER SMASH MOBS BRAWL</bold> ⚔</gradient><newline><gradient:#ffd93d:#6bcf7f>\uD83C\uDFAE Choose Your Mob • Smash Enemies • Dominate! \uD83C\uDFC6</gradient>"
-            )
-        )
+        server.motd(mm("The brawl reborn -- a wondrous thing!"))
 
         liteCommands =
             LiteBukkitFactory.builder(this)
-                .argument(MinigameDefinition::class.java, MinigameDefinitionArgument())
+                .argument(MinigameDef::class.java, MinigameDefinitionArgument())
                 .commands(QueueCommand())
                 .commands(KitCommand())
                 .commands(LeaveCommand())
@@ -77,7 +88,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         event<FoodLevelChangeEvent> {
             if (entity is Player) {
                 val player = entity as Player
-                if (!player.hasPassive(HungerPassiveDefinition)) {
+                if (!player.hasPassive("hunger")) {
                     player.feed()
                     isCancelled = true
                 }
@@ -102,6 +113,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         HubService.teardown()
         WorldService.teardown()
         DebugService.teardown()
+        stopKoin()
         logger.info("SSMB shutting down")
     }
 }

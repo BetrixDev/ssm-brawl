@@ -1,20 +1,21 @@
 package dev.betrix.superSmashMobsBrawl.events
 
-import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
+import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
+import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import gg.flyte.twilight.event.TwilightEvent
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
 sealed class SmashDamageType {
-    object Projectile : SmashDamageType()
+    data object Projectile : SmashDamageType()
 
-    object Explosion : SmashDamageType()
+    data object Explosion : SmashDamageType()
 }
 
 sealed class Damager {
-    object System : Damager()
+    data object System : Damager()
 
-    data class LivingEntity(val livingEntity: org.bukkit.entity.LivingEntity) : Damager()
+    data class DamagerLivingEntity(val livingEntity: LivingEntity) : Damager()
 }
 
 class SmashDamageEvent(
@@ -25,7 +26,7 @@ class SmashDamageEvent(
     val damageType: SmashDamageType? = null,
 ) : TwilightEvent() {
 
-    fun isValid(minigame: MinigameInstance): Boolean {
+    fun isValid(minigame: BrawlMinigame<MinigameDef>): Boolean {
         // TODO: Once we figure out how we want to handle all living entities in minigames, this
         // check will be removed
         if (victim !is Player) {
@@ -35,7 +36,7 @@ class SmashDamageEvent(
         // Check if damager is a player when it's a LivingEntity
         val damagerPlayer =
             when (damager) {
-                is Damager.LivingEntity -> damager.livingEntity as? Player
+                is Damager.DamagerLivingEntity -> damager.livingEntity as? Player
                 is Damager.System -> return minigame.isPlayerInMinigame(victim)
                 null -> return false
             }

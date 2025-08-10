@@ -1,17 +1,14 @@
 package dev.betrix.superSmashMobsBrawl.services
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.onFailure
-import com.github.michaelbull.result.onSuccess
+import com.github.michaelbull.result.*
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.minigames.definitions.MinigameDefinition
-import dev.betrix.superSmashMobsBrawl.minigames.instances.MinigameInstance
-import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
-import dev.betrix.superSmashMobsBrawl.utils.mm
+import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
+import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
+import dev.betrix.superSmashMobsBrawl.utils.resultRunCatching
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 sealed class MinigameInitError {
     data class PlayerAlreadyInMinigame(val players: List<Player>) : MinigameInitError()
@@ -24,74 +21,85 @@ enum class MinigameLeaveError {
     Unknown,
 }
 
-object MinigameService {
-    private val inFlightMinigames = arrayListOf<MinigameInstance>()
+class MinigameService : KoinComponent {
+    private val plugin: SuperSmashMobsBrawl by inject()
+    private val dataService: DataService by inject()
+    private val hubService: HubService by inject()
 
-    fun initializeMinigameInstance(
-        minigameDefinition: MinigameDefinition,
-        teams: List<MinigameTeam>,
-    ): Result<MinigameInstance, MinigameInitError> {
-        val playersInAMinigame =
-            teams
-                .map { team -> team.players.filter { player -> isPlayerInMinigame(player) } }
-                .flatten()
+    private val inFlightMinigames = arrayListOf<BrawlMinigame<*>>()
 
-        if (!playersInAMinigame.isEmpty()) {
-            return Err(MinigameInitError.PlayerAlreadyInMinigame(playersInAMinigame))
-        }
-
-        val minigameInstance = minigameDefinition.createInstance(teams)
-
-        inFlightMinigames.add(minigameInstance)
-
-        return Ok(minigameInstance)
+    fun getMinigameData(id: String): MinigameDef? {
+        return dataService.getMinigame(id)
     }
 
-    fun handleMinigameSetup(minigameInstance: MinigameInstance) {
-        SuperSmashMobsBrawl.instance.launch {
-            minigameInstance.initMinigame().onFailure { minigameInstance.teardownMinigame() }
+    fun getAllMinigameData(): List<MinigameDef> {
+        return dataService.getAllMinigames()
+    }
+
+    fun findClosestMinigameById(id: String): MinigameDef? {
+        if (id.isBlank()) return null
+
+        getMinigameData(id)?.let {
+            return it
+        }
+
+        getAllMinigameData()
+            .find { it.id.equals(id, ignoreCase = true) }
+            ?.let {
+                return it
+            }
+
+        return getAllMinigameData().find { it.id.contains(id, ignoreCase = true) }
+    }
+
+    fun handleMinigameSetup(minigameInstance: BrawlMinigame<*>) {
+        plugin.launch {
+            minigameInstance
+                .initMinigame()
+                .onSuccess {
+                    if (!inFlightMinigames.contains(minigameInstance)) {
+                        inFlightMinigames.add(minigameInstance)
+                    }
+                }
+                .onFailure { err ->
+                    plugin.logger.warning("Minigame init failed: $err")
+                    minigameInstance.teardown()
+                }
         }
     }
 
-    fun removeMinigameInstance(minigameInstance: MinigameInstance): Boolean {
+    fun removeMinigameInstance(minigameInstance: BrawlMinigame<*>): Boolean {
         return inFlightMinigames.remove(minigameInstance)
     }
 
     fun isPlayerInMinigame(player: Player): Boolean {
-        return inFlightMinigames.find { it.isPlayerInMinigame(player) } != null
+        return getMinigameForPlayer(player) != null
     }
 
-    fun getMinigameForPlayer(player: Player): MinigameInstance? {
+    fun getMinigameForPlayer(player: Player): BrawlMinigame<*>? {
         return inFlightMinigames.find { it.isPlayerInMinigame(player) }
     }
 
-    fun handlePlayerLeave(player: Player): Result<Unit, MinigameLeaveError> {
+    fun handlePlayerLeave(player: Player): Result<BrawlMinigame<*>, MinigameLeaveError> {
         val minigameInstance =
             getMinigameForPlayer(player) ?: return Err(MinigameLeaveError.PlayerNotInMinigame)
 
-        return try {
-            minigameInstance
-                .onPlayerLeave(player)
-                .onSuccess {
-                    KitService.unassignKit(player)
+        val canPlayerLeave = minigameInstance.canPlayerLeaveMinigame(player)
 
-                    // Try to move player back to hub
-                    HubService.tryTeleportToDefaultHub(player).onFailure {
-                        // Log the teleportation failure but don't fail the leave operation
-                        player.kick(mm("<red>We couldn't put you back in the hub</red>"))
-                        SuperSmashMobsBrawl.instance.logger.severe(
-                            "Failed to teleport ${player.name} to hub: ${it.message}"
-                        )
-                    }
-                }
-                .onFailure {
-                    return Err(MinigameLeaveError.NotAllowedToLeave)
-                }
-
-            return Ok(Unit)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Err(MinigameLeaveError.Unknown)
+        if (!canPlayerLeave) {
+            return Err(MinigameLeaveError.NotAllowedToLeave)
         }
+
+        resultRunCatching { minigameInstance.onPlayerLeave(player) }
+            .onFailure { err ->
+                plugin.logger.severe("Error calling minigame.onPlayerLeave $err")
+                return Err(MinigameLeaveError.NotAllowedToLeave)
+            }
+
+        hubService.teleportToDefaultHub(player).onFailure {
+            return Err(MinigameLeaveError.HubNotReady)
+        }
+
+        return Ok(minigameInstance)
     }
 }

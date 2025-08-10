@@ -1,0 +1,21 @@
+minigames:
+  - id: prototyping
+    countdown: 0
+    type: ffa
+    isHidden: false
+    minPlayers: 1
+    maxPlayers: 4
+    allowKitSwitching: true
+    allowParties: true
+    passiveBlacklist: [hunger]
+    respawnDelaySeconds: 5
+
+  - id: two_player_duels
+    countdown: 5
+    type: team_based_stocks
+    isHidden: false
+    playersPerTeam: 1
+    amountOfTeams: 2
+    stocks: 4
+    allowParties: false
+    respawnDelaySeconds: 5

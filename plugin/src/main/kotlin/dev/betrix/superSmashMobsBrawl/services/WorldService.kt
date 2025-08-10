@@ -4,10 +4,14 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
-import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.maps.SsmbMap
+import dev.betrix.superSmashMobsBrawl.models.BrawlGameWorld
+import dev.betrix.superSmashMobsBrawl.models.BrawlHubWorld
+import dev.betrix.superSmashMobsBrawl.models.BrawlWorld
+import dev.betrix.superSmashMobsBrawl.models.brawlData.GameMapDef
+import dev.betrix.superSmashMobsBrawl.models.brawlData.HubMapDef
+import dev.betrix.superSmashMobsBrawl.models.brawlData.MapDef
 import java.io.IOException
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -16,34 +20,37 @@ import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bukkit.Bukkit
 import org.bukkit.GameRule
 import org.bukkit.World
 import org.bukkit.WorldCreator
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-data class LoadedWorld(val world: World, val mapDefinition: SsmbMap)
+object WorldService : KoinComponent {
+    private val plugin: SuperSmashMobsBrawl by inject()
 
-object WorldService {
-    private val loadedWorlds = hashMapOf<String, LoadedWorld>()
+    private val loadedWorlds = hashMapOf<String, BrawlWorld>()
 
     private const val WORLD_PREFIX = "ssmbworld_"
 
     suspend fun teardown() {
-        loadedWorlds.forEach { it ->
-            deleteWorld(it.value).onFailure { error ->
-                SuperSmashMobsBrawl.instance.logger.severe(
-                    "Failed to delete world: ${error.message}"
-                )
+        val worlds = loadedWorlds.values.toList()
+
+        worlds.forEach {
+            deleteWorld(it).onFailure { error ->
+                plugin.logger.severe("Failed to delete world: ${error.message}")
             }
         }
     }
 
     suspend fun copyAndLoadWorld(
-        map: SsmbMap,
+        map: MapDef,
         customWorldName: String = UUID.randomUUID().toString(),
-    ): Result<LoadedWorld, Exception> =
-        withContext(SuperSmashMobsBrawl.instance.asyncDispatcher) {
+    ): Result<BrawlWorld, Exception> =
+        withContext(Dispatchers.IO) {
             val copyResult = runCatching {
                 val serverFolder = Bukkit.getWorldContainer().toPath()
                 val worldsFolder = serverFolder.resolve("worlds")
@@ -71,15 +78,15 @@ object WorldService {
                 prefixedWorldName
             }
 
-            withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) {
+            withContext(plugin.minecraftDispatcher) {
                 copyResult.fold(
                     onSuccess = { worldName ->
                         runCatching {
                                 val worldCreator = WorldCreator(worldName)
                                 val world = Bukkit.createWorld(worldCreator)
 
-                                if (world == null) {
-                                    error("Failed to create world: $worldName")
+                                require(world != null) {
+                                    "Failed to create world: $worldName (Bukkit.createWorld returned null)"
                                 }
 
                                 setupWorld(world, map)
@@ -88,7 +95,11 @@ object WorldService {
                             }
                             .fold(
                                 onSuccess = { world ->
-                                    val loadedWorld = LoadedWorld(world, map)
+                                    val loadedWorld =
+                                        when (map) {
+                                            is GameMapDef -> BrawlGameWorld(world, map)
+                                            is HubMapDef -> BrawlHubWorld(world, map)
+                                        }
 
                                     loadedWorlds[customWorldName] = loadedWorld
 
@@ -98,7 +109,7 @@ object WorldService {
                             )
                     },
                     onFailure = {
-                        return@withContext Err(RuntimeException(it.message, it))
+                        return@fold Err(RuntimeException(it.message, it))
                     },
                 )
             }
@@ -114,8 +125,8 @@ object WorldService {
         return deleteWorld(loadedWorld)
     }
 
-    suspend fun deleteWorld(loadedWorld: LoadedWorld): Result<Unit, Exception> =
-        withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) mainContext@{
+    suspend fun deleteWorld(loadedWorld: BrawlWorld): Result<Unit, Exception> =
+        withContext(plugin.minecraftDispatcher) mainContext@{
             val loadedWorldEntry = loadedWorlds.entries.find { it.value == loadedWorld }
 
             if (loadedWorldEntry == null) {
@@ -147,9 +158,7 @@ object WorldService {
                 }
                 .fold(
                     onSuccess = { actualWorldName ->
-                        return@mainContext withContext(
-                            SuperSmashMobsBrawl.instance.asyncDispatcher
-                        ) {
+                        return@mainContext withContext(Dispatchers.IO) {
                             runCatching {
                                     val serverFolder = Bukkit.getWorldContainer().toPath()
                                     val worldPath = serverFolder.resolve(actualWorldName)
@@ -172,7 +181,7 @@ object WorldService {
                 )
         }
 
-    private fun setupWorld(world: World, map: SsmbMap) {
+    private fun setupWorld(world: World, map: MapDef) {
         world.worldBorder.size = map.worldBorderSize
         world.setStorm(false)
         world.isVoidDamageEnabled = false
@@ -248,13 +257,7 @@ object WorldService {
                             return FileVisitResult.SKIP_SUBTREE
                         }
 
-                        runCatching { Files.createDirectories(targetDir) }
-                            .onFailure { exception ->
-                                if (!Files.exists(targetDir)) {
-                                    throw exception
-                                }
-                            }
-
+                        Files.createDirectories(targetDir)
                         return FileVisitResult.CONTINUE
                     }
 
@@ -263,13 +266,12 @@ object WorldService {
                         attrs: BasicFileAttributes,
                     ): FileVisitResult {
                         val fileName = file.fileName.toString()
-
-                        // Skip problematic files
                         if (fileName == "session.lock" || fileName == "uid.dat") {
                             return FileVisitResult.CONTINUE
                         }
 
                         val targetFile = target.resolve(source.relativize(file))
+                        Files.createDirectories(targetFile.parent)
                         Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING)
 
                         return FileVisitResult.CONTINUE
@@ -279,20 +281,7 @@ object WorldService {
         }
     }
 
-    /** Removes the SSMB world prefix from a world name if present */
-    private fun removeWorldPrefix(worldName: String): String {
-        return if (worldName.startsWith(WORLD_PREFIX)) {
-            worldName.removePrefix(WORLD_PREFIX)
-        } else {
-            worldName
-        }
-    }
+    private fun addWorldPrefix(worldName: String): String = "$WORLD_PREFIX$worldName"
 
-    private fun addWorldPrefix(worldName: String): String {
-        return if (worldName.startsWith(WORLD_PREFIX)) {
-            worldName
-        } else {
-            "$WORLD_PREFIX$worldName"
-        }
-    }
+    private fun removeWorldPrefix(worldName: String): String = worldName.removePrefix(WORLD_PREFIX)
 }

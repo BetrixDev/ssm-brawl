@@ -15,15 +15,7 @@ abstract class Manageable : IManageable {
     protected val listeners = arrayListOf<TwilightListener>()
     protected val jobs = arrayListOf<Job>()
 
-    open suspend fun setupAsync() {
-        setup()
-    }
-
     override fun setup() {}
-
-    open suspend fun teardownAsync() {
-        teardown()
-    }
 
     override fun teardown() {
         runnables.forEach { it.cancel() }

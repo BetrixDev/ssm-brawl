@@ -1,10 +1,10 @@
 package dev.betrix.superSmashMobsBrawl.extensions
 
-import dev.betrix.superSmashMobsBrawl.passives.definitions.PassiveDefinition
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.KitService
-import dev.betrix.superSmashMobsBrawl.utils.mm
+import dev.betrix.superSmashMobsBrawl.services.LangService
 import org.bukkit.entity.Player
+import org.koin.core.context.GlobalContext
 
 /**
  * Check if debug mode is enabled for this player.
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player
  * Usage:
  * ```kotlin
  * if (player.hasDebugEnabled()) {
- *     player.sendMessage("Debug: Some debug information")
+ *     player.sendMessage("Some debug information")
  * }
  * ```
  */
@@ -25,11 +25,15 @@ fun Player.sendDebugMessage(message: String) {
         return
     }
 
-    sendMessage(mm("<gray>[DEBUG] $message</gray>"))
+    val lang: LangService = GlobalContext.get().get()
+
+    sendMessage(lang.t("messages.debug") { "message" to message })
 }
 
-fun Player.hasPassive(definition: PassiveDefinition): Boolean {
-    val kit = KitService.getKitInstance(this)
+fun Player.hasPassive(passiveId: String): Boolean {
+    val kitService: KitService = GlobalContext.get().get()
 
-    return kit?.passiveInstances?.find { it.definition.id == definition.id } != null
+    val brawlKit = kitService.getKitForPlayer(this) ?: return false
+
+    return brawlKit.getPassive(passiveId) != null
 }
