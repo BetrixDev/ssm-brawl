@@ -4,8 +4,8 @@ import dev.betrix.superSmashMobsBrawl.models.brawlData.GameMapDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.HubMapDef
 import org.bukkit.World
 
-sealed class BrawlWorld {
-    abstract val world: World
+sealed interface BrawlWorld {
+    val world: World
 }
 
 data class BrawlGameWorld(override val world: World, val data: GameMapDef) : BrawlWorld()

@@ -100,7 +100,9 @@ class LangService : KoinComponent {
             }
 
             val value = vars[token]
-            val replacement = value?.toString() ?: matcher.group() // leave placeholder if missing
+            val replacement =
+                value?.let { miniMessage.escapeTags(it.toString()) }
+                    ?: matcher.group() // leave placeholder if missing
             matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement))
         }
 

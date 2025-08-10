@@ -25,6 +25,7 @@ import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
 import gg.flyte.twilight.scheduler.repeatingTask
 import java.time.Duration
+import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -47,9 +48,10 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     private val langService: LangService by inject()
     private val plugin: SuperSmashMobsBrawl by inject()
 
-    protected val minigameData =
+    protected val minigameData by lazy {
         (dataService.getMinigame(minigameId) as TMinigameDef?)
             ?: throw RuntimeException("Could not find minigame data for id $minigameId")
+    }
 
     lateinit var brawlWorld: BrawlGameWorld
         protected set
@@ -61,7 +63,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
     /** Determine if a passive can be used in a minigame */
     fun isPassiveValid(id: String): Boolean {
-        return minigameData.isPasiveValid(id)
+        return minigameData.isPassiveValid(id)
     }
 
     fun hasPlayer(player: Player): Boolean {
@@ -90,7 +92,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         val spawnPoints = brawlWorld.data.spawnPoints.getEquidistant(players.size)
 
         players.forEachIndexed { idx, player ->
-            player.teleport(brawlWorld.world.location(spawnPoints[idx]))
+            player.teleport(brawlWorld.world.location(spawnPoints[min(idx, spawnPoints.size)]))
             assignPlayerKit(player)
         }
 

@@ -12,6 +12,11 @@ class RegenerationPassive(player: Player) : BrawlPassive("regeneration", player)
     override fun setup() {
         val regenTask =
             repeatingTask(healIntervalTicks) {
+                if (!player.isOnline || player.isDead) {
+                    cancel()
+                    return@repeatingTask
+                }
+
                 val playerMaxHealth = player.getAttribute(Attribute.MAX_HEALTH)?.value ?: 20.0
                 if (player.health < playerMaxHealth) {
                     val newHealth = (player.health + healAmount).coerceAtMost(playerMaxHealth)

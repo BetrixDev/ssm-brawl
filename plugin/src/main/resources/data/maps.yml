@@ -8,6 +8,8 @@ gameMaps:
       x: 0.0
       y: 150.0
       z: 45.0
+      yaw: 0.0
+      pitch: 0.0
     spawnPoints:
       - x: 13.0
         y: 106.0
@@ -26,9 +28,9 @@ hubMaps:
   - id: blue_forest
     voidLevel: -10.0
     worldBorderSize: 500.0
-    creators: null
+    creators: []
     spawnPoints:
-      - x: 29.5
+      - x: -29.5
         y: 58.0
         z: 1.5
         yaw: 90.0

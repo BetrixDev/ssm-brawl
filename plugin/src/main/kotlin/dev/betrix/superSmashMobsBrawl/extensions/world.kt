@@ -11,6 +11,6 @@ fun World.location(spawnPoint: SpawnPoint): Location {
         spawnPoint.y,
         spawnPoint.z,
         spawnPoint.yaw ?: 0f,
-        spawnPoint.pitch ?: 90f,
+        spawnPoint.pitch ?: 0f,
     )
 }

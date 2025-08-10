@@ -43,7 +43,7 @@ kits:
       - id: arrow_recharge
         overrides:
           metadata:
-            arrowIntervalTicks: 60.0
+            arrowIntervalTicks: 60
       - id: barrage
     abilities:
       - id: bone_explosion

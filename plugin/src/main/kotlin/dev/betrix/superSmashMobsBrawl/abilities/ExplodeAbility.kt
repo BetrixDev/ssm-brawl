@@ -1,9 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.abilities
 
-import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.ticks
-import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
@@ -14,6 +12,7 @@ import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.getNearbyEntities
 import gg.flyte.twilight.scheduler.repeatingTask
 import kotlin.math.min
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -29,15 +28,18 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
     private var isExplodeActive = false
     private val fuseTimeTicks = metadata.int("fuseTimeTicks") ?: 30
     private val explosionRadius = metadata.double("explosionRadius") ?: 8.0
-    private val explosionKnockbackMultiplier = metadata.double("explosionKnockbackMultiplier") ?: 2.5
+    private val explosionKnockbackMultiplier =
+        metadata.double("explosionKnockbackMultiplier") ?: 2.5
 
-    override fun canActivate(): Boolean {
+    override fun canActivate(sendMessage: Boolean): Boolean {
         if (isExplodeActive) {
-            player.sendMessage(mm("<red>Already charging explosion!</red>"))
+            if (sendMessage) {
+                player.sendMessage(mm("<red>Already charging explosion!</red>"))
+            }
             return false
         }
 
-        return super.canActivate() && !isExplodeActive
+        return super.canActivate(sendMessage) && !isExplodeActive
     }
 
     override fun teardown() {
@@ -64,7 +66,7 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
     override fun activate() {
         val currentTimeAtActivation = System.currentTimeMillis()
 
-        setCooldown()
+        super.activate()
 
         isExplodeActive = true
 
@@ -92,10 +94,8 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
         )
 
         jobs.add(
-            SuperSmashMobsBrawl.Companion.instance.launch {
-                withContext(SuperSmashMobsBrawl.Companion.instance.asyncDispatcher) {
-                    delay(fuseTimeTicks.ticks)
-                }
+            plugin.launch {
+                withContext(Dispatchers.IO) { delay(fuseTimeTicks.ticks) }
 
                 if (!isExplodeActive) {
                     cancel()
@@ -116,7 +116,7 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
                         val distance = player.location.distance(entity.location)
                         val damage =
                             ((0.1 + 0.9 * ((explosionRadius - distance) / explosionRadius)) * 20) *
-                                    0.75
+                                0.75
 
                         entity.doKnockback(
                             explosionKnockbackMultiplier,
@@ -129,7 +129,7 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
                         val damageEvent =
                             SmashDamageEvent(
                                 entity,
-                                Damager.LivingEntity(player),
+                                Damager.DamagerLivingEntity(player),
                                 damage,
                                 explosionKnockbackMultiplier,
                                 SmashDamageType.Explosion,

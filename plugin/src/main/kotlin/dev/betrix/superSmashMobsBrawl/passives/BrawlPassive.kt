@@ -16,20 +16,22 @@ abstract class BrawlPassive(val id: String, val player: Player) : Manageable(), 
     protected val minigameService: MinigameService by inject()
     protected val kitService: KitService by inject()
 
-    protected val passiveData =
+    protected val passiveData by lazy {
         dataService.getPassive(id)
             ?: throw RuntimeException("No passive found in DataService with id $id")
-
-    protected val minigameData = run {
-        val minigameId = minigameService.getMinigameForPlayer(player)?.minigameId ?: return@run null
-
-        return@run dataService.getMinigame(minigameId)
     }
 
-    protected val kitData = run {
-        val kitId = kitService.getKitForPlayer(player)?.id ?: return@run null
+    protected val minigameData by lazy {
+        val minigameId =
+            minigameService.getMinigameForPlayer(player)?.minigameId ?: return@lazy null
 
-        return@run dataService.getKit(kitId)
+        return@lazy dataService.getMinigame(minigameId)
+    }
+
+    protected val kitData by lazy {
+        val kitId = kitService.getKitForPlayer(player)?.id ?: return@lazy null
+
+        return@lazy dataService.getKit(kitId)
     }
 
     protected val metadata: MetadataAccessor =
@@ -44,17 +46,20 @@ abstract class BrawlPassive(val id: String, val player: Player) : Manageable(), 
 
             override fun long(name: String): Long? = getValue<Long>(name)
 
+            override fun boolean(name: String): Boolean? = getValue<Boolean>(name)
+
             inline fun <reified T> getValue(name: String): T? {
                 try {
                     if (kitData != null) {
-                        minigameData?.overrides?.kits?.get(kitData.id)?.passives?.get(id)?.let {
+                        minigameData?.overrides?.kits?.get(kitData?.id)?.passives?.get(id)?.let {
                             it.metadata?.getAs<T>(name)?.let { value ->
                                 return value
                             }
                         }
 
-                        kitData.passives
-                            .find { it.id == id }
+                        kitData
+                            ?.passives
+                            ?.find { it.id == id }
                             ?.overrides
                             ?.metadata
                             ?.getAs<T>(name)

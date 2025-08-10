@@ -10,4 +10,6 @@ interface MetadataAccessor {
     fun float(name: String): Float?
 
     fun long(name: String): Long?
+
+    fun boolean(name: String): Boolean?
 }

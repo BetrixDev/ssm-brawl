@@ -45,6 +45,8 @@ object HubService : KoinComponent {
         plugin.logger.info("Trying to load default world hub with id $defaultHubId")
 
         plugin.launch {
+            dataService.awaitReady()
+
             val mapDef = dataService.getHubMap("blue_forest")!!
 
             WorldService.copyAndLoadWorld<BrawlHubWorld>(mapDef)
@@ -115,7 +117,12 @@ object HubService : KoinComponent {
         }
 
         val spawnPoint = hubWorld.data.spawnPoints[0]
-        player.teleport(createLocation(hubWorld.world, spawnPoint))
+        val teleportSuccess = player.teleport(createLocation(hubWorld.world, spawnPoint))
+
+        if (!teleportSuccess) {
+            return Err(RuntimeException("Teleport to hub failed for ${player.name}"))
+        }
+
         player.inventory.clear()
         player.feed()
         player.heal()

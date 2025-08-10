@@ -17,7 +17,10 @@ import dev.betrix.superSmashMobsBrawl.passives.HungerPassive
 import dev.betrix.superSmashMobsBrawl.passives.RegenerationPassive
 import dev.betrix.superSmashMobsBrawl.services.DataService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
+import gg.flyte.twilight.extension.feed
+import gg.flyte.twilight.extension.heal
 import java.util.logging.Logger
+import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -55,10 +58,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                 }
             }
 
-        logger.info(kitData.abilities.toString())
-
         kitData.abilities.forEach {
-            logger.info(it.toString())
             abilities.add(
                 when (it.id) {
                     "sulphur_bomb" -> SulphurBombAbility(player)
@@ -100,6 +100,10 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
         abilities.forEach { ability -> ability.setup() }
         passives.forEach { passive -> passive.setup() }
         disguise?.setup()
+
+        player.gameMode = GameMode.SURVIVAL
+        player.heal()
+        player.feed()
 
         player.sendDebugMessage("You have been given the $id kit")
     }

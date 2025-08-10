@@ -34,14 +34,14 @@ minigames:
     description: "For all of your testing needs"
   two_player_duels:
     name: "1v1 Duels"
-    descriptions: "A competitive 1v1game mode"
+    description: "A competitive 1v1game mode"
 prefix: "<#585b70>[<gradient:#cba6f7:#585b70>Brawl</gradient><#585b70>]<reset>"
 messages:
   debug: "{lang:prefix} <#4c4f69>[DEBUG] {message}"
   kick:
     serverStarting: "Server is still starting! Please come back in a moment"
   commands:
-    onlyPlayers: "<red>On players can execute this command</red>"
+    onlyPlayers: "<red>Only players can execute this command</red>"
   queue:
     leave:
       notInQueue: "{lang:prefix} <#f2b8c6>You are not currently in a queue<#e8edff>"
@@ -70,6 +70,6 @@ messages:
       success: "{lang:prefix} <#e8edff>You have left <#8bd5ff>{lang:minigames.{minigameId}.name}"
       notAllowed: "{lang:prefix} <#f2b8c6>You are not allowed to leave this game"
       notInGame: "{lang:prefix} <#f2b8c6>You are not in a game"
-      unknown: "{lang:prefix} <#f2b8c6>An unknown error occured. Please try again"
+      unknown: "{lang:prefix} <#f2b8c6>An unknown error occurred. Please try again"
     respawn:
       timeLeft: "<#8bd5ff>{secondsLeft}"

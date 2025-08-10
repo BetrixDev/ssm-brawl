@@ -7,6 +7,6 @@ data class SpawnPoint(
     val x: Double,
     val y: Double,
     val z: Double,
-    val pitch: Float? = null,
-    val yaw: Float? = null,
+    val pitch: Float = 0f,
+    val yaw: Float = 0f,
 )

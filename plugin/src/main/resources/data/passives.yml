@@ -12,7 +12,7 @@ passives:
     displayItem: bundle
     userFacing: true
     metadata:
-      arrowIntervalTicks: 20.0
+      arrowIntervalTicks: 20
 
   - id: barrage
     displayItem: spectral_arrow

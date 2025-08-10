@@ -7,15 +7,11 @@ import org.bukkit.entity.Player
 open class TeamBasedStocksMinigame(minigameId: String, gameId: String, teams: List<MinigameTeam>) :
     BrawlMinigame<TeamBasedStocksMinigameDef>(minigameId, gameId, teams.flatMap { it.players }) {
 
-    override fun setup() {
-        super.setup()
-    }
-
     override fun canPlayerLeaveMinigame(player: Player): Boolean {
         return true
     }
 
     override fun onPlayerLeave(player: Player) {
-        // No-op for now
+        TODO("Implement")
     }
 }

@@ -3,8 +3,7 @@ package dev.betrix.superSmashMobsBrawl.models.brawlData
 import com.charleskorn.kaml.YamlScalar
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class AbilityDefFile(val abilities: List<AbilityDef>)
+@Serializable data class AbilityDefFile(val abilities: List<AbilityDef>)
 
 @Serializable
 data class AbilityDef(

@@ -4,7 +4,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.onFailure
-import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.models.BrawlGameWorld
@@ -21,32 +20,37 @@ import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bukkit.Bukkit
 import org.bukkit.GameRule
 import org.bukkit.World
 import org.bukkit.WorldCreator
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-object WorldService {
+object WorldService : KoinComponent {
+    private val plugin: SuperSmashMobsBrawl by inject()
+
     private val loadedWorlds = hashMapOf<String, BrawlWorld>()
 
     private const val WORLD_PREFIX = "ssmbworld_"
 
     suspend fun teardown() {
-        loadedWorlds.forEach { it ->
-            deleteWorld(it.value).onFailure { error ->
-                SuperSmashMobsBrawl.instance.logger.severe(
-                    "Failed to delete world: ${error.message}"
-                )
+        val worlds = loadedWorlds.values.toList()
+
+        worlds.forEach {
+            deleteWorld(it).onFailure { error ->
+                plugin.logger.severe("Failed to delete world: ${error.message}")
             }
         }
     }
 
-    suspend fun <T : BrawlWorld> copyAndLoadWorld(
+    suspend fun copyAndLoadWorld(
         map: MapDef,
         customWorldName: String = UUID.randomUUID().toString(),
-    ): Result<T, Exception> =
-        withContext(SuperSmashMobsBrawl.instance.asyncDispatcher) {
+    ): Result<BrawlWorld, Exception> =
+        withContext(Dispatchers.IO) {
             val copyResult = runCatching {
                 val serverFolder = Bukkit.getWorldContainer().toPath()
                 val worldsFolder = serverFolder.resolve("worlds")
@@ -74,15 +78,15 @@ object WorldService {
                 prefixedWorldName
             }
 
-            withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) {
+            withContext(plugin.minecraftDispatcher) {
                 copyResult.fold(
                     onSuccess = { worldName ->
                         runCatching {
                                 val worldCreator = WorldCreator(worldName)
                                 val world = Bukkit.createWorld(worldCreator)
 
-                                if (world == null) {
-                                    error("Failed to create world: $worldName")
+                                require(world != null) {
+                                    "Failed to create world: $worldName (Bukkit.createWorld returned null)"
                                 }
 
                                 setupWorld(world, map)
@@ -99,13 +103,13 @@ object WorldService {
 
                                     loadedWorlds[customWorldName] = loadedWorld
 
-                                    Ok(loadedWorld as T)
+                                    Ok(loadedWorld)
                                 },
                                 onFailure = { Err(RuntimeException(it.message, it)) },
                             )
                     },
                     onFailure = {
-                        return@withContext Err(RuntimeException(it.message, it))
+                        return@fold Err(RuntimeException(it.message, it))
                     },
                 )
             }
@@ -122,7 +126,7 @@ object WorldService {
     }
 
     suspend fun deleteWorld(loadedWorld: BrawlWorld): Result<Unit, Exception> =
-        withContext(SuperSmashMobsBrawl.instance.minecraftDispatcher) mainContext@{
+        withContext(plugin.minecraftDispatcher) mainContext@{
             val loadedWorldEntry = loadedWorlds.entries.find { it.value == loadedWorld }
 
             if (loadedWorldEntry == null) {
@@ -154,9 +158,7 @@ object WorldService {
                 }
                 .fold(
                     onSuccess = { actualWorldName ->
-                        return@mainContext withContext(
-                            SuperSmashMobsBrawl.instance.asyncDispatcher
-                        ) {
+                        return@mainContext withContext(Dispatchers.IO) {
                             runCatching {
                                     val serverFolder = Bukkit.getWorldContainer().toPath()
                                     val worldPath = serverFolder.resolve(actualWorldName)
@@ -266,6 +268,12 @@ object WorldService {
                         val targetFile = target.resolve(source.relativize(file))
                         Files.createDirectories(targetFile.parent)
                         Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING)
+
+                        val fileName = file.fileName.toString()
+                        if (fileName == "session.lock" || fileName == "uid.dat") {
+                            return FileVisitResult.CONTINUE
+                        }
+
                         return FileVisitResult.CONTINUE
                     }
                 },

@@ -28,11 +28,10 @@ class DoubleJumpPassive(player: Player) : BrawlPassive("double_jump", player) {
         )
 
         runnables.add(
-            repeatingTask(0) {
+            repeatingTask(1) {
                 if (
                     (player.isOnBlock() || canDoubleJump) && (!canDoubleJump || !player.allowFlight)
                 ) {
-                    player.sendDebugMessage("[DJ] You have hit the ground")
                     canDoubleJump = true
                     player.allowFlight = true
                 }
@@ -42,15 +41,14 @@ class DoubleJumpPassive(player: Player) : BrawlPassive("double_jump", player) {
         listeners.add(
             event<PlayerToggleFlightEvent> ToggleFlightEvent@{
                 if (
-                    player != this@DoubleJumpPassive.player || player.gameMode == GameMode.CREATIVE
+                    player != this@DoubleJumpPassive.player ||
+                        player.gameMode == GameMode.CREATIVE ||
+                        player.gameMode == GameMode.SPECTATOR
                 ) {
                     return@ToggleFlightEvent
                 }
 
                 isCancelled = true
-                player.isFlying = false
-                player.allowFlight = false
-                player.fallDistance = 0f
 
                 if (!canDoubleJump) {
                     player.sendDebugMessage("[DJ] You cannot double jump right now")
@@ -58,6 +56,10 @@ class DoubleJumpPassive(player: Player) : BrawlPassive("double_jump", player) {
                 }
 
                 player.sendDebugMessage("[DJ] Double jump activated")
+
+                player.isFlying = false
+                player.allowFlight = false
+                player.fallDistance = 0f
 
                 player.playSound(player.location, Sound.ENTITY_BLAZE_SHOOT, 1F, 1F)
                 player.setVelocity(player.location.direction, 0.9, true, 0.9, 0.0, 0.9, true)

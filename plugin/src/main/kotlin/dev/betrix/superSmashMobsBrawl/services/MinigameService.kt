@@ -1,13 +1,9 @@
 package dev.betrix.superSmashMobsBrawl.services
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.onFailure
+import com.github.michaelbull.result.*
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
-import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.utils.resultRunCatching
 import org.bukkit.entity.Player
@@ -56,15 +52,20 @@ class MinigameService : KoinComponent {
         return getAllMinigameData().find { it.id.contains(id, ignoreCase = true) }
     }
 
-    fun initializeMinigameInstance(
-        minigameDefinition: MinigameDef,
-        teams: List<MinigameTeam>,
-    ): Result<BrawlMinigame<*>, MinigameInitError> {
-        return Err(MinigameInitError.PlayerAlreadyInMinigame(emptyList()))
-    }
-
     fun handleMinigameSetup(minigameInstance: BrawlMinigame<*>) {
-        plugin.launch { minigameInstance.initMinigame().onFailure { minigameInstance.teardown() } }
+        plugin.launch {
+            minigameInstance
+                .initMinigame()
+                .onSuccess {
+                    if (!inFlightMinigames.contains(minigameInstance)) {
+                        inFlightMinigames.add(minigameInstance)
+                    }
+                }
+                .onFailure { err ->
+                    plugin.logger.warning("Minigame init failed: $err")
+                    minigameInstance.teardown()
+                }
+        }
     }
 
     fun removeMinigameInstance(minigameInstance: BrawlMinigame<*>): Boolean {
@@ -95,7 +96,9 @@ class MinigameService : KoinComponent {
                 return Err(MinigameLeaveError.NotAllowedToLeave)
             }
 
-        hubService.teleportToDefaultHub(player)
+        hubService.teleportToDefaultHub(player).onFailure {
+            return Err(MinigameLeaveError.HubNotReady)
+        }
 
         return Ok(minigameInstance)
     }

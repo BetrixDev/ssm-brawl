@@ -3,17 +3,12 @@ package dev.betrix.superSmashMobsBrawl.extensions
 import gg.flyte.twilight.event.TwilightListener
 import gg.flyte.twilight.event.event
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 
-fun <T : PlayerInteractEvent> event(
+inline fun <reified T : org.bukkit.event.player.PlayerEvent> event(
     player: Player,
-    callback: PlayerInteractEvent.() -> Unit,
-): TwilightListener {
-    return event<PlayerInteractEvent> interactEvent@{
-        if (this.player != player) {
-            return@interactEvent
-        }
-
+    noinline callback: T.() -> Unit,
+): TwilightListener =
+    event<T> twilightEvent@{
+        if (this.player != player) return@twilightEvent
         callback()
     }
-}

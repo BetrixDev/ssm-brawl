@@ -10,8 +10,8 @@ class CreeperDisguise(player: Player) : BrawlDisguise(player) {
     override val disguise = MobDisguise(DisguiseType.CREEPER)
     override val hitbox = Hitbox(0.6, 1.7)
 
-    fun setIgnited(charged: Boolean) {
-        (disguise.watcher as? CreeperWatcher)?.isIgnited = charged
+    fun setIgnited(ignited: Boolean) {
+        (disguise.watcher as? CreeperWatcher)?.isIgnited = ignited
     }
 
     fun setCharged(charged: Boolean) {

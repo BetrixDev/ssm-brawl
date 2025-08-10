@@ -16,6 +16,7 @@ class BoneExplosionAbility(player: Player) : BrawlAbility("bone_explosion", play
 
     override fun activate() {
         player.location
+            .clone()
             .add(0.0, 0.5, 0.5)
             .itemEffect(48, 0.8, Sound.ENTITY_SKELETON_HURT, 2f, 1.2f, Material.BONE, 40)
 
@@ -27,13 +28,13 @@ class BoneExplosionAbility(player: Player) : BrawlAbility("bone_explosion", play
                 max(
                     0.0,
                     baseDamage *
-                            (1.0 - (entity.location.distance(player.location) / explosionRadius)),
+                        (1.0 - (entity.location.distance(player.location) / explosionRadius)),
                 )
 
             val damageEvent =
                 SmashDamageEvent(
                     entity,
-                    Damager.LivingEntity(player),
+                    Damager.DamagerLivingEntity(player),
                     damage,
                     2.5,
                     SmashDamageType.Explosion,

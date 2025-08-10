@@ -15,10 +15,8 @@ class SulphurBombAbility(player: Player) : BrawlAbility("sulphur_bomb", player) 
     private val projectileDamage = metadata.double("projectileDamage") ?: 6.5
 
     override fun activate() {
-        setCooldown()
         throwProjectile()
-
-        player.sendMessage("§7Sulphur Bomb thrown!")
+        super.activate()
     }
 
     private fun throwProjectile() {
@@ -38,7 +36,7 @@ class SulphurBombAbility(player: Player) : BrawlAbility("sulphur_bomb", player) 
                     val damageEvent =
                         SmashDamageEvent(
                             hitEntity,
-                            Damager.LivingEntity(player),
+                            Damager.DamagerLivingEntity(player),
                             projectileDamage,
                             0.0,
                             SmashDamageType.Projectile,

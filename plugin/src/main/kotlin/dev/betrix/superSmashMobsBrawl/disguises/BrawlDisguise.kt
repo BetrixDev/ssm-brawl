@@ -1,6 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.disguises
 
 import dev.betrix.superSmashMobsBrawl.Manageable
+import dev.betrix.superSmashMobsBrawl.extensions.disguise
 import dev.betrix.superSmashMobsBrawl.models.Hitbox
 import gg.flyte.twilight.event.event
 import java.util.concurrent.ConcurrentHashMap
@@ -10,7 +11,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.util.BoundingBox
 
-abstract class BrawlDisguise(private val player: Player) : Manageable() {
+abstract class BrawlDisguise(protected val player: Player) : Manageable() {
     protected abstract val disguise: MobDisguise
     protected abstract val hitbox: Hitbox
 
@@ -69,7 +70,7 @@ abstract class BrawlDisguise(private val player: Player) : Manageable() {
                     return@event
                 }
 
-                getDisguise(player)?.teardown()
+                player.disguise?.teardown()
             }
         )
     }

@@ -30,7 +30,7 @@ class RopedArrowAbility(player: Player) : BrawlAbility("roped_arrow", player) {
                     val damageEvent =
                         SmashDamageEvent(
                             entity,
-                            Damager.LivingEntity(player),
+                            Damager.DamagerLivingEntity(player),
                             arrowDamage,
                             damageType = SmashDamageType.Projectile,
                         )
@@ -47,8 +47,13 @@ class RopedArrowAbility(player: Player) : BrawlAbility("roped_arrow", player) {
         val playerLocationVector = player.location.toVector()
         val arrowLocationVector = location.toVector()
 
-        val pre = arrowLocationVector.subtract(playerLocationVector)
-        val trajectory = pre.normalize()
+        val delta = arrowLocationVector.subtract(playerLocationVector)
+
+        if (delta.lengthSquared() == 0.0) {
+            return
+        }
+
+        val trajectory = delta.normalize()
         val mult = velocity.length() / 3.0
 
         player.setVelocity(trajectory, 0.4 + mult, false, 0.0, 0.2 * mult, 1.2 * mult, true)

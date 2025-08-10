@@ -12,6 +12,7 @@ import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
 import gg.flyte.twilight.scheduler.repeatingTask
 import java.util.UUID
+import java.util.logging.Logger
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -38,6 +39,8 @@ data class QueueEntry(val player: Player, val minigame: MinigameDef, val partyId
 }
 
 object QueueService : Manageable(), KoinComponent {
+    private val logger: Logger by inject()
+    private val plugin: SuperSmashMobsBrawl by inject()
     private val minigameService: MinigameService by inject()
 
     private val queue = hashSetOf<QueueEntry>()
@@ -89,6 +92,7 @@ object QueueService : Manageable(), KoinComponent {
             is TeamBasedStocksMinigameDef -> {
                 minigameDef.playersPerTeam * minigameDef.amountOfTeams
             }
+
             is FfaMinigameDef -> {
                 // Use the minimum to allow starting when the game defines it can
                 minigameDef.minPlayers
@@ -108,6 +112,13 @@ object QueueService : Manageable(), KoinComponent {
 
     private fun tryStartMinigamesFor(minigameDef: MinigameDef) {
         val requiredPlayers = getRequiredPlayersForMinigame(minigameDef)
+
+        if (requiredPlayers <= 0) {
+            logger.severe(
+                "Minigame ${minigameDef.id} has invalid player requirement: $requiredPlayers"
+            )
+            return
+        }
 
         // Filter out any players who may have entered a minigame meanwhile
         var available =
@@ -139,6 +150,7 @@ object QueueService : Manageable(), KoinComponent {
                     val totalPlayersNeeded = playersPerTeam * amountOfTeams
                     queuedPlayers.take(totalPlayersNeeded)
                 }
+
                 is FfaMinigameDef -> {
                     queuedPlayers.take(minigameDef.maxPlayers)
                 }
@@ -152,14 +164,16 @@ object QueueService : Manageable(), KoinComponent {
                 // val playersPerTeam = minigameDef.playersPerTeam
                 // val amountOfTeams = minigameDef.amountOfTeams
             }
+
             is FfaMinigameDef -> {
                 val players = entriesToUse.map { it.player }
 
                 when (minigameDef.id) {
                     "prototyping" -> {
                         val minigame = PrototypingMinigame(minigameDef.id, gameId, players)
-                        SuperSmashMobsBrawl.instance.launch { minigame.initMinigame() }
+                        plugin.launch { minigame.initMinigame() }
                     }
+
                     else -> {
                         // No-op for unknown ids for now
                     }

@@ -22,7 +22,8 @@ class HungerPassive(player: Player) : BrawlPassive("hunger", player) {
             event<SmashDamageEvent> {
                 val isThisPlayerDamager =
                     when (damager) {
-                        is Damager.LivingEntity -> damager.livingEntity == this@HungerPassive.player
+                        is Damager.DamagerLivingEntity ->
+                            damager.livingEntity == this@HungerPassive.player
                         is Damager.System -> false
                         null -> false
                     }
@@ -48,7 +49,7 @@ class HungerPassive(player: Player) : BrawlPassive("hunger", player) {
     }
 
     private fun activate() {
-        if (player.gameMode == GameMode.CREATIVE) {
+        if (player.gameMode != GameMode.SPECTATOR) {
             return
         }
 

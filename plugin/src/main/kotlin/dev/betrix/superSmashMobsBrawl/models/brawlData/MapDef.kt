@@ -3,22 +3,29 @@ package dev.betrix.superSmashMobsBrawl.models.brawlData
 import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
 import kotlinx.serialization.Serializable
 
-@Serializable data class MapDefFile(val gameMaps: List<GameMapDef>, val hubMaps: List<HubMapDef>)
+@Serializable
+data class MapDefFile(
+    val gameMaps: List<GameMapDef> = emptyList(),
+    val hubMaps: List<HubMapDef> = emptyList(),
+)
 
 @Serializable
 sealed class MapDef {
     abstract val id: String
     abstract val worldBorderSize: Double
+    abstract val voidLevel: Double
+    abstract val creators: List<String>
+    abstract val spawnPoints: List<SpawnPoint>
 }
 
 @Serializable
 data class GameMapDef(
     override val id: String,
     override val worldBorderSize: Double,
-    val voidLevel: Double,
+    override val voidLevel: Double,
     val maxPlayers: Int,
-    val creators: List<String>?,
-    val spawnPoints: List<SpawnPoint>,
+    override val creators: List<String> = emptyList(),
+    override val spawnPoints: List<SpawnPoint>,
     val spectatorSpawnPoint: SpawnPoint,
 ) : MapDef()
 
@@ -26,7 +33,7 @@ data class GameMapDef(
 data class HubMapDef(
     override val id: String,
     override val worldBorderSize: Double,
-    val voidLevel: Double,
-    val creators: List<String>?,
-    val spawnPoints: List<SpawnPoint>,
+    override val voidLevel: Double,
+    override val creators: List<String> = emptyList(),
+    override val spawnPoints: List<SpawnPoint>,
 ) : MapDef()

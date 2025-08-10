@@ -41,10 +41,6 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var liteCommands: LiteCommands<CommandSender>
     lateinit var twilight: Twilight
 
-    companion object {
-        lateinit var instance: SuperSmashMobsBrawl
-    }
-
     override suspend fun onEnableAsync() {
         startKoin {
             modules(
@@ -61,7 +57,6 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
             )
         }
 
-        instance = this
         twilight = twilight(this)
 
         // Initialize services

@@ -53,7 +53,7 @@ class LeaveCommand : KoinComponent {
                     }
 
                     else -> {
-                        sender.sendMessage(lang.t("messages.minigames.leave.unknwon"))
+                        sender.sendMessage(lang.t("messages.minigames.leave.unknown"))
                     }
                 }
             }

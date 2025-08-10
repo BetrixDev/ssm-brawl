@@ -11,6 +11,14 @@ inline fun <reified T> Map<String, YamlScalar>?.getAs(name: String): T? {
         Double::class -> value.toDoubleOrNull() as T?
         Int::class -> value.toIntOrNull() as T?
         Float::class -> value.toFloatOrNull() as T?
+        Long::class -> value.toLongOrNull() as T?
+        Boolean::class ->
+            when {
+                value.equals("true", ignoreCase = true) -> true as T
+                value.equals("false", ignoreCase = true) -> false as T
+                else -> null
+            }
+
         else -> throw IllegalArgumentException("Unsupported type: ${T::class}")
     }
 }

@@ -16,7 +16,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 @Command(name = "queue")
-class QueueCommand() : KoinComponent {
+class QueueCommand : KoinComponent {
 
     private val lang: LangService by inject()
 

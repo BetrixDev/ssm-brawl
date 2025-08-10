@@ -5,6 +5,7 @@ import com.charleskorn.kaml.Yaml
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.models.brawlData.*
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -45,6 +46,8 @@ class DataService : KoinComponent {
     private lateinit var minigameDefs: Map<String, MinigameDef>
     private lateinit var disguiseDefs: Map<String, DisguiseDef>
 
+    private val ready = CompletableDeferred<Unit>()
+
     init {
         plugin.launch {
             withContext(Dispatchers.IO) {
@@ -58,9 +61,13 @@ class DataService : KoinComponent {
                 val mapDefs = readFile<MapDefFile>("maps")
                 gameMapDefs = mapDefs.gameMaps.associateBy { it.id }
                 hubMapDefs = mapDefs.hubMaps.associateBy { it.id }
+
+                ready.complete(Unit)
             }
         }
     }
+
+    suspend fun awaitReady() = ready.await()
 
     fun getKit(id: String): KitDef? = if (::kitDefs.isInitialized) kitDefs[id] else null
 
@@ -68,7 +75,7 @@ class DataService : KoinComponent {
         if (::gameMapDefs.isInitialized) gameMapDefs[id] else null
 
     fun getAllGameMaps(): List<GameMapDef> =
-        if (::gameMapDefs.isInitialized) gameMapDefs.values.toList() else listOf()
+        if (::gameMapDefs.isInitialized) gameMapDefs.values.toList() else emptyList()
 
     fun getHubMap(id: String): HubMapDef? = if (::hubMapDefs.isInitialized) hubMapDefs[id] else null
 
@@ -82,7 +89,7 @@ class DataService : KoinComponent {
         if (::minigameDefs.isInitialized) minigameDefs[id] else null
 
     fun getAllMinigames(): List<MinigameDef> =
-        if (::minigameDefs.isInitialized) minigameDefs.values.toList() else listOf()
+        if (::minigameDefs.isInitialized) minigameDefs.values.toList() else emptyList()
 
     private suspend inline fun <reified T> readFile(path: String): T =
         withContext(Dispatchers.IO) {
