@@ -33,7 +33,7 @@ fun Player.sendDebugMessage(message: String) {
 fun Player.hasPassive(passiveId: String): Boolean {
     val kitService: KitService = GlobalContext.get().get()
 
-    val brawlKit = kitService.getBrawlKit(this) ?: return false
+    val brawlKit = kitService.getKitForPlayer(this) ?: return false
 
     return brawlKit.getPassive(passiveId) != null
 }

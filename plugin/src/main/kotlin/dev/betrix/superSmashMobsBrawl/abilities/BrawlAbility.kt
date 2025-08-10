@@ -2,15 +2,20 @@ package dev.betrix.superSmashMobsBrawl.abilities
 
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.extensions.event
+import dev.betrix.superSmashMobsBrawl.extensions.getAs
+import dev.betrix.superSmashMobsBrawl.interfaces.MetadataAccessor
 import dev.betrix.superSmashMobsBrawl.models.brawlData.AbilityUsage
 import dev.betrix.superSmashMobsBrawl.services.DataService
+import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
+import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
@@ -21,11 +26,25 @@ import org.koin.core.component.inject
 abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), KoinComponent {
     protected val plugin: JavaPlugin by inject()
     private val dataService: DataService by inject()
+    protected val minigameService: MinigameService by inject()
+    protected val kitService: KitService by inject()
     private val lang: LangService by inject()
 
     protected val abilityData =
         dataService.getAbility(id)
             ?: throw RuntimeException("No ability found in DataService with id $id")
+
+    protected val minigameData = run {
+        val minigameId = minigameService.getMinigameForPlayer(player)?.minigameId ?: return@run null
+
+        return@run dataService.getMinigame(minigameId)
+    }
+
+    protected val kitData = run {
+        val kitId = kitService.getKitForPlayer(player)?.id ?: return@run null
+
+        return@run dataService.getKit(kitId)
+    }
 
     private val abilityKey = NamespacedKey(plugin, "abilityId")
 
@@ -35,7 +54,45 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
 
     protected lateinit var hotbarItemStack: ItemStack
 
-    open override fun setup() {
+    protected val metadata: MetadataAccessor = object : MetadataAccessor {
+        override fun string(name: String): String? = getValue<String>(name)
+
+        override fun double(name: String): Double? = getValue<Double>(name)
+
+        override fun int(name: String): Int? = getValue<Int>(name)
+
+        override fun float(name: String): Float? = getValue<Float>(name)
+
+        override fun long(name: String): Long? = getValue<Long>(name)
+
+        inline fun <reified T> getValue(name: String): T? {
+            try {
+                if (kitData != null) {
+                    minigameData?.overrides?.kits?.get(kitData.id)?.abilities?.get(id)?.let {
+                        it.metadata?.getAs<T>(name)?.let { value ->
+                            return value
+                        }
+                    }
+
+                    kitData.passives
+                        .find { it.id == id }
+                        ?.overrides
+                        ?.metadata
+                        ?.getAs<T>(name)
+                        ?.let { value ->
+                            return value
+                        }
+                }
+
+                return abilityData.metadata.getAs<T>(name)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return null
+            }
+        }
+    }
+
+    override fun setup() {
         val hotbarItemMaterial =
             Material.matchMaterial(abilityData.hotbarItem.uppercase())
                 ?: run {
@@ -81,7 +138,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
         player.inventory.setItem(hotBarItemSlot, hotbarItemStack)
 
         runnables.add(
-            repeatingTask(1) {
+            repeatingTask(10) {
                 if (!lastCheckForCanActivate && canActivate()) {
                     lastCheckForCanActivate = true
 
@@ -96,6 +153,10 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
 
         listeners.add(
             event<PlayerInteractEvent>(player) {
+                if (hand != EquipmentSlot.HAND) {
+                    return@event
+                }
+
                 when (abilityData.usage) {
                     AbilityUsage.LEFT_CLICK -> {
                         if (action != Action.LEFT_CLICK_AIR && action != Action.LEFT_CLICK_BLOCK) {
@@ -128,7 +189,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
         )
     }
 
-    open override fun teardown() {
+    override fun teardown() {
         if (::hotbarItemStack.isInitialized) {
             player.inventory.remove(hotbarItemStack)
         }
@@ -156,18 +217,19 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
         return true
     }
 
-    fun isOnCooldown(): Boolean {
+    protected fun isOnCooldown(): Boolean {
         val cooldownMs = abilityData.cooldown * 1000L
         return System.currentTimeMillis() - lastUsed < cooldownMs
     }
 
-    fun getRemainingCooldown(): Int {
+    protected fun getRemainingCooldown(): Int {
         val cooldownMs = (abilityData.cooldown * 1000).toLong()
         val elapsed = System.currentTimeMillis() - lastUsed
         return ((cooldownMs - elapsed) / 1000).coerceAtLeast(0).toInt()
     }
 
     protected fun setCooldown(time: Long = System.currentTimeMillis()) {
+        lastCheckForCanActivate = false
         lastUsed = time
     }
 

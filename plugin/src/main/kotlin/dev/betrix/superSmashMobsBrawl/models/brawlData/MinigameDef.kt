@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.models.brawlData
 
+import com.charleskorn.kaml.YamlScalar
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -15,6 +16,7 @@ sealed class MinigameDef {
     abstract val passiveBlacklist: List<String>?
     abstract val passiveWhitelist: List<String>?
     abstract val respawnDelaySeconds: Int?
+    abstract val overrides: MinigameDefOverrides?
 
     fun isPasiveValid(id: String): Boolean {
         if (passiveBlacklist?.contains(id) == true) {
@@ -22,11 +24,7 @@ sealed class MinigameDef {
         }
 
         if (passiveWhitelist != null) {
-            if (passiveWhitelist?.contains(id) == true) {
-                return true
-            }
-
-            return false
+            return passiveWhitelist?.contains(id) == true
         }
 
         return true
@@ -44,6 +42,7 @@ data class FfaMinigameDef(
     override val passiveBlacklist: List<String>? = null,
     override val passiveWhitelist: List<String>? = null,
     override val respawnDelaySeconds: Int? = null,
+    override val overrides: MinigameDefOverrides? = null,
     val minPlayers: Int,
     val maxPlayers: Int,
     val allowKitSwitching: Boolean,
@@ -60,7 +59,22 @@ data class TeamBasedStocksMinigameDef(
     override val passiveBlacklist: List<String>? = null,
     override val passiveWhitelist: List<String>? = null,
     override val respawnDelaySeconds: Int? = null,
+    override val overrides: MinigameDefOverrides? = null,
     val playersPerTeam: Int,
     val amountOfTeams: Int,
     val stocks: Int,
 ) : MinigameDef()
+
+@Serializable
+data class MinigameDefOverrides(
+    val kits: Map<String, MinigameDefKitOverrides>? = null,
+    val passives: Map<String, KitPassiveDefOverrides>? = null,
+    val abilities: Map<String, KitAbilityDefOverrides>? = null,
+)
+
+@Serializable
+data class MinigameDefKitOverrides(
+    val metadata: Map<String, YamlScalar>? = null,
+    val passives: Map<String, KitPassiveDefOverrides>? = null,
+    val abilities: Map<String, KitAbilityDefOverrides>? = null,
+)

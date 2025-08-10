@@ -27,9 +27,9 @@ import org.bukkit.util.Vector
 class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
 
     private var isExplodeActive = false
-    private val fuseTimeTicks = 30
-    private val explosionRadius = 8.0
-    private val explosionKnockbackMultiplier = 2.5
+    private val fuseTimeTicks = metadata.int("fuseTimeTicks") ?: 30
+    private val explosionRadius = metadata.double("explosionRadius") ?: 8.0
+    private val explosionKnockbackMultiplier = metadata.double("explosionKnockbackMultiplier") ?: 2.5
 
     override fun canActivate(): Boolean {
         if (isExplodeActive) {
@@ -116,7 +116,7 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
                         val distance = player.location.distance(entity.location)
                         val damage =
                             ((0.1 + 0.9 * ((explosionRadius - distance) / explosionRadius)) * 20) *
-                                0.75
+                                    0.75
 
                         entity.doKnockback(
                             explosionKnockbackMultiplier,

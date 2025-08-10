@@ -11,8 +11,8 @@ import org.bukkit.entity.Player
 
 class SulphurBombAbility(player: Player) : BrawlAbility("sulphur_bomb", player) {
 
-    private val projectileKnockbackModifier = 2.5
-    private val projectileDamage = 6.5
+    private val projectileKnockbackModifier = metadata.double("projectileKnockbackModifier") ?: 2.5
+    private val projectileDamage = metadata.double("projectileDamage") ?: 6.5
 
     override fun activate() {
         setCooldown()

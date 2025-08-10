@@ -21,7 +21,7 @@ import org.bukkit.util.Vector
 
 class BarragePassive(player: Player) : BrawlPassive("barrage", player) {
 
-    private val maxCharge = 5
+    private val maxCharge = metadata.int("maxCharge") ?: 5
     private var charge = 0
     private var chargeRunnable: TwilightRunnable? = null
 
@@ -30,9 +30,9 @@ class BarragePassive(player: Player) : BrawlPassive("barrage", player) {
             event<PlayerInteractEvent> {
                 if (
                     player != this@BarragePassive.player ||
-                        player.inventory.itemInMainHand.type != Material.BOW ||
-                        !player.inventory.contains(Material.ARROW) ||
-                        (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK)
+                    player.inventory.itemInMainHand.type != Material.BOW ||
+                    !player.inventory.contains(Material.ARROW) ||
+                    (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK)
                 ) {
                     return@event
                 }
@@ -100,17 +100,16 @@ class BarragePassive(player: Player) : BrawlPassive("barrage", player) {
                     )
 
                 val arrow =
-                    ArrowProjectile(player, "Barrage Arrow", 3.0, spread).onHitLivingEntity {
-                        entity,
-                        arrow ->
+                    ArrowProjectile(player, "Barrage Arrow", 3.0, spread).onHitLivingEntity { entity,
+                                                                                              arrow ->
                         arrow.projectile?.remove()
 
                         SmashDamageEvent(
-                                entity,
-                                Damager.LivingEntity(player),
-                                6.0,
-                                damageType = SmashDamageType.Projectile,
-                            )
+                            entity,
+                            Damager.LivingEntity(player),
+                            6.0,
+                            damageType = SmashDamageType.Projectile,
+                        )
                             .callEvent()
 
                         true

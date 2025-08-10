@@ -1,6 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.models.brawlData
 
-import com.charleskorn.kaml.YamlNode
+import com.charleskorn.kaml.YamlScalar
 import kotlinx.serialization.Serializable
 
 @Serializable data class KitDefFile(val kits: List<KitDef>)
@@ -18,11 +18,11 @@ data class KitDef(
 )
 
 @Serializable
-data class KitPassiveDef(val id: String, val overrides: KitPassiveDefOverride? = null)
+data class KitPassiveDef(val id: String, val overrides: KitPassiveDefOverrides? = null)
 
-@Serializable data class KitPassiveDefOverride(val metadata: Map<String, YamlNode>? = null)
+@Serializable data class KitPassiveDefOverrides(val metadata: Map<String, YamlScalar>? = null)
 
 @Serializable
-data class KitAbilityDef(val id: String, val overrides: KitAbilityDefOverride? = null)
+data class KitAbilityDef(val id: String, val overrides: KitAbilityDefOverrides? = null)
 
-@Serializable data class KitAbilityDefOverride(val metadata: Map<String, YamlNode>? = null)
+@Serializable data class KitAbilityDefOverrides(val metadata: Map<String, YamlScalar>? = null)

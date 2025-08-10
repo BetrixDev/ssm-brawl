@@ -10,9 +10,9 @@ import org.bukkit.inventory.ItemStack
 
 class ArrowRechargePassive(player: Player) : BrawlPassive("arrow_recharge", player) {
 
-    private val arrowHotbarSlot = 2
-    private val maximumArrowCount = 3
-    private val arrowRechargeDelayTicks = 40L
+    private val arrowHotbarSlot = metadata.int("arrowHotbarSlot") ?: 2
+    private val maximumArrowCount = metadata.int("maximumArrowCount") ?: 3
+    private val arrowIntervalTicks = metadata.long("arrowIntervalTicks") ?: 40L
 
     override fun setup() {
         val inv = player.inventory
@@ -32,7 +32,7 @@ class ArrowRechargePassive(player: Player) : BrawlPassive("arrow_recharge", play
                     runnables.clear()
 
                     runnables.add(
-                        repeatingTask(arrowRechargeDelayTicks, arrowRechargeDelayTicks) {
+                        repeatingTask(arrowIntervalTicks, arrowIntervalTicks) {
                             val arrowItemStack = inv.getItem(arrowHotbarSlot)
 
                             if (arrowItemStack == null) {

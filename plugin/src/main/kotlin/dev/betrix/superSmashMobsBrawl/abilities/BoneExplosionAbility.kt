@@ -11,8 +11,8 @@ import org.bukkit.entity.Player
 
 class BoneExplosionAbility(player: Player) : BrawlAbility("bone_explosion", player) {
 
-    private val explosionRadius = 7.0
-    private val baseDamage = 6.0
+    private val explosionRadius = metadata.double("explosionRadius") ?: 7.0
+    private val baseDamage = metadata.double("baseDamage") ?: 6.0
 
     override fun activate() {
         player.location
@@ -27,7 +27,7 @@ class BoneExplosionAbility(player: Player) : BrawlAbility("bone_explosion", play
                 max(
                     0.0,
                     baseDamage *
-                        (1.0 - (entity.location.distance(player.location) / explosionRadius)),
+                            (1.0 - (entity.location.distance(player.location) / explosionRadius)),
                 )
 
             val damageEvent =

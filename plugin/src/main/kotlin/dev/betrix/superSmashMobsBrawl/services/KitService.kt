@@ -70,7 +70,7 @@ object KitService : KoinComponent {
         return kit
     }
 
-    fun getBrawlKit(player: Player): BrawlKit? = assignedBrawlKits[player]
+    fun getKitForPlayer(player: Player): BrawlKit? = assignedBrawlKits[player]
 
     fun hasKit(player: Player): Boolean = assignedBrawlKits.containsKey(player)
 }

@@ -12,11 +12,14 @@ import org.bukkit.util.Vector
 
 class RopedArrowAbility(player: Player) : BrawlAbility("roped_arrow", player) {
 
+    private val arrowVelocityModifier = metadata.double("arrowVelocityModifier") ?: 2.4
+    private val arrowDamage = metadata.double("arrowDamage") ?: 6.0
+
     override fun activate() {
         super.activate()
 
         val projectile =
-            ArrowProjectile(player, "Roped Arrow", 2.4)
+            ArrowProjectile(player, "Roped Arrow", arrowVelocityModifier)
                 .onHitBlock { block, projectile ->
                     pullPlayerToLocation(block.location, projectile.velocityBeforeImpact)
                     true
@@ -28,7 +31,7 @@ class RopedArrowAbility(player: Player) : BrawlAbility("roped_arrow", player) {
                         SmashDamageEvent(
                             entity,
                             Damager.LivingEntity(player),
-                            6.0,
+                            arrowDamage,
                             damageType = SmashDamageType.Projectile,
                         )
 
