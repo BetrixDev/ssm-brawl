@@ -10,6 +10,7 @@ import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import gg.flyte.twilight.scheduler.repeatingTask
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -151,6 +152,37 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
             }
         )
 
+        var cooldownBarCheck = true
+
+        runnables.add(
+            repeatingTask(1) {
+                val heldItem = player.inventory.itemInMainHand
+                val abilityId = getAbilityId(heldItem) ?: return@repeatingTask
+
+                if (abilityId != id || !isOnCooldown()) {
+                    if (!cooldownBarCheck) {
+                        player.sendActionBar(Component.empty())
+                    }
+
+                    cooldownBarCheck = true
+                    return@repeatingTask
+                }
+
+                val timeLeftTicks = getRemainingCooldownTicks()
+                val secondsLeft = timeLeftTicks / 20.0
+
+                player.setCooldown(heldItem, timeLeftTicks)
+
+                player.sendActionBar(
+                    Component.text(
+                        "Sulphur Bomb - ${"%.1f".format(secondsLeft)}s"
+                    )
+                )
+
+                cooldownBarCheck = false
+            }
+        )
+
         listeners.add(
             event<PlayerInteractEvent>(player) {
                 if (hand != EquipmentSlot.HAND) {
@@ -226,6 +258,13 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
         val cooldownMs = (abilityData.cooldown * 1000).toLong()
         val elapsed = System.currentTimeMillis() - lastUsed
         return ((cooldownMs - elapsed) / 1000).coerceAtLeast(0).toInt()
+    }
+
+    private fun getRemainingCooldownTicks(): Int {
+        val cooldownMs = (abilityData.cooldown * 1000).toLong()
+        val elapsed = System.currentTimeMillis() - lastUsed
+        val remainingMs = (cooldownMs - elapsed).coerceAtLeast(0)
+        return (remainingMs / 50).toInt() // 1 tick = 50 ms
     }
 
     protected fun setCooldown(time: Long = System.currentTimeMillis()) {
