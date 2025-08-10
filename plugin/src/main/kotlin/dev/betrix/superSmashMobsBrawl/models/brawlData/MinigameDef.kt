@@ -18,13 +18,13 @@ sealed class MinigameDef {
     abstract val respawnDelaySeconds: Int?
     abstract val overrides: MinigameDefOverrides?
 
-    fun isPassiveValid(id: String): Boolean {
-        if (passiveBlacklist?.contains(id) == true) {
+    fun isPassiveValid(passiveId: String): Boolean {
+        if (passiveBlacklist?.contains(passiveId) == true) {
             return false
         }
 
         if (passiveWhitelist != null) {
-            return passiveWhitelist?.contains(id) == true
+            return passiveWhitelist?.contains(passiveId) == true
         }
 
         return true

@@ -1,15 +1,15 @@
 package dev.betrix.superSmashMobsBrawl.interfaces
 
 interface MetadataAccessor {
-    fun string(name: String): String?
+    fun string(key: String): String?
 
-    fun double(name: String): Double?
+    fun double(key: String): Double?
 
-    fun int(name: String): Int?
+    fun int(key: String): Int?
 
-    fun float(name: String): Float?
+    fun float(key: String): Float?
 
-    fun long(name: String): Long?
+    fun long(key: String): Long?
 
-    fun boolean(name: String): Boolean?
+    fun boolean(key: String): Boolean?
 }

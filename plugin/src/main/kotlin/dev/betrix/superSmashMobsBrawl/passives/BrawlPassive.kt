@@ -36,17 +36,17 @@ abstract class BrawlPassive(val id: String, val player: Player) : Manageable(), 
 
     protected val metadata: MetadataAccessor =
         object : MetadataAccessor {
-            override fun string(name: String): String? = getValue<String>(name)
+            override fun string(key: String): String? = getValue<String>(key)
 
-            override fun double(name: String): Double? = getValue<Double>(name)
+            override fun double(key: String): Double? = getValue<Double>(key)
 
-            override fun int(name: String): Int? = getValue<Int>(name)
+            override fun int(key: String): Int? = getValue<Int>(key)
 
-            override fun float(name: String): Float? = getValue<Float>(name)
+            override fun float(key: String): Float? = getValue<Float>(key)
 
-            override fun long(name: String): Long? = getValue<Long>(name)
+            override fun long(key: String): Long? = getValue<Long>(key)
 
-            override fun boolean(name: String): Boolean? = getValue<Boolean>(name)
+            override fun boolean(key: String): Boolean? = getValue<Boolean>(key)
 
             inline fun <reified T> getValue(name: String): T? {
                 try {

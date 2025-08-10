@@ -34,7 +34,7 @@ minigames:
     description: "For all of your testing needs"
   two_player_duels:
     name: "1v1 Duels"
-    description: "A competitive 1v1game mode"
+    description: "A competitive 1v1 game mode"
 prefix: "<#585b70>[<gradient:#cba6f7:#585b70>Brawl</gradient><#585b70>]<reset>"
 messages:
   debug: "{lang:prefix} <#4c4f69>[DEBUG] {message}"

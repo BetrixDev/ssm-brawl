@@ -27,9 +27,7 @@ import gg.flyte.twilight.scheduler.repeatingTask
 import java.time.Duration
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import org.bukkit.GameMode
@@ -49,7 +47,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     private val plugin: SuperSmashMobsBrawl by inject()
 
     protected val minigameData by lazy {
-        (dataService.getMinigame(minigameId) as TMinigameDef?)
+        (dataService.getMinigame(minigameId))
             ?: throw RuntimeException("Could not find minigame data for id $minigameId")
     }
 
@@ -130,7 +128,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 player.showTitle(title)
 
-                withContext(Dispatchers.IO) { delay(1.seconds) }
+                delay(1.seconds)
             }
         }
 
@@ -157,6 +155,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
     open fun onPlayerLeave(player: Player) {
         kitService.unassignKit(player)
+        assignedKits.removeIf { it.first == player }
     }
 
     private fun assignPlayerKit(player: Player) {
@@ -199,15 +198,13 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     private suspend fun findAndCreateWorld(): Result<BrawlGameWorld, Exception> {
         val validMaps =
             dataService.getAllGameMaps().filter { map ->
-                if (minigameData.mapWhitelist?.contains(map.id) == true) {
-                    return@filter true
+                minigameData.mapWhitelist?.let { whitelist ->
+                    return@filter whitelist.contains(map.id)
                 }
-
-                if (minigameData.mapBlacklist?.contains(map.id) == true) {
-                    return@filter false
+                minigameData.mapBlacklist?.let { blacklist ->
+                    return@filter !blacklist.contains(map.id)
                 }
-
-                return@filter true
+                true
             }
 
         if (validMaps.isEmpty()) {

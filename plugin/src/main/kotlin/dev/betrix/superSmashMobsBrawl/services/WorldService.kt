@@ -265,14 +265,14 @@ object WorldService : KoinComponent {
                         file: Path,
                         attrs: BasicFileAttributes,
                     ): FileVisitResult {
-                        val targetFile = target.resolve(source.relativize(file))
-                        Files.createDirectories(targetFile.parent)
-                        Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING)
-
                         val fileName = file.fileName.toString()
                         if (fileName == "session.lock" || fileName == "uid.dat") {
                             return FileVisitResult.CONTINUE
                         }
+
+                        val targetFile = target.resolve(source.relativize(file))
+                        Files.createDirectories(targetFile.parent)
+                        Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING)
 
                         return FileVisitResult.CONTINUE
                     }
