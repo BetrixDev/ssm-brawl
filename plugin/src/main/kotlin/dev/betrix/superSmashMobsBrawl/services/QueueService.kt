@@ -7,6 +7,8 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.PrototypingMinigame
+import dev.betrix.superSmashMobsBrawl.minigames.TeamBasedStocksMinigame
+import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
@@ -140,7 +142,7 @@ object QueueService : Manageable(), KoinComponent {
     }
 
     private fun onMinigameCanStart(minigameDef: MinigameDef, queuedPlayers: List<QueueEntry>) {
-        val entriesToUse =
+        val entriesToUse: List<QueueEntry> =
             when (minigameDef) {
                 is TeamBasedStocksMinigameDef -> {
                     val playersPerTeam = minigameDef.playersPerTeam
@@ -160,18 +162,30 @@ object QueueService : Manageable(), KoinComponent {
 
         when (minigameDef) {
             is TeamBasedStocksMinigameDef -> {
-                // TODO: Implement team-based start
-                // val playersPerTeam = minigameDef.playersPerTeam
-                // val amountOfTeams = minigameDef.amountOfTeams
+                val playersPerTeam = minigameDef.playersPerTeam
+                val amountOfTeams = minigameDef.amountOfTeams
+
+                val players: List<Player> = entriesToUse.map { it.player }
+
+                val teams: List<MinigameTeam> = (0 until amountOfTeams).map { teamIndex ->
+                    val startIndex = teamIndex * playersPerTeam
+                    val endIndex = startIndex + playersPerTeam
+                    val teamPlayers = players.subList(startIndex, endIndex).toMutableList()
+                    // Initial stocks value will be set during minigame init from definition
+                    MinigameTeam(teamPlayers, minigameDef.stocks)
+                }
+
+                val minigame = TeamBasedStocksMinigame(minigameDef.id, gameId, teams)
+                minigameService.handleMinigameSetup(minigame)
             }
 
             is FfaMinigameDef -> {
-                val players = entriesToUse.map { it.player }
+                val players: List<Player> = entriesToUse.map { it.player }
 
                 when (minigameDef.id) {
                     "prototyping" -> {
                         val minigame = PrototypingMinigame(minigameDef.id, gameId, players)
-                        plugin.launch { minigame.initMinigame() }
+                        minigameService.handleMinigameSetup(minigame)
                     }
 
                     else -> {
