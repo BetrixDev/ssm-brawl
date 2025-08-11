@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.minigames
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.map
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.github.michaelbull.result.unwrap
@@ -46,9 +47,11 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     private val langService: LangService by inject()
     private val plugin: SuperSmashMobsBrawl by inject()
 
-    protected val minigameData by lazy {
-        (dataService.getMinigame(minigameId))
-            ?: throw RuntimeException("Could not find minigame data for id $minigameId")
+    @Suppress("UNCHECKED_CAST")
+    protected val minigameData: TMinigameDef by lazy {
+        (dataService.getMinigame(minigameId)
+            ?: throw RuntimeException("Could not find minigame data for id $minigameId"))
+            as TMinigameDef
     }
 
     lateinit var brawlWorld: BrawlGameWorld
@@ -128,7 +131,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 player.showTitle(title)
 
-                delay(1.seconds)
+                kotlinx.coroutines.delay(1.seconds)
             }
         }
 
@@ -182,11 +185,14 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         val voidLevel = brawlWorld.data.voidLevel
 
         runnables.add(
-            repeatingTask(5) {
+            gg.flyte.twilight.scheduler.repeatingTask(5) {
                 players.forEach { player ->
                     if (player.gameMode == GameMode.SURVIVAL && player.location.y <= voidLevel) {
                         plugin.logger.info("Player $player fell into the void")
-                        BrawlDeathEvent.call(player, DeathReason.Void)
+                        dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent.call(
+                            player,
+                            dev.betrix.superSmashMobsBrawl.events.DeathReason.Void,
+                        )
                     }
                 }
             }
@@ -213,6 +219,6 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
         val selectedMap = validMaps.random()
 
-        return worldService.copyAndLoadWorld(selectedMap, gameId)
+        return worldService.copyAndLoadWorld(selectedMap, gameId).map { it as BrawlGameWorld }
     }
 }

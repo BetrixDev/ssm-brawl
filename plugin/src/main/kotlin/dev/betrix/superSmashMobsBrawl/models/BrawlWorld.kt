@@ -8,6 +8,6 @@ sealed interface BrawlWorld {
     val world: World
 }
 
-data class BrawlGameWorld(override val world: World, val data: GameMapDef) : BrawlWorld()
+data class BrawlGameWorld(override val world: World, val data: GameMapDef) : BrawlWorld
 
-data class BrawlHubWorld(override val world: World, val data: HubMapDef) : BrawlWorld()
+data class BrawlHubWorld(override val world: World, val data: HubMapDef) : BrawlWorld

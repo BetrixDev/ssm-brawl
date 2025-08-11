@@ -73,3 +73,5 @@ messages:
       unknown: "{lang:prefix} <#f2b8c6>An unknown error occurred. Please try again"
     respawn:
       timeLeft: "<#8bd5ff>{secondsLeft}"
+    teamBasedStocks:
+      winner: "{lang:prefix} <#e8edff>Team <#a6e3a1>{winners}</#a6e3a1> <#e8edff>won <#8bd5ff>{lang:minigames.{minigameId}.name}</#8bd5ff>!"
