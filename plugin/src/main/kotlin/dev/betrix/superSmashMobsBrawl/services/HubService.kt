@@ -49,11 +49,16 @@ object HubService : KoinComponent {
 
             val mapDef = dataService.getHubMap("blue_forest")!!
 
-            WorldService.copyAndLoadWorld<BrawlHubWorld>(mapDef)
+            WorldService.copyAndLoadWorld(mapDef)
                 .mapBoth(
                     success = { loadedWorld ->
+                        val hub = loadedWorld as? BrawlHubWorld
+                        if (hub == null) {
+                            plugin.logger.severe("Loaded world is not a hub world!")
+                            return@mapBoth
+                        }
                         plugin.logger.info("Successfully loaded default hub world")
-                        defaultHubWorld = loadedWorld
+                        defaultHubWorld = hub
                         registerEvents()
                     },
                     failure = { err ->

@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.minigames
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.map
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.github.michaelbull.result.unwrap
@@ -10,7 +11,9 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
+import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
+import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.extensions.getEquidistant
 import dev.betrix.superSmashMobsBrawl.extensions.getFarthestFromPlayers
 import dev.betrix.superSmashMobsBrawl.extensions.location
@@ -21,6 +24,7 @@ import dev.betrix.superSmashMobsBrawl.models.MinigameState
 import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.services.*
+import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
 import gg.flyte.twilight.scheduler.repeatingTask
@@ -32,6 +36,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -46,9 +52,11 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     private val langService: LangService by inject()
     private val plugin: SuperSmashMobsBrawl by inject()
 
-    protected val minigameData by lazy {
-        (dataService.getMinigame(minigameId))
-            ?: throw RuntimeException("Could not find minigame data for id $minigameId")
+    @Suppress("UNCHECKED_CAST")
+    protected val minigameData: TMinigameDef by lazy {
+        (dataService.getMinigame(minigameId)
+            ?: throw RuntimeException("Could not find minigame data for id $minigameId"))
+            as TMinigameDef
     }
 
     lateinit var brawlWorld: BrawlGameWorld
@@ -73,6 +81,61 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             BrawlDeathEvent.listen(this) {
                 plugin.logger.info("Player $player died")
                 plugin.launch { onPlayerDeath(player) }
+            }
+        )
+
+        // Apply damage within the context of this minigame
+        listeners.add(
+            event<SmashDamageEvent> {
+                // Only handle if this damage concerns players in this minigame
+                if (!isValid(this@BrawlMinigame as BrawlMinigame<*>)) return@event
+
+                val victimPlayer = victim as? Player ?: return@event
+
+                if (victimPlayer.gameMode != GameMode.SURVIVAL) return@event
+
+                val newHealth = (victimPlayer.health - damage).coerceAtLeast(0.0)
+
+                if (newHealth <= 0.0) {
+                    // Prevent vanilla death and route through our brawl death flow
+                    victimPlayer.health = 1.0
+                    BrawlDeathEvent.call(victimPlayer, DeathReason.Damage)
+                } else {
+                    victimPlayer.health = newHealth
+                }
+            }
+        )
+
+        // Translate melee damage into SmashDamageEvent within this minigame
+        listeners.add(
+            event<EntityDamageByEntityEvent> {
+                if (isCancelled) return@event
+
+                val victimPlayer = entity as? Player ?: return@event
+                val damagerPlayer = damager as? Player ?: return@event
+
+                if (!hasPlayer(victimPlayer) || !hasPlayer(damagerPlayer)) return@event
+
+                if (
+                    cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
+                        cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
+                )
+                    return@event
+
+                if (victimPlayer.gameMode != GameMode.SURVIVAL) return@event
+
+                // Cancel vanilla damage and route through SmashDamageEvent using kit melee damage
+                isCancelled = true
+
+                val attackerKit = kitService.getKitForPlayer(damagerPlayer)
+                val meleeDamage = attackerKit?.getMeleeDamage() ?: damage
+
+                SmashDamageEvent(
+                        victimPlayer,
+                        Damager.DamagerLivingEntity(damagerPlayer),
+                        meleeDamage,
+                    )
+                    .callEvent()
             }
         )
 
@@ -128,7 +191,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 player.showTitle(title)
 
-                delay(1.seconds)
+                kotlinx.coroutines.delay(1.seconds)
             }
         }
 
@@ -182,11 +245,14 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         val voidLevel = brawlWorld.data.voidLevel
 
         runnables.add(
-            repeatingTask(5) {
+            gg.flyte.twilight.scheduler.repeatingTask(5) {
                 players.forEach { player ->
                     if (player.gameMode == GameMode.SURVIVAL && player.location.y <= voidLevel) {
                         plugin.logger.info("Player $player fell into the void")
-                        BrawlDeathEvent.call(player, DeathReason.Void)
+                        dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent.call(
+                            player,
+                            dev.betrix.superSmashMobsBrawl.events.DeathReason.Void,
+                        )
                     }
                 }
             }
@@ -213,6 +279,6 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
         val selectedMap = validMaps.random()
 
-        return worldService.copyAndLoadWorld(selectedMap, gameId)
+        return worldService.copyAndLoadWorld(selectedMap, gameId).map { it as BrawlGameWorld }
     }
 }

@@ -4,6 +4,7 @@ import com.github.michaelbull.result.mapBoth
 import dev.betrix.superSmashMobsBrawl.extensions.hasDebugEnabled
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.services.LangService
+import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.services.QueueService
 import dev.betrix.superSmashMobsBrawl.utils.mm
 import dev.rollczi.litecommands.annotations.argument.Arg
@@ -19,6 +20,7 @@ import org.koin.core.component.inject
 class QueueCommand : KoinComponent {
 
     private val lang: LangService by inject()
+    private val minigameService: MinigameService by inject()
 
     @Execute
     fun queue(@Context sender: CommandSender) {
@@ -74,15 +76,25 @@ class QueueCommand : KoinComponent {
             return
         }
 
-        val playerMessage =
-            QueueService.removePlayer(sender)
-                .mapBoth(
-                    success = {
-                        lang.t("messages.queue.leave.success") { "minigameId" to it.minigame.id }
-                    },
-                    failure = { lang.t("messages.queue.leave.notInQueue") },
-                )
-
-        sender.sendMessage(playerMessage)
+        QueueService.removePlayer(sender)
+            .mapBoth(
+                success = {
+                    lang.t("messages.queue.leave.success") { "minigameId" to it.minigame.id }
+                },
+                failure = {
+                    // If not in queue, fall back to leaving a running minigame
+                    minigameService
+                        .handlePlayerLeave(sender)
+                        .mapBoth(
+                            success = {
+                                lang.t("messages.minigames.leave.success") {
+                                    "minigameId" to it.minigameId
+                                }
+                            },
+                            failure = { lang.t("messages.queue.leave.notInQueue") },
+                        )
+                },
+            )
+            .let { sender.sendMessage(it) }
     }
 }
