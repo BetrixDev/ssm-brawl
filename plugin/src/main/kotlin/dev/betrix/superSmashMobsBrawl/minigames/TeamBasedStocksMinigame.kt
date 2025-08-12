@@ -38,6 +38,8 @@ open class TeamBasedStocksMinigame(
     }
 
     override suspend fun onPlayerDeath(player: Player) {
+        if (state == MinigameState.ENDED) return
+
         val team = playerToTeam[player]
         if (team == null) {
             // Fallback: if somehow no team, just use base behavior
@@ -98,7 +100,10 @@ open class TeamBasedStocksMinigame(
         if (state == MinigameState.ENDED) return
 
         val teamsWithStocks = teams.filter { it.stocks > 0 }
-        if (teamsWithStocks.size == 1) {
+        val teamsWithActivePlayer =
+            teams.filter { team -> team.players.any { it.gameMode == GameMode.SURVIVAL } }
+
+        if (teamsWithStocks.size == 1 && teamsWithActivePlayer.size <= 1) {
             endGame(teamsWithStocks.first())
         }
     }
