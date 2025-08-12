@@ -39,6 +39,8 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
 
     protected var disguise: BrawlDisguise? = null
 
+    fun getMeleeDamage(): Double = kitData.meleeDamage
+
     fun getPassive(id: String): BrawlPassive? {
         return passives.find { it.id == id }
     }

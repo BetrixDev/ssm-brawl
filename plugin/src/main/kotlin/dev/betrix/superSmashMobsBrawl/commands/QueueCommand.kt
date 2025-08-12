@@ -76,8 +76,7 @@ class QueueCommand : KoinComponent {
             return
         }
 
-        QueueService
-            .removePlayer(sender)
+        QueueService.removePlayer(sender)
             .mapBoth(
                 success = {
                     lang.t("messages.queue.leave.success") { "minigameId" to it.minigame.id }

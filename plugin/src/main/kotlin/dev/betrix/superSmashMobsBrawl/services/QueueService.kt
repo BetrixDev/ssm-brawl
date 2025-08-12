@@ -3,7 +3,6 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.PrototypingMinigame
@@ -167,13 +166,14 @@ object QueueService : Manageable(), KoinComponent {
 
                 val players: List<Player> = entriesToUse.map { it.player }
 
-                val teams: List<MinigameTeam> = (0 until amountOfTeams).map { teamIndex ->
-                    val startIndex = teamIndex * playersPerTeam
-                    val endIndex = startIndex + playersPerTeam
-                    val teamPlayers = players.subList(startIndex, endIndex).toMutableList()
-                    // Initial stocks value will be set during minigame init from definition
-                    MinigameTeam(teamPlayers, minigameDef.stocks)
-                }
+                val teams: List<MinigameTeam> =
+                    (0 until amountOfTeams).map { teamIndex ->
+                        val startIndex = teamIndex * playersPerTeam
+                        val endIndex = startIndex + playersPerTeam
+                        val teamPlayers = players.subList(startIndex, endIndex).toMutableList()
+                        // Initial stocks value will be set during minigame init from definition
+                        MinigameTeam(teamPlayers, minigameDef.stocks)
+                    }
 
                 val minigame = TeamBasedStocksMinigame(minigameDef.id, gameId, teams)
                 minigameService.handleMinigameSetup(minigame)

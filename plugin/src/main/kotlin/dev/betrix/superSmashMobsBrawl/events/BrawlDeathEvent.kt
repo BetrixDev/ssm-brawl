@@ -8,6 +8,8 @@ import org.bukkit.entity.Player
 
 sealed class DeathReason {
     data object Void : DeathReason()
+
+    data object Damage : DeathReason()
 }
 
 class BrawlDeathEvent(val player: Player, val reason: DeathReason) : TwilightEvent() {
