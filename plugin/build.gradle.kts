@@ -6,6 +6,8 @@ plugins {
     id("com.ncorti.ktfmt.gradle") version "0.23.0"
 }
 
+val ktor_version: String by project
+
 group = "dev.betrix"
 
 version = "0.1.0"
@@ -35,6 +37,10 @@ dependencies {
     implementation("com.charleskorn.kaml:kaml:0.85.0")
     implementation("com.squareup.okio:okio:3.10.2")
     implementation("io.insert-koin:koin-core:3.5.6")
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
 
     // Testing
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
