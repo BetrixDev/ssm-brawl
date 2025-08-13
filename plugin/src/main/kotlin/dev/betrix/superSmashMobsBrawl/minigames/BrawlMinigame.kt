@@ -56,7 +56,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     protected val minigameData: TMinigameDef by lazy {
         (dataService.getMinigame(minigameId)
             ?: throw RuntimeException("Could not find minigame data for id $minigameId"))
-                as TMinigameDef
+            as TMinigameDef
     }
 
     lateinit var brawlWorld: BrawlGameWorld
@@ -119,7 +119,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 if (
                     cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
-                    cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
+                        cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
                 )
                     return@event
 
@@ -132,10 +132,10 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 val meleeDamage = attackerKit?.getMeleeDamage() ?: damage
 
                 SmashDamageEvent(
-                    victimPlayer,
-                    Damager.DamagerLivingEntity(damagerPlayer),
-                    meleeDamage,
-                )
+                        victimPlayer,
+                        Damager.DamagerLivingEntity(damagerPlayer),
+                        meleeDamage,
+                    )
                     .callEvent()
             }
         )

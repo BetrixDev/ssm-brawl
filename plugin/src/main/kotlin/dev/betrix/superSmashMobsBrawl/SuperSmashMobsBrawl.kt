@@ -23,6 +23,7 @@ import gg.flyte.twilight.Twilight
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.twilight
+import java.util.logging.Logger
 import org.bukkit.GameMode
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -36,7 +37,6 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
-import java.util.logging.Logger
 
 class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var liteCommands: LiteCommands<CommandSender>
@@ -58,9 +58,12 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
                     single { KitService }
                     single(createdAtStart = true) { LangService() }
                     single { WorldService }
+                    single { HubService }
                 }
             )
         }
+
+        StatisticsBroadcaster()
 
         // Initialize services
         HubService.initialize(this)
