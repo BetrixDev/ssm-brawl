@@ -63,3 +63,26 @@ kits:
       chestplate: iron_chestplate
       leggings: iron_leggings
       boots: iron_boots
+
+  # Cow Kit
+  - id: cow
+    meleeDamage: 6.0
+    armor: 6.5
+    knockbackMultiplier: 1.10
+    disguiseId: "cow"
+    passives:
+      - id: double_jump
+      - id: regeneration
+        overrides:
+          metadata:
+            regenRate: 0.25
+      - id: stampede
+      - id: hunger
+    abilities:
+      - id: angry_herd
+      - id: milk_spiral
+    armorItems:
+      helmet: iron_helmet
+      chestplate: chainmail_chestplate
+      leggings: iron_leggings
+      boots: iron_boots

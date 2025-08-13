@@ -1,11 +1,14 @@
 package dev.betrix.superSmashMobsBrawl.kits
 
+import dev.betrix.superSmashMobsBrawl.abilities.AngryHerdAbility
 import dev.betrix.superSmashMobsBrawl.abilities.BoneExplosionAbility
 import dev.betrix.superSmashMobsBrawl.abilities.BrawlAbility
 import dev.betrix.superSmashMobsBrawl.abilities.ExplodeAbility
+import dev.betrix.superSmashMobsBrawl.abilities.MilkSpiralAbility
 import dev.betrix.superSmashMobsBrawl.abilities.RopedArrowAbility
 import dev.betrix.superSmashMobsBrawl.abilities.SulphurBombAbility
 import dev.betrix.superSmashMobsBrawl.disguises.BrawlDisguise
+import dev.betrix.superSmashMobsBrawl.disguises.CowDisguise
 import dev.betrix.superSmashMobsBrawl.disguises.CreeperDisguise
 import dev.betrix.superSmashMobsBrawl.disguises.SkeletonDisguise
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
@@ -15,6 +18,7 @@ import dev.betrix.superSmashMobsBrawl.passives.BrawlPassive
 import dev.betrix.superSmashMobsBrawl.passives.DoubleJumpPassive
 import dev.betrix.superSmashMobsBrawl.passives.HungerPassive
 import dev.betrix.superSmashMobsBrawl.passives.RegenerationPassive
+import dev.betrix.superSmashMobsBrawl.passives.StampedePassive
 import dev.betrix.superSmashMobsBrawl.services.DataService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import gg.flyte.twilight.extension.feed
@@ -57,6 +61,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
             when (kitData.disguiseId) {
                 "creeper" -> CreeperDisguise(player)
                 "skeleton" -> SkeletonDisguise(player)
+                "cow" -> CowDisguise(player)
                 else -> {
                     logger.severe("No disguise known with id ${kitData.disguiseId}")
                     null
@@ -70,6 +75,8 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "explode" -> ExplodeAbility(player)
                     "roped_arrow" -> RopedArrowAbility(player)
                     "bone_explosion" -> BoneExplosionAbility(player)
+                    "angry_herd" -> AngryHerdAbility(player)
+                    "milk_spiral" -> MilkSpiralAbility(player)
                     else -> {
                         logger.severe(
                             "No ability found with id ${it.id} reference on kit ${kitData.id}"
@@ -92,6 +99,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "hunger" -> HungerPassive(player)
                     "arrow_recharge" -> ArrowRechargePassive(player)
                     "barrage" -> BarragePassive(player)
+                    "stampede" -> StampedePassive(player)
                     else -> {
                         logger.severe(
                             "No passive found with id ${it.id} reference on kit ${kitData.id}"
