@@ -22,7 +22,7 @@ class LeaveCommand : KoinComponent {
     @Execute
     fun leave(@Context sender: CommandSender) {
         if (sender !is Player) {
-            sender.sendMessage(lang.t("messages.commands.onPlayers"))
+            sender.sendMessage(lang.t("messages.commands.onlyPlayers"))
             return
         }
 

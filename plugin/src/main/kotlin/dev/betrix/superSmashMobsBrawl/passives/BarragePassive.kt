@@ -102,21 +102,20 @@ class BarragePassive(player: Player) : BrawlPassive("barrage", player) {
                     )
 
                 val arrow =
-                    ArrowProjectile(player, "Barrage Arrow", 3.0, spread).onHitLivingEntity {
-                        entity,
-                        arrow ->
-                        arrow.projectile?.remove()
+                    ArrowProjectile(player, "messages.projectiles.barrage_arrow", 3.0, spread)
+                        .onHitLivingEntity { entity, arrow ->
+                            arrow.projectile?.remove()
 
-                        SmashDamageEvent(
-                                entity,
-                                Damager.DamagerLivingEntity(player),
-                                6.0,
-                                damageType = SmashDamageType.Projectile,
-                            )
-                            .callEvent()
+                            SmashDamageEvent(
+                                    entity,
+                                    Damager.DamagerLivingEntity(player),
+                                    6.0,
+                                    damageType = SmashDamageType.Projectile,
+                                )
+                                .callEvent()
 
-                        true
-                    }
+                            true
+                        }
 
                 arrow.launch()
 

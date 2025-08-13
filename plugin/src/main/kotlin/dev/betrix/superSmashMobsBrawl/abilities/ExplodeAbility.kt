@@ -7,7 +7,6 @@ import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
-import dev.betrix.superSmashMobsBrawl.utils.mm
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.getNearbyEntities
 import gg.flyte.twilight.scheduler.repeatingTask
@@ -34,7 +33,7 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
     override fun canActivate(sendMessage: Boolean): Boolean {
         if (isExplodeActive) {
             if (sendMessage) {
-                player.sendMessage(mm("<red>Already charging explosion!</red>"))
+                player.sendMessage(lang.t("messages.abilities.explode.alreadyCharging"))
             }
             return false
         }

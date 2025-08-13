@@ -16,7 +16,6 @@ import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
-import dev.betrix.superSmashMobsBrawl.utils.mm
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
 import gg.flyte.twilight.Twilight
@@ -34,11 +33,14 @@ import org.bukkit.event.inventory.InventoryInteractEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.plugin.java.JavaPlugin
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 
-class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
+class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
+    private val lang: LangService by inject()
     lateinit var liteCommands: LiteCommands<CommandSender>
     lateinit var twilight: Twilight
 
@@ -70,7 +72,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
         HubProtectionService.registerEvents()
         DebugService.initialize(this)
 
-        server.motd(mm("The brawl reborn -- a wondrous thing!"))
+        server.motd(lang.t("messages.server.motd"))
 
         liteCommands =
             LiteBukkitFactory.builder(this)

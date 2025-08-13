@@ -2,7 +2,7 @@ package dev.betrix.superSmashMobsBrawl.passives
 
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
-import dev.betrix.superSmashMobsBrawl.utils.mm
+import dev.betrix.superSmashMobsBrawl.services.LangService
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.scheduler.repeatingTask
@@ -11,8 +11,11 @@ import kotlin.math.min
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class HungerPassive(player: Player) : BrawlPassive("hunger", player) {
+class HungerPassive(player: Player) : BrawlPassive("hunger", player), KoinComponent {
+    private val lang: LangService by inject()
     private val hungerRestoreDelayMs = 250L
     private var hungerTicks = 0L
     private var lastHungerRestoreMs = System.currentTimeMillis()
@@ -59,7 +62,7 @@ class HungerPassive(player: Player) : BrawlPassive("hunger", player) {
         player.exhaustion = 0f
 
         if (player.foodLevel <= 0) {
-            player.sendMessage(mm("<red>Attack other players to restore hunger!</red>"))
+            player.sendMessage(lang.t("messages.passives.hunger.attackToRestore"))
 
             val damageEvent =
                 SmashDamageEvent(

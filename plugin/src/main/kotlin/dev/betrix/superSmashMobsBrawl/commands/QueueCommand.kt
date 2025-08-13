@@ -2,11 +2,11 @@ package dev.betrix.superSmashMobsBrawl.commands
 
 import com.github.michaelbull.result.mapBoth
 import dev.betrix.superSmashMobsBrawl.extensions.hasDebugEnabled
+import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.services.QueueService
-import dev.betrix.superSmashMobsBrawl.utils.mm
 import dev.rollczi.litecommands.annotations.argument.Arg
 import dev.rollczi.litecommands.annotations.command.Command
 import dev.rollczi.litecommands.annotations.context.Context
@@ -25,7 +25,7 @@ class QueueCommand : KoinComponent {
     @Execute
     fun queue(@Context sender: CommandSender) {
         if (sender !is Player) {
-            sender.sendMessage(lang.t("messages.commands.onPlayers"))
+            sender.sendMessage(lang.t("messages.commands.onlyPlayers"))
             return
         }
 
@@ -44,16 +44,14 @@ class QueueCommand : KoinComponent {
 
         // Example debug usage - show additional information if debug is enabled
         if (sender.hasDebugEnabled()) {
-            sender.sendMessage(
-                mm("<gray>[DEBUG] Queue status checked at ${System.currentTimeMillis()}</gray>")
-            )
+            sender.sendDebugMessage("Queue status checked at ${System.currentTimeMillis()}")
         }
     }
 
     @Execute
     fun queue(@Context sender: CommandSender, @Arg minigame: MinigameDef) {
         if (sender !is Player) {
-            sender.sendMessage(lang.t("messages.commands.onPlayers"))
+            sender.sendMessage(lang.t("messages.commands.onlyPlayers"))
             return
         }
 
@@ -72,7 +70,7 @@ class QueueCommand : KoinComponent {
     @Execute(name = "leave")
     fun queueLeave(@Context sender: CommandSender) {
         if (sender !is Player) {
-            sender.sendMessage(lang.t("messages.commands.onPlayers"))
+            sender.sendMessage(lang.t("messages.commands.onlyPlayers"))
             return
         }
 

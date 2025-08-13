@@ -19,7 +19,7 @@ class RopedArrowAbility(player: Player) : BrawlAbility("roped_arrow", player) {
         super.activate()
 
         val projectile =
-            ArrowProjectile(player, "Roped Arrow", arrowVelocityModifier)
+            ArrowProjectile(player, "abilities.roped_arrow.name", arrowVelocityModifier)
                 .onHitBlock { block, projectile ->
                     pullPlayerToLocation(block.location, projectile.velocityBeforeImpact)
                     true
