@@ -86,5 +86,4 @@ messages:
   projectiles:
     arrow: "Arrow"
     barrage_arrow: "Barrage Arrow"
-server:
-  motd: "The brawl reborn -- a wondrous thing!"
+motd: "The brawl reborn -- a wondrous thing!"

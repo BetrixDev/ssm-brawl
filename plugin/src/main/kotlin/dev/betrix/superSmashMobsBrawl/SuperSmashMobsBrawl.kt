@@ -72,7 +72,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
         HubProtectionService.registerEvents()
         DebugService.initialize(this)
 
-        server.motd(lang.t("messages.server.motd"))
+        server.motd(lang.t("motd"))
 
         liteCommands =
             LiteBukkitFactory.builder(this)
