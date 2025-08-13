@@ -22,6 +22,7 @@ import gg.flyte.twilight.extension.heal
 import java.util.logging.Logger
 import org.bukkit.GameMode
 import org.bukkit.Material
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
@@ -121,6 +122,17 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
             legsMat?.let { player.inventory.leggings = ItemStack.of(it) }
             bootsMat?.let { player.inventory.boots = ItemStack.of(it) }
         }
+
+        // 1.8 PVP feel adjustments
+        try {
+            // Set high attack speed to remove 1.9+ cooldown
+            val attackSpeedAttr = Attribute.valueOf("GENERIC_ATTACK_SPEED")
+            player.getAttribute(attackSpeedAttr)?.baseValue = 16.0
+        } catch (_: Throwable) {}
+        // Clear offhand to avoid shield mechanics
+        try {
+            player.inventory.setItemInOffHand(ItemStack.of(Material.AIR))
+        } catch (_: Throwable) {}
 
         player.sendDebugMessage("You have been given the $id kit")
     }
