@@ -1,6 +1,7 @@
 package dev.betrix.superSmashMobsBrawl
 
 import com.github.shynixn.mccoroutine.bukkit.launch
+import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -35,10 +36,13 @@ data class AxiomLogEvent(
 
 class AxiomLoggerHandler(private val plugin: SuperSmashMobsBrawl) : Handler() {
 
+    private val maxBatchSize = 500
     private val axiomApiToken = System.getenv("AXIOM_API_TOKEN")
     private val axiomDatasetName = System.getenv("AXIOM_DATASET_NAME")
 
     private val queue = ConcurrentLinkedQueue<JsonElement>()
+
+    private var runnable: TwilightRunnable? = null
 
     private val axiomApiClient =
         HttpClient(CIO) {
@@ -58,7 +62,7 @@ class AxiomLoggerHandler(private val plugin: SuperSmashMobsBrawl) : Handler() {
         }
 
     init {
-        repeatingTask(20 * 5, async = true) { flushQueue() }
+        runnable = repeatingTask(20 * 5, async = true) { flushQueue() }
     }
 
     override fun publish(record: LogRecord?) {
@@ -96,6 +100,7 @@ class AxiomLoggerHandler(private val plugin: SuperSmashMobsBrawl) : Handler() {
             }
         }
 
+        // Log in console for observability there as well
         println(value)
 
         queue.add(enriched)
@@ -106,6 +111,7 @@ class AxiomLoggerHandler(private val plugin: SuperSmashMobsBrawl) : Handler() {
     }
 
     override fun close() {
+        runnable?.cancel()()
         flushQueue()
         axiomApiClient.close()
     }
@@ -114,7 +120,7 @@ class AxiomLoggerHandler(private val plugin: SuperSmashMobsBrawl) : Handler() {
         if (queue.isEmpty()) return
 
         val batch = mutableListOf<JsonElement>()
-        while (true) {
+        while (batch.size < maxBatchSize) {
             val log = queue.poll() ?: break
             batch.add(log)
         }
