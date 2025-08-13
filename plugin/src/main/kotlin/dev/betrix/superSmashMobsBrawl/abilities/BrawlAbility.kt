@@ -159,9 +159,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
 
         listeners.add(
             event<PlayerInteractEvent>(player) {
-                if (hand != EquipmentSlot.HAND) {
-                    return@event
-                }
+                if (hand != null && hand != EquipmentSlot.HAND) return@event
 
                 when (abilityData.usage) {
                     AbilityUsage.LEFT_CLICK -> {
@@ -207,7 +205,10 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
 
     open fun activate() {
         setCooldown()
-        player.setCooldown(hotbarItemStack, (abilityData.cooldown * 20).toInt())
+        // Avoid client-side item cooldown visuals affecting combat rhythm; we keep only our timers
+        try {
+            player.setCooldown(hotbarItemStack, 0)
+        } catch (_: Throwable) {}
         player.sendMessage(lang.t("messages.abilities.use.success") { "abilityId" to id })
     }
 

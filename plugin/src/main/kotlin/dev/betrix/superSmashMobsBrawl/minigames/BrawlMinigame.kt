@@ -14,6 +14,7 @@ import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
+import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.extensions.getEquidistant
 import dev.betrix.superSmashMobsBrawl.extensions.getFarthestFromPlayers
 import dev.betrix.superSmashMobsBrawl.extensions.location
@@ -95,7 +96,8 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 if (victimPlayer.gameMode != GameMode.SURVIVAL) return@event
 
-                val newHealth = (victimPlayer.health - damage).coerceAtLeast(0.0)
+                val startingHealth = victimPlayer.health
+                val newHealth = (startingHealth - damage).coerceAtLeast(0.0)
 
                 if (newHealth <= 0.0) {
                     // Prevent vanilla death and route through our brawl death flow
@@ -103,6 +105,27 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                     BrawlDeathEvent.call(victimPlayer, DeathReason.Damage)
                 } else {
                     victimPlayer.health = newHealth
+                }
+
+                // Apply 1.8-style melee knockback only for melee damage (no special damage type)
+                if (damageType == null) {
+                    val damagerPlayer =
+                        (damager as? Damager.DamagerLivingEntity)?.livingEntity as? Player
+                    if (damagerPlayer != null) {
+                        val kitKnockbackMult =
+                            kitService.getKitForPlayer(damagerPlayer)?.let {
+                                dataService.getKit(it.id)?.knockbackMultiplier
+                            } ?: 1.0
+
+                        victimPlayer.noDamageTicks = 0
+                        victimPlayer.doKnockback(
+                            knockbackMultiplier * kitKnockbackMult,
+                            damage,
+                            startingHealth,
+                            damagerPlayer.location.toVector(),
+                            null,
+                        )
+                    }
                 }
             }
         )
@@ -156,6 +179,12 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         players.forEachIndexed { idx, player ->
             player.teleport(brawlWorld.world.location(spawnPoints[min(idx, spawnPoints.size)]))
             assignPlayerKit(player)
+            // Clear offhand to remove shield mechanics (1.8 feel)
+            try {
+                player.inventory.setItemInOffHand(
+                    org.bukkit.inventory.ItemStack.of(org.bukkit.Material.AIR)
+                )
+            } catch (_: Throwable) {}
         }
 
         state = MinigameState.STARTING
