@@ -9,7 +9,7 @@ import org.bukkit.util.Vector
 
 class ArrowProjectile(
     override val owner: Player,
-    override val name: String = "Arrow",
+    override val name: String = "messages.projectiles.arrow",
     private val velocityMultiplier: Double,
     private val velocityAddend: Vector? = null,
 ) : BrawlProjectile(owner, name) {

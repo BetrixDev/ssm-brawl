@@ -28,7 +28,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
     private val dataService: DataService by inject()
     protected val minigameService: MinigameService by inject()
     protected val kitService: KitService by inject()
-    private val lang: LangService by inject()
+    protected val lang: LangService by inject()
 
     protected val abilityData by lazy {
         dataService.getAbility(id)

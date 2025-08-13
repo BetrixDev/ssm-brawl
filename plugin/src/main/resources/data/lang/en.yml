@@ -42,6 +42,9 @@ messages:
     serverStarting: "Server is still starting! Please come back in a moment"
   commands:
     onlyPlayers: "<red>Only players can execute this command</red>"
+    debug:
+      enabled: "<green>Debug mode enabled!</green>"
+      disabled: "<red>Debug mode disabled!</red>"
   queue:
     leave:
       notInQueue: "{lang:prefix} <#f2b8c6>You are not currently in a queue<#e8edff>"
@@ -60,6 +63,8 @@ messages:
     use:
       success: "{lang:prefix} <#e8edff>Activated <#8bd5ff>{lang:abilities.{abilityId}.name}"
       cooldown: "{lang:prefix} <red>{lang:abilities.{abilityId}.name}</red> <#e8edff>is on cooldown for</#e8edff> <yellow>{seconds}s</yellow>!"
+    explode:
+      alreadyCharging: "<red>Already charging explosion!</red>"
   kits:
     select:
       success: "{lang:prefix} <#e8edff>You have selected kit <#8bd5ff>{lang:kits.{kitId}.name}"
@@ -75,3 +80,10 @@ messages:
       timeLeft: "<#8bd5ff>{secondsLeft}"
     teamBasedStocks:
       winner: "{lang:prefix} <#e8edff>Team <#a6e3a1>{winners}</#a6e3a1> <#e8edff>won <#8bd5ff>{lang:minigames.{minigameId}.name}</#8bd5ff>!"
+  passives:
+    hunger:
+      attackToRestore: "<red>Attack other players to restore hunger!</red>"
+  projectiles:
+    arrow: "Arrow"
+    barrage_arrow: "Barrage Arrow"
+motd: "The brawl reborn -- a wondrous thing!"

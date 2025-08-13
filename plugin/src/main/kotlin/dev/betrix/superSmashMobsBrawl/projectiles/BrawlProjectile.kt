@@ -3,7 +3,7 @@ package dev.betrix.superSmashMobsBrawl.projectiles
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.extensions.disguise
 import dev.betrix.superSmashMobsBrawl.extensions.isAirOrFoliage
-import dev.betrix.superSmashMobsBrawl.utils.mm
+import dev.betrix.superSmashMobsBrawl.services.LangService
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
@@ -19,8 +19,12 @@ import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.util.BoundingBox
 import org.bukkit.util.RayTraceResult
 import org.bukkit.util.Vector
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-abstract class BrawlProjectile(open val owner: Player, open val name: String) : Manageable() {
+abstract class BrawlProjectile(open val owner: Player, open val name: String) :
+    Manageable(), KoinComponent {
+    private val lang: LangService by inject()
     private var job: TwilightRunnable? = null
 
     @Volatile
@@ -71,7 +75,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) : 
 
     fun launch() {
         projectile = createProjectileEntity()
-        projectile?.customName(mm(name))
+        projectile?.customName(lang.t(name))
 
         if (projectile is Item) {
             val item = projectile as Item
