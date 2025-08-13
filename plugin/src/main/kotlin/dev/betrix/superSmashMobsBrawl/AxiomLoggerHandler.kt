@@ -58,10 +58,6 @@ class AxiomLoggerHandler(private val plugin: SuperSmashMobsBrawl) : Handler() {
         }
 
     init {
-        require(axiomApiToken.isNotBlank()) { "AXIOM_API_TOKEN was not set" }
-
-        require(axiomDatasetName.isNotBlank()) { "AXIOM_DATASET_NAME was not set" }
-
         repeatingTask(20 * 5, async = true) { flushQueue() }
     }
 
