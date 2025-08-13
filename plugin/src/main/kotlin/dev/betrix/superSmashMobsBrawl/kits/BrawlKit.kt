@@ -21,7 +21,9 @@ import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
 import java.util.logging.Logger
 import org.bukkit.GameMode
+import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -107,6 +109,19 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
         player.heal()
         player.feed()
 
+        // Equip armor if specified
+        kitData.armorItems?.let { armor ->
+            val helmetMat = armor.helmet?.let { Material.matchMaterial(it.uppercase()) }
+            val chestMat = armor.chestplate?.let { Material.matchMaterial(it.uppercase()) }
+            val legsMat = armor.leggings?.let { Material.matchMaterial(it.uppercase()) }
+            val bootsMat = armor.boots?.let { Material.matchMaterial(it.uppercase()) }
+
+            helmetMat?.let { player.inventory.helmet = ItemStack.of(it) }
+            chestMat?.let { player.inventory.chestplate = ItemStack.of(it) }
+            legsMat?.let { player.inventory.leggings = ItemStack.of(it) }
+            bootsMat?.let { player.inventory.boots = ItemStack.of(it) }
+        }
+
         player.sendDebugMessage("You have been given the $id kit")
     }
 
@@ -118,6 +133,14 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
 
         passives.forEach { it.teardown() }
         passives.clear()
+
+        // Remove armor given by this kit, if any
+        kitData.armorItems?.let {
+            player.inventory.helmet = null
+            player.inventory.chestplate = null
+            player.inventory.leggings = null
+            player.inventory.boots = null
+        }
 
         player.sendDebugMessage("The $id kit has been removed")
     }

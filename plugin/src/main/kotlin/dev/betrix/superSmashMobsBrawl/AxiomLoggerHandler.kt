@@ -111,7 +111,7 @@ class AxiomLoggerHandler(private val plugin: SuperSmashMobsBrawl) : Handler() {
     }
 
     override fun close() {
-        runnable?.cancel()()
+        runnable?.cancel()
         flushQueue()
         axiomApiClient.close()
     }
