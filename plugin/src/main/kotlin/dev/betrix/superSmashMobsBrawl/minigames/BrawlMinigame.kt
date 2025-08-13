@@ -88,7 +88,8 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         listeners.add(
             event<SmashDamageEvent> {
                 // Only handle if this damage concerns players in this minigame
-                if (!isValid(this@BrawlMinigame as BrawlMinigame<*>)) return@event
+                @Suppress("UNCHECKED_CAST")
+                if (!isValid(this@BrawlMinigame as BrawlMinigame<MinigameDef>)) return@event
 
                 val victimPlayer = victim as? Player ?: return@event
 

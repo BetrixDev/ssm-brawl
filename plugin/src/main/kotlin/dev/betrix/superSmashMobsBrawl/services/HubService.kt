@@ -69,6 +69,10 @@ object HubService : KoinComponent {
         }
     }
 
+    fun playersInHubCount(): Int {
+        return playersInHub.size
+    }
+
     private fun registerEvents() {
         event<PlayerJoinEvent> {
             plugin.logger.info("${player.name} joined")

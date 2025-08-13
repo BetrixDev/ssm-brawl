@@ -23,6 +23,7 @@ import gg.flyte.twilight.Twilight
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.twilight
+import java.util.logging.Logger
 import org.bukkit.GameMode
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -42,6 +43,10 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
     lateinit var twilight: Twilight
 
     override suspend fun onEnableAsync() {
+        twilight = twilight(this)
+
+        Logger.getLogger("").addHandler(AxiomLoggerHandler(this))
+
         startKoin {
             modules(
                 module {
@@ -53,11 +58,12 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin() {
                     single { KitService }
                     single(createdAtStart = true) { LangService() }
                     single { WorldService }
+                    single { HubService }
                 }
             )
         }
 
-        twilight = twilight(this)
+        StatisticsBroadcaster()
 
         // Initialize services
         HubService.initialize(this)
