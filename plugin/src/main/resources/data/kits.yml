@@ -7,6 +7,11 @@ kits:
     knockbackMultiplier: 1.0
     passives:
       - id: double_jump
+    armorItems:
+      helmet: iron_helmet
+      chestplate: iron_chestplate
+      leggings: iron_leggings
+      boots: iron_boots
 
   # Creeper Kit
   - id: creeper
@@ -24,6 +29,11 @@ kits:
     abilities:
       - id: sulphur_bomb
       - id: explode
+    armorItems:
+      helmet: iron_helmet
+      chestplate: iron_chestplate
+      leggings: iron_leggings
+      boots: iron_boots
 
   # Skeleton Kit
   - id: skeleton
@@ -48,3 +58,8 @@ kits:
     abilities:
       - id: bone_explosion
       - id: roped_arrow
+    armorItems:
+      helmet: iron_helmet
+      chestplate: iron_chestplate
+      leggings: iron_leggings
+      boots: iron_boots

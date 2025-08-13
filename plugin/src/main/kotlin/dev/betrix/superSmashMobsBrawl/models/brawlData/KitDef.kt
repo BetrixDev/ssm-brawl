@@ -14,6 +14,7 @@ data class KitDef(
     val disguiseId: String? = null,
     val passives: List<KitPassiveDef> = emptyList(),
     val abilities: List<KitAbilityDef> = emptyList(),
+    val armorItems: KitArmorItemsDef? = null,
     val userFacing: Boolean = true,
 )
 
@@ -26,3 +27,11 @@ data class KitPassiveDef(val id: String, val overrides: KitPassiveDefOverrides? 
 data class KitAbilityDef(val id: String, val overrides: KitAbilityDefOverrides? = null)
 
 @Serializable data class KitAbilityDefOverrides(val metadata: Map<String, YamlScalar>? = null)
+
+@Serializable
+data class KitArmorItemsDef(
+    val helmet: String? = null,
+    val chestplate: String? = null,
+    val leggings: String? = null,
+    val boots: String? = null,
+)
