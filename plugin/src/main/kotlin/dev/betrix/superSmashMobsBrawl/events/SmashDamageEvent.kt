@@ -22,7 +22,7 @@ class SmashDamageEvent(
     val victim: LivingEntity,
     val damager: Damager?,
     val damage: Double,
-    val knockbackMultiplier: Double = 1.0,
+    var knockbackMultiplier: Double = 1.0,
     val damageType: SmashDamageType? = null,
 ) : TwilightEvent() {
 

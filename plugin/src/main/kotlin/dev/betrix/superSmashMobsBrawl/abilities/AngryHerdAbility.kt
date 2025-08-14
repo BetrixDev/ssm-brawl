@@ -2,140 +2,164 @@ package dev.betrix.superSmashMobsBrawl.abilities
 
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
-import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
-import gg.flyte.twilight.event.event
+import gg.flyte.twilight.extension.addY
+import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
-import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
+import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.Cow
-import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.util.Vector
 
 class AngryHerdAbility(player: Player) : BrawlAbility("angry_herd", player) {
 
-    private val cowsCount = metadata.int("cowsCount") ?: 5
-    private val cowSpeed = metadata.double("cowSpeed") ?: 0.9
-    private val contactRadius = metadata.double("contactRadius") ?: 1.2
-    private val durationTicks = metadata.int("durationTicks") ?: 60 // 3s
-    private val damagePerHit = metadata.double("damagePerHit") ?: 5.0
-    private val knockbackMultiplier = metadata.double("knockbackMultiplier") ?: 1.25
-    private val hitCooldownTicks = metadata.int("hitCooldownTicks") ?: 10
+    private val stuckTimeMs = metadata.long("stuckTimeMs") ?: 300L
+    private val forceMoveTimeMs = metadata.long("forceMoveTimeMs") ?: 350L
+    private val durationMs = metadata.long("durationMs") ?: 2500L
+    private val hitboxRadius = metadata.double("hitboxRadius") ?: 2.5
+    private val damageCooldownMs = metadata.long("damageCooldownMs") ?: 600L
+    private val cowDamage = metadata.double("cowDamage") ?: 5.0
+    private val cowAmountRadius = metadata.int("cowAmountRadius") ?: 3
+    private val cowAmountHeight = metadata.int("cowAmountHeight") ?: 1
+    private val knockback = metadata.double("knockback") ?: 1.25
 
-    private val activeCowIds = ConcurrentHashMap.newKeySet<UUID>()
+    private val cowDirections = hashMapOf<Entity, Vector>()
+    private val lastCowLocations = hashMapOf<Entity, Location>()
+    private val lastMoveTime = hashMapOf<Entity, Long>()
+    private val lastDamageTime = hashMapOf<Player, Long>()
+
+    private var herdTask: TwilightRunnable? = null
 
     override fun teardown() {
         super.teardown()
     }
 
     override fun activate() {
-        val dir = player.eyeLocation.direction.normalize()
+        super.activate()
+        cowDirections.clear()
+        lastCowLocations.clear()
+        lastMoveTime.clear()
+        lastDamageTime.clear()
 
-        val spawnedCows = mutableListOf<Cow>()
-        repeat(cowsCount) { idx ->
-            val spawnLoc = player.location.clone().add(dir.clone().multiply(idx * 0.75))
-            val cow = player.world.spawn(spawnLoc, Cow::class.java)
-            cow.velocity = dir.clone().multiply(cowSpeed)
-            activeCowIds.add(cow.uniqueId)
-            spawnedCows.add(cow)
+        val cows = arrayListOf<Entity>()
+
+        repeat(cowAmountHeight) { j ->
+            for (i in (1 - cowAmountRadius) until cowAmountRadius) {
+                val direction = player.location.direction.clone()
+                direction.y = 0.0
+                direction.normalize()
+
+                val cowLocation = player.location.clone()
+                cowLocation.add(direction)
+                cowLocation.add(Vector(-direction.z, 0.0, direction.x).multiply(i * 1.5))
+                cowLocation.add(Vector(0, j, 0))
+
+                val cow = player.world.spawn(cowLocation, Cow::class.java)
+                cows.add(cow)
+
+                val cowDirection = player.location.direction.clone()
+                cowDirection.y = 0.0
+                cowDirection.normalize()
+                cowDirection.multiply(0.85)
+                cowDirection.y = -0.2
+
+                cowDirections[cow] = cowDirection
+                lastCowLocations[cow] = cowLocation
+                lastMoveTime[cow] = System.currentTimeMillis()
+            }
         }
 
-        // Track death to cleanup ids
-        listeners.add(
-            event<EntityDeathEvent> {
-                val entity = entity
-                if (entity.uniqueId in activeCowIds) {
-                    activeCowIds.remove(entity.uniqueId)
-                }
+        player.playSound(player.eyeLocation, Sound.ENTITY_COW_AMBIENT, 2f, 0.6f)
+
+        herdTask?.cancel()
+
+        herdTask = repeatingTask(1) {
+            if (cows.isEmpty()) {
+                cancel()
+                return@repeatingTask
             }
-        )
 
-        val lastHitTickByCowAndPlayer = mutableMapOf<UUID, MutableMap<UUID, Int>>()
+            if (getElaspedSinceLastActivation() >= durationMs) {
+                cancel()
 
-        var tick = 0
-        runnables.add(
-            repeatingTask(1) {
-                // End condition
-                if (tick >= durationTicks) {
-                    spawnedCows.forEach { if (it.isValid) it.remove() }
-                    cancel()
-                    return@repeatingTask
+                cows.removeIf { cow ->
+                    if (cow.isValid) {
+                        cow.world.spawnParticle(Particle.EXPLOSION, cow.location.add(0.0, 1.0, 0.0), 1, 0)
+                    }
+
+                    true
                 }
 
-                spawnedCows.removeIf { !it.isValid }
-                if (spawnedCows.isEmpty()) {
-                    cancel()
-                    return@repeatingTask
+                return@repeatingTask
+            }
+
+            cows.removeIf { cow ->
+                if (lastCowLocations[cow] != null && cow.location.distance(lastCowLocations[cow]!!) > 1.0) {
+                    lastCowLocations[cow] = cow.location
+                    lastMoveTime[cow] = System.currentTimeMillis()
                 }
 
-                spawnedCows.forEach { cow ->
-                    // Maintain velocity in a straight line
-                    cow.velocity = dir.clone().multiply(cowSpeed)
+                if ((System.currentTimeMillis() - (lastMoveTime[cow] ?: 0)) >= stuckTimeMs) {
+                    if (cow.isValid) {
+                        cow.world.spawnParticle(Particle.EXPLOSION, cow.location.add(0.0, 1.0, 0.0), 1, 0)
+                    }
 
-                    // Visuals
-                    cow.world.spawnParticle(
-                        Particle.CLOUD,
-                        cow.location.add(0.0, 0.8, 0.0),
-                        2,
-                        0.1,
-                        0.1,
-                        0.1,
-                        0.0,
-                    )
+                    return@removeIf true
+                }
 
-                    // Damage detection
-                    val nearby =
-                        cow.world.getNearbyEntities(
-                            cow.location,
-                            contactRadius,
-                            contactRadius,
-                            contactRadius,
-                        )
-                    nearby.forEach { ent ->
-                        val victim = (ent as? Player) ?: return@forEach
-                        if (victim == player) return@forEach
-
-                        val cowMap =
-                            lastHitTickByCowAndPlayer.getOrPut(cow.uniqueId) { mutableMapOf() }
-                        val lastHit = cowMap[victim.uniqueId] ?: -9999
-                        if (tick - lastHit < hitCooldownTicks) return@forEach
-
-                        // Apply damage and knockback
-                        SmashDamageEvent(victim, Damager.DamagerLivingEntity(player), damagePerHit)
-                            .callEvent()
-
-                        victim.world.playSound(
-                            victim.location,
-                            Sound.ENTITY_GENERIC_EXPLODE,
-                            0.6f,
-                            1f,
-                        )
-                        victim.world.spawnParticle(
-                            Particle.EXPLOSION,
-                            victim.location.add(0.0, 0.2, 0.0),
-                            1,
-                        )
-
-                        // Dedicated melee-style knockback using our multiplier (projectile null)
-                        victim.doKnockback(
-                            knockbackMultiplier,
-                            damagePerHit,
-                            (victim as LivingEntity).health,
-                            cow.location.toVector(),
-                            null,
-                        )
-
-                        cowMap[victim.uniqueId] = tick
+                if (cow.isOnGround) {
+                    cowDirections[cow]?.let {
+                        cowDirections[cow] = it.setY(0.1)
+                    }
+                } else {
+                    cowDirections[cow]?.let {
+                        cowDirections[cow] = it.setY(Math.max(-1.0, it.y - 0.03))
                     }
                 }
 
-                tick++
-            }
-        )
+                if (cow.isOnGround && System.currentTimeMillis() - (lastMoveTime[cow] ?: 0) >= forceMoveTimeMs) {
+                    cowDirections[cow]?.let {
+                        cow.velocity = it.clone().add(Vector(0.0, 0.75, 0.0))
+                    }
+                } else {
+                    cowDirections[cow]?.let {
+                        cow.velocity = it
+                    }
+                }
 
-        player.playSound(player.location, Sound.ENTITY_COW_AMBIENT, 2f, 0.6f)
-        super.activate()
+                if (Math.random() > 0.99) {
+                    cow.world.playSound(cow.location, Sound.ENTITY_COW_AMBIENT, 1f, 1f)
+                }
+
+                if (Math.random() > 0.97) {
+                    cow.world.playSound(cow.location, Sound.ENTITY_COW_STEP, 1f, 1.2f)
+                }
+
+                player.world.players
+                    .filter { it != player && cow.location.distance(it.location) < hitboxRadius }
+                    .forEach {
+                        lastDamageTime.putIfAbsent(it, 0L)
+
+                        if ((System.currentTimeMillis() - (lastDamageTime[it] ?: 0)) < damageCooldownMs) {
+                            return@forEach
+                        }
+
+                        lastDamageTime[it] = System.currentTimeMillis()
+
+                        val damageEvent = SmashDamageEvent(it, Damager.DamagerLivingEntity(player), cowDamage).apply {
+                            knockbackMultiplier = knockback
+                        }
+
+                        damageEvent.callEvent()
+                        cow.world.spawnParticle(Particle.EXPLOSION, cow.location.addY(1.0), 1, 0)
+                        cow.world.playSound(cow.location, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.75f, 0.8f)
+                        cow.world.playSound(cow.location, Sound.ENTITY_COW_HURT, 1.5f, 0.75f)
+                    }
+
+                false
+            }
+        }
     }
 }
