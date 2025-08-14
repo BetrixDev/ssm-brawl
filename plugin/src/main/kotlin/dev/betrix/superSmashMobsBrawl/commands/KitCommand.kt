@@ -14,6 +14,13 @@ import org.koin.core.component.inject
 class KitCommand : KoinComponent {
     private val lang: LangService by inject()
 
+    @Execute(name = "cow")
+    fun cowKit(@Context player: Player) {
+        KitService.playerSelectKit(player, "cow")
+
+        onSuccess(player, "cow")
+    }
+
     @Execute(name = "creeper")
     fun creeperKit(@Context player: Player) {
         KitService.playerSelectKit(player, "creeper")
