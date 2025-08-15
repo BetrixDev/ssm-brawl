@@ -212,8 +212,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
         // Avoid client-side item cooldown visuals affecting combat rhythm; we keep only our timers
         try {
             player.setCooldown(hotbarItemStack, 0)
-        } catch (_: Throwable) {
-        }
+        } catch (_: Throwable) {}
         player.sendMessage(lang.t("messages.abilities.use.success") { "abilityId" to id })
     }
 

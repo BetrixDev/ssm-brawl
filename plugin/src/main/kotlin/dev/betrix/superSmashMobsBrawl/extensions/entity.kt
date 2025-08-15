@@ -10,6 +10,9 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.Projectile
 import org.bukkit.util.Vector
 
+val Entity.blocksPerSecond: Double
+    get() = this.velocity.length() * 20
+
 fun Entity.teleport(spawnPoint: SpawnPoint) {
     teleport(Location(world, spawnPoint.x, spawnPoint.y, spawnPoint.z))
 }
