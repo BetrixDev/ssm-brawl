@@ -200,6 +200,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             player.gameMode = GameMode.SPECTATOR
             player.allowFlight = true
             player.isFlying = true
+            player.fallDistance = 0f
 
             val respawnDelay = minigameData.respawnDelaySeconds ?: 0
 
