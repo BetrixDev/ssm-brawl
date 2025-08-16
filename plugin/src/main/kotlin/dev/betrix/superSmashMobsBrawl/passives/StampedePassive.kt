@@ -26,72 +26,105 @@ class StampedePassive(player: Player) : BrawlPassive("stampede", player) {
         super.setup()
 
         runnable?.cancel()
-        runnable = repeatingTask(1) {
-            ticks = (ticks + 1) % 5
+        runnable =
+            repeatingTask(1) {
+                ticks = (ticks + 1) % 5
 
-            if (ticks != 0) {
-                return@repeatingTask
-            }
-
-            if (stacks == -1) {
-                if (player.isSprinting || !player.location.block.isLiquid) {
-                    startTimeMs = System.currentTimeMillis()
-                    stacks = 0
+                if (ticks != 0) {
+                    return@repeatingTask
                 }
 
-                return@repeatingTask
-            }
-
-            if (!player.isSprinting || player.location.block.isLiquid) {
-                removeStampede()
-                return@repeatingTask
-            }
-
-            if (stacks > 0) {
-                player.removePotionEffect(PotionEffectType.SPEED)
-                player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 38, stacks - 1, false, false))
-            }
-
-            if (System.currentTimeMillis() - startTimeMs < stackIncreaseTimeMs) {
-                return@repeatingTask
-            }
-
-            startTimeMs = System.currentTimeMillis()
-
-            if (stacks < maxStacks) {
-                stacks++
-                player.world.playSound(player.eyeLocation, Sound.ENTITY_COW_HURT, 2f, 0.75f + 0.25f * stacks)
-            }
-        }
-
-        listeners.add(event<SmashDamageEvent> {
-            when (victim) {
-                player -> {
-                    if (isCancelled || damage < stopSprintDamage) {
-                        return@event
+                if (stacks == -1) {
+                    if (player.isSprinting || !player.location.block.isLiquid) {
+                        startTimeMs = System.currentTimeMillis()
+                        stacks = 0
                     }
 
-                    removeStampede()
+                    return@repeatingTask
                 }
 
-                else -> {
-                    if (isCancelled || damageType != SmashDamageType.MeleeAttack || stacks <= 0) {
-                        return@event
-                    }
-
-                    damage += stacks
-                    knockbackMultiplier *= 1 + 0.1 * stacks
-
-                    player.world.playSound(player.eyeLocation, Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1f, 2f)
-                    player.world.playSound(player.eyeLocation, Sound.ENTITY_COW_HURT, 2f, 2f)
+                if (!player.isSprinting || player.location.block.isLiquid) {
                     removeStampede()
+                    return@repeatingTask
+                }
+
+                if (stacks > 0) {
+                    player.removePotionEffect(PotionEffectType.SPEED)
+                    player.addPotionEffect(
+                        PotionEffect(PotionEffectType.SPEED, 38, stacks - 1, false, false)
+                    )
+                }
+
+                if (stacks < maxStacks) {
+                    val elapsedMs = System.currentTimeMillis() - startTimeMs
+                    val denominator =
+                        if (stackIncreaseTimeMs > 0) stackIncreaseTimeMs.toFloat() else 1f
+                    player.exp = kotlin.math.min(0.9999f, elapsedMs.toFloat() / denominator)
+                } else {
+                    player.exp = 0.9999f
+                }
+
+                if (System.currentTimeMillis() - startTimeMs < stackIncreaseTimeMs) {
+                    return@repeatingTask
+                }
+
+                startTimeMs = System.currentTimeMillis()
+
+                if (stacks < maxStacks) {
+                    stacks++
+                    player.world.playSound(
+                        player.eyeLocation,
+                        Sound.ENTITY_COW_HURT,
+                        2f,
+                        0.75f + 0.25f * stacks,
+                    )
                 }
             }
-        })
+        runnable?.let { runnables.add(it) }
+
+        listeners.add(
+            event<SmashDamageEvent> {
+                when (victim) {
+                    player -> {
+                        if (isCancelled || damage < stopSprintDamage) {
+                            return@event
+                        }
+
+                        removeStampede()
+                    }
+
+                    else -> {
+                        if (
+                            isCancelled || damageType != SmashDamageType.MeleeAttack || stacks <= 0
+                        ) {
+                            return@event
+                        }
+
+                        damage += stacks
+                        knockbackMultiplier *= 1 + 0.1 * stacks
+
+                        player.world.playSound(
+                            player.eyeLocation,
+                            Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR,
+                            1f,
+                            2f,
+                        )
+                        player.world.playSound(player.eyeLocation, Sound.ENTITY_COW_HURT, 2f, 2f)
+                        removeStampede()
+                    }
+                }
+            }
+        )
     }
 
     private fun removeStampede() {
-        stacks = -1;
+        stacks = -1
         player.removePotionEffect(PotionEffectType.SPEED)
+        player.exp = 0f
+    }
+
+    override fun teardown() {
+        removeStampede()
+        super.teardown()
     }
 }

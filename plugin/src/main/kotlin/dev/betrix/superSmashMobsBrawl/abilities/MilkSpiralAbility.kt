@@ -30,7 +30,8 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
         spiralRunnable?.cancel()
 
         val direction = player.location.direction
-        val spiralLocation = player.location.clone().add(Vector(0.0, 1.0, 0.0)).add(direction.clone().multiply(2))
+        val spiralLocation =
+            player.location.clone().add(Vector(0.0, 1.0, 0.0)).add(direction.clone().multiply(2))
         var doVelocity = true
         var first = true
 
@@ -93,13 +94,15 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
                         .location(firstParticle)
                         .count(1)
                         .extra(0.0)
-                        .receivers(96, true).spawn()
+                        .receivers(96, true)
+                        .spawn()
 
                     Particle.FIREWORK.builder()
                         .location(secondParticle)
                         .count(1)
                         .extra(0.0)
-                        .receivers(96, true).spawn()
+                        .receivers(96, true)
+                        .spawn()
 
                     val distance = totalDistance / 4
                     oldLocation.add(direction.clone().multiply(distance))
@@ -112,7 +115,7 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
                     .forEach {
                         if (
                             lastDamageTime[it] != null &&
-                            System.currentTimeMillis() - lastDamageTime[it]!! < damageCooldownMs
+                                System.currentTimeMillis() - lastDamageTime[it]!! < damageCooldownMs
                         ) {
                             return@forEach
                         }
