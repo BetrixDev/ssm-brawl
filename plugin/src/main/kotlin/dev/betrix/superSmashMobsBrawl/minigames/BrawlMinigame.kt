@@ -33,9 +33,11 @@ import java.time.Duration
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import org.bukkit.GameMode
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
@@ -57,7 +59,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     protected val minigameData: TMinigameDef by lazy {
         (dataService.getMinigame(minigameId)
             ?: throw RuntimeException("Could not find minigame data for id $minigameId"))
-            as TMinigameDef
+                as TMinigameDef
     }
 
     lateinit var brawlWorld: BrawlGameWorld
@@ -142,7 +144,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 if (
                     cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
-                        cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
+                    cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
                 )
                     return@event
 
@@ -155,10 +157,10 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 val meleeDamage = attackerKit?.getMeleeDamage() ?: damage
 
                 SmashDamageEvent(
-                        victimPlayer,
-                        Damager.DamagerLivingEntity(damagerPlayer),
-                        meleeDamage,
-                    )
+                    victimPlayer,
+                    Damager.DamagerLivingEntity(damagerPlayer),
+                    meleeDamage,
+                )
                     .callEvent()
             }
         )
@@ -184,7 +186,8 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 player.inventory.setItemInOffHand(
                     org.bukkit.inventory.ItemStack.of(org.bukkit.Material.AIR)
                 )
-            } catch (_: Throwable) {}
+            } catch (_: Throwable) {
+            }
         }
 
         state = MinigameState.STARTING
@@ -194,6 +197,12 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
     open suspend fun onPlayerDeath(player: Player) {
         kitService.unassignKit(player)?.let { assignedKits.removeIf { it.first == player } }
+
+        player.world.strikeLightningEffect(player.location)
+
+        gg.flyte.twilight.scheduler.delay(1) {
+            player.playSound(player.eyeLocation, Sound.ENTITY_PLAYER_HURT, 1f, 1f)
+        }
 
         if (minigameData.respawnDelaySeconds != null) {
             player.teleport(brawlWorld.data.spectatorSpawnPoint)
@@ -222,7 +231,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 player.showTitle(title)
 
-                kotlinx.coroutines.delay(1.seconds)
+                delay(1.seconds)
             }
         }
 
@@ -230,7 +239,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             brawlWorld.data.spawnPoints.getFarthestFromPlayers(
                 players.filter { it != player },
                 brawlWorld.world,
-            ) ?: SpawnPoint(100.0, 100.0, 100.0)
+            ) ?: SpawnPoint(0.0, 100.0, 0.0)
 
         player.teleport(spawnPoint)
         player.feed()
