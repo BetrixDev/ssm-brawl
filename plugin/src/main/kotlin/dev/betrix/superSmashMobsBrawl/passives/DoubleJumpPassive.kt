@@ -84,7 +84,10 @@ class DoubleJumpPassive(player: Player) : BrawlPassive("double_jump", player) {
 
     override fun teardown() {
         super.teardown()
-        player.allowFlight = false
+        if (player.gameMode != GameMode.SPECTATOR && player.gameMode != GameMode.CREATIVE) {
+            player.isFlying = false
+            player.allowFlight = false
+        }
         canDoubleJump = false
     }
 }

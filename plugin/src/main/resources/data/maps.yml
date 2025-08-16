@@ -6,7 +6,7 @@ gameMaps:
     creators: [8ebcc57e-89df-4454-95b0-e7edc0071ac0]
     spectatorSpawnPoint:
       x: 0.0
-      y: 150.0
+      y: 110.0
       z: 45.0
       yaw: 0.0
       pitch: 0.0

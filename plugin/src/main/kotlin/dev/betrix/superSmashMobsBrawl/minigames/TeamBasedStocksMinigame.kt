@@ -89,6 +89,7 @@ open class TeamBasedStocksMinigame(
         player.gameMode = GameMode.SPECTATOR
         player.allowFlight = true
         player.isFlying = true
+        player.fallDistance = 0f
         player.feed()
         player.heal()
 
