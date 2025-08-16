@@ -33,7 +33,6 @@ import java.time.Duration
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import org.bukkit.GameMode
@@ -59,7 +58,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     protected val minigameData: TMinigameDef by lazy {
         (dataService.getMinigame(minigameId)
             ?: throw RuntimeException("Could not find minigame data for id $minigameId"))
-                as TMinigameDef
+            as TMinigameDef
     }
 
     lateinit var brawlWorld: BrawlGameWorld
@@ -144,7 +143,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 if (
                     cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
-                    cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
+                        cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
                 )
                     return@event
 
@@ -157,10 +156,10 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 val meleeDamage = attackerKit?.getMeleeDamage() ?: damage
 
                 SmashDamageEvent(
-                    victimPlayer,
-                    Damager.DamagerLivingEntity(damagerPlayer),
-                    meleeDamage,
-                )
+                        victimPlayer,
+                        Damager.DamagerLivingEntity(damagerPlayer),
+                        meleeDamage,
+                    )
                     .callEvent()
             }
         )
@@ -186,8 +185,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 player.inventory.setItemInOffHand(
                     org.bukkit.inventory.ItemStack.of(org.bukkit.Material.AIR)
                 )
-            } catch (_: Throwable) {
-            }
+            } catch (_: Throwable) {}
         }
 
         state = MinigameState.STARTING
