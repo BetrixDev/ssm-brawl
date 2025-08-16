@@ -18,20 +18,22 @@ class AngryHerdAbility(player: Player) : BrawlAbility("angry_herd", player) {
     private val cowDirections = mutableMapOf<Entity, Vector>()
     private val lastCowLocation = mutableMapOf<Entity, Location>()
     private val lastMoveTime = mutableMapOf<Entity, Long>()
-    protected val lastDamageTime = mutableMapOf<Player, Long>()
+    private val lastDamageTime = mutableMapOf<Player, Long>()
 
-    protected val stuckTimeMs: Long = 300
-    protected val forceMoveTimeMs: Long = 350
-    protected val durationMs: Long = 2500
-    protected val hitboxRadius: Double = 2.2
-    protected val damageCooldownMs: Long = 600
-    protected val damage: Double = 5.0
-    protected val cowAmountRadius: Int = 3
-    protected val cowAmountHeight: Int = 1
-    protected val knockback: Double = 1.25
+    private val stuckTimeMs: Long = metadata.long("stuckTimeMs") ?: 300
+    private val forceMoveTimeMs: Long = metadata.long("forceMoveTimeMs") ?: 350
+    private val durationMs: Long = metadata.long("durationMs") ?: 2500
+    private val hitboxRadius: Double = metadata.double("hitboxRadius") ?: 2.2
+    private val damageCooldownMs: Long = metadata.long("damageCooldownMs") ?: 600
+    private val damage: Double = metadata.double("damage") ?: 5.0
+    private val cowAmountRadius: Int = metadata.int("cowAmountRadius") ?: 3
+    private val cowAmountHeight: Int = metadata.int("cowAmountHeight") ?: 1
+    private val knockback: Double = metadata.double("knockback") ?: 1.25
 
     override fun teardown() {
         super.teardown()
+        herdTask?.cancel()
+        herdTask = null
     }
 
     override fun activate() {
@@ -83,7 +85,7 @@ class AngryHerdAbility(player: Player) : BrawlAbility("angry_herd", player) {
         herdTask =
             repeatingTask(1) task@{
                 // End condition: owner null or ability duration elapsed
-                if (elaspedSinceLastActivation >= durationMs) {
+                if (elapsedSinceLastActivation >= durationMs) {
                     // Cleanup cows
                     cows.forEach { cow ->
                         if (cow.isValid) {
@@ -129,7 +131,7 @@ class AngryHerdAbility(player: Player) : BrawlAbility("angry_herd", player) {
 
                     if (
                         cow.isOnGround &&
-                            System.currentTimeMillis() - (lastMoveTime[cow] ?: 0) >= forceMoveTimeMs
+                        System.currentTimeMillis() - (lastMoveTime[cow] ?: 0) >= forceMoveTimeMs
                     ) {
                         cow.velocity =
                             cowDirections[cow]?.clone()?.add(Vector(0.0, 0.75, 0.0)) ?: Vector()
@@ -179,5 +181,7 @@ class AngryHerdAbility(player: Player) : BrawlAbility("angry_herd", player) {
                     }
                 }
             }
+
+        herdTask?.let { runnables.add(it) }
     }
 }

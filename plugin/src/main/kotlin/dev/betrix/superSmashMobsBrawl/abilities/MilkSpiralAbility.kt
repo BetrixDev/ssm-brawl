@@ -37,12 +37,12 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
 
         spiralRunnable =
             repeatingTask(1) {
-                if (elaspedSinceLastActivation >= spiralDurationMs) {
+                if (elapsedSinceLastActivation >= spiralDurationMs) {
                     cancel()
                     return@repeatingTask
                 }
 
-                if (player.isSneaking || elaspedSinceLastActivation >= velocityDurationMs) {
+                if (player.isSneaking || elapsedSinceLastActivation >= velocityDurationMs) {
                     doVelocity = false
                 }
 
@@ -115,7 +115,7 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
                     .forEach {
                         if (
                             lastDamageTime[it] != null &&
-                                System.currentTimeMillis() - lastDamageTime[it]!! < damageCooldownMs
+                            System.currentTimeMillis() - lastDamageTime[it]!! < damageCooldownMs
                         ) {
                             return@forEach
                         }
@@ -150,6 +150,14 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
                             .callEvent()
                     }
             }
+
+        spiralRunnable?.let { runnables.add(it) }
+    }
+
+    override fun teardown() {
+        spiralRunnable?.cancel()
+        spiralRunnable = null
+        super.teardown()
     }
 
     private fun getCirclePoint(

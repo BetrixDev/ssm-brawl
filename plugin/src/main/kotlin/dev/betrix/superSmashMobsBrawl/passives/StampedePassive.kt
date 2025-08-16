@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.passives
 
+import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
 import gg.flyte.twilight.event.event
@@ -14,7 +15,7 @@ class StampedePassive(player: Player) : BrawlPassive("stampede", player) {
 
     private val stackIncreaseTimeMs = metadata.long("stackIncreaseTimeMs") ?: 3000
     private val maxStacks = metadata.int("maxStacks") ?: 3
-    private val stopSprintDamage = metadata.int("damage") ?: 3
+    private val stopSprintDamage = metadata.int("stopSprintDamage") ?: 3
 
     private var startTimeMs = 0L
     private var ticks = 0
@@ -35,7 +36,7 @@ class StampedePassive(player: Player) : BrawlPassive("stampede", player) {
                 }
 
                 if (stacks == -1) {
-                    if (player.isSprinting || !player.location.block.isLiquid) {
+                    if (player.isSprinting && !player.location.block.isLiquid) {
                         startTimeMs = System.currentTimeMillis()
                         stacks = 0
                     }
@@ -97,6 +98,10 @@ class StampedePassive(player: Player) : BrawlPassive("stampede", player) {
                         if (
                             isCancelled || damageType != SmashDamageType.MeleeAttack || stacks <= 0
                         ) {
+                            return@event
+                        }
+
+                        if (damager is Damager.DamagerLivingEntity && damager.livingEntity != player) {
                             return@event
                         }
 
