@@ -131,7 +131,7 @@ class AngryHerdAbility(player: Player) : BrawlAbility("angry_herd", player) {
 
                     if (
                         cow.isOnGround &&
-                        System.currentTimeMillis() - (lastMoveTime[cow] ?: 0) >= forceMoveTimeMs
+                            System.currentTimeMillis() - (lastMoveTime[cow] ?: 0) >= forceMoveTimeMs
                     ) {
                         cow.velocity =
                             cowDirections[cow]?.clone()?.add(Vector(0.0, 0.75, 0.0)) ?: Vector()

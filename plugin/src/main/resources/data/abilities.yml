@@ -63,3 +63,13 @@ abilities:
       damage: 5.0
       maxTargets: 2
       hitCooldownTicks: 10
+
+  - id: blink
+    cooldown: 6.0
+    itemSlot: 1
+    type: recovery
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: ender_pearl
+    metadata:
+      teleportDistance: 16.0

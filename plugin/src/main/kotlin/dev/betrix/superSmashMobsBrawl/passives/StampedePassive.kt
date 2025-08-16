@@ -101,7 +101,9 @@ class StampedePassive(player: Player) : BrawlPassive("stampede", player) {
                             return@event
                         }
 
-                        if (damager is Damager.DamagerLivingEntity && damager.livingEntity != player) {
+                        if (
+                            damager is Damager.DamagerLivingEntity && damager.livingEntity != player
+                        ) {
                             return@event
                         }
 

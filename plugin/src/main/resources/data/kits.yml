@@ -1,5 +1,5 @@
 kits:
-  # Hub Kit
+  # Hub
   - id: hub
     userFacing: false
     meleeDamage: 0.0
@@ -13,7 +13,7 @@ kits:
       leggings: iron_leggings
       boots: iron_boots
 
-  # Creeper Kit
+  # Creeper
   - id: creeper
     meleeDamage: 6.0
     armor: 4.0
@@ -35,7 +35,7 @@ kits:
       leggings: iron_leggings
       boots: iron_boots
 
-  # Skeleton Kit
+  # Skeleton
   - id: skeleton
     meleeDamage: 5.0
     armor: 6.0
@@ -64,7 +64,7 @@ kits:
       leggings: iron_leggings
       boots: iron_boots
 
-  # Cow Kit
+  # Cow
   - id: cow
     meleeDamage: 6.0
     armor: 6.5
@@ -86,3 +86,24 @@ kits:
       chestplate: chainmail_chestplate
       leggings: iron_leggings
       boots: iron_boots
+
+  # Enderman
+  - id: enderman
+    meleeDamage: 7.0
+    armor: 6.0
+    knockbackMultiplier: 1.25
+    disguiseId: enderman
+    passives:
+      - id: double_jump
+      - id: regeneration
+        overrides:
+          metadata:
+            regenRate: 0.25
+      - id: hunger
+    abilities:
+      - id: blink
+    armorItems:
+      helmet: chainmail_helmet
+      chestplate: chainmail_chestplate
+      leggings: chainmail_leggings
+      boots: chainmail_boots

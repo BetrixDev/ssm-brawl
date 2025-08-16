@@ -115,7 +115,7 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
                     .forEach {
                         if (
                             lastDamageTime[it] != null &&
-                            System.currentTimeMillis() - lastDamageTime[it]!! < damageCooldownMs
+                                System.currentTimeMillis() - lastDamageTime[it]!! < damageCooldownMs
                         ) {
                             return@forEach
                         }

@@ -57,25 +57,12 @@ class SulphurBombProjectile(
         // Make particles less early on so it doesn't block the shooter's screen
         val particleCount = min(projectile.ticksLived, 8)
 
-        projectile.world.spawnParticle(
-            Particle.SMOKE,
-            projectile.location,
-            particleCount,
-            0.1,
-            0.1,
-            0.1,
-            0.01,
-        )
-
-        projectile.world.spawnParticle(
-            Particle.FIREFLY,
-            projectile.location,
-            1,
-            0.1,
-            0.1,
-            0.1,
-            0.01,
-        )
+        Particle.SMOKE.builder()
+            .location(projectile.location)
+            .count(particleCount)
+            .offset(0.1, 0.1, 0.1)
+            .receivers(96, true)
+            .spawn()
     }
 
     private fun onHitEffects() {
