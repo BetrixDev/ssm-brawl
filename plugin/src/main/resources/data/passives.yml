@@ -17,3 +17,12 @@ passives:
   - id: barrage
     displayItem: spectral_arrow
     userFacing: true
+
+  - id: stampede
+    displayItem: leather
+    userFacing: true
+    metadata:
+      maxLevel: 4
+      ticksPerLevel: 60
+      extraDamagePerLevel: 0.5
+      extraKnockbackPerLevel: 0.1

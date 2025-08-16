@@ -30,3 +30,36 @@ abilities:
     usage: left_click
     hotbarItem: bow
     displayItem: arrow
+
+  - id: angry_herd
+    cooldown: 13.0
+    itemSlot: 0
+    type: aoe
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: cow_spawn_egg
+    metadata:
+      cowsCount: 5
+      cowSpeed: 0.9
+      contactRadius: 1.2
+      durationTicks: 60
+      damagePerHit: 5.0
+      knockbackMultiplier: 1.25
+      hitCooldownTicks: 10
+
+  - id: milk_spiral
+    cooldown: 9.0
+    itemSlot: 1
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: milk_bucket
+    metadata:
+      durationTicks: 160
+      propelTicks: 80
+      helixRadius: 1.5
+      centerSpeed: 0.9
+      playerSpeed: 1.0
+      damage: 5.0
+      maxTargets: 2
+      hitCooldownTicks: 10

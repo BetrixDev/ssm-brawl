@@ -10,6 +10,8 @@ sealed class SmashDamageType {
     data object Projectile : SmashDamageType()
 
     data object Explosion : SmashDamageType()
+
+    data object MeleeAttack : SmashDamageType()
 }
 
 sealed class Damager {
@@ -21,8 +23,8 @@ sealed class Damager {
 class SmashDamageEvent(
     val victim: LivingEntity,
     val damager: Damager?,
-    val damage: Double,
-    val knockbackMultiplier: Double = 1.0,
+    var damage: Double,
+    var knockbackMultiplier: Double = 1.0,
     val damageType: SmashDamageType? = null,
 ) : TwilightEvent() {
 

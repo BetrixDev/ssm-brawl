@@ -60,6 +60,7 @@ abstract class BrawlDisguise(protected val player: Player) : Manageable() {
 
         disguise.entity = player
         disguise.notifyBar = null
+        disguise.isSelfDisguiseVisible = false
 
         DisguiseAPI.disguiseToAll(player, disguise)
         disguise.startDisguise()
