@@ -30,8 +30,9 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
         spiralRunnable?.cancel()
 
         val direction = player.location.direction
-        val spiralLocation = player.location.clone().addY(1.0).add(direction.clone().multiply(2))
+        val spiralLocation = player.location.clone().add(Vector(0.0, 1.0, 0.0)).add(direction.clone().multiply(2))
         var doVelocity = true
+        var first = true
 
         spiralRunnable =
             repeatingTask(1) {
@@ -59,8 +60,7 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
 
                 val speed = 3
                 val radius = 1.5
-                val theta = (player.ticksLived / speed).toDouble()
-                var first = true
+                var theta = player.ticksLived.toDouble() / speed
                 var totalAddedDistance = 0.0
 
                 while (totalAddedDistance < totalDistance) {
@@ -103,6 +103,7 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
 
                     val distance = totalDistance / 4
                     oldLocation.add(direction.clone().multiply(distance))
+                    theta += (1.0 / speed) * (distance / totalDistance)
                     totalAddedDistance += distance
                 }
 
