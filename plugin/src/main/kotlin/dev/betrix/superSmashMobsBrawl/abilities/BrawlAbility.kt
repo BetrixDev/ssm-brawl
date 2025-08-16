@@ -56,9 +56,8 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
 
     protected lateinit var hotbarItemStack: ItemStack
 
-    protected fun getElaspedSinceLastActivation(): Long {
-        return System.currentTimeMillis() - lastUsed
-    }
+    protected val elaspedSinceLastActivation: Long
+        get() = System.currentTimeMillis() - lastUsed
 
     protected val metadata: MetadataAccessor =
         object : MetadataAccessor {
@@ -234,19 +233,17 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
 
     protected fun isOnCooldown(): Boolean {
         val cooldownMs = abilityData.cooldown * 1000L
-        return System.currentTimeMillis() - lastUsed < cooldownMs
+        return elaspedSinceLastActivation < cooldownMs
     }
 
     protected fun getRemainingCooldown(): Int {
         val cooldownMs = (abilityData.cooldown * 1000).toLong()
-        val elapsed = System.currentTimeMillis() - lastUsed
-        return ((cooldownMs - elapsed) / 1000).coerceAtLeast(0).toInt()
+        return ((cooldownMs - elaspedSinceLastActivation) / 1000).coerceAtLeast(0).toInt()
     }
 
     private fun getRemainingCooldownTicks(): Int {
         val cooldownMs = (abilityData.cooldown * 1000).toLong()
-        val elapsed = System.currentTimeMillis() - lastUsed
-        val remainingMs = (cooldownMs - elapsed).coerceAtLeast(0)
+        val remainingMs = (cooldownMs - elaspedSinceLastActivation).coerceAtLeast(0)
         return (remainingMs / 50).toInt() // 1 tick = 50 ms
     }
 

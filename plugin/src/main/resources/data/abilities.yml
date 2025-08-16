@@ -48,7 +48,7 @@ abilities:
       hitCooldownTicks: 10
 
   - id: milk_spiral
-    cooldown: 11.0
+    cooldown: 9.0
     itemSlot: 1
     type: projectile
     usage: right_click

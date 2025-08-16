@@ -2,11 +2,9 @@ package dev.betrix.superSmashMobsBrawl.abilities
 
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
+import gg.flyte.twilight.extension.addY
+import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
-import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -14,92 +12,151 @@ import org.bukkit.util.Vector
 
 class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
 
-    private val durationTicks = metadata.int("durationTicks") ?: 160 // 8s
-    private val propelTicks = metadata.int("propelTicks") ?: 80 // 4s
-    private val helixRadius = metadata.double("helixRadius") ?: 1.5
-    private val centerSpeed = metadata.double("centerSpeed") ?: 0.9
-    private val playerSpeed = metadata.double("playerSpeed") ?: 1.0
+    private val spiralDurationMs = metadata.long("spiralDurationMs") ?: 3000
+    private val velocityDurationMs = metadata.long("velocityDurationMs") ?: 1800
+    private val hitboxRadius = metadata.double("hitboxRadius") ?: 2.0
     private val damage = metadata.double("damage") ?: 5.0
-    private val maxTargets = metadata.int("maxTargets") ?: 2
-    private val hitCooldownTicks = metadata.int("hitCooldownTicks") ?: 10
+    private val maxTimesHit = metadata.int("maxTimesHit") ?: 2
+    private val damageCooldownMs = metadata.long("damageCooldownMs") ?: 250
+
+    private val lastDamageTime = hashMapOf<Player, Long>()
+    private val timesHit = hashMapOf<Player, Int>()
+
+    private var spiralRunnable: TwilightRunnable? = null
 
     override fun activate() {
-        val dir = player.eyeLocation.direction.normalize()
-        var center = player.eyeLocation.clone()
-        var tick = 0
-        val victims = mutableSetOf<Player>()
-        val lastHitTick = mutableMapOf<Player, Int>()
-        var theta = 0.0
+        super.activate()
 
-        runnables.add(
+        spiralRunnable?.cancel()
+
+        val direction = player.location.direction
+        val spiralLocation = player.location.clone().addY(1.0).add(direction.clone().multiply(2))
+        var doVelocity = true
+
+        spiralRunnable =
             repeatingTask(1) {
-                if (tick >= durationTicks || !player.isOnline) {
+                if (elaspedSinceLastActivation >= spiralDurationMs) {
                     cancel()
                     return@repeatingTask
                 }
 
-                // Move spiral center forward
-                center = center.add(dir.clone().multiply(centerSpeed))
-
-                // Propel player for first 4s unless sneaking
-                if (tick < propelTicks && !player.isSneaking) {
-                    player.velocity = dir.clone().multiply(playerSpeed)
+                if (player.isSneaking || elaspedSinceLastActivation >= velocityDurationMs) {
+                    doVelocity = false
                 }
 
-                // Build orthonormal basis perpendicular to dir
-                val up = Vector(0.0, 1.0, 0.0)
-                var right = dir.clone().crossProduct(up)
-                if (right.lengthSquared() < 1e-6) {
-                    right = Vector(1.0, 0.0, 0.0)
-                }
-                right.normalize()
-                val upOrtho = right.clone().crossProduct(dir).normalize()
-
-                // Two helix points
-                val p1 =
-                    center
-                        .clone()
-                        .add(right.clone().multiply(cos(theta) * helixRadius))
-                        .add(upOrtho.clone().multiply(sin(theta) * helixRadius))
-                val p2 =
-                    center
-                        .clone()
-                        .add(right.clone().multiply(cos(theta + PI) * helixRadius))
-                        .add(upOrtho.clone().multiply(sin(theta + PI) * helixRadius))
-
-                // Particles
-                center.world.spawnParticle(Particle.CLOUD, p1, 3, 0.05, 0.05, 0.05, 0.0)
-                center.world.spawnParticle(Particle.CLOUD, p2, 3, 0.05, 0.05, 0.05, 0.0)
-                if (tick % 6 == 0) {
-                    center.world.playSound(center, Sound.ENTITY_COW_MILK, 0.5f, 1.2f)
+                if (doVelocity) {
+                    player.velocity =
+                        direction.clone().add(Vector(0.0, 0.1, 0.0)).normalize().multiply(0.45)
                 }
 
-                // Damage detection near helix points
-                fun damageAt(point: Location) {
-                    if (victims.size >= maxTargets) return
-                    val nearby = point.world.getNearbyPlayers(point, 0.9)
-                    nearby.forEach { target ->
-                        if (target == player) return@forEach
-                        if (victims.size >= maxTargets) return@forEach
-                        val last = lastHitTick[target] ?: -9999
-                        if (tick - last < hitCooldownTicks) return@forEach
+                val oldLocation = spiralLocation.clone()
+                val totalDistance = 0.7
 
-                        SmashDamageEvent(target, Damager.DamagerLivingEntity(player), damage)
-                            .callEvent()
-                        lastHitTick[target] = tick
-                        victims.add(target)
+                spiralLocation.add(direction.clone().multiply(totalDistance))
+
+                val circleFirst = Vector(-direction.z, 0.0, direction.x).normalize()
+                val circleSecond = direction.clone().crossProduct(circleFirst).normalize()
+
+                val speed = 3
+                val radius = 1.5
+                val theta = (player.ticksLived / speed).toDouble()
+                var first = true
+                var totalAddedDistance = 0.0
+
+                while (totalAddedDistance < totalDistance) {
+                    val firstParticle =
+                        oldLocation
+                            .clone()
+                            .add(getCirclePoint(circleFirst, circleSecond, theta, radius))
+                    val secondParticle =
+                        oldLocation
+                            .clone()
+                            .add(getCirclePoint(circleFirst, circleSecond, theta + Math.PI, radius))
+
+                    if (first) {
+                        firstParticle.world.playSound(
+                            firstParticle,
+                            Sound.ENTITY_PLAYER_SPLASH_HIGH_SPEED,
+                            0.2f,
+                            0.75f,
+                        )
+                        secondParticle.world.playSound(
+                            secondParticle,
+                            Sound.ENTITY_PLAYER_SPLASH_HIGH_SPEED,
+                            0.2f,
+                            0.75f,
+                        )
+                        first = false
                     }
+
+                    Particle.FIREWORK.builder()
+                        .location(firstParticle)
+                        .count(1)
+                        .extra(0.0)
+                        .receivers(96, true).spawn()
+
+                    Particle.FIREWORK.builder()
+                        .location(secondParticle)
+                        .count(1)
+                        .extra(0.0)
+                        .receivers(96, true).spawn()
+
+                    val distance = totalDistance / 4
+                    oldLocation.add(direction.clone().multiply(distance))
+                    totalAddedDistance += distance
                 }
 
-                damageAt(p1)
-                damageAt(p2)
+                player.world.players
+                    .filter { it != player }
+                    .forEach {
+                        if (
+                            lastDamageTime[it] != null &&
+                            System.currentTimeMillis() - lastDamageTime[it]!! < damageCooldownMs
+                        ) {
+                            return@forEach
+                        }
 
-                theta += 0.45
-                tick++
+                        if (timesHit[it] != null && timesHit[it]!! >= maxTimesHit) {
+                            return@forEach
+                        }
+
+                        if (it.eyeLocation.distance(spiralLocation) >= hitboxRadius) {
+                            return@forEach
+                        }
+
+                        lastDamageTime[it] = System.currentTimeMillis()
+                        timesHit.putIfAbsent(it, 0)
+                        timesHit[it] = timesHit[it]!! + 1
+
+                        Particle.FIREWORK.builder()
+                            .location(it.location.addY(1.0))
+                            .offset(0.2, 0.2, 0.2)
+                            .count(30)
+                            .extra(0.3)
+                            .receivers(96, true)
+                            .spawn()
+                        it.world.playSound(
+                            it.eyeLocation,
+                            Sound.ENTITY_FISHING_BOBBER_SPLASH,
+                            0.2f,
+                            2f,
+                        )
+
+                        SmashDamageEvent(it, Damager.DamagerLivingEntity(player), damage)
+                            .callEvent()
+                    }
             }
-        )
+    }
 
-        player.playSound(player.location, Sound.ITEM_BUCKET_FILL, 1f, 1.2f)
-        super.activate()
+    private fun getCirclePoint(
+        circleFirst: Vector,
+        circleSecond: Vector,
+        theta: Double,
+        radius: Double,
+    ): Vector {
+        val particleOffset = circleFirst.clone().multiply(Math.cos(theta) * radius)
+        particleOffset.add(circleSecond.clone().multiply(Math.sin(theta) * radius))
+
+        return particleOffset
     }
 }
