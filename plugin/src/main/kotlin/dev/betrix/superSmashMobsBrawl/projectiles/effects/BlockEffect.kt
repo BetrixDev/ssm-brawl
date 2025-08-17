@@ -11,7 +11,13 @@ import org.bukkit.block.data.BlockData
 class BlockEffect(private val blockData: BlockData) : ProjectileEffect {
 
     override fun onTick(projectile: BrawlProjectile) {
-        val particleCount = Math.min(projectile.projectileEntity?.ticksLived ?: 8, 8)
+        val ticksLived = projectile.projectileEntity?.ticksLived ?: 0
+
+        if (ticksLived < 2) {
+            return
+        }
+
+        val particleCount = Math.min(ticksLived, 5)
 
         Particle.BLOCK_CRUMBLE.builder()
             .location(

@@ -11,10 +11,13 @@ import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.*
 import org.bukkit.block.data.BlockData
-import org.bukkit.entity.FallingBlock
+import org.bukkit.entity.BlockDisplay
 import org.bukkit.entity.Player
+import org.bukkit.entity.Snowball
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.util.Vector
+import org.joml.Matrix4f
 
 class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
 
@@ -25,6 +28,8 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
     private val maxDamage = metadata.double("maxDamage") ?: 9.0
     private val damage = metadata.double("damage") ?: 8.0
     private val knockbackMultiplier = metadata.double("knockbackMultiplier") ?: 2.5
+
+    private val activeProjectiles = mutableListOf<BrawlProjectile>()
 
     override fun setup() {
         super.setup()
@@ -88,27 +93,71 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
         val charge = System.currentTimeMillis() - pickupTimeMs
         val multiplier = Math.min(1.4, 1.4 * (charge.toDouble() / chargeTimeMs))
 
+        val displayBlock =
+            player.world.spawn(player.eyeLocation, BlockDisplay::class.java).apply {
+                block = holdingBlockData!!
+            }
+
         val fallingBlock =
-            player.world.spawn(player.eyeLocation, FallingBlock::class.java).apply {
-                blockData = holdingBlockData!!
-                setHurtEntities(false)
-                dropItem = false
+            player.world.spawn(player.eyeLocation, Snowball::class.java).apply {
+                isInvisible = true
+                isInvulnerable = true
+                velocity = Vector()
+                addPassenger(displayBlock)
             }
 
-        BrawlProjectile.custom(player, "Block Toss") { fallingBlock }
-            .addEffect(BlockEffect(holdingBlockData!!))
-            .velocityMultiplier(multiplier)
-            .onHitEntity { entity, projectile ->
-                val blockDamage =
-                    Math.min(maxDamage, projectile.velocityBeforeImpact.length() * damage)
+        val projectile =
+            BrawlProjectile.custom(player, "Block Toss") { fallingBlock }
+                .addEffect(BlockEffect(holdingBlockData!!))
+                .velocityMultiplier(multiplier)
+                .onHitEntity { entity, projectile ->
+                    val blockDamage =
+                        Math.min(maxDamage, projectile.velocityBeforeImpact.length() * damage)
 
-                SmashDamageEvent(entity, Damager.DamagerLivingEntity(player), blockDamage)
-                    .apply { knockbackMultiplier *= this@BlockTossAbility.knockbackMultiplier }
-                    .callEvent()
+                    SmashDamageEvent(entity, Damager.DamagerLivingEntity(player), blockDamage)
+                        .apply { knockbackMultiplier *= this@BlockTossAbility.knockbackMultiplier }
+                        .callEvent()
 
-                ProjectileAction.DESTROY
+                    ProjectileAction.DESTROY
+                }
+                .launch()
+
+        activeProjectiles.add(projectile)
+
+        val scaleFactor = 0.75f
+        var tumbleAngleY = 0f
+        var tumbleAngleX = 0f
+
+        val rotatationStepSpeedTicks = 5
+
+        runnables.add(
+            repeatingTask(rotatationStepSpeedTicks.toLong()) {
+                if (!displayBlock.isValid) {
+                    cancel()
+                    return@repeatingTask
+                }
+
+                if (projectile.projectileEntity?.isValid != true) {
+                    displayBlock.remove()
+                    cancel()
+                    return@repeatingTask
+                }
+
+                tumbleAngleY += 0.40f
+                tumbleAngleX += 0.30f
+
+                val transform =
+                    Matrix4f()
+                        .rotateY(tumbleAngleY)
+                        .rotateX(tumbleAngleX)
+                        .scale(scaleFactor)
+                        .translate(-0.5f, -0.5f, -0.5f)
+
+                displayBlock.setTransformationMatrix(transform)
+                displayBlock.interpolationDelay = 0
+                displayBlock.interpolationDuration = rotatationStepSpeedTicks
             }
-            .launch()
+        )
 
         setDisguiseBlock(null)
     }
