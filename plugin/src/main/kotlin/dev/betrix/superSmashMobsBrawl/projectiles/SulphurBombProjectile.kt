@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.projectiles
 
-import gg.flyte.twilight.extension.add
 import kotlin.math.min
 import org.bukkit.Material
 import org.bukkit.Particle
@@ -62,13 +61,21 @@ class SulphurBombProjectile(
             .count(particleCount)
             .offset(0.1, 0.1, 0.1)
             .receivers(96, true)
+            .extra(0.0)
             .spawn()
     }
 
     private fun onHitEffects() {
         val projectile = projectile ?: return
 
-        projectile.world.spawnParticle(Particle.EXPLOSION, projectile.location.add(0, 0.25, 0), 1)
+        Particle.EXPLOSION.builder()
+            .count(1)
+            .offset(0.5, 0.5, 0.5)
+            .location(projectile.location)
+            .receivers(96, true)
+            .extra(0.0)
+            .spawn()
+
         projectile.world.playSound(projectile.location, Sound.ENTITY_GENERIC_EXPLODE, 1F, 1F)
     }
 }

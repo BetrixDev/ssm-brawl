@@ -2,6 +2,7 @@ package dev.betrix.superSmashMobsBrawl.abilities
 
 import dev.betrix.superSmashMobsBrawl.extensions.getLocationInFrontOfEyes
 import dev.betrix.superSmashMobsBrawl.extensions.interpolateTo
+import gg.flyte.twilight.scheduler.delay
 import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.Particle
@@ -19,7 +20,8 @@ class BlinkAbility(player: Player) : BrawlAbility("blink", player) {
         val endLocation = player.getLocationInFrontOfEyes(teleportDistance)
 
         doTpEffect(startLocation)
-        doTpEffect(endLocation)
+
+        delay(1) { doTpEffect(endLocation) }
 
         startLocation.interpolateTo(endLocation, 0.25).forEach { location ->
             Particle.DUST.builder()

@@ -55,6 +55,10 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
     private var lastCheckForCanActivate = true
 
     protected lateinit var hotbarItemStack: ItemStack
+        private set
+
+    protected var latestInteractEvent: PlayerInteractEvent? = null
+        private set
 
     protected val elapsedSinceLastActivation: Long
         get() = System.currentTimeMillis() - lastUsed
@@ -187,9 +191,10 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
                     return@event
                 }
 
-                isCancelled = true
+                //                isCancelled = true
 
                 if (canActivate()) {
+                    latestInteractEvent = this
                     activate()
                 }
             }

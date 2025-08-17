@@ -73,3 +73,12 @@ abilities:
     displayItem: ender_pearl
     metadata:
       teleportDistance: 16.0
+
+  - id: block_toss
+    cooldown: 2.5
+    itemSlot: 0
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_sword
+    displayItem: grass_block
+    metadata:

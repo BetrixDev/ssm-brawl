@@ -102,6 +102,7 @@ kits:
       - id: hunger
     abilities:
       - id: blink
+      - id: block_toss
     armorItems:
       helmet: chainmail_helmet
       chestplate: chainmail_chestplate
