@@ -279,7 +279,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
         effects.forEach { it.onHit(this, HitType.ENTITY) }
 
         return if (entityHitCallbacks.isEmpty()) {
-            onHitLivingEntity(entity)
+            ProjectileAction.DESTROY
         } else {
             var finalAction = ProjectileAction.CONTINUE
             entityHitCallbacks.forEach { callback ->
@@ -378,9 +378,6 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
             }
         }
     }
-
-    // Default implementations (can be overridden for backward compatibility)
-    open fun onHitLivingEntity(entity: LivingEntity): ProjectileAction = ProjectileAction.DESTROY
 
     open fun onHitBlock(block: Block): Boolean = true
 
