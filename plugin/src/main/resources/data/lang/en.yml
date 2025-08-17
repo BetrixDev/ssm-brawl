@@ -27,10 +27,16 @@ abilities:
     description: ""
   blink:
     name: "Blink"
+    description: ""
+  block_toss:
+    name: "Block Toss"
+    description: ""
   angry_herd:
     name: "Angry Herd"
+    description: ""
   milk_spiral:
     name: "Milk Spiral"
+    description: ""
 maps:
   blue_forest:
     name: "Blue Forest"

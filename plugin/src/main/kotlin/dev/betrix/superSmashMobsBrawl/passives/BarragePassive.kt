@@ -3,7 +3,8 @@ package dev.betrix.superSmashMobsBrawl.passives
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
-import dev.betrix.superSmashMobsBrawl.projectiles.ArrowProjectile
+import dev.betrix.superSmashMobsBrawl.projectiles.BrawlProjectile
+import dev.betrix.superSmashMobsBrawl.projectiles.ProjectileAction
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.delay
@@ -22,8 +23,11 @@ import org.bukkit.util.Vector
 class BarragePassive(player: Player) : BrawlPassive("barrage", player) {
 
     private val maxCharge = metadata.int("maxCharge") ?: 5
+    private val arrowDamage = metadata.double("arrowDamage") ?: 6.0
     private var charge = 0
     private var chargeRunnable: TwilightRunnable? = null
+
+    private val activeProjectiles = mutableListOf<BrawlProjectile>()
 
     override fun setup() {
         listeners.add(
@@ -86,6 +90,8 @@ class BarragePassive(player: Player) : BrawlPassive("barrage", player) {
 
     override fun teardown() {
         finishFiring()
+        activeProjectiles.forEach { it.teardown() }
+        activeProjectiles.clear()
         super.teardown()
     }
 
@@ -102,22 +108,22 @@ class BarragePassive(player: Player) : BrawlPassive("barrage", player) {
                     )
 
                 val arrow =
-                    ArrowProjectile(player, "messages.projectiles.barrage_arrow", 3.0, spread)
-                        .onHitLivingEntity { entity, arrow ->
-                            arrow.projectile?.remove()
-
+                    BrawlProjectile.arrow(player, 3.0, "messages.projectiles.barrage_arrow")
+                        .velocityAddend(spread)
+                        .onHitEntity { entity, _ ->
                             SmashDamageEvent(
                                     entity,
                                     Damager.DamagerLivingEntity(player),
-                                    6.0,
+                                    arrowDamage,
                                     damageType = SmashDamageType.Projectile,
                                 )
                                 .callEvent()
 
-                            true
+                            ProjectileAction.DESTROY
                         }
+                        .launch()
 
-                arrow.launch()
+                activeProjectiles.add(arrow)
 
                 player.playSound(player.eyeLocation, Sound.ENTITY_ARROW_SHOOT, 1f, 1f)
             }

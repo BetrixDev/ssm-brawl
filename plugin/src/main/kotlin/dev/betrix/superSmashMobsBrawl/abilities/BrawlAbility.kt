@@ -137,7 +137,10 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
                 itemMeta = meta
 
                 if (type.isSword) {
-                    setData(DataComponentTypes.BLOCKS_ATTACKS, BlocksAttacks.blocksAttacks().build())
+                    setData(
+                        DataComponentTypes.BLOCKS_ATTACKS,
+                        BlocksAttacks.blocksAttacks().build(),
+                    )
                 }
             }
 
@@ -168,11 +171,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
             }
         )
 
-        listeners.add(
-            event<PlayerInteractEvent>(player) {
-                onPlayerInteract(this)
-            }
-        )
+        listeners.add(event<PlayerInteractEvent>(player) { onPlayerInteract(this) })
     }
 
     override fun teardown() {
@@ -214,7 +213,9 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
     protected fun isCorrectActionForUsage(eventAction: Action): Boolean {
         when (abilityData.usage) {
             AbilityUsage.LEFT_CLICK -> {
-                if (eventAction == Action.LEFT_CLICK_AIR || eventAction == Action.LEFT_CLICK_BLOCK) {
+                if (
+                    eventAction == Action.LEFT_CLICK_AIR || eventAction == Action.LEFT_CLICK_BLOCK
+                ) {
                     return true
                 }
             }
@@ -236,8 +237,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
         // Avoid client-side item cooldown visuals affecting combat rhythm; we keep only our timers
         try {
             player.setCooldown(hotbarItemStack, 0)
-        } catch (_: Throwable) {
-        }
+        } catch (_: Throwable) {}
         player.sendMessage(lang.t("messages.abilities.use.success") { "abilityId" to id })
     }
 

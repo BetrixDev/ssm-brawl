@@ -4,7 +4,8 @@ import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
-import dev.betrix.superSmashMobsBrawl.projectiles.ArrowProjectile
+import dev.betrix.superSmashMobsBrawl.projectiles.BrawlProjectile
+import dev.betrix.superSmashMobsBrawl.projectiles.ProjectileAction
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -15,32 +16,39 @@ class RopedArrowAbility(player: Player) : BrawlAbility("roped_arrow", player) {
     private val arrowVelocityModifier = metadata.double("arrowVelocityModifier") ?: 2.4
     private val arrowDamage = metadata.double("arrowDamage") ?: 6.0
 
+    private val activeProjectiles = mutableListOf<BrawlProjectile>()
+
     override fun activate() {
         super.activate()
 
-        val projectile =
-            ArrowProjectile(player, "abilities.roped_arrow.name", arrowVelocityModifier)
+        val ropedArrow =
+            BrawlProjectile.arrow(player, arrowVelocityModifier, "abilities.roped_arrow.name")
                 .onHitBlock { block, projectile ->
                     pullPlayerToLocation(block.location, projectile.velocityBeforeImpact)
-                    true
+                    ProjectileAction.DESTROY
                 }
-                .onHitLivingEntity { entity, projectile ->
+                .onHitEntity { entity, projectile ->
                     pullPlayerToLocation(entity.location, projectile.velocityBeforeImpact)
 
-                    val damageEvent =
-                        SmashDamageEvent(
+                    SmashDamageEvent(
                             entity,
                             Damager.DamagerLivingEntity(player),
                             arrowDamage,
                             damageType = SmashDamageType.Projectile,
                         )
+                        .callEvent()
 
-                    damageEvent.callEvent()
-
-                    true
+                    ProjectileAction.DESTROY
                 }
+                .launch()
 
-        projectile.launch()
+        activeProjectiles.add(ropedArrow)
+    }
+
+    override fun teardown() {
+        activeProjectiles.forEach { it.teardown() }
+        activeProjectiles.clear()
+        super.teardown()
     }
 
     private fun pullPlayerToLocation(location: Location, velocity: Vector) {
