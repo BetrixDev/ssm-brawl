@@ -4,6 +4,7 @@ import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.extensions.event
 import dev.betrix.superSmashMobsBrawl.extensions.getAs
+import dev.betrix.superSmashMobsBrawl.extensions.isSword
 import dev.betrix.superSmashMobsBrawl.interfaces.MetadataAccessor
 import dev.betrix.superSmashMobsBrawl.models.brawlData.AbilityUsage
 import dev.betrix.superSmashMobsBrawl.services.DataService
@@ -11,6 +12,8 @@ import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import gg.flyte.twilight.scheduler.repeatingTask
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.BlocksAttacks
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -135,6 +138,10 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
                 meta.persistentDataContainer.set(abilityKey, PersistentDataType.STRING, id)
 
                 itemMeta = meta
+
+                if (type.isSword) {
+                    setData(DataComponentTypes.BLOCKS_ATTACKS, BlocksAttacks.blocksAttacks().build())
+                }
             }
 
         val hotBarItemSlot =
@@ -216,7 +223,8 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
         // Avoid client-side item cooldown visuals affecting combat rhythm; we keep only our timers
         try {
             player.setCooldown(hotbarItemStack, 0)
-        } catch (_: Throwable) {}
+        } catch (_: Throwable) {
+        }
         player.sendMessage(lang.t("messages.abilities.use.success") { "abilityId" to id })
     }
 
