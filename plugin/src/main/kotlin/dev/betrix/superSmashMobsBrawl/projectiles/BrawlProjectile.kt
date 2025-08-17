@@ -3,12 +3,12 @@ package dev.betrix.superSmashMobsBrawl.projectiles
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.extensions.disguise
 import dev.betrix.superSmashMobsBrawl.extensions.isAirOrFoliage
-import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
+import dev.betrix.superSmashMobsBrawl.projectiles.effects.StandardImpactEffect
+import dev.betrix.superSmashMobsBrawl.projectiles.effects.StandardTrailEffect
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
-import kotlin.math.min
 import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
@@ -163,12 +163,12 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
 
     fun trailEffect(particle: Particle, count: Int = 1, offset: Vector? = null): BrawlProjectile =
         apply {
-            addEffect(TrailEffect(particle, count, offset ?: Vector(0.1, 0.1, 0.1)))
+            addEffect(StandardTrailEffect(particle, count, offset ?: Vector(0.1, 0.1, 0.1)))
         }
 
     fun impactEffect(particle: Particle, sound: Sound? = null, count: Int = 1): BrawlProjectile =
         apply {
-            addEffect(ImpactEffect(particle, sound, count))
+            addEffect(StandardImpactEffect(particle, sound, count))
         }
 
     fun launch(): BrawlProjectile {
@@ -478,110 +478,5 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
 
         fun custom(owner: Player, name: String, entitySupplier: () -> Entity): CustomProjectile =
             CustomProjectile(owner, name, entitySupplier)
-    }
-}
-
-// Concrete implementations
-class ArrowProjectile(
-    owner: Player,
-    velocityMultiplier: Double = 1.0,
-    name: String = "messages.projectiles.arrow",
-) : BrawlProjectile(owner, name) {
-
-    init {
-        velocityMultiplier(velocityMultiplier)
-        projectileSize(0.5)
-    }
-
-    override fun createProjectileEntity(): Projectile =
-        owner.world.spawn(owner.eyeLocation, Arrow::class.java).apply { shooter = owner }
-}
-
-class PotionProjectile(
-    owner: Player,
-    private val item: ItemStack,
-    name: String = "messages.projectiles.potion",
-) : BrawlProjectile(owner, name) {
-
-    init {
-        projectileSize(0.65)
-    }
-
-    override fun createProjectileEntity(): Projectile =
-        owner.world.spawn(owner.eyeLocation, ThrownPotion::class.java).apply {
-            shooter = owner
-            this.item = this@PotionProjectile.item
-        }
-}
-
-class CustomProjectile(owner: Player, name: String, private val entitySupplier: () -> Entity) :
-    BrawlProjectile(owner, name) {
-
-    override fun createProjectileEntity(): Entity = entitySupplier()
-
-    override fun doVelocity() {
-        projectileEntity?.setVelocity(
-            owner.location.direction,
-            velocityMultiplier,
-            false,
-            0.2,
-            0.0,
-            1.0,
-            true,
-        )
-    }
-}
-
-// Effect implementations
-class TrailEffect(
-    private val particle: Particle,
-    private val count: Int,
-    private val offset: Vector,
-) : ProjectileEffect {
-
-    override fun onTick(projectile: BrawlProjectile) {
-        val entity = projectile.projectileEntity ?: return
-
-        // Make particles less early on so it doesn't block the shooter's screen
-        val particleCount = min(entity.ticksLived, count)
-
-        particle
-            .builder()
-            .location(entity.location)
-            .count(particleCount)
-            .offset(offset.x, offset.y, offset.z)
-            .receivers(96, true)
-            .extra(0.0)
-            .spawn()
-    }
-
-    override fun onHit(projectile: BrawlProjectile, hitType: HitType) {
-        // No special hit behavior for trail effects
-    }
-}
-
-class ImpactEffect(
-    private val particle: Particle,
-    private val sound: Sound?,
-    private val count: Int,
-) : ProjectileEffect {
-
-    override fun onTick(projectile: BrawlProjectile) {
-        // No tick behavior for impact effects
-    }
-
-    override fun onHit(projectile: BrawlProjectile, hitType: HitType) {
-        val entity = projectile.projectileEntity ?: return
-
-        particle
-            .builder()
-            .count(count)
-            .offset(0.5, 0.5, 0.5)
-            .location(entity.location)
-            .receivers(96, true)
-            .extra(0.0)
-            .spawn()
-
-        sound?.let { entity.world.playSound(entity.location, it, 1F, 1F) }
     }
 }

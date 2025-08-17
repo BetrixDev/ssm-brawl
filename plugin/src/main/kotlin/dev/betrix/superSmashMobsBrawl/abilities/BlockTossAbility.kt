@@ -5,16 +5,13 @@ import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.extensions.disguise
 import dev.betrix.superSmashMobsBrawl.projectiles.BrawlProjectile
-import dev.betrix.superSmashMobsBrawl.projectiles.HitType
 import dev.betrix.superSmashMobsBrawl.projectiles.ProjectileAction
-import dev.betrix.superSmashMobsBrawl.projectiles.ProjectileEffect
-import gg.flyte.twilight.extension.addY
+import dev.betrix.superSmashMobsBrawl.projectiles.effects.BlockEffect
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.*
 import org.bukkit.block.data.BlockData
 import org.bukkit.entity.FallingBlock
-import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.EquipmentSlot
@@ -98,57 +95,16 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
                 dropItem = false
             }
 
-        class BlockEffect() : ProjectileEffect {
-            override fun onTick(projectile: BrawlProjectile) {
-                val particleCount = Math.min(projectile.projectileEntity?.ticksLived ?: 8, 8)
-
-                Particle.BLOCK_CRUMBLE.builder()
-                    .location(
-                        projectile.projectileEntity!!
-                            .location
-                            .addY(projectile.projectileEntity!!.height / 2)
-                    )
-                    .count(particleCount)
-                    .offset(0.1, 0.1, 0.1)
-                    .extra(0.1)
-                    .data(holdingBlockData!!)
-                    .receivers(96, true)
-                    .spawn()
-            }
-
-            override fun onHit(projectile: BrawlProjectile, hitType: HitType) {
-                player.world.playSound(
-                    projectile.projectileEntity!!.location,
-                    holdingBlockData!!.soundGroup.breakSound,
-                    SoundCategory.BLOCKS,
-                    1f,
-                    1f,
-                )
-
-                Particle.BLOCK_CRUMBLE.builder()
-                    .location(
-                        projectile.projectileEntity!!
-                            .location
-                            .addY(projectile.projectileEntity!!.height / 2)
-                    )
-                    .count(50)
-                    .offset(0.75, 0.75, 0.75)
-                    .extra(0.25)
-                    .data(holdingBlockData!!)
-                    .receivers(96, true)
-                    .spawn()
-            }
-        }
-
         BrawlProjectile.custom(player, "Block Toss") { fallingBlock }
-            .addEffect(BlockEffect())
+            .addEffect(BlockEffect(holdingBlockData!!))
             .velocityMultiplier(multiplier)
             .onHitEntity { entity, projectile ->
-                val blockDamage = Math.min(maxDamage, projectile.velocityBeforeImpact.length() * damage)
+                val blockDamage =
+                    Math.min(maxDamage, projectile.velocityBeforeImpact.length() * damage)
 
-                SmashDamageEvent(entity, Damager.DamagerLivingEntity(player), blockDamage).apply {
-                    knockbackMultiplier *= this@BlockTossAbility.knockbackMultiplier
-                }.callEvent()
+                SmashDamageEvent(entity, Damager.DamagerLivingEntity(player), blockDamage)
+                    .apply { knockbackMultiplier *= this@BlockTossAbility.knockbackMultiplier }
+                    .callEvent()
 
                 ProjectileAction.DESTROY
             }
