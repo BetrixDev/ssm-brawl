@@ -5,6 +5,7 @@ import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.block.Block
+import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
@@ -13,7 +14,7 @@ import org.bukkit.inventory.ItemStack
 
 class SulphurBombProjectile(
     override val owner: Player,
-    private val onHit: (entity: LivingEntity?, projectile: Projectile?) -> Boolean,
+    private val onHit: (entity: LivingEntity?, projectile: Entity?) -> Boolean,
 ) : BrawlProjectile(owner, "abilities.sulphur_bomb.name") {
     override var projectileSize = 0.65
 

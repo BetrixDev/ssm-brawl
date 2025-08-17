@@ -11,10 +11,10 @@ import org.bukkit.FluidCollisionMode
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Item
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.util.BoundingBox
 import org.bukkit.util.RayTraceResult
@@ -28,7 +28,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
     private var job: TwilightRunnable? = null
 
     @Volatile
-    var projectile: Projectile? = null
+    var projectile: Entity? = null
         protected set
 
     protected var maxLifetimeTicks = 20L * 30L // 30 seconds in ticks
@@ -136,7 +136,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
             }
     }
 
-    abstract fun createProjectileEntity(): Projectile
+    abstract fun createProjectileEntity(): Entity
 
     abstract fun doVelocity()
 
@@ -228,6 +228,6 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
         val checkBlock = projectile.location.block.getRelative(BlockFace.DOWN)
 
         return projectile.velocity.length() <= 0.01 &&
-            (projectile.isOnGround || checkBlock.isAirOrFoliage())
+                (projectile.isOnGround || checkBlock.isAirOrFoliage())
     }
 }
