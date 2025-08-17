@@ -197,7 +197,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
         if (!isCorrectItemForAbility(item)) {
             return
         }
-        
+
         event.isCancelled = true
 
         if (canActivate()) {
@@ -214,14 +214,14 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
     protected fun isCorrectActionForUsage(eventAction: Action): Boolean {
         when (abilityData.usage) {
             AbilityUsage.LEFT_CLICK -> {
-                if (eventAction != Action.LEFT_CLICK_AIR && eventAction != Action.LEFT_CLICK_BLOCK) {
+                if (eventAction == Action.LEFT_CLICK_AIR || eventAction == Action.LEFT_CLICK_BLOCK) {
                     return true
                 }
             }
 
             AbilityUsage.RIGHT_CLICK -> {
                 if (
-                    eventAction != Action.RIGHT_CLICK_AIR && eventAction != Action.RIGHT_CLICK_BLOCK
+                    eventAction == Action.RIGHT_CLICK_AIR || eventAction == Action.RIGHT_CLICK_BLOCK
                 ) {
                     return true
                 }
