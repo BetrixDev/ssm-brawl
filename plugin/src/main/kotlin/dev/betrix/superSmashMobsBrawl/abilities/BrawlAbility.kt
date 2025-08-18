@@ -4,6 +4,7 @@ import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.extensions.event
 import dev.betrix.superSmashMobsBrawl.extensions.getAs
+import dev.betrix.superSmashMobsBrawl.extensions.isSword
 import dev.betrix.superSmashMobsBrawl.interfaces.MetadataAccessor
 import dev.betrix.superSmashMobsBrawl.models.brawlData.AbilityUsage
 import dev.betrix.superSmashMobsBrawl.services.DataService
@@ -11,6 +12,8 @@ import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import gg.flyte.twilight.scheduler.repeatingTask
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.BlocksAttacks
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -55,6 +58,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
     private var lastCheckForCanActivate = true
 
     protected lateinit var hotbarItemStack: ItemStack
+        private set
 
     protected val elapsedSinceLastActivation: Long
         get() = System.currentTimeMillis() - lastUsed
@@ -131,6 +135,13 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
                 meta.persistentDataContainer.set(abilityKey, PersistentDataType.STRING, id)
 
                 itemMeta = meta
+
+                if (type.isSword) {
+                    setData(
+                        DataComponentTypes.BLOCKS_ATTACKS,
+                        BlocksAttacks.blocksAttacks().build(),
+                    )
+                }
             }
 
         val hotBarItemSlot =
@@ -160,40 +171,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
             }
         )
 
-        listeners.add(
-            event<PlayerInteractEvent>(player) {
-                if (hand != null && hand != EquipmentSlot.HAND) return@event
-
-                when (abilityData.usage) {
-                    AbilityUsage.LEFT_CLICK -> {
-                        if (action != Action.LEFT_CLICK_AIR && action != Action.LEFT_CLICK_BLOCK) {
-                            return@event
-                        }
-                    }
-
-                    AbilityUsage.RIGHT_CLICK -> {
-                        if (
-                            action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK
-                        ) {
-                            return@event
-                        }
-                    }
-                }
-
-                val item = item ?: return@event
-                val abilityId = getAbilityId(item) ?: return@event
-
-                if (abilityId != id) {
-                    return@event
-                }
-
-                isCancelled = true
-
-                if (canActivate()) {
-                    activate()
-                }
-            }
-        )
+        listeners.add(event<PlayerInteractEvent>(player) { onPlayerInteract(this) })
     }
 
     override fun teardown() {
@@ -206,7 +184,58 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
         jobs.forEach { it.cancel() }
     }
 
-    open fun activate() {
+    protected open fun onPlayerInteract(event: PlayerInteractEvent) {
+        if (event.hand != null && event.hand != EquipmentSlot.HAND) return
+
+        if (!isCorrectActionForUsage(event.action)) {
+            return
+        }
+
+        val item =
+            event.item
+                ?: player.inventory.itemInMainHand.takeIf { it.type != Material.AIR }
+                ?: return
+
+        if (!isCorrectItemForAbility(item)) {
+            return
+        }
+
+        event.isCancelled = true
+
+        if (canActivate()) {
+            activate()
+        }
+    }
+
+    protected fun isCorrectItemForAbility(item: ItemStack): Boolean {
+        val abilityId = getAbilityId(item) ?: return false
+
+        return abilityId == id
+    }
+
+    protected fun isCorrectActionForUsage(eventAction: Action): Boolean {
+        when (abilityData.usage) {
+            AbilityUsage.LEFT_CLICK -> {
+                if (
+                    eventAction == Action.LEFT_CLICK_AIR || eventAction == Action.LEFT_CLICK_BLOCK
+                ) {
+                    return true
+                }
+            }
+
+            AbilityUsage.RIGHT_CLICK -> {
+                if (
+                    eventAction == Action.RIGHT_CLICK_AIR || eventAction == Action.RIGHT_CLICK_BLOCK
+                ) {
+                    return true
+                }
+            }
+        }
+
+        return false
+    }
+
+    protected open fun activate() {
         setCooldown()
         // Avoid client-side item cooldown visuals affecting combat rhythm; we keep only our timers
         try {
@@ -215,7 +244,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
         player.sendMessage(lang.t("messages.abilities.use.success") { "abilityId" to id })
     }
 
-    open fun canActivate(sendMessage: Boolean = true): Boolean {
+    protected open fun canActivate(sendMessage: Boolean = true): Boolean {
         if (isOnCooldown()) {
             if (sendMessage) {
                 val component =

@@ -21,6 +21,13 @@ class KitCommand : KoinComponent {
         onSuccess(player, "cow")
     }
 
+    @Execute(name = "enderman")
+    fun endermanKit(@Context player: Player) {
+        KitService.playerSelectKit(player, "enderman")
+
+        onSuccess(player, "enderman")
+    }
+
     @Execute(name = "creeper")
     fun creeperKit(@Context player: Player) {
         KitService.playerSelectKit(player, "creeper")

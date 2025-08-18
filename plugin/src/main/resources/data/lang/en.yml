@@ -8,6 +8,10 @@ kits:
   skeleton:
     name: "Skeleton"
     description: "He got bones"
+  cow:
+    name: "Cow"
+  enderman:
+    name: "Enderman"
 abilities:
   sulphur_bomb:
     name: "Sulphur Bomb"
@@ -20,6 +24,18 @@ abilities:
     description: ""
   roped_arrow:
     name: "Roped Arrow"
+    description: ""
+  blink:
+    name: "Blink"
+    description: ""
+  block_toss:
+    name: "Block Toss"
+    description: ""
+  angry_herd:
+    name: "Angry Herd"
+    description: ""
+  milk_spiral:
+    name: "Milk Spiral"
     description: ""
 maps:
   blue_forest:

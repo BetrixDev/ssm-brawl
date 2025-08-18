@@ -3,24 +3,57 @@ package dev.betrix.superSmashMobsBrawl.projectiles
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.extensions.disguise
 import dev.betrix.superSmashMobsBrawl.extensions.isAirOrFoliage
+import dev.betrix.superSmashMobsBrawl.projectiles.effects.StandardImpactEffect
+import dev.betrix.superSmashMobsBrawl.projectiles.effects.StandardTrailEffect
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
-import org.bukkit.FluidCollisionMode
-import org.bukkit.Location
+import org.bukkit.*
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.entity.Item
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
+import org.bukkit.entity.*
 import org.bukkit.event.entity.ProjectileHitEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.util.BoundingBox
 import org.bukkit.util.RayTraceResult
 import org.bukkit.util.Vector
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+
+// Callback type aliases
+typealias EntityHitCallback =
+    (entity: LivingEntity, projectile: BrawlProjectile) -> ProjectileAction
+
+typealias BlockHitCallback = (block: Block, projectile: BrawlProjectile) -> ProjectileAction
+
+typealias ExpireCallback = (projectile: BrawlProjectile) -> ProjectileAction
+
+typealias IdleCallback = (projectile: BrawlProjectile) -> ProjectileAction
+
+typealias TickCallback = (projectile: BrawlProjectile) -> Unit
+
+typealias TeardownCallback = (projectile: BrawlProjectile) -> Unit
+
+enum class ProjectileAction {
+    CONTINUE, // Keep projectile alive
+    DESTROY, // Destroy projectile
+    BOUNCE, // Bounce off surface (for block hits)
+}
+
+enum class HitType {
+    ENTITY,
+    BLOCK,
+    EXPIRE,
+    IDLE,
+}
+
+// Effect system
+interface ProjectileEffect {
+    fun onTick(projectile: BrawlProjectile)
+
+    fun onHit(projectile: BrawlProjectile, hitType: HitType)
+}
 
 abstract class BrawlProjectile(open val owner: Player, open val name: String) :
     Manageable(), KoinComponent {
@@ -28,14 +61,28 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
     private var job: TwilightRunnable? = null
 
     @Volatile
-    var projectile: Projectile? = null
+    var projectileEntity: Entity? = null
         protected set
 
+    // Configuration properties
     protected var maxLifetimeTicks = 20L * 30L // 30 seconds in ticks
-    protected open var doEntityDetection = true
-    protected open var doBlockDetection = true
-    protected open var doIdleDetection = true
-    protected open var projectileSize = 0.5
+    protected var doEntityDetection = true
+    protected var doBlockDetection = true
+    protected var doIdleDetection = true
+    protected var projectileSize = 0.5
+    protected open var velocityMultiplier = 1.0
+    protected var velocityAddend: Vector? = null
+
+    // Callback collections
+    private val entityHitCallbacks = mutableListOf<EntityHitCallback>()
+    private val blockHitCallbacks = mutableListOf<BlockHitCallback>()
+    private val expireCallbacks = mutableListOf<ExpireCallback>()
+    private val idleCallbacks = mutableListOf<IdleCallback>()
+    private val tickCallbacks = mutableListOf<TickCallback>()
+    private val teardownCallbacks = mutableListOf<TeardownCallback>()
+
+    // Effects
+    private val effects = mutableListOf<ProjectileEffect>()
 
     var velocityBeforeImpact = Vector()
         private set
@@ -45,7 +92,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
 
     val projectileBoundingBox: BoundingBox
         get() {
-            val projectile = projectile ?: return BoundingBox(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+            val projectile = projectileEntity ?: return BoundingBox(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
             val currentLocation = projectile.location
             if (cachedBoundingBox != null && lastProjectileLocation == currentLocation) {
@@ -73,12 +120,71 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
             return boundingBox
         }
 
-    fun launch() {
-        projectile = createProjectileEntity()
-        projectile?.customName(lang.t(name))
+    // Fluent configuration API
+    fun maxLifetime(ticks: Long): BrawlProjectile = apply { maxLifetimeTicks = ticks }
 
-        if (projectile is Item) {
-            val item = projectile as Item
+    fun projectileSize(size: Double): BrawlProjectile = apply { projectileSize = size }
+
+    fun velocityMultiplier(multiplier: Double): BrawlProjectile = apply {
+        velocityMultiplier = multiplier
+    }
+
+    fun velocityAddend(vector: Vector?): BrawlProjectile = apply { velocityAddend = vector }
+
+    // Detection toggles
+    fun enableEntityDetection(enabled: Boolean = true): BrawlProjectile = apply {
+        doEntityDetection = enabled
+    }
+
+    fun enableBlockDetection(enabled: Boolean = true): BrawlProjectile = apply {
+        doBlockDetection = enabled
+    }
+
+    fun enableIdleDetection(enabled: Boolean = true): BrawlProjectile = apply {
+        doIdleDetection = enabled
+    }
+
+    // Event handlers
+    fun onHitEntity(callback: EntityHitCallback): BrawlProjectile = apply {
+        entityHitCallbacks.add(callback)
+    }
+
+    fun onHitBlock(callback: BlockHitCallback): BrawlProjectile = apply {
+        blockHitCallbacks.add(callback)
+    }
+
+    fun onExpire(callback: ExpireCallback): BrawlProjectile = apply {
+        expireCallbacks.add(callback)
+    }
+
+    fun onIdle(callback: IdleCallback): BrawlProjectile = apply { idleCallbacks.add(callback) }
+
+    fun onTick(callback: TickCallback): BrawlProjectile = apply { tickCallbacks.add(callback) }
+
+    fun onTeardown(callback: TeardownCallback): BrawlProjectile = apply {
+        teardownCallbacks.add(callback)
+    }
+
+    // Effect system
+    fun addEffect(effect: ProjectileEffect): BrawlProjectile = apply { effects.add(effect) }
+
+    fun trailEffect(particle: Particle, count: Int = 1, offset: Vector? = null): BrawlProjectile =
+        apply {
+            addEffect(StandardTrailEffect(particle, count, offset ?: Vector(0.1, 0.1, 0.1)))
+        }
+
+    fun impactEffect(particle: Particle, sound: Sound? = null, count: Int = 1): BrawlProjectile =
+        apply {
+            addEffect(StandardImpactEffect(particle, sound, count))
+        }
+
+    fun launch(): BrawlProjectile {
+        projectileEntity = createProjectileEntity()
+        projectileEntity?.isCustomNameVisible = false
+        projectileEntity?.isPersistent = false
+
+        if (projectileEntity is Item) {
+            val item = projectileEntity as Item
             item.pickupDelay = 1000000
         }
 
@@ -86,7 +192,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
 
         listeners.add(
             event<ProjectileHitEvent> {
-                if (entity == projectile) {
+                if (entity == projectileEntity) {
                     isCancelled = true
                 }
             }
@@ -95,22 +201,28 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
         job =
             repeatingTask(1) {
                 if (
-                    projectile == null || !projectile!!.isValid || projectile!!.world != owner.world
+                    projectileEntity == null ||
+                        !projectileEntity!!.isValid ||
+                        projectileEntity!!.world != owner.world
                 ) {
                     teardown()
                     return@repeatingTask
                 }
 
-                if (projectile!!.ticksLived > maxLifetimeTicks && onExpire()) {
-                    teardown()
-                    return@repeatingTask
+                if (projectileEntity!!.ticksLived > maxLifetimeTicks) {
+                    val action = handleExpire()
+                    if (action == ProjectileAction.DESTROY) {
+                        teardown()
+                        return@repeatingTask
+                    }
                 }
 
-                velocityBeforeImpact = projectile!!.velocity.clone()
+                velocityBeforeImpact = projectileEntity!!.velocity.clone()
 
                 if (doEntityDetection) {
                     checkHitLivingEntity()?.let { entity ->
-                        if (onHitLivingEntity(entity)) {
+                        val action = handleEntityHit(entity)
+                        if (action == ProjectileAction.DESTROY) {
                             teardown()
                             return@repeatingTask
                         }
@@ -119,48 +231,176 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
 
                 if (doBlockDetection) {
                     checkHitBlock()?.let { block ->
-                        if (onHitBlock(block)) {
+                        val action = handleBlockHit(block)
+                        when (action) {
+                            ProjectileAction.DESTROY -> {
+                                teardown()
+                                return@repeatingTask
+                            }
+
+                            ProjectileAction.BOUNCE -> {
+                                handleBounce(block)
+                            }
+
+                            ProjectileAction.CONTINUE -> {
+                                // Continue as normal
+                            }
+                        }
+                    }
+                }
+
+                if (doIdleDetection) {
+                    if (checkIdle()) {
+                        val action = handleIdle()
+                        if (action == ProjectileAction.DESTROY) {
                             teardown()
                             return@repeatingTask
                         }
                     }
                 }
 
-                if (doIdleDetection) {
-                    if (checkIdle() && onIdle()) {
-                        teardown()
-                        return@repeatingTask
-                    }
-                }
-                doEffect()
+                // Execute tick callbacks
+                tickCallbacks.forEach { it(this@BrawlProjectile) }
+
+                // Execute effects
+                effects.forEach { it.onTick(this@BrawlProjectile) }
             }
+
+        return this
     }
 
-    abstract fun createProjectileEntity(): Projectile
+    abstract fun createProjectileEntity(): Entity
 
-    abstract fun doVelocity()
-
-    open fun doEffect() {}
-
-    open fun onExpire(): Boolean {
-        return true
+    open fun doVelocity() {
+        val baseVelocity = owner.eyeLocation.direction
+        val finalVelocity =
+            if (velocityAddend != null) {
+                baseVelocity.add(velocityAddend!!).multiply(velocityMultiplier)
+            } else {
+                baseVelocity.multiply(velocityMultiplier)
+            }
+        projectileEntity?.velocity = finalVelocity
     }
 
-    abstract fun onHitLivingEntity(entity: LivingEntity): Boolean
+    private fun handleEntityHit(entity: LivingEntity): ProjectileAction {
+        effects.forEach { it.onHit(this, HitType.ENTITY) }
 
-    abstract fun onHitBlock(block: Block): Boolean
-
-    open fun onIdle(): Boolean {
-        return true
+        return if (entityHitCallbacks.isEmpty()) {
+            ProjectileAction.DESTROY
+        } else {
+            var finalAction = ProjectileAction.CONTINUE
+            entityHitCallbacks.forEach { callback ->
+                val action = callback(entity, this)
+                if (action == ProjectileAction.DESTROY) {
+                    finalAction = ProjectileAction.DESTROY
+                }
+            }
+            finalAction
+        }
     }
+
+    private fun handleBlockHit(block: Block): ProjectileAction {
+        effects.forEach { it.onHit(this, HitType.BLOCK) }
+
+        return if (blockHitCallbacks.isEmpty()) {
+            if (onHitBlock(block)) ProjectileAction.DESTROY else ProjectileAction.CONTINUE
+        } else {
+            var finalAction = ProjectileAction.CONTINUE
+            blockHitCallbacks.forEach { callback ->
+                val action = callback(block, this)
+                if (action == ProjectileAction.DESTROY) {
+                    finalAction = ProjectileAction.DESTROY
+                } else if (
+                    action == ProjectileAction.BOUNCE && finalAction != ProjectileAction.DESTROY
+                ) {
+                    finalAction = ProjectileAction.BOUNCE
+                }
+            }
+            finalAction
+        }
+    }
+
+    private fun handleExpire(): ProjectileAction {
+        effects.forEach { it.onHit(this, HitType.EXPIRE) }
+
+        return if (expireCallbacks.isEmpty()) {
+            if (onExpire()) ProjectileAction.DESTROY else ProjectileAction.CONTINUE
+        } else {
+            var finalAction = ProjectileAction.CONTINUE
+            expireCallbacks.forEach { callback ->
+                val action = callback(this)
+                if (action == ProjectileAction.DESTROY) {
+                    finalAction = ProjectileAction.DESTROY
+                }
+            }
+            finalAction
+        }
+    }
+
+    private fun handleIdle(): ProjectileAction {
+        effects.forEach { it.onHit(this, HitType.IDLE) }
+
+        return if (idleCallbacks.isEmpty()) {
+            if (onIdle()) ProjectileAction.DESTROY else ProjectileAction.CONTINUE
+        } else {
+            var finalAction = ProjectileAction.CONTINUE
+            idleCallbacks.forEach { callback ->
+                val action = callback(this)
+                if (action == ProjectileAction.DESTROY) {
+                    finalAction = ProjectileAction.DESTROY
+                }
+            }
+            finalAction
+        }
+    }
+
+    private fun handleBounce(block: Block) {
+        val projectileEntity = projectileEntity ?: return
+        val velocity = velocityBeforeImpact.takeIf { it.length() > 0 } ?: projectileEntity.velocity
+
+        // Simple bounce logic - reverse the appropriate velocity component
+        val normal = getBlockNormal(block, projectileEntity.location)
+        val bounceVelocity = velocity.clone().subtract(normal.multiply(2 * velocity.dot(normal)))
+
+        projectileEntity.velocity = bounceVelocity.multiply(0.8) // Reduce velocity on bounce
+    }
+
+    private fun getBlockNormal(block: Block, projectileLocation: Location): Vector {
+        val blockCenter = block.location.add(0.5, 0.5, 0.5)
+        val direction = projectileLocation.toVector().subtract(blockCenter.toVector()).normalize()
+
+        // Determine which face was hit based on direction
+        return when {
+            kotlin.math.abs(direction.x) > kotlin.math.abs(direction.y) &&
+                kotlin.math.abs(direction.x) > kotlin.math.abs(direction.z) -> {
+                Vector(if (direction.x > 0) 1.0 else -1.0, 0.0, 0.0)
+            }
+
+            kotlin.math.abs(direction.y) > kotlin.math.abs(direction.z) -> {
+                Vector(0.0, if (direction.y > 0) 1.0 else -1.0, 0.0)
+            }
+
+            else -> {
+                Vector(0.0, 0.0, if (direction.z > 0) 1.0 else -1.0)
+            }
+        }
+    }
+
+    open fun onHitBlock(block: Block): Boolean = true
+
+    open fun onExpire(): Boolean = true
+
+    open fun onIdle(): Boolean = true
 
     override fun teardown() {
+        teardownCallbacks.forEach { it(this@BrawlProjectile) }
         job?.cancel()
-        projectile?.remove()
+        projectileEntity?.remove()
+        super.teardown()
     }
 
     private fun checkHitLivingEntity(): LivingEntity? {
-        val projectile = projectile ?: return null
+        val projectile = projectileEntity ?: return null
 
         val possibleLivingEntities =
             projectile.world.livingEntities.filter { entity ->
@@ -169,7 +409,6 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
                 }
 
                 val candidateBox = (entity as? Player)?.disguise?.boundingBox ?: entity.boundingBox
-
                 return@filter candidateBox.overlaps(projectileBoundingBox)
             }
 
@@ -177,8 +416,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
     }
 
     private fun checkHitBlock(): Block? {
-        val projectile = projectile ?: return null
-
+        val projectile = projectileEntity ?: return null
         val world = projectile.world
         val currentLocation = projectile.location
         val velocity = projectile.velocity
@@ -219,7 +457,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
     }
 
     private fun checkIdle(): Boolean {
-        val projectile = projectile ?: return true
+        val projectile = projectileEntity ?: return true
 
         if (projectile.isDead || !projectile.isValid) {
             return true
@@ -229,5 +467,22 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
 
         return projectile.velocity.length() <= 0.01 &&
             (projectile.isOnGround || checkBlock.isAirOrFoliage())
+    }
+
+    companion object {
+        fun arrow(
+            owner: Player,
+            velocityMultiplier: Double = 1.0,
+            name: String = "messages.projectiles.arrow",
+        ): ArrowProjectile = ArrowProjectile(owner, velocityMultiplier, name)
+
+        fun potion(
+            owner: Player,
+            item: ItemStack,
+            name: String = "messages.projectiles.potion",
+        ): PotionProjectile = PotionProjectile(owner, item, name)
+
+        fun custom(owner: Player, name: String, entitySupplier: () -> Entity): CustomProjectile =
+            CustomProjectile(owner, name, entitySupplier)
     }
 }

@@ -21,6 +21,7 @@ data class AbilityDef(
 enum class AbilityType {
     AOE,
     PROJECTILE,
+    RECOVERY,
 }
 
 @Serializable

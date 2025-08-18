@@ -81,3 +81,6 @@ fun Material.isPressurePlate(): Boolean {
 fun Material.isHubInteractable(): Boolean {
     return hubInteractableMaterials.contains(this)
 }
+
+val Material.isSword: Boolean
+    get() = this.name.lowercase().endsWith("_sword")

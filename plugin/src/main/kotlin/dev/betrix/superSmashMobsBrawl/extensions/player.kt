@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.extensions
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
+import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.koin.core.context.GlobalContext
 
@@ -36,4 +37,29 @@ fun Player.hasPassive(passiveId: String): Boolean {
     val brawlKit = kitService.getKitForPlayer(this) ?: return false
 
     return brawlKit.getPassive(passiveId) != null
+}
+
+/**
+ * Gets a location in front of the player's eyes.
+ *
+ * @param distance How far to look ahead (max distance if raycasting)
+ */
+fun Player.getLocationInFrontOfEyes(distance: Double): Location {
+    require(distance > 0) { "distance must be > 0, was $distance" }
+
+    val world = this.world
+    val eyeLocation = this.eyeLocation.clone()
+    val direction = eyeLocation.direction.normalize()
+
+    val result = world.rayTraceBlocks(eyeLocation, direction, distance)
+
+    return if (result != null && result.hitBlock != null) {
+        val hitPos = result.hitPosition
+        val safeLocation = hitPos.toLocation(world).subtract(direction.multiply(0.5))
+        safeLocation.y += 0.1
+        safeLocation.setDirection(direction)
+    } else {
+        val target = eyeLocation.add(direction.multiply(distance))
+        target.setDirection(direction)
+    }
 }
