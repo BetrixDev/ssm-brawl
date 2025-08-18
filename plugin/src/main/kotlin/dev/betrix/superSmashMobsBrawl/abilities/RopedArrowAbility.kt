@@ -40,6 +40,7 @@ class RopedArrowAbility(player: Player) : BrawlAbility("roped_arrow", player) {
 
                     ProjectileAction.DESTROY
                 }
+                .onTeardown { activeProjectiles.remove(it) }
                 .launch()
 
         activeProjectiles.add(ropedArrow)

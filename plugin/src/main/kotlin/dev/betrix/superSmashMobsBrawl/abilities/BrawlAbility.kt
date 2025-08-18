@@ -191,7 +191,10 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
             return
         }
 
-        val item = event.item ?: return
+        val item =
+            event.item
+                ?: player.inventory.itemInMainHand.takeIf { it.type != Material.AIR }
+                ?: return
 
         if (!isCorrectItemForAbility(item)) {
             return

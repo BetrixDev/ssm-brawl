@@ -11,7 +11,7 @@ class CustomProjectile(owner: Player, name: String, private val entitySupplier: 
 
     override fun doVelocity() {
         projectileEntity?.setVelocity(
-            owner.location.direction,
+            owner.eyeLocation.direction,
             velocityMultiplier,
             false,
             0.2,

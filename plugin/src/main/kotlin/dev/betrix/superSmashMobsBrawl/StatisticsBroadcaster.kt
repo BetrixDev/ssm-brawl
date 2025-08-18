@@ -13,7 +13,7 @@ import kotlinx.serialization.json.putJsonObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class StatisticsBroadcaster() : KoinComponent {
+class StatisticsBroadcaster : KoinComponent {
 
     private val plugin: SuperSmashMobsBrawl by inject()
     private val hubService: HubService by inject()

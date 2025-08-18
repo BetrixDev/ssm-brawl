@@ -65,16 +65,6 @@ private val hubInteractableMaterials =
             // Add any other blocks that should be interactable in hubs
         )
 
-private val swordMaterials =
-    listOf(
-        Material.WOODEN_SWORD,
-        Material.STONE_SWORD,
-        Material.IRON_SWORD,
-        Material.GOLDEN_SWORD,
-        Material.DIAMOND_SWORD,
-        Material.NETHERITE_SWORD,
-    )
-
 fun Material.isDoor(): Boolean {
     return doorMaterials.contains(this)
 }
@@ -93,4 +83,4 @@ fun Material.isHubInteractable(): Boolean {
 }
 
 val Material.isSword: Boolean
-    get() = swordMaterials.contains(this)
+    get() = this.name.lowercase().endsWith("_sword")

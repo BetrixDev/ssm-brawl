@@ -33,6 +33,8 @@ typealias IdleCallback = (projectile: BrawlProjectile) -> ProjectileAction
 
 typealias TickCallback = (projectile: BrawlProjectile) -> Unit
 
+typealias TeardownCallback = (projectile: BrawlProjectile) -> Unit
+
 enum class ProjectileAction {
     CONTINUE, // Keep projectile alive
     DESTROY, // Destroy projectile
@@ -77,6 +79,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
     private val expireCallbacks = mutableListOf<ExpireCallback>()
     private val idleCallbacks = mutableListOf<IdleCallback>()
     private val tickCallbacks = mutableListOf<TickCallback>()
+    private val teardownCallbacks = mutableListOf<TeardownCallback>()
 
     // Effects
     private val effects = mutableListOf<ProjectileEffect>()
@@ -157,6 +160,10 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
     fun onIdle(callback: IdleCallback): BrawlProjectile = apply { idleCallbacks.add(callback) }
 
     fun onTick(callback: TickCallback): BrawlProjectile = apply { tickCallbacks.add(callback) }
+
+    fun onTeardown(callback: TeardownCallback): BrawlProjectile = apply {
+        teardownCallbacks.add(callback)
+    }
 
     // Effect system
     fun addEffect(effect: ProjectileEffect): BrawlProjectile = apply { effects.add(effect) }
@@ -348,14 +355,14 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
     }
 
     private fun handleBounce(block: Block) {
-        val projectile = projectileEntity ?: return
-        val velocity = projectile.velocity
+        val projectileEntity = projectileEntity ?: return
+        val velocity = velocityBeforeImpact.takeIf { it.length() > 0 } ?: projectileEntity.velocity
 
         // Simple bounce logic - reverse the appropriate velocity component
-        val normal = getBlockNormal(block, projectile.location)
+        val normal = getBlockNormal(block, projectileEntity.location)
         val bounceVelocity = velocity.clone().subtract(normal.multiply(2 * velocity.dot(normal)))
 
-        projectile.velocity = bounceVelocity.multiply(0.8) // Reduce velocity on bounce
+        projectileEntity.velocity = bounceVelocity.multiply(0.8) // Reduce velocity on bounce
     }
 
     private fun getBlockNormal(block: Block, projectileLocation: Location): Vector {
@@ -386,8 +393,10 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
     open fun onIdle(): Boolean = true
 
     override fun teardown() {
+        teardownCallbacks.forEach { it(this@BrawlProjectile) }
         job?.cancel()
         projectileEntity?.remove()
+        super.teardown()
     }
 
     private fun checkHitLivingEntity(): LivingEntity? {

@@ -53,6 +53,7 @@ class SulphurBombAbility(player: Player) : BrawlAbility("sulphur_bomb", player) 
                     handleSulphurBombHit(null, projectile)
                     ProjectileAction.DESTROY
                 }
+                .onTeardown { activeProjectiles.remove(it) }
                 .launch()
 
         activeProjectiles.add(sulphurBombProjectile)

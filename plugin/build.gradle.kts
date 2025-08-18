@@ -18,6 +18,8 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/") { name = "sonatype" }
     maven("https://repo.flyte.gg/releases")
     maven { url = uri("https://repo.panda-lang.org/releases") }
+    maven { url = uri("https://repo.codemc.io/repository/maven-releases/") }
+    maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
     maven("https://repo.md-5.net/content/groups/public/") {
         content { includeGroup("me.libraryaddict.disguises") }
     }
@@ -33,6 +35,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("com.michael-bull.kotlin-result:kotlin-result:2.0.1")
     compileOnly("me.libraryaddict.disguises:libsdisguises:11.0.6")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.9.3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
     implementation("com.charleskorn.kaml:kaml:0.85.0")
     implementation("com.squareup.okio:okio:3.10.2")

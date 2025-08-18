@@ -25,6 +25,7 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
     private var pickupTimeMs: Long = 0
     private var tossRunnable: TwilightRunnable? = null
     private val chargeTimeMs = metadata.long("chargeTimeMs") ?: 1200L
+    private val maxCharge = metadata.double("maxCharge") ?: 1.4
     private val maxDamage = metadata.double("maxDamage") ?: 9.0
     private val damage = metadata.double("damage") ?: 8.0
     private val knockbackMultiplier = metadata.double("knockbackMultiplier") ?: 2.5
@@ -37,6 +38,8 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
 
     override fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.hand != null && event.hand != EquipmentSlot.HAND) return
+
+        event.isCancelled = true
 
         if (!isCorrectActionForUsage(event.action)) {
             return
@@ -90,8 +93,11 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
 
         super.activate()
 
-        val charge = System.currentTimeMillis() - pickupTimeMs
-        val multiplier = Math.min(1.4, 1.4 * (charge.toDouble() / chargeTimeMs))
+        val currentChargeTime = System.currentTimeMillis() - pickupTimeMs
+        val chargeValue =
+            Math.min(maxCharge, maxCharge * (currentChargeTime.toDouble() / chargeTimeMs))
+                .coerceAtLeast(0.2)
+        val chargePercent = chargeValue / maxCharge
 
         val displayBlock =
             player.world.spawn(player.eyeLocation, BlockDisplay::class.java).apply {
@@ -107,9 +113,9 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
             }
 
         val projectile =
-            BrawlProjectile.custom(player, "Block Toss") { fallingBlock }
+            BrawlProjectile.custom(player, "abilities.$id.name") { fallingBlock }
                 .addEffect(BlockEffect(holdingBlockData!!))
-                .velocityMultiplier(multiplier)
+                .velocityMultiplier(chargeValue)
                 .onHitEntity { entity, projectile ->
                     val blockDamage =
                         Math.min(maxDamage, projectile.velocityBeforeImpact.length() * damage)
@@ -120,15 +126,18 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
 
                     ProjectileAction.DESTROY
                 }
+                .onTeardown { activeProjectiles.remove(it) }
                 .launch()
 
         activeProjectiles.add(projectile)
 
-        val scaleFactor = 0.75f
+        val scaleFactor =
+            (0.5 + (1.1 - 0.5) * chargePercent)
+                .toFloat() // Lerp between 0.5 and 1.1 based on charge percent for block scale
         var tumbleAngleY = 0f
         var tumbleAngleX = 0f
 
-        val rotatationStepSpeedTicks = 5
+        val rotatationStepSpeedTicks = 4
 
         runnables.add(
             repeatingTask(rotatationStepSpeedTicks.toLong()) {
@@ -160,6 +169,15 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
         )
 
         setDisguiseBlock(null)
+        holdingBlockData = null
+    }
+
+    override fun teardown() {
+        cancelTossTask()
+        setDisguiseBlock(null)
+        activeProjectiles.forEach { it.teardown() }
+        activeProjectiles.clear()
+        super.teardown()
     }
 
     private fun setDisguiseBlock(material: Material?) {

@@ -18,6 +18,6 @@ class PotionProjectile(
     override fun createProjectileEntity(): Projectile =
         owner.world.spawn(owner.eyeLocation, ThrownPotion::class.java).apply {
             shooter = owner
-            this.item = this@PotionProjectile.item
+            this.item = this@PotionProjectile.item.clone()
         }
 }

@@ -121,6 +121,7 @@ class BarragePassive(player: Player) : BrawlPassive("barrage", player) {
 
                             ProjectileAction.DESTROY
                         }
+                        .onTeardown { activeProjectiles.remove(it) }
                         .launch()
 
                 activeProjectiles.add(arrow)

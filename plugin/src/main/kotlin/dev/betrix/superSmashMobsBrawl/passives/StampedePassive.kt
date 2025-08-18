@@ -95,15 +95,21 @@ class StampedePassive(player: Player) : BrawlPassive("stampede", player) {
                     }
 
                     else -> {
-                        if (
-                            isCancelled || damageType != SmashDamageType.MeleeAttack || stacks <= 0
-                        ) {
+                        if (isCancelled || stacks <= 0) {
                             return@event
                         }
 
-                        if (
-                            damager is Damager.DamagerLivingEntity && damager.livingEntity != player
-                        ) {
+                        val isThisPlayerDamager =
+                            when (damager) {
+                                is Damager.DamagerLivingEntity -> damager.livingEntity == player
+                                else -> false
+                            }
+
+                        if (!isThisPlayerDamager) {
+                            return@event
+                        }
+
+                        if (damageType != null && damageType != SmashDamageType.MeleeAttack) {
                             return@event
                         }
 

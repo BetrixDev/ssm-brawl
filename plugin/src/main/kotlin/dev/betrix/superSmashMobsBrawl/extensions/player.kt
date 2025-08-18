@@ -45,21 +45,20 @@ fun Player.hasPassive(passiveId: String): Boolean {
  * @param distance How far to look ahead (max distance if raycasting)
  */
 fun Player.getLocationInFrontOfEyes(distance: Double): Location {
+    require(distance > 0) { "distance must be > 0, was $distance" }
+
     val world = this.world
-    val eyeLocation = this.eyeLocation
+    val eyeLocation = this.eyeLocation.clone()
     val direction = eyeLocation.direction.normalize()
 
-    // Perform a ray trace from the player's eye
     val result = world.rayTraceBlocks(eyeLocation, direction, distance)
 
     return if (result != null && result.hitBlock != null) {
-        // Obstacle found: return location just before it
         val hitPos = result.hitPosition
         val safeLocation = hitPos.toLocation(world).subtract(direction.multiply(0.5))
-        safeLocation.y += 0.1 // lift slightly to avoid clipping
+        safeLocation.y += 0.1
         safeLocation.setDirection(direction)
     } else {
-        // No obstacle: return full distance location
         val target = eyeLocation.add(direction.multiply(distance))
         target.setDirection(direction)
     }

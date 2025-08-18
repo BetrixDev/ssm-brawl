@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
 
 class BlinkAbility(player: Player) : BrawlAbility("blink", player) {
 
-    private val teleportDistance = metadata.double("teleportDistance")!!
+    private val teleportDistance = metadata.double("teleportDistance") ?: 16.0
 
     override fun activate() {
         super.activate()
@@ -34,7 +34,7 @@ class BlinkAbility(player: Player) : BrawlAbility("blink", player) {
 
         Particle.PORTAL.builder()
             .location(endLocation)
-            .offset(-2.0, 0.0, 2.0)
+            .offset(2.0, 0.0, 2.0)
             .count(10)
             .receivers(96, true)
             .spawn()

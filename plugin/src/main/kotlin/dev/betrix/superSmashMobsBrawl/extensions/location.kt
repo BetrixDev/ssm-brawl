@@ -15,6 +15,9 @@ import org.bukkit.util.Vector
  */
 fun Location.interpolateTo(endLocation: Location, spacing: Double): List<Location> {
     require(spacing > 0) { "spacing must be greater than 0, was $spacing" }
+    require(endLocation.world == world) {
+        "start and end locations must be in the same world (start=$world, end=${endLocation.world})"
+    }
 
     val locations = mutableListOf<Location>()
 
