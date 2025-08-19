@@ -128,6 +128,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
 
     open fun teardown() {
         disguise?.teardown()
+        disguise = null
 
         abilities.forEach { it.teardown() }
         abilities.clear()

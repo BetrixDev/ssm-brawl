@@ -2,35 +2,35 @@ package dev.betrix.superSmashMobsBrawl.disguises
 
 import org.bukkit.entity.Player
 
+private val disguiseConstructors: Map<String, (Player) -> BrawlDisguise> = mapOf(
+    "creeper" to ::CreeperDisguise,
+    "skeleton" to ::SkeletonDisguise,
+    "cow" to ::CowDisguise,
+    "enderman" to ::EndermanDisguise,
+    "mooshroom" to ::MooshroomDisguise,
+    "mushroom_cow" to ::MooshroomDisguise,
+    "villager" to ::VillagerDisguise,
+    "sheep" to ::SheepDisguise,
+    "blaze" to ::BlazeDisguise,
+    "guardian" to ::GuardianDisguise,
+    "pig" to ::PigDisguise,
+    "horse" to ::HorseDisguise,
+    "zombie" to ::ZombieDisguise,
+    "wither_skeleton" to ::WitherSkeletonDisguise,
+    "witch" to ::WitchDisguise,
+    "magma_cube" to ::MagmaCubeDisguise,
+    "wolf" to ::WolfDisguise,
+    "snowman" to ::SnowmanDisguise,
+    "snow_golem" to ::SnowmanDisguise,
+    "squid" to ::SquidDisguise,
+    "slime" to ::SlimeDisguise,
+    "spider" to ::SpiderDisguise,
+    "iron_golem" to ::IronGolemDisguise,
+)
+
 object BrawlDisguiseFactory {
     fun create(player: Player, id: String): BrawlDisguise? {
         val normalized = id.lowercase().replace(" ", "_").replace("-", "_")
-        return when (normalized) {
-            "creeper" -> CreeperDisguise(player)
-            "skeleton" -> SkeletonDisguise(player)
-            "cow" -> CowDisguise(player)
-            "enderman" -> EndermanDisguise(player)
-
-            "mooshroom",
-            "mushroom_cow" -> MooshroomDisguise(player)
-            "villager" -> VillagerDisguise(player)
-            "sheep" -> SheepDisguise(player)
-            "blaze" -> BlazeDisguise(player)
-            "guardian" -> GuardianDisguise(player)
-            "pig" -> PigDisguise(player)
-            "horse" -> HorseDisguise(player)
-            "zombie" -> ZombieDisguise(player)
-            "wither_skeleton" -> WitherSkeletonDisguise(player)
-            "witch" -> WitchDisguise(player)
-            "magma_cube" -> MagmaCubeDisguise(player)
-            "wolf" -> WolfDisguise(player)
-            "snowman",
-            "snow_golem" -> SnowmanDisguise(player)
-            "squid" -> SquidDisguise(player)
-            "slime" -> SlimeDisguise(player)
-            "spider" -> SpiderDisguise(player)
-            "iron_golem" -> IronGolemDisguise(player)
-            else -> null
-        }
+        return disguiseConstructors[normalized]?.invoke(player)
     }
 }
