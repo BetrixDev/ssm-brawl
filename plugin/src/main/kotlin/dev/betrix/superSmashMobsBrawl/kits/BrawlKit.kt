@@ -51,6 +51,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
             abilities.add(
                 when (it.id) {
                     "sulphur_bomb" -> SulphurBombAbility(player)
+                    "iron_hook" -> IronHookAbility(player)
                     "explode" -> ExplodeAbility(player)
                     "roped_arrow" -> RopedArrowAbility(player)
                     "bone_explosion" -> BoneExplosionAbility(player)
