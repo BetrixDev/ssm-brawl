@@ -287,10 +287,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 players.forEach { player ->
                     if (player.gameMode == GameMode.SURVIVAL && player.location.y <= voidLevel) {
                         plugin.logger.info("Player $player fell into the void")
-                        BrawlDeathEvent.call(
-                            player,
-                            DeathReason.Void,
-                        )
+                        BrawlDeathEvent.call(player, DeathReason.Void)
                     }
                 }
             }
