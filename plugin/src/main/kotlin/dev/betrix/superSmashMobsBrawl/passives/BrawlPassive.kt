@@ -1,6 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.passives
 
 import dev.betrix.superSmashMobsBrawl.Manageable
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.extensions.getAs
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.interfaces.MetadataAccessor
@@ -15,6 +16,7 @@ abstract class BrawlPassive(val id: String, val player: Player) : Manageable(), 
     protected val dataService: DataService by inject()
     protected val minigameService: MinigameService by inject()
     protected val kitService: KitService by inject()
+    protected val plugin: SuperSmashMobsBrawl by inject()
 
     protected val passiveData by lazy {
         dataService.getPassive(id)

@@ -1,0 +1,45 @@
+package dev.betrix.superSmashMobsBrawl.passives
+
+import net.kyori.adventure.key.Key
+import org.bukkit.NamespacedKey
+import org.bukkit.Registry
+import org.bukkit.entity.Player
+import org.bukkit.potion.PotionEffect
+
+class PotionEffectPassive(player: Player) : BrawlPassive("potion_effect", player) {
+
+    private val effectName = metadata.string("effect")
+    private val effectLevel = metadata.int("level") ?: run {
+        plugin.logger.fine("metadata.level not set for $id passive, defaulting to 1")
+        1
+    }
+    private val isAmbient = metadata.boolean("isAmbient") ?: false
+    private val showParticles = metadata.boolean("showParticles") ?: false
+
+    private val resolvedPotionEffect = when (effectName) {
+        null -> null
+        else -> Registry.EFFECT.get(NamespacedKey.minecraft(effectName.lowercase())) ?: Registry.EFFECT.get(Key.key(effectName))
+     }
+
+    override fun setup() {
+        if (resolvedPotionEffect == null) {
+            plugin.logger.severe("Unable to resolve potion effect $effectName because it is either null or incorrect")
+            return
+        }
+
+        player.addPotionEffect(PotionEffect(
+            resolvedPotionEffect,
+            Int.MAX_VALUE,
+            effectLevel,
+            isAmbient,
+            showParticles
+        ))
+
+        super.setup()
+    }
+
+    override fun teardown() {
+        resolvedPotionEffect?.let { player.removePotionEffect(resolvedPotionEffect) }
+        super.teardown()
+    }
+}
