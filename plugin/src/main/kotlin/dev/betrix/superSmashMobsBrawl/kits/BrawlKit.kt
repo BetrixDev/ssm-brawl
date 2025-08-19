@@ -42,17 +42,10 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
     }
 
     open fun setup() {
-        disguise =
-            when (kitData.disguiseId) {
-                "creeper" -> CreeperDisguise(player)
-                "skeleton" -> SkeletonDisguise(player)
-                "cow" -> CowDisguise(player)
-                "enderman" -> EndermanDisguise(player)
-                else -> {
-                    logger.severe("No disguise known with id ${kitData.disguiseId}")
-                    null
-                }
-            }
+        disguise = kitData.disguiseId?.let { BrawlDisguiseFactory.create(player, it) }
+        if (kitData.disguiseId != null && disguise == null) {
+            logger.severe("No disguise known with id ${kitData.disguiseId}")
+        }
 
         kitData.abilities.forEach {
             abilities.add(
@@ -135,6 +128,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
 
     open fun teardown() {
         disguise?.teardown()
+        disguise = null
 
         abilities.forEach { it.teardown() }
         abilities.clear()
