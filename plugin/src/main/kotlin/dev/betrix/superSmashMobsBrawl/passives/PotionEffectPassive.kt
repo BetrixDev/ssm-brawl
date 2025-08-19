@@ -10,11 +10,12 @@ class PotionEffectPassive(player: Player) : BrawlPassive("potion_effect", player
 
     private val effectName = metadata.string("effect")
     private val effectLevel = metadata.int("level") ?: run {
-        plugin.logger.fine("metadata.level not set for $id passive, defaulting to 1")
-        1
+        plugin.logger.fine("metadata.level not set for $id passive, defaulting to 0")
+        0
     }
     private val isAmbient = metadata.boolean("isAmbient") ?: false
     private val showParticles = metadata.boolean("showParticles") ?: false
+    private val showIcon = metadata.boolean("showIcon") ?: true
 
     private val resolvedPotionEffect = when (effectName) {
         null -> null
@@ -23,7 +24,7 @@ class PotionEffectPassive(player: Player) : BrawlPassive("potion_effect", player
 
     override fun setup() {
         if (resolvedPotionEffect == null) {
-            plugin.logger.severe("Unable to resolve potion effect $effectName because it is either null or incorrect")
+            plugin.logger.severe("Unable to resolve potion effect $effectName for passive $id on kit ${kitData?.id ?: "unknown"}")
             return
         }
 
@@ -32,7 +33,8 @@ class PotionEffectPassive(player: Player) : BrawlPassive("potion_effect", player
             Int.MAX_VALUE,
             effectLevel,
             isAmbient,
-            showParticles
+            showParticles,
+            showIcon
         ))
 
         super.setup()
