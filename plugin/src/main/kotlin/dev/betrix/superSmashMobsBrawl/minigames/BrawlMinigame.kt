@@ -44,7 +44,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
-    public val minigameId: String,
+    val minigameId: String,
     protected val gameId: String,
     protected val players: List<Player>,
 ) : Manageable(), KoinComponent {
@@ -283,13 +283,13 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         val voidLevel = brawlWorld.data.voidLevel
 
         runnables.add(
-            gg.flyte.twilight.scheduler.repeatingTask(5) {
+            repeatingTask(5) {
                 players.forEach { player ->
                     if (player.gameMode == GameMode.SURVIVAL && player.location.y <= voidLevel) {
                         plugin.logger.info("Player $player fell into the void")
-                        dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent.call(
+                        BrawlDeathEvent.call(
                             player,
-                            dev.betrix.superSmashMobsBrawl.events.DeathReason.Void,
+                            DeathReason.Void,
                         )
                     }
                 }
