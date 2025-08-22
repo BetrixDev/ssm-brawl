@@ -4,6 +4,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
 import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
 import java.util.concurrent.ConcurrentHashMap
 import org.bukkit.entity.Player
@@ -23,6 +24,7 @@ object KitService : KoinComponent {
     private val dataService: DataService by inject()
 
     fun playerSelectKit(player: Player, kitId: String) {
+        PlayerSelectKitEvent(player, kitId).callEvent()
         playerSelectedKits[player] = kitId
     }
 
