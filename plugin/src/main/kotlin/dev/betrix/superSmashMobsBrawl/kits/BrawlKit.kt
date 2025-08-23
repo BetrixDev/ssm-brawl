@@ -117,7 +117,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
         try {
             // Set high attack speed to remove 1.9+ cooldown
             val attackSpeedAttr = Attribute.valueOf("GENERIC_ATTACK_SPEED")
-            player.getAttribute(attackSpeedAttr)?.baseValue = 16.0
+            player.getAttribute(attackSpeedAttr)?.baseValue = 32.0
         } catch (_: Throwable) {}
         // Clear offhand to avoid shield mechanics
         try {
