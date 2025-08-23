@@ -41,7 +41,6 @@ data class QueueEntry(val player: Player, val minigame: MinigameDef, val partyId
 
 object QueueService : Manageable(), KoinComponent {
     private val logger: Logger by inject()
-    private val plugin: SuperSmashMobsBrawl by inject()
     private val minigameService: MinigameService by inject()
 
     private val queue = hashSetOf<QueueEntry>()
