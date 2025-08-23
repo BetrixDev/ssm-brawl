@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.minigames
 import dev.betrix.superSmashMobsBrawl.models.MinigamePlayer
 import dev.betrix.superSmashMobsBrawl.models.MinigameState
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
+import org.bukkit.GameMode
 import org.bukkit.entity.Player
 
 open class FfaMinigame(minigameId: String, gameId: String, players: List<MinigamePlayer>) :
@@ -28,8 +29,8 @@ open class FfaMinigame(minigameId: String, gameId: String, players: List<Minigam
             players.filter { player ->
                 val bukkitPlayer = player.player
                 bukkitPlayer.isOnline &&
-                    !disconnectedPlayers.contains(bukkitPlayer) &&
-                    bukkitPlayer.gameMode.name != "SPECTATOR"
+                    !disconnectedPlayers.contains(bukkitPlayer.uniqueId) &&
+                    bukkitPlayer.gameMode != GameMode.SPECTATOR
             }
 
         // For FFA, end game if 1 or fewer players remain

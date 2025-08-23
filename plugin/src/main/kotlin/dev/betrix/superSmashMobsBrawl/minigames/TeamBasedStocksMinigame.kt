@@ -89,16 +89,16 @@ open class TeamBasedStocksMinigame(
 
     override fun checkAndHandleMinigameEnd() {
         if (state == MinigameState.ENDED) return
-
-        // Use the existing logic from checkForWinnerAndEndIfNeeded
+        super.checkAndHandleMinigameEnd()
+        if (state == MinigameState.ENDED) return
         checkForWinnerAndEndIfNeeded()
     }
 
     private fun eliminatePlayer(player: Player) {
         // Put player into spectator mode at the spectator spawn and stop further participation
-        if (!::brawlWorld.isInitialized) return
+        if (brawlWorld == null) return
 
-        player.teleport(brawlWorld.data.spectatorSpawnPoint)
+        player.teleport(brawlWorld!!.data.spectatorSpawnPoint)
         player.gameMode = GameMode.SPECTATOR
         player.allowFlight = true
         player.isFlying = true

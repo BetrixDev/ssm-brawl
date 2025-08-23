@@ -12,9 +12,11 @@ class PotionEffectPassive(player: Player) : BrawlPassive("potion_effect", player
     private val effectLevel =
         metadata.int("level")
             ?: run {
-                plugin.logger.fine("metadata.level not set for $id passive, defaulting to 0")
-                0
-            }
+                    plugin.logger.fine("metadata.level not set for $id passive, defaulting to 0")
+                    0
+                }
+                .coerceAtLeast(0)
+
     private val isAmbient = metadata.boolean("isAmbient") ?: false
     private val showParticles = metadata.boolean("showParticles") ?: false
     private val showIcon = metadata.boolean("showIcon") ?: true
@@ -23,7 +25,7 @@ class PotionEffectPassive(player: Player) : BrawlPassive("potion_effect", player
         when (effectName) {
             null -> null
             else ->
-                Registry.EFFECT.get(NamespacedKey.minecraft(effectName.lowercase()))
+                Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(effectName.lowercase()))
                     ?: Registry.EFFECT.get(Key.key(effectName))
         }
 
@@ -50,7 +52,7 @@ class PotionEffectPassive(player: Player) : BrawlPassive("potion_effect", player
     }
 
     override fun teardown() {
-        resolvedPotionEffect?.let { player.removePotionEffect(resolvedPotionEffect) }
+        resolvedPotionEffect?.let { player.removePotionEffect(it) }
         super.teardown()
     }
 }
