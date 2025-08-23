@@ -4,6 +4,7 @@ import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import org.bukkit.Location
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.koin.core.context.GlobalContext
 
@@ -62,4 +63,8 @@ fun Player.getLocationInFrontOfEyes(distance: Double): Location {
         val target = eyeLocation.add(direction.multiply(distance))
         target.setDirection(direction)
     }
+}
+
+fun Player.playSound(sound: Sound, pitch: Float = 1f, volume: Float = 1f) {
+    playSound(eyeLocation, sound, pitch, volume)
 }

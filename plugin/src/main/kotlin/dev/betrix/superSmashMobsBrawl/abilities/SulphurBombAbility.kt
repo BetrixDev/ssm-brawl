@@ -4,6 +4,7 @@ import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
+import dev.betrix.superSmashMobsBrawl.extensions.playSound
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.projectiles.BrawlProjectile
 import dev.betrix.superSmashMobsBrawl.projectiles.ProjectileAction
@@ -35,6 +36,8 @@ class SulphurBombAbility(player: Player) : BrawlAbility("sulphur_bomb", player) 
     }
 
     private fun throwProjectile() {
+        player.playSound(Sound.ENTITY_FISHING_BOBBER_THROW, pitch = 0.75f)
+
         val sulphurBombProjectile =
             BrawlProjectile.potion(
                     player,
