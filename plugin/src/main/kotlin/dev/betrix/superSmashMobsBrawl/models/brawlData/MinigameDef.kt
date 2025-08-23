@@ -17,6 +17,7 @@ sealed class MinigameDef {
     abstract val passiveWhitelist: List<String>?
     abstract val respawnDelaySeconds: Int?
     abstract val overrides: MinigameDefOverrides?
+    abstract val allowRejoinAfterLeave: Boolean
 
     fun isPassiveValid(passiveId: String): Boolean {
         if (passiveBlacklist?.contains(passiveId) == true) {
@@ -43,6 +44,7 @@ data class FfaMinigameDef(
     override val passiveWhitelist: List<String>? = null,
     override val respawnDelaySeconds: Int? = null,
     override val overrides: MinigameDefOverrides? = null,
+    override val allowRejoinAfterLeave: Boolean = true,
     val minPlayers: Int,
     val maxPlayers: Int,
     val allowKitSwitching: Boolean,
@@ -60,6 +62,7 @@ data class TeamBasedStocksMinigameDef(
     override val passiveWhitelist: List<String>? = null,
     override val respawnDelaySeconds: Int? = null,
     override val overrides: MinigameDefOverrides? = null,
+    override val allowRejoinAfterLeave: Boolean = true,
     val playersPerTeam: Int,
     val amountOfTeams: Int,
     val stocks: Int,
