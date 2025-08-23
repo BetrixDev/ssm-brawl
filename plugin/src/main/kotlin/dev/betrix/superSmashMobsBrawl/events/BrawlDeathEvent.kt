@@ -25,7 +25,7 @@ class BrawlDeathEvent(val player: Player, val reason: DeathReason) : TwilightEve
             callback: BrawlDeathEvent.() -> Unit,
         ): TwilightListener {
             return event<BrawlDeathEvent> {
-                if (!minigame.hasPlayer(player)) {
+                if (!minigame.isPlayerInMinigame(player)) {
                     return@event
                 }
 

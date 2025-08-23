@@ -21,6 +21,7 @@ import dev.betrix.superSmashMobsBrawl.extensions.location
 import dev.betrix.superSmashMobsBrawl.extensions.teleport
 import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
 import dev.betrix.superSmashMobsBrawl.models.BrawlGameWorld
+import dev.betrix.superSmashMobsBrawl.models.MinigamePlayer
 import dev.betrix.superSmashMobsBrawl.models.MinigameState
 import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
@@ -46,7 +47,7 @@ import org.koin.core.component.inject
 abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     val minigameId: String,
     protected val gameId: String,
-    protected val players: List<Player>,
+    protected val players: List<MinigamePlayer>,
 ) : Manageable(), KoinComponent {
     protected val dataService: DataService by inject()
     private val kitService: KitService by inject()
@@ -72,10 +73,6 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     /** Determine if a passive can be used in a minigame */
     fun isPassiveValid(id: String): Boolean {
         return minigameData.isPassiveValid(id)
-    }
-
-    fun hasPlayer(player: Player): Boolean {
-        return players.contains(player)
     }
 
     open suspend fun initMinigame(): Result<Unit, Exception> {
@@ -139,7 +136,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 val victimPlayer = entity as? Player ?: return@event
                 val damagerPlayer = damager as? Player ?: return@event
 
-                if (!hasPlayer(victimPlayer) || !hasPlayer(damagerPlayer)) return@event
+                if (!isPlayerInMinigame(victimPlayer) || !isPlayerInMinigame(damagerPlayer)) return@event
 
                 if (
                     cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
@@ -178,11 +175,11 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         val spawnPoints = brawlWorld.data.spawnPoints.getEquidistant(players.size)
 
         players.forEachIndexed { idx, player ->
-            player.teleport(brawlWorld.world.location(spawnPoints[min(idx, spawnPoints.size)]))
-            assignPlayerKit(player)
+            player.player.teleport(brawlWorld.world.location(spawnPoints[min(idx, spawnPoints.size)]))
+            assignPlayerKit(  player.player)
             // Clear offhand to remove shield mechanics (1.8 feel)
             try {
-                player.inventory.setItemInOffHand(
+                  player.player.inventory.setItemInOffHand(
                     org.bukkit.inventory.ItemStack.of(org.bukkit.Material.AIR)
                 )
             } catch (_: Throwable) {}
@@ -235,7 +232,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
         val spawnPoint =
             brawlWorld.data.spawnPoints.getFarthestFromPlayers(
-                players.filter { it != player },
+                players.filter { it.player != player }.map { it.player },
                 brawlWorld.world,
             ) ?: SpawnPoint(0.0, 100.0, 0.0)
 
@@ -247,7 +244,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     }
 
     fun isPlayerInMinigame(player: Player): Boolean {
-        return players.contains(player)
+        return players.find { it.player == player } != null
     }
 
     open fun canPlayerLeaveMinigame(player: Player): Boolean {
@@ -285,9 +282,9 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         runnables.add(
             repeatingTask(5) {
                 players.forEach { player ->
-                    if (player.gameMode == GameMode.SURVIVAL && player.location.y <= voidLevel) {
+                    if (player.player.gameMode == GameMode.SURVIVAL && player.player.location.y <= voidLevel) {
                         plugin.logger.info("Player $player fell into the void")
-                        BrawlDeathEvent.call(player, DeathReason.Void)
+                        BrawlDeathEvent.call(player.player, DeathReason.Void)
                     }
                 }
             }

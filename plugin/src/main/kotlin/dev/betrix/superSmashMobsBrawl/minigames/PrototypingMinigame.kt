@@ -1,6 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.minigames
 
-import org.bukkit.entity.Player
+import dev.betrix.superSmashMobsBrawl.models.MinigamePlayer
 
-class PrototypingMinigame(minigameId: String, gameId: String, players: List<Player>) :
+class PrototypingMinigame(minigameId: String, gameId: String, players: List<MinigamePlayer>) :
     FfaMinigame(minigameId, gameId, players)

@@ -7,6 +7,7 @@ import dev.betrix.superSmashMobsBrawl.events.QueuePopEvent
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import dev.betrix.superSmashMobsBrawl.minigames.PrototypingMinigame
 import dev.betrix.superSmashMobsBrawl.minigames.TeamBasedStocksMinigame
+import dev.betrix.superSmashMobsBrawl.models.MinigamePlayer
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
@@ -62,7 +63,7 @@ class MinigameService : KoinComponent {
                 is FfaMinigameDef -> {
                     when (minigameDef.id) {
                         "prototyping" -> {
-                            PrototypingMinigame(minigameDef.id, gameId, players)
+                            PrototypingMinigame(minigameDef.id, gameId, players.map { MinigamePlayer(it) })
                         }
 
                         else -> {

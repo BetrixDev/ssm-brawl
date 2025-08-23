@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.minigames
 import com.github.michaelbull.result.onFailure
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.extensions.teleport
+import dev.betrix.superSmashMobsBrawl.models.MinigamePlayer
 import dev.betrix.superSmashMobsBrawl.models.MinigameState
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
@@ -19,7 +20,7 @@ open class TeamBasedStocksMinigame(
     minigameId: String,
     gameId: String,
     private val teams: List<MinigameTeam>,
-) : BrawlMinigame<TeamBasedStocksMinigameDef>(minigameId, gameId, teams.flatMap { it.players }) {
+) : BrawlMinigame<TeamBasedStocksMinigameDef>(minigameId, gameId, teams.flatMap { it.players }.map { MinigamePlayer(it) }) {
 
     private val hubService: HubService by inject()
     private val langService: LangService by inject()
@@ -124,7 +125,7 @@ open class TeamBasedStocksMinigame(
         plugin.server.onlinePlayers.forEach { it.sendMessage(winMessage) }
 
         // Teleport all participants back to the hub
-        players.forEach { p -> hubService.tryTeleportToDefaultHub(p).onFailure { /* ignore */ } }
+        players.forEach { p -> hubService.tryTeleportToDefaultHub(p.player).onFailure { /* ignore */ } }
 
         // Remove this minigame instance and cleanup
         minigameService.removeMinigameInstance(this)
