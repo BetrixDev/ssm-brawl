@@ -3,12 +3,20 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.*
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
+import dev.betrix.superSmashMobsBrawl.events.QueuePopEvent
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
+import dev.betrix.superSmashMobsBrawl.minigames.PrototypingMinigame
+import dev.betrix.superSmashMobsBrawl.minigames.TeamBasedStocksMinigame
+import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
+import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
+import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
 import dev.betrix.superSmashMobsBrawl.utils.resultRunCatching
+import gg.flyte.twilight.event.event
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.UUID
 
 sealed class MinigameInitError {
     data class PlayerAlreadyInMinigame(val players: List<Player>) : MinigameInitError()
@@ -27,6 +35,47 @@ class MinigameService : KoinComponent {
     private val hubService: HubService by inject()
 
     private val inFlightMinigames = arrayListOf<BrawlMinigame<*>>()
+
+    init {
+        event<QueuePopEvent> {
+            val minigameDef = dataService.getMinigame(minigameId) ?: return@event
+
+            val gameId = UUID.randomUUID().toString()
+
+            val minigameInstance = when (minigameDef) {
+                is TeamBasedStocksMinigameDef -> {
+                    val playersPerTeam = minigameDef.playersPerTeam
+                    val amountOfTeams = minigameDef.amountOfTeams
+
+                    val teams: List<MinigameTeam> =
+                        (0 until amountOfTeams).map { teamIndex ->
+                            val startIndex = teamIndex * playersPerTeam
+                            val endIndex = startIndex + playersPerTeam
+                            val teamPlayers = players.subList(startIndex, endIndex).toMutableList()
+                            // Initial stocks value will be set during minigame init from definition
+                            MinigameTeam(teamPlayers, minigameDef.stocks)
+                        }
+
+                    TeamBasedStocksMinigame(minigameDef.id, gameId, teams)
+                }
+
+                is FfaMinigameDef -> {
+                    when (minigameDef.id) {
+                        "prototyping" -> {
+                            PrototypingMinigame(minigameDef.id, gameId, players)
+                        }
+
+                        else -> {
+                            // No-op for unknown ids for now
+                            TODO("handle this")
+                        }
+                    }
+                }
+            }
+
+            handleMinigameSetup(minigameInstance)
+        }
+    }
 
     fun getMinigameData(id: String): MinigameDef? {
         return dataService.getMinigame(id)
@@ -52,7 +101,7 @@ class MinigameService : KoinComponent {
         return getAllMinigameData().find { it.id.contains(id, ignoreCase = true) }
     }
 
-    fun handleMinigameSetup(minigameInstance: BrawlMinigame<*>) {
+    private fun handleMinigameSetup(minigameInstance: BrawlMinigame<*>) {
         plugin.launch {
             minigameInstance
                 .initMinigame()

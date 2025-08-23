@@ -198,7 +198,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
         player.world.strikeLightningEffect(player.location)
 
-        delay(1) {
+        gg.flyte.twilight.scheduler.delay(1) {
             player.playSound(player.eyeLocation, Sound.ENTITY_PLAYER_HURT, 1f, 1f)
         }
 
