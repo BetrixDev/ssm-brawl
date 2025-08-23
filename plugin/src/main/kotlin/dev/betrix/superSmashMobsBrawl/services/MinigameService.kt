@@ -14,10 +14,12 @@ import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
 import dev.betrix.superSmashMobsBrawl.utils.resultRunCatching
 import gg.flyte.twilight.event.event
+import java.util.UUID
 import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.UUID
 
 sealed class MinigameInitError {
     data class PlayerAlreadyInMinigame(val players: List<Player>) : MinigameInitError()
@@ -43,38 +45,63 @@ class MinigameService : KoinComponent {
 
             val gameId = UUID.randomUUID().toString()
 
-            val minigameInstance = when (minigameDef) {
-                is TeamBasedStocksMinigameDef -> {
-                    val playersPerTeam = minigameDef.playersPerTeam
-                    val amountOfTeams = minigameDef.amountOfTeams
+            val minigameInstance =
+                when (minigameDef) {
+                    is TeamBasedStocksMinigameDef -> {
+                        val playersPerTeam = minigameDef.playersPerTeam
+                        val amountOfTeams = minigameDef.amountOfTeams
 
-                    val teams: List<MinigameTeam> =
-                        (0 until amountOfTeams).map { teamIndex ->
-                            val startIndex = teamIndex * playersPerTeam
-                            val endIndex = startIndex + playersPerTeam
-                            val teamPlayers = players.subList(startIndex, endIndex).toMutableList()
-                            // Initial stocks value will be set during minigame init from definition
-                            MinigameTeam(teamPlayers, minigameDef.stocks)
-                        }
+                        val teams: List<MinigameTeam> =
+                            (0 until amountOfTeams).map { teamIndex ->
+                                val startIndex = teamIndex * playersPerTeam
+                                val endIndex = startIndex + playersPerTeam
+                                val teamPlayers =
+                                    players.subList(startIndex, endIndex).toMutableList()
+                                // Initial stocks value will be set during minigame init from
+                                // definition
+                                MinigameTeam(teamPlayers, minigameDef.stocks)
+                            }
 
-                    TeamBasedStocksMinigame(minigameDef.id, gameId, teams)
-                }
+                        TeamBasedStocksMinigame(minigameDef.id, gameId, teams)
+                    }
 
-                is FfaMinigameDef -> {
-                    when (minigameDef.id) {
-                        "prototyping" -> {
-                            PrototypingMinigame(minigameDef.id, gameId, players.map { MinigamePlayer(it) })
-                        }
+                    is FfaMinigameDef -> {
+                        when (minigameDef.id) {
+                            "prototyping" -> {
+                                PrototypingMinigame(
+                                    minigameDef.id,
+                                    gameId,
+                                    players.map { MinigamePlayer(it) },
+                                )
+                            }
 
-                        else -> {
-                            // No-op for unknown ids for now
-                            TODO("handle this")
+                            else -> {
+                                // No-op for unknown ids for now
+                                TODO("handle this")
+                            }
                         }
                     }
                 }
-            }
 
             handleMinigameSetup(minigameInstance)
+        }
+
+        // Handle player disconnect
+        event<PlayerQuitEvent> {
+            val minigameInstance = getMinigameForPlayer(player) ?: return@event
+
+            plugin.launch { minigameInstance.onPlayerDisconnect(player) }
+        }
+
+        // Handle player reconnect
+        event<PlayerJoinEvent> {
+            // Check if this player was in any active minigame when they disconnected
+            for (minigameInstance in inFlightMinigames) {
+                if (minigameInstance.onPlayerReconnect(player)) {
+                    // Player was successfully teleported back to a minigame
+                    break
+                }
+            }
         }
     }
 

@@ -20,7 +20,12 @@ open class TeamBasedStocksMinigame(
     minigameId: String,
     gameId: String,
     private val teams: List<MinigameTeam>,
-) : BrawlMinigame<TeamBasedStocksMinigameDef>(minigameId, gameId, teams.flatMap { it.players }.map { MinigamePlayer(it) }) {
+) :
+    BrawlMinigame<TeamBasedStocksMinigameDef>(
+        minigameId,
+        gameId,
+        teams.flatMap { it.players }.map { MinigamePlayer(it) },
+    ) {
 
     private val hubService: HubService by inject()
     private val langService: LangService by inject()
@@ -78,7 +83,14 @@ open class TeamBasedStocksMinigame(
         playerToTeam[player]?.players?.remove(player)
         playerToTeam.remove(player)
 
-        // Optional: if leaving causes only one team with stocks left, end the game
+        // Check if minigame should end due to insufficient players
+        checkAndHandleMinigameEnd()
+    }
+
+    override fun checkAndHandleMinigameEnd() {
+        if (state == MinigameState.ENDED) return
+
+        // Use the existing logic from checkForWinnerAndEndIfNeeded
         checkForWinnerAndEndIfNeeded()
     }
 
@@ -125,7 +137,9 @@ open class TeamBasedStocksMinigame(
         plugin.server.onlinePlayers.forEach { it.sendMessage(winMessage) }
 
         // Teleport all participants back to the hub
-        players.forEach { p -> hubService.tryTeleportToDefaultHub(p.player).onFailure { /* ignore */ } }
+        players.forEach { p ->
+            hubService.tryTeleportToDefaultHub(p.player).onFailure { /* ignore */ }
+        }
 
         // Remove this minigame instance and cleanup
         minigameService.removeMinigameInstance(this)

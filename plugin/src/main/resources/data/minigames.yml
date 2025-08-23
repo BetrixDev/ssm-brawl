@@ -9,6 +9,7 @@ minigames:
     allowParties: true
     passiveBlacklist: [hunger]
     respawnDelaySeconds: 5
+    allowRejoinAfterLeave: true
 
   - id: two_player_duels
     countdown: 5
@@ -19,3 +20,4 @@ minigames:
     stocks: 4
     allowParties: false
     respawnDelaySeconds: 5
+    allowRejoinAfterLeave: true

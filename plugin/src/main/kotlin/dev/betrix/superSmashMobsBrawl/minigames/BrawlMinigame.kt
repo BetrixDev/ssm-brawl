@@ -59,7 +59,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     protected val minigameData: TMinigameDef by lazy {
         (dataService.getMinigame(minigameId)
             ?: throw RuntimeException("Could not find minigame data for id $minigameId"))
-            as TMinigameDef
+                as TMinigameDef
     }
 
     lateinit var brawlWorld: BrawlGameWorld
@@ -69,6 +69,9 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
     var state = MinigameState.PREFLIGHT
         protected set
+
+    /** Tracks players who disconnected while in this minigame */
+    protected val disconnectedPlayers = mutableSetOf<Player>()
 
     /** Determine if a passive can be used in a minigame */
     fun isPassiveValid(id: String): Boolean {
@@ -136,11 +139,12 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 val victimPlayer = entity as? Player ?: return@event
                 val damagerPlayer = damager as? Player ?: return@event
 
-                if (!isPlayerInMinigame(victimPlayer) || !isPlayerInMinigame(damagerPlayer)) return@event
+                if (!isPlayerInMinigame(victimPlayer) || !isPlayerInMinigame(damagerPlayer))
+                    return@event
 
                 if (
                     cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
-                        cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
+                    cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
                 )
                     return@event
 
@@ -153,10 +157,10 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 val meleeDamage = attackerKit?.getMeleeDamage() ?: damage
 
                 SmashDamageEvent(
-                        victimPlayer,
-                        Damager.DamagerLivingEntity(damagerPlayer),
-                        meleeDamage,
-                    )
+                    victimPlayer,
+                    Damager.DamagerLivingEntity(damagerPlayer),
+                    meleeDamage,
+                )
                     .callEvent()
             }
         )
@@ -175,14 +179,17 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         val spawnPoints = brawlWorld.data.spawnPoints.getEquidistant(players.size)
 
         players.forEachIndexed { idx, player ->
-            player.player.teleport(brawlWorld.world.location(spawnPoints[min(idx, spawnPoints.size)]))
-            assignPlayerKit(  player.player)
+            player.player.teleport(
+                brawlWorld.world.location(spawnPoints[min(idx, spawnPoints.size)])
+            )
+            assignPlayerKit(player.player)
             // Clear offhand to remove shield mechanics (1.8 feel)
             try {
-                  player.player.inventory.setItemInOffHand(
+                player.player.inventory.setItemInOffHand(
                     org.bukkit.inventory.ItemStack.of(org.bukkit.Material.AIR)
                 )
-            } catch (_: Throwable) {}
+            } catch (_: Throwable) {
+            }
         }
 
         state = MinigameState.STARTING
@@ -191,6 +198,11 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     }
 
     open suspend fun onPlayerDeath(player: Player) {
+        // Check if player is still in the minigame at the start
+        if (!isPlayerInMinigame(player)) {
+            return
+        }
+
         kitService.unassignKit(player)?.let { assignedKits.removeIf { it.first == player } }
 
         player.world.strikeLightningEffect(player.location)
@@ -209,6 +221,11 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             val respawnDelay = minigameData.respawnDelaySeconds ?: 0
 
             repeat(respawnDelay) { iteration ->
+                // Check if player is still in the minigame before each countdown step
+                if (!isPlayerInMinigame(player)) {
+                    return
+                }
+
                 val secondsLeft = respawnDelay - iteration
 
                 val title =
@@ -228,6 +245,11 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 delay(1.seconds)
             }
+
+            // Final check before respawning
+            if (!isPlayerInMinigame(player)) {
+                return
+            }
         }
 
         val spawnPoint =
@@ -244,7 +266,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     }
 
     fun isPlayerInMinigame(player: Player): Boolean {
-        return players.find { it.player == player } != null
+        return players.find { it.player == player } != null && !disconnectedPlayers.contains(player)
     }
 
     open fun canPlayerLeaveMinigame(player: Player): Boolean {
@@ -254,6 +276,78 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     open fun onPlayerLeave(player: Player) {
         kitService.unassignKit(player)
         assignedKits.removeIf { it.first == player }
+        if (!disconnectedPlayers.contains(player)) {
+            disconnectedPlayers.add(player)
+        }
+    }
+
+    /** Called when a player disconnects from the server while in this minigame */
+    open fun onPlayerDisconnect(player: Player) {
+        if (!isPlayerInMinigame(player)) return
+
+        disconnectedPlayers.add(player)
+        onPlayerLeave(player)
+        checkAndHandleMinigameEnd()
+    }
+
+    /**
+     * Called when a player rejoins the server Returns true if the player was teleported back to the
+     * minigame
+     */
+    open fun onPlayerReconnect(player: Player): Boolean {
+        // Only handle if player was previously in this minigame and disconnected
+        if (!disconnectedPlayers.remove(player) || !minigameData.allowRejoinAfterLeave) {
+            return false
+        }
+
+        // Only teleport back if minigame is still active and not ended
+        if (state == MinigameState.ENDED) {
+            return false
+        }
+
+        // Add player back to the minigame
+        // Note: We need to restore the player to the active players list
+        // This assumes the MinigamePlayer was not removed from the original players list
+        if (!isPlayerInMinigame(player)) {
+            return false
+        }
+
+        // Teleport player back to the minigame world
+        if (::brawlWorld.isInitialized) {
+            val spawnPoint =
+                brawlWorld.data.spawnPoints.getFarthestFromPlayers(
+                    players.filter { it.player != player }.map { it.player },
+                    brawlWorld.world,
+                ) ?: brawlWorld.data.spawnPoints.firstOrNull() ?: return false
+
+            player.teleport(brawlWorld.world.location(spawnPoint))
+            assignPlayerKit(player)
+            player.gameMode = GameMode.SURVIVAL
+        }
+
+        return true
+    }
+
+    /**
+     * Checks if the minigame should end due to insufficient players and takes appropriate action
+     */
+    protected open fun checkAndHandleMinigameEnd() {
+        if (state == MinigameState.ENDED) return
+
+        // Count active players (not spectator mode, still connected, and not disconnected)
+        val activePlayers =
+            players.filter { player ->
+                val bukkitPlayer = player.player
+                bukkitPlayer.isOnline &&
+                        !disconnectedPlayers.contains(bukkitPlayer) &&
+                        bukkitPlayer.gameMode != GameMode.SPECTATOR
+            }
+
+        // End minigame if no active players remain
+        if (activePlayers.isEmpty()) {
+            state = MinigameState.ENDED
+            teardown()
+        }
     }
 
     private fun assignPlayerKit(player: Player) {
@@ -282,7 +376,10 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         runnables.add(
             repeatingTask(5) {
                 players.forEach { player ->
-                    if (player.player.gameMode == GameMode.SURVIVAL && player.player.location.y <= voidLevel) {
+                    if (
+                        player.player.gameMode == GameMode.SURVIVAL &&
+                        player.player.location.y <= voidLevel
+                    ) {
                         plugin.logger.info("Player $player fell into the void")
                         BrawlDeathEvent.call(player.player, DeathReason.Void)
                     }
