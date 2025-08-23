@@ -12,6 +12,8 @@ kits:
     name: "Cow"
   enderman:
     name: "Enderman"
+  iron_golem:
+    name: "Iron Golem"
 abilities:
   sulphur_bomb:
     name: "Sulphur Bomb"
@@ -36,6 +38,9 @@ abilities:
     description: ""
   milk_spiral:
     name: "Milk Spiral"
+    description: ""
+  iron_hook:
+    name: "Iron Hook"
     description: ""
 maps:
   blue_forest:

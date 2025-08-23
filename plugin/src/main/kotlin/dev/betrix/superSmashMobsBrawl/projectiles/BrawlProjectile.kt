@@ -23,7 +23,7 @@ import org.koin.core.component.inject
 
 // Callback type aliases
 typealias EntityHitCallback =
-    (entity: LivingEntity, projectile: BrawlProjectile) -> ProjectileAction
+            (entity: LivingEntity, projectile: BrawlProjectile) -> ProjectileAction
 
 typealias BlockHitCallback = (block: Block, projectile: BrawlProjectile) -> ProjectileAction
 
@@ -202,8 +202,8 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
             repeatingTask(1) {
                 if (
                     projectileEntity == null ||
-                        !projectileEntity!!.isValid ||
-                        projectileEntity!!.world != owner.world
+                    !projectileEntity!!.isValid ||
+                    projectileEntity!!.world != owner.world
                 ) {
                     teardown()
                     return@repeatingTask
@@ -372,7 +372,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
         // Determine which face was hit based on direction
         return when {
             kotlin.math.abs(direction.x) > kotlin.math.abs(direction.y) &&
-                kotlin.math.abs(direction.x) > kotlin.math.abs(direction.z) -> {
+                    kotlin.math.abs(direction.x) > kotlin.math.abs(direction.z) -> {
                 Vector(if (direction.x > 0) 1.0 else -1.0, 0.0, 0.0)
             }
 
@@ -466,7 +466,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
         val checkBlock = projectile.location.block.getRelative(BlockFace.DOWN)
 
         return projectile.velocity.length() <= 0.01 &&
-            (projectile.isOnGround || checkBlock.isAirOrFoliage())
+                (projectile.isOnGround || checkBlock.isAirOrFoliage())
     }
 
     companion object {

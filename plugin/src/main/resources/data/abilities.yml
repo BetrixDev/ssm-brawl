@@ -81,4 +81,11 @@ abilities:
     usage: right_click
     hotbarItem: iron_sword
     displayItem: grass_block
-    metadata:
+
+  - id: iron_hook
+    cooldown: 8
+    itemSlot: 1
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_pickaxe
+    displayItem: tripwire_hook
