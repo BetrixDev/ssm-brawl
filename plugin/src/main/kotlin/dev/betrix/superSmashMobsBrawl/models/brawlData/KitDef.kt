@@ -1,7 +1,11 @@
 package dev.betrix.superSmashMobsBrawl.models.brawlData
 
 import com.charleskorn.kaml.YamlScalar
+import dev.betrix.superSmashMobsBrawl.serializers.SoundSerializer
+import dev.betrix.superSmashMobsBrawl.serializers.MaterialSerializer
 import kotlinx.serialization.Serializable
+import org.bukkit.Material
+import org.bukkit.Sound
 
 @Serializable data class KitDefFile(val kits: List<KitDef>)
 
@@ -15,6 +19,10 @@ data class KitDef(
     val passives: List<KitPassiveDef> = emptyList(),
     val abilities: List<KitAbilityDef> = emptyList(),
     val armorItems: KitArmorItemsDef? = null,
+    @Serializable(with = MaterialSerializer::class)
+    val displayItem: Material? = null,
+    @Serializable(with = SoundSerializer::class)
+    val selectionSound: Sound? = null,
     val userFacing: Boolean = true,
 )
 

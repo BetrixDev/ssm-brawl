@@ -91,6 +91,9 @@ class DataService : KoinComponent {
     fun getAllMinigames(): List<MinigameDef> =
         if (::minigameDefs.isInitialized) minigameDefs.values.toList() else emptyList()
 
+    fun getAllKits(): List<KitDef> =
+        if (::kitDefs.isInitialized) kitDefs.values.toList() else emptyList()
+
     private suspend inline fun <reified T> readFile(path: String): T =
         withContext(Dispatchers.IO) {
             val resourcePath = "data/$path.yml"
