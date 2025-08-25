@@ -26,10 +26,10 @@ class KitDefArgument : ArgumentResolver<CommandSender, KitDef>(), KoinComponent 
 
         val kitDefinition = kitService.getKitData(argument)
 
-        if (kitDefinition == null) {
+        if (kitDefinition == null || !kitDefinition.userFacing) {
             val possibleMatch = kitService.findClosestKitById(argument)
 
-            return if (possibleMatch != null) {
+            return if (possibleMatch != null && possibleMatch.userFacing) {
                 ParseResult.failure("Invalid kit id. Did you mean ${possibleMatch.id}?")
             } else {
                 ParseResult.failure("Invalid kit id")
@@ -44,6 +44,6 @@ class KitDefArgument : ArgumentResolver<CommandSender, KitDef>(), KoinComponent 
         argument: Argument<KitDef?>?,
         context: SuggestionContext?,
     ): SuggestionResult? {
-        return SuggestionResult.of(kitService.getAllKitData().map { it.id })
+        return SuggestionResult.of(kitService.getAllKitData().filter { it.userFacing }.map { it.id })
     }
 }
