@@ -127,7 +127,7 @@ class AxiomLoggerHandler(private val plugin: SuperSmashMobsBrawl) : Handler() {
 
         if (batch.isEmpty()) return
 
-        if (axiomApiToken.isBlank() || axiomDatasetName.isBlank()) {
+        if (axiomApiToken == null || axiomApiToken.isBlank() || axiomDatasetName == null || axiomDatasetName.isBlank()) {
             plugin.logger.info("Axiom values not set in ENV, skipping ingesting logs")
             return
         }
