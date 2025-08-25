@@ -15,6 +15,7 @@ import io.papermc.paper.registry.TypedKey
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
+import org.bukkit.Sound
 import java.util.concurrent.ConcurrentHashMap
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -36,6 +37,10 @@ object KitService : KoinComponent {
 
     fun playerSelectKit(player: Player, kitId: String) {
         playerSelectedKits[player] = kitId
+    }
+
+    fun playerSelectKit(player: Player, kit: KitDef) {
+        playerSelectedKits[player] = kit.id
     }
 
     fun currentSelectedKitForPlayer(player: Player): KitDef {
@@ -116,14 +121,24 @@ object KitService : KoinComponent {
     fun openKitSelectionGui(player: Player) {
         val currentSelectedKit = currentSelectedKitForPlayer(player)
 
-        val kitSelectionGui = gui(lang.t("gui.kitSelection.title"), 36) {
+        val guiColumns = 9
+        val guiRows = 4
+        val filledSlots = hashSetOf<Int>()
+
+        val kitSelectionGui = gui(lang.t("gui.kitSelection.title"), guiColumns * guiRows) {
             onClick { isCancelled = true }
 
             getAllKitData().filter { it.userFacing && it.displayItem != null }.forEachIndexed { idx, kit ->
-                set(getCenteredSlot(9, 4, idx), ItemStack.of(kit.displayItem!!).apply {
+                set(getCenteredSlot(guiColumns, guiRows, idx).apply { filledSlots.add(this) }, ItemStack.of(kit.displayItem!!).apply {
+                    val isKitSelected = currentSelectedKit.id == kit.id
+
                     val meta = itemMeta
 
-                    meta.displayName(lang.t("gui.kitSelection.kitName") { "kitId" to kit.id })
+                    if (isKitSelected) {
+                        meta.displayName(lang.t("gui.kitSelection.selectedKitName") { "kitId" to kit.id })
+                    } else {
+                        meta.displayName(lang.t("gui.kitSelection.kitName") { "kitId" to kit.id })
+                    }
 
                     val loreList = arrayListOf<Component>()
 
@@ -136,7 +151,26 @@ object KitService : KoinComponent {
 
                     itemMeta = meta
 
-                    setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, currentSelectedKit.id == kit.id);
+                    setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, isKitSelected);
+                }) {
+                    playerSelectKit(player, kit)
+                    player.closeInventory()
+                    player.sendMessage(lang.t("messages.kits.select.success") { "kitId" to kit.id })
+                    player.playSound(player.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
+                }
+            }
+
+            for (cellIdx in 0 until guiColumns * guiRows) {
+                if (filledSlots.contains(cellIdx)) {
+                    continue
+                }
+
+                set(cellIdx, ItemStack.of(Material.BLACK_STAINED_GLASS_PANE).apply {
+                    val meta = itemMeta
+
+                    meta.customName(Component.empty())
+
+                    itemMeta = meta
                 })
             }
         }
