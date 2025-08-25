@@ -102,4 +102,12 @@ messages:
   projectiles:
     arrow: "Arrow"
     barrage_arrow: "Barrage Arrow"
-motd: "The brawl reborn -- a wondrous thing!"
+gui:
+  kitSelection:
+    title: "<!i><#1e1e2e><shadow:#585b70>Select a kit"
+    kitName: "<!i><#e8edff>{lang:kits.{kitId}.name}"
+    selectedKitName: "<!i><#a6e3a1>✔ Selected <#a6adc8>- <#e8edff>{lang:kits.{kitId}.name}"
+    abilityList:
+      title: "<!i><#a6adc8>Abilities"
+      entry: "<!i><#a6adc8>• <#fab387>{lang:abilities.{abilityId}.name}"
+motd: "<#89dceb>The brawl reborn <#a6adc8>-- <#89dceb>a wondrous thing<#94e2d5>!"

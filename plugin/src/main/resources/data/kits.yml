@@ -19,6 +19,8 @@ kits:
     armor: 4.0
     knockbackMultiplier: 1.65
     disguiseId: "creeper"
+    selectionSound: "entity.creeper.hurt"
+    displayItem: "coal"
     passives:
       - id: double_jump
       - id: regeneration
@@ -41,6 +43,8 @@ kits:
     armor: 6.0
     knockbackMultiplier: 1.25
     disguiseId: "skeleton"
+    selectionSound: "entity.skeleton.ambient"
+    displayItem: "bone"
     metadata:
       arrowKnockbackMultiplier: 1.50
     passives:
@@ -70,6 +74,8 @@ kits:
     armor: 6.5
     knockbackMultiplier: 1.10
     disguiseId: "cow"
+    selectionSound: "entity.cow.ambient"
+    displayItem: "milk_bucket"
     passives:
       - id: double_jump
       - id: regeneration
@@ -93,6 +99,8 @@ kits:
     armor: 6.0
     knockbackMultiplier: 1.25
     disguiseId: enderman
+    selectionSound: "entity.enderman.teleport"
+    displayItem: "ender_pearl"
     passives:
       - id: double_jump
       - id: regeneration

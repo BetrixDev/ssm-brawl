@@ -5,8 +5,10 @@ import dev.betrix.superSmashMobsBrawl.commands.DebugCommand
 import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
+import dev.betrix.superSmashMobsBrawl.commands.resolvers.KitDefArgument
 import dev.betrix.superSmashMobsBrawl.commands.resolvers.MinigameDefinitionArgument
 import dev.betrix.superSmashMobsBrawl.extensions.hasPassive
+import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.services.DataService
 import dev.betrix.superSmashMobsBrawl.services.DebugService
@@ -77,6 +79,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
         liteCommands =
             LiteBukkitFactory.builder(this)
                 .argument(MinigameDef::class.java, MinigameDefinitionArgument())
+                .argument(KitDef::class.java, KitDefArgument())
                 .commands(QueueCommand())
                 .commands(KitCommand())
                 .commands(LeaveCommand())
