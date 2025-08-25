@@ -24,9 +24,14 @@ class KitCommand : KoinComponent {
 
     @Execute
     fun kit(@Context player: Player, @Arg kit: KitDef) {
-        kitService.playerSelectKit(player, kit.id)
+        kitService.playerSelectKit(player, kit)
 
         player.sendMessage(lang.t("messages.kits.select.success") { "kitId" to kit.id })
-        player.playSound(player.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
+        player.playSound(
+            player.location,
+            kit.selectionSound ?: Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
+            1f,
+            1f,
+        )
     }
 }

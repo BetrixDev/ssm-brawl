@@ -47,7 +47,9 @@ class AxiomLoggerHandler(private val plugin: SuperSmashMobsBrawl) : Handler() {
     private val axiomApiClient =
         HttpClient(CIO) {
             defaultRequest {
-                header("Authorization", "Bearer $axiomApiToken")
+                if (!axiomApiToken.isNullOrBlank()) {
+                    header("Authorization", "Bearer $axiomApiToken")
+                }
                 contentType(ContentType.Application.Json)
             }
             install(ContentNegotiation) {
@@ -62,11 +64,16 @@ class AxiomLoggerHandler(private val plugin: SuperSmashMobsBrawl) : Handler() {
         }
 
     init {
-        runnable = repeatingTask(20 * 5, async = true) { flushQueue() }
+        val hasAxiomEnv = !axiomApiToken.isNullOrBlank() && !axiomDatasetName.isNullOrBlank()
+        if (hasAxiomEnv) {
+            runnable = repeatingTask(20 * 5, async = true) { flushQueue() }
+        } else {
+            plugin.logger.info("Axiom ENV not set; ingestion disabled")
+        }
     }
 
     override fun publish(record: LogRecord?) {
-        if (record == null) {
+        if (record == null || !isLoggable(record)) {
             return
         }
 
@@ -77,6 +84,10 @@ class AxiomLoggerHandler(private val plugin: SuperSmashMobsBrawl) : Handler() {
                     record.level.name.let {
                         when (it.lowercase()) {
                             "severe" -> "error"
+                            "warning" -> "warn"
+                            "fine",
+                            "finer",
+                            "finest" -> "debug"
                             else -> it
                         }
                     },
@@ -127,8 +138,14 @@ class AxiomLoggerHandler(private val plugin: SuperSmashMobsBrawl) : Handler() {
 
         if (batch.isEmpty()) return
 
-        if (axiomApiToken == null || axiomApiToken.isBlank() || axiomDatasetName == null || axiomDatasetName.isBlank()) {
+        if (
+            axiomApiToken == null ||
+                axiomApiToken.isBlank() ||
+                axiomDatasetName == null ||
+                axiomDatasetName.isBlank()
+        ) {
             plugin.logger.info("Axiom values not set in ENV, skipping ingesting logs")
+            queue.clear()
             return
         }
 

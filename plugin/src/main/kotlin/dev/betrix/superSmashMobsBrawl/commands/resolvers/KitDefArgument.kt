@@ -21,7 +21,7 @@ class KitDefArgument : ArgumentResolver<CommandSender, KitDef>(), KoinComponent 
         argument: String?,
     ): ParseResult<KitDef?>? {
         if (argument.isNullOrEmpty()) {
-            return ParseResult.failure("Queue should not be empty value")
+            return ParseResult.failure("Kit id must not be empty")
         }
 
         val kitDefinition = kitService.getKitData(argument)
@@ -44,6 +44,8 @@ class KitDefArgument : ArgumentResolver<CommandSender, KitDef>(), KoinComponent 
         argument: Argument<KitDef?>?,
         context: SuggestionContext?,
     ): SuggestionResult? {
-        return SuggestionResult.of(kitService.getAllKitData().filter { it.userFacing }.map { it.id })
+        return SuggestionResult.of(
+            kitService.getAllKitData().filter { it.userFacing }.map { it.id }
+        )
     }
 }

@@ -4,20 +4,19 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.extensions.event
 import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
+import gg.flyte.twilight.event.event
 import gg.flyte.twilight.gui.GUI.Companion.openInventory
 import gg.flyte.twilight.gui.gui
 import io.papermc.paper.datacomponent.DataComponentTypes
-import io.papermc.paper.registry.RegistryAccess
-import io.papermc.paper.registry.RegistryKey
-import io.papermc.paper.registry.TypedKey
-import net.kyori.adventure.key.Key
+import java.util.concurrent.ConcurrentHashMap
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.Sound
-import java.util.concurrent.ConcurrentHashMap
 import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
@@ -35,8 +34,11 @@ object KitService : KoinComponent {
     private val playerSelectedKits = ConcurrentHashMap<Player, String>() // kit id
     private val assignedBrawlKits = ConcurrentHashMap<Player, BrawlKit>()
 
-    fun playerSelectKit(player: Player, kitId: String) {
-        playerSelectedKits[player] = kitId
+    init {
+        event<PlayerQuitEvent> {
+            unassignKit(player)
+            playerSelectedKits.remove(player)
+        }
     }
 
     fun playerSelectKit(player: Player, kit: KitDef) {
@@ -44,9 +46,9 @@ object KitService : KoinComponent {
     }
 
     fun currentSelectedKitForPlayer(player: Player): KitDef {
-        val kitId = playerSelectedKits[player] ?: defaultKitId()
+        val kitId = playerSelectedKits[player]
 
-        return dataService.getKit(kitId)!!
+        return kitId?.let { dataService.getKit(kitId) } ?: dataService.getKit(defaultKitId())!!
     }
 
     fun assignKit(player: Player): Result<BrawlKit, AssignKitError> {
@@ -115,7 +117,9 @@ object KitService : KoinComponent {
                 return it
             }
 
-        return getAllKitData().filter { it.userFacing }.find { it.id.contains(id, ignoreCase = true) }
+        return getAllKitData()
+            .filter { it.userFacing }
+            .find { it.id.contains(id, ignoreCase = true) }
     }
 
     fun openKitSelectionGui(player: Player) {
@@ -125,55 +129,87 @@ object KitService : KoinComponent {
         val guiRows = 4
         val filledSlots = hashSetOf<Int>()
 
-        val kitSelectionGui = gui(lang.t("gui.kitSelection.title"), guiColumns * guiRows) {
-            onClick { isCancelled = true }
+        val kitSelectionGui =
+            gui(lang.t("gui.kitSelection.title"), guiColumns * guiRows) {
+                onClick { isCancelled = true }
 
-            getAllKitData().filter { it.userFacing && it.displayItem != null }.forEachIndexed { idx, kit ->
-                set(getCenteredSlot(guiColumns, guiRows, idx).apply { filledSlots.add(this) }, ItemStack.of(kit.displayItem!!).apply {
-                    val isKitSelected = currentSelectedKit.id == kit.id
+                getAllKitData()
+                    .filter { it.userFacing && it.displayItem != null }
+                    .forEachIndexed { idx, kit ->
+                        set(
+                            getCenteredSlot(guiColumns, guiRows, idx).apply {
+                                filledSlots.add(this)
+                            },
+                            ItemStack.of(kit.displayItem!!).apply {
+                                val isKitSelected = currentSelectedKit.id == kit.id
 
-                    val meta = itemMeta
+                                val meta = itemMeta
 
-                    if (isKitSelected) {
-                        meta.displayName(lang.t("gui.kitSelection.selectedKitName") { "kitId" to kit.id })
-                    } else {
-                        meta.displayName(lang.t("gui.kitSelection.kitName") { "kitId" to kit.id })
+                                if (isKitSelected) {
+                                    meta.displayName(
+                                        lang.t("gui.kitSelection.selectedKitName") {
+                                            "kitId" to kit.id
+                                        }
+                                    )
+                                } else {
+                                    meta.displayName(
+                                        lang.t("gui.kitSelection.kitName") { "kitId" to kit.id }
+                                    )
+                                }
+
+                                val loreList = arrayListOf<Component>()
+
+                                loreList.add(lang.t("gui.kitSelection.abilityList.title"))
+
+                                val abilityList =
+                                    kit.abilities.map {
+                                        lang.t("gui.kitSelection.abilityList.entry") {
+                                            "abilityId" to it.id
+                                        }
+                                    }
+                                loreList.addAll(abilityList)
+
+                                meta.lore(loreList)
+
+                                itemMeta = meta
+
+                                setData(
+                                    DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE,
+                                    isKitSelected,
+                                )
+                            },
+                        ) {
+                            playerSelectKit(player, kit)
+                            player.closeInventory()
+                            player.sendMessage(
+                                lang.t("messages.kits.select.success") { "kitId" to kit.id }
+                            )
+                            player.playSound(
+                                player.location,
+                                kit.selectionSound ?: Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
+                                1f,
+                                1f,
+                            )
+                        }
                     }
 
-                    val loreList = arrayListOf<Component>()
+                for (cellIdx in 0 until guiColumns * guiRows) {
+                    if (filledSlots.contains(cellIdx)) {
+                        continue
+                    }
 
-                    loreList.add(lang.t("gui.kitSelection.abilityList.title"))
+                    set(
+                        cellIdx,
+                        ItemStack.of(Material.BLACK_STAINED_GLASS_PANE).apply {
+                            val meta = itemMeta
 
-                    val abilityList = kit.abilities.map { lang.t("gui.kitSelection.abilityList.entry") { "abilityId" to it.id } }
-                    loreList.addAll(abilityList)
+                            meta.displayName(Component.empty())
 
-                    meta.lore(loreList)
-
-                    itemMeta = meta
-
-                    setData(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, isKitSelected);
-                }) {
-                    playerSelectKit(player, kit)
-                    player.closeInventory()
-                    player.sendMessage(lang.t("messages.kits.select.success") { "kitId" to kit.id })
-                    player.playSound(player.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
+                            itemMeta = meta
+                        },
+                    )
                 }
             }
-
-            for (cellIdx in 0 until guiColumns * guiRows) {
-                if (filledSlots.contains(cellIdx)) {
-                    continue
-                }
-
-                set(cellIdx, ItemStack.of(Material.BLACK_STAINED_GLASS_PANE).apply {
-                    val meta = itemMeta
-
-                    meta.customName(Component.empty())
-
-                    itemMeta = meta
-                })
-            }
-        }
 
         player.openInventory(kitSelectionGui)
     }
@@ -184,7 +220,7 @@ object KitService : KoinComponent {
 }
 
 fun getCenteredSlot(columns: Int, rows: Int, index: Int): Int {
-    if (index == 0) {
+    if (index <= 0) {
         val centerRow = rows / 2
         val centerCol = columns / 2
         return centerRow * columns + centerCol
@@ -193,12 +229,21 @@ fun getCenteredSlot(columns: Int, rows: Int, index: Int): Int {
     val centerRow = rows / 2
     val centerCol = columns / 2
 
+    // Prevent infinite loops when there are more items than slots
+    if (index >= columns * rows) {
+        return centerRow * columns + centerCol
+    }
+
     // Calculate which "layer" this index belongs to
     var currentIndex = 1
     var layer = 1
 
     while (currentIndex <= index) {
         val itemsInLayer = getItemsInLayer(layer, centerRow, centerCol, rows, columns)
+        if (itemsInLayer == 0) {
+            break
+        }
+
         if (currentIndex + itemsInLayer > index) {
             // This index is in the current layer
             val positionInLayer = index - currentIndex
@@ -212,7 +257,13 @@ fun getCenteredSlot(columns: Int, rows: Int, index: Int): Int {
     return centerRow * columns + centerCol
 }
 
-private fun getItemsInLayer(layer: Int, centerRow: Int, centerCol: Int, rows: Int, columns: Int): Int {
+private fun getItemsInLayer(
+    layer: Int,
+    centerRow: Int,
+    centerCol: Int,
+    rows: Int,
+    columns: Int,
+): Int {
     var count = 0
 
     for (r in 0 until rows) {
@@ -227,7 +278,14 @@ private fun getItemsInLayer(layer: Int, centerRow: Int, centerCol: Int, rows: In
     return count
 }
 
-private fun getSlotInLayer(layer: Int, positionInLayer: Int, centerRow: Int, centerCol: Int, rows: Int, columns: Int): Int {
+private fun getSlotInLayer(
+    layer: Int,
+    positionInLayer: Int,
+    centerRow: Int,
+    centerCol: Int,
+    rows: Int,
+    columns: Int,
+): Int {
     var currentPos = 0
 
     for (r in 0 until rows) {

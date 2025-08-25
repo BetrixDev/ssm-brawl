@@ -9,12 +9,12 @@ import kotlinx.serialization.encoding.Encoder
 import org.bukkit.Material
 
 /**
- * Kotlinx serialization deserializer for Paper Material using Registry API
- * Serializes/deserializes ItemType using NamespacedKey strings
+ * Kotlinx serialization deserializer for Paper Material using Registry API Serializes/deserializes
+ * ItemType using NamespacedKey strings
  */
 object MaterialSerializer : KSerializer<Material> {
     override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("ItemType", PrimitiveKind.STRING)
+        PrimitiveSerialDescriptor("Material", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Material) {
         encoder.encodeString(value.toString())
@@ -23,6 +23,7 @@ object MaterialSerializer : KSerializer<Material> {
     override fun deserialize(decoder: Decoder): Material {
         val name = decoder.decodeString().uppercase()
 
-        return Material.getMaterial(name) ?: throw IllegalArgumentException("Material not found for key: $name")
+        return Material.getMaterial(name)
+            ?: throw IllegalArgumentException("Material not found for key: $name")
     }
 }
