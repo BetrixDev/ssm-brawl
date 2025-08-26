@@ -11,8 +11,7 @@ enum class KitSwitchingMode {
     IMMEDIATE,
 }
 
-@Serializable
-data class MinigameDefFile(val minigames: List<MinigameDef>)
+@Serializable data class MinigameDefFile(val minigames: List<MinigameDef>)
 
 @Serializable
 sealed class MinigameDef {

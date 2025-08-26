@@ -109,6 +109,15 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 if (!isPlayerInMinigame(player)) return@event
 
                 when (minigameData.kitSwitchingMode) {
+                    KitSwitchingMode.NEVER -> {
+                        // Just update the selection, no switching
+                    }
+
+                    KitSwitchingMode.ON_DEATH -> {
+                        // Update selection but don't switch immediately
+                        // The kit will be switched on respawn in onPlayerDeath
+                    }
+
                     KitSwitchingMode.IMMEDIATE -> {
                         if (shouldSwitchImmediately && !isPlayerRespawning(player)) {
                             // Switch kit immediately (but not if player is currently respawning)
@@ -245,6 +254,8 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             player.playSound(player.eyeLocation, Sound.ENTITY_PLAYER_HURT, 1f, 1f)
         }
 
+        var respawnSuccessful = false
+
         if (minigameData.respawnDelaySeconds != null) {
             player.teleport(brawlWorld!!.data.spectatorSpawnPoint)
             player.gameMode = GameMode.SPECTATOR
@@ -255,42 +266,54 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             // Mark player as respawning
             respawningPlayers.add(player.uniqueId)
 
-            val respawnDelay = minigameData.respawnDelaySeconds ?: 0
+            try {
+                val respawnDelay = minigameData.respawnDelaySeconds ?: 0
 
-            repeat(respawnDelay) { iteration ->
-                // Check if player is still in the minigame before each countdown step
+                repeat(respawnDelay) { iteration ->
+                    // Check if player is still in the minigame before each countdown step
+                    if (!isPlayerInMinigame(player)) {
+                        return
+                    }
+
+                    val secondsLeft = respawnDelay - iteration
+
+                    val title =
+                        Title.title(
+                            langService.t("messages.minigames.respawn.timeLeft") {
+                                "secondsLeft" to secondsLeft
+                            },
+                            Component.empty(),
+                            Title.Times.times(
+                                Duration.ofMillis(250),
+                                Duration.ofMillis(500),
+                                Duration.ofMillis(250),
+                            ),
+                        )
+
+                    player.showTitle(title)
+
+                    delay(1.seconds)
+                }
+
+                // Final check before respawning
                 if (!isPlayerInMinigame(player)) {
                     return
                 }
 
-                val secondsLeft = respawnDelay - iteration
-
-                val title =
-                    Title.title(
-                        langService.t("messages.minigames.respawn.timeLeft") {
-                            "secondsLeft" to secondsLeft
-                        },
-                        Component.empty(),
-                        Title.Times.times(
-                            Duration.ofMillis(250),
-                            Duration.ofMillis(500),
-                            Duration.ofMillis(250),
-                        ),
-                    )
-
-                player.showTitle(title)
-
-                delay(1.seconds)
-            }
-
-            // Final check before respawning
-            if (!isPlayerInMinigame(player)) {
-                return
+                // If we reach here, respawn was successful
+                respawnSuccessful = true
+            } finally {
+                // Only remove from respawning if respawn failed (player left during countdown)
+                if (!respawnSuccessful) {
+                    respawningPlayers.remove(player.uniqueId)
+                }
             }
         }
 
-        // Remove player from respawning state before respawning
-        respawningPlayers.remove(player.uniqueId)
+        // Remove player from respawning state before respawning (successful case)
+        if (respawnSuccessful || minigameData.respawnDelaySeconds == null) {
+            respawningPlayers.remove(player.uniqueId)
+        }
 
         val spawnPoint =
             brawlWorld!!
