@@ -84,6 +84,9 @@ messages:
   kits:
     select:
       success: "{lang:prefix} <#e8edff>You have selected kit <#8bd5ff>{lang:kits.{kitId}.name}"
+      success_never: "{lang:prefix} <#e8edff>You have selected kit <#8bd5ff>{lang:kits.{kitId}.name}<#e8edff>, but kit switching is disabled in this minigame"
+      success_on_death: "{lang:prefix} <#e8edff>You have selected kit <#8bd5ff>{lang:kits.{kitId}.name}<#e8edff>. Your kit will switch after you respawn"
+      success_immediate: "{lang:prefix} <#e8edff>You have selected and switched to kit <#8bd5ff>{lang:kits.{kitId}.name}"
   players:
     joinServer: "{lang:prefix} <#8bd5ff>{playerName} <#e8edff>has joined the server"
   minigames:

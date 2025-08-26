@@ -5,7 +5,7 @@ minigames:
     isHidden: false
     minPlayers: 1
     maxPlayers: 4
-    allowKitSwitching: true
+    kitSwitchingMode: immediate
     allowParties: true
     passiveBlacklist: [hunger]
     respawnDelaySeconds: 5

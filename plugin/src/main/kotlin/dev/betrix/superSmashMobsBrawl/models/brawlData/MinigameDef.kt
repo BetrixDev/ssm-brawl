@@ -4,7 +4,15 @@ import com.charleskorn.kaml.YamlScalar
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable data class MinigameDefFile(val minigames: List<MinigameDef>)
+@Serializable
+enum class KitSwitchingMode {
+    NEVER,
+    ON_DEATH,
+    IMMEDIATE,
+}
+
+@Serializable
+data class MinigameDefFile(val minigames: List<MinigameDef>)
 
 @Serializable
 sealed class MinigameDef {
@@ -18,6 +26,7 @@ sealed class MinigameDef {
     abstract val respawnDelaySeconds: Int?
     abstract val overrides: MinigameDefOverrides?
     abstract val allowRejoinAfterLeave: Boolean
+    abstract val kitSwitchingMode: KitSwitchingMode
 
     fun isPassiveValid(passiveId: String): Boolean {
         if (passiveBlacklist?.contains(passiveId) == true) {
@@ -45,9 +54,9 @@ data class FfaMinigameDef(
     override val respawnDelaySeconds: Int? = null,
     override val overrides: MinigameDefOverrides? = null,
     override val allowRejoinAfterLeave: Boolean = true,
+    override val kitSwitchingMode: KitSwitchingMode = KitSwitchingMode.NEVER,
     val minPlayers: Int,
     val maxPlayers: Int,
-    val allowKitSwitching: Boolean,
 ) : MinigameDef()
 
 @Serializable
@@ -63,6 +72,7 @@ data class TeamBasedStocksMinigameDef(
     override val respawnDelaySeconds: Int? = null,
     override val overrides: MinigameDefOverrides? = null,
     override val allowRejoinAfterLeave: Boolean = true,
+    override val kitSwitchingMode: KitSwitchingMode = KitSwitchingMode.NEVER,
     val playersPerTeam: Int,
     val amountOfTeams: Int,
     val stocks: Int,

@@ -13,6 +13,7 @@ import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
+import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.extensions.getEquidistant
@@ -24,6 +25,7 @@ import dev.betrix.superSmashMobsBrawl.models.BrawlGameWorld
 import dev.betrix.superSmashMobsBrawl.models.MinigamePlayer
 import dev.betrix.superSmashMobsBrawl.models.MinigameState
 import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
+import dev.betrix.superSmashMobsBrawl.models.brawlData.KitSwitchingMode
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.services.*
 import gg.flyte.twilight.event.event
@@ -60,7 +62,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     protected val minigameData: TMinigameDef by lazy {
         (dataService.getMinigame(minigameId)
             ?: throw RuntimeException("Could not find minigame data for id $minigameId"))
-            as TMinigameDef
+                as TMinigameDef
     }
 
     var brawlWorld: BrawlGameWorld? = null
@@ -74,9 +76,22 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     /** Tracks players who disconnected while in this minigame */
     protected val disconnectedPlayers = mutableSetOf<UUID>()
 
+    /** Tracks players who are currently dead and waiting to respawn */
+    protected val respawningPlayers = mutableSetOf<UUID>()
+
     /** Determine if a passive can be used in a minigame */
     fun isPassiveValid(id: String): Boolean {
         return minigameData.isPassiveValid(id)
+    }
+
+    /** Get the kit switching mode for this minigame */
+    fun getKitSwitchingMode(): KitSwitchingMode {
+        return minigameData.kitSwitchingMode
+    }
+
+    /** Check if a player is currently dead and waiting to respawn */
+    fun isPlayerRespawning(player: Player): Boolean {
+        return respawningPlayers.contains(player.uniqueId)
     }
 
     open suspend fun initMinigame(): Result<Unit, Exception> {
@@ -84,6 +99,24 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             BrawlDeathEvent.listen(this) {
                 plugin.logger.info("Player $player died")
                 plugin.launch { onPlayerDeath(player) }
+            }
+        )
+
+        // Handle kit selection events
+        listeners.add(
+            event<PlayerSelectKitEvent> {
+                // Only handle if this player is in this minigame
+                if (!isPlayerInMinigame(player)) return@event
+
+                when (minigameData.kitSwitchingMode) {
+                    KitSwitchingMode.IMMEDIATE -> {
+                        if (shouldSwitchImmediately && !isPlayerRespawning(player)) {
+                            // Switch kit immediately (but not if player is currently respawning)
+                            kitService.unassignKit(player)
+                            kitService.assignKit(player, kit.id)
+                        }
+                    }
+                }
             }
         )
 
@@ -145,7 +178,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 if (
                     cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
-                        cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
+                    cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
                 )
                     return@event
 
@@ -158,10 +191,10 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 val meleeDamage = attackerKit?.getMeleeDamage() ?: damage
 
                 SmashDamageEvent(
-                        victimPlayer,
-                        Damager.DamagerLivingEntity(damagerPlayer),
-                        meleeDamage,
-                    )
+                    victimPlayer,
+                    Damager.DamagerLivingEntity(damagerPlayer),
+                    meleeDamage,
+                )
                     .callEvent()
             }
         )
@@ -189,7 +222,8 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 player.player.inventory.setItemInOffHand(
                     org.bukkit.inventory.ItemStack.of(org.bukkit.Material.AIR)
                 )
-            } catch (_: Throwable) {}
+            } catch (_: Throwable) {
+            }
         }
 
         state = MinigameState.STARTING
@@ -217,6 +251,9 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             player.allowFlight = true
             player.isFlying = true
             player.fallDistance = 0f
+
+            // Mark player as respawning
+            respawningPlayers.add(player.uniqueId)
 
             val respawnDelay = minigameData.respawnDelaySeconds ?: 0
 
@@ -252,6 +289,9 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             }
         }
 
+        // Remove player from respawning state before respawning
+        respawningPlayers.remove(player.uniqueId)
+
         val spawnPoint =
             brawlWorld!!
                 .data
@@ -269,12 +309,28 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         player.feed()
         player.heal()
         player.gameMode = GameMode.SURVIVAL
+
+        // Handle kit switching on respawn for both ON_DEATH and IMMEDIATE modes
+        // (IMMEDIATE mode needs this for cases where kit was selected during spectator countdown)
+        if (
+            minigameData.kitSwitchingMode == KitSwitchingMode.ON_DEATH ||
+            minigameData.kitSwitchingMode == KitSwitchingMode.IMMEDIATE
+        ) {
+            val currentKit = kitService.getKitForPlayer(player)
+            val selectedKit = kitService.currentSelectedKitForPlayer(player)
+
+            if (currentKit?.id != selectedKit.id) {
+                // Unassign current kit and assign the selected one
+                kitService.unassignKit(player)
+            }
+        }
+
         assignPlayerKit(player)
     }
 
     fun isPlayerInMinigame(player: Player): Boolean {
         return players.find { it.player == player } != null &&
-            !disconnectedPlayers.contains(player.uniqueId)
+                !disconnectedPlayers.contains(player.uniqueId)
     }
 
     open fun canPlayerLeaveMinigame(player: Player): Boolean {
@@ -287,6 +343,8 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         if (!disconnectedPlayers.contains(player.uniqueId)) {
             disconnectedPlayers.add(player.uniqueId)
         }
+        // Clean up respawning state if player leaves while respawning
+        respawningPlayers.remove(player.uniqueId)
     }
 
     /** Called when a player disconnects from the server while in this minigame */
@@ -350,8 +408,8 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             players.filter { player ->
                 val bukkitPlayer = player.player
                 bukkitPlayer.isOnline &&
-                    !disconnectedPlayers.contains(bukkitPlayer.uniqueId) &&
-                    bukkitPlayer.gameMode != GameMode.SPECTATOR
+                        !disconnectedPlayers.contains(bukkitPlayer.uniqueId) &&
+                        bukkitPlayer.gameMode != GameMode.SPECTATOR
             }
 
         // End minigame if no active players remain
@@ -389,7 +447,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 players.forEach { player ->
                     if (
                         player.player.gameMode == GameMode.SURVIVAL &&
-                            player.player.location.y <= voidLevel
+                        player.player.location.y <= voidLevel
                     ) {
                         plugin.logger.info("Player $player fell into the void")
                         BrawlDeathEvent.call(player.player, DeathReason.Void)
