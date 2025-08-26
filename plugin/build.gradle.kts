@@ -3,7 +3,6 @@ plugins {
     kotlin("plugin.serialization") version "2.2.0"
     id("com.gradleup.shadow") version "8.3.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("com.ncorti.ktfmt.gradle") version "0.23.0"
 }
 
 val ktor_version: String by project
@@ -73,8 +72,6 @@ tasks {
         filteringCharset = "UTF-8"
         filesMatching("plugin.yml") { expand(props) }
     }
-
-    ktfmt { kotlinLangStyle() }
 
     withType<Test>().configureEach {
         useJUnitPlatform()
