@@ -62,7 +62,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     protected val minigameData: TMinigameDef by lazy {
         (dataService.getMinigame(minigameId)
             ?: throw RuntimeException("Could not find minigame data for id $minigameId"))
-                as TMinigameDef
+            as TMinigameDef
     }
 
     var brawlWorld: BrawlGameWorld? = null
@@ -109,15 +109,6 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 if (!isPlayerInMinigame(player)) return@event
 
                 when (minigameData.kitSwitchingMode) {
-                    KitSwitchingMode.NEVER -> {
-                        // Just update the selection, no switching
-                    }
-
-                    KitSwitchingMode.ON_DEATH -> {
-                        // Update selection but don't switch immediately
-                        // The kit will be switched on respawn in onPlayerDeath
-                    }
-
                     KitSwitchingMode.IMMEDIATE -> {
                         if (shouldSwitchImmediately && !isPlayerRespawning(player)) {
                             // Switch kit immediately (but not if player is currently respawning)
@@ -125,6 +116,8 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                             kitService.assignKit(player, kit.id)
                         }
                     }
+
+                    else -> {}
                 }
             }
         )
@@ -187,7 +180,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 if (
                     cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
-                    cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
+                        cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
                 )
                     return@event
 
@@ -200,10 +193,10 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 val meleeDamage = attackerKit?.getMeleeDamage() ?: damage
 
                 SmashDamageEvent(
-                    victimPlayer,
-                    Damager.DamagerLivingEntity(damagerPlayer),
-                    meleeDamage,
-                )
+                        victimPlayer,
+                        Damager.DamagerLivingEntity(damagerPlayer),
+                        meleeDamage,
+                    )
                     .callEvent()
             }
         )
@@ -231,8 +224,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 player.player.inventory.setItemInOffHand(
                     org.bukkit.inventory.ItemStack.of(org.bukkit.Material.AIR)
                 )
-            } catch (_: Throwable) {
-            }
+            } catch (_: Throwable) {}
         }
 
         state = MinigameState.STARTING
@@ -337,7 +329,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         // (IMMEDIATE mode needs this for cases where kit was selected during spectator countdown)
         if (
             minigameData.kitSwitchingMode == KitSwitchingMode.ON_DEATH ||
-            minigameData.kitSwitchingMode == KitSwitchingMode.IMMEDIATE
+                minigameData.kitSwitchingMode == KitSwitchingMode.IMMEDIATE
         ) {
             val currentKit = kitService.getKitForPlayer(player)
             val selectedKit = kitService.currentSelectedKitForPlayer(player)
@@ -353,7 +345,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
     fun isPlayerInMinigame(player: Player): Boolean {
         return players.find { it.player == player } != null &&
-                !disconnectedPlayers.contains(player.uniqueId)
+            !disconnectedPlayers.contains(player.uniqueId)
     }
 
     open fun canPlayerLeaveMinigame(player: Player): Boolean {
@@ -431,8 +423,8 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             players.filter { player ->
                 val bukkitPlayer = player.player
                 bukkitPlayer.isOnline &&
-                        !disconnectedPlayers.contains(bukkitPlayer.uniqueId) &&
-                        bukkitPlayer.gameMode != GameMode.SPECTATOR
+                    !disconnectedPlayers.contains(bukkitPlayer.uniqueId) &&
+                    bukkitPlayer.gameMode != GameMode.SPECTATOR
             }
 
         // End minigame if no active players remain
@@ -470,7 +462,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 players.forEach { player ->
                     if (
                         player.player.gameMode == GameMode.SURVIVAL &&
-                        player.player.location.y <= voidLevel
+                            player.player.location.y <= voidLevel
                     ) {
                         plugin.logger.info("Player $player fell into the void")
                         BrawlDeathEvent.call(player.player, DeathReason.Void)
