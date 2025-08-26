@@ -4,9 +4,11 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
 import dev.betrix.superSmashMobsBrawl.extensions.event
 import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
+import dev.betrix.superSmashMobsBrawl.models.brawlData.KitSwitchingMode
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.gui.GUI.Companion.openInventory
 import gg.flyte.twilight.gui.gui
@@ -30,6 +32,7 @@ object KitService : KoinComponent {
     private val lang: LangService by inject()
     private val plugin: JavaPlugin by inject()
     private val dataService: DataService by inject()
+    private val minigameService: MinigameService by inject()
 
     private val playerSelectedKits = ConcurrentHashMap<Player, String>() // kit id
     private val assignedBrawlKits = ConcurrentHashMap<Player, BrawlKit>()
@@ -43,6 +46,14 @@ object KitService : KoinComponent {
 
     fun playerSelectKit(player: Player, kit: KitDef) {
         playerSelectedKits[player] = kit.id
+
+        // Determine if the player should switch kits immediately based on their current minigame
+        val currentMinigame = minigameService.getMinigameForPlayer(player)
+        val shouldSwitchImmediately =
+            currentMinigame?.getKitSwitchingMode() == KitSwitchingMode.IMMEDIATE
+
+        // Dispatch the event
+        PlayerSelectKitEvent.call(player, kit, shouldSwitchImmediately)
     }
 
     fun currentSelectedKitForPlayer(player: Player): KitDef {
