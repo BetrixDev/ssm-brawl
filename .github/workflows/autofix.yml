@@ -3,7 +3,7 @@ name: autofix.ci
 on:
   pull_request:
   push:
-    branches: [ "main", "reimagined" ]
+    branches: ["main", "reimagined"]
 permissions:
   contents: read
 
@@ -16,7 +16,10 @@ jobs:
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Run ktfmt on plugin/src
+      - name: Run Ktfmt
         run: bunx ktfmt@latest --kotlinlang-style plugin/src
+
+      - name: Run Prettier
+        run: bun run format
 
       - uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27

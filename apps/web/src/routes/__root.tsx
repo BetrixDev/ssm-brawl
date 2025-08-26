@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
- 
+
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
- 
+
 import {
   HeadContent,
   Outlet,

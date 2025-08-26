@@ -67,13 +67,7 @@ services:
     networks:
       - ssmb-network
     healthcheck:
-      test:
-        [
-          "CMD",
-          "sh",
-          "-c",
-          "curl -f http://localhost:${WEB_PORT:-3001} || exit 1",
-        ]
+      test: ["CMD", "sh", "-c", "curl -f http://localhost:${WEB_PORT:-3001} || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
