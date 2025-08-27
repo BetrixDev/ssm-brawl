@@ -2,8 +2,7 @@ import app from "../backend/dist/index.js";
 
 function getOriginalRequestUrl(req: any): string {
   const proto = (req.headers["x-forwarded-proto"] as string) || "https";
-  const host =
-    (req.headers["x-forwarded-host"] as string) || req.headers.host || "localhost";
+  const host = (req.headers["x-forwarded-host"] as string) || req.headers.host || "localhost";
   const currentUrl = new URL(req.url || "/", `${proto}://${host}`);
 
   // Reconstruct the original path (strip the /api prefix added by Vercel routing)
@@ -15,7 +14,9 @@ function getOriginalRequestUrl(req: any): string {
   return originalUrl.toString();
 }
 
-function nodeHeadersToWebHeaders(nodeHeaders: Record<string, string | string[] | undefined>): Headers {
+function nodeHeadersToWebHeaders(
+  nodeHeaders: Record<string, string | string[] | undefined>,
+): Headers {
   const headers = new Headers();
   for (const [key, value] of Object.entries(nodeHeaders)) {
     if (typeof value === "undefined") continue;
@@ -65,4 +66,3 @@ export default async function handler(req: any, res: any) {
     res.end("Internal Server Error");
   }
 }
-
