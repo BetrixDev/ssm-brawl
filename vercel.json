@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "turbo build",
   "devCommand": "turbo dev",
-  "outputDirectory": "./web/dist",
+  "outputDirectory": "./backend/dist",
   "routes": [
     {
       "src": "/(.*)",
