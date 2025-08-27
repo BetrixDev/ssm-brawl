@@ -14,7 +14,7 @@ function App() {
 
   return (
     <div>
-      <h1>Super Smash Mobs Brawl</h1>
+      <h1>Super Smash Mobs Brawl YOOOO</h1>
       <div>
         Response from server: <span className="text-blue-500">{data ?? "loading..."}</span>
       </div>
