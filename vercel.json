@@ -1,9 +1,23 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/backend/src"
+      "src": "backend/dist/index.js",
+      "use": "@vercel/node"
     }
-  ]
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/backend/dist/index.js"
+    }
+  ],
+  "functions": {
+    "backend/dist/index.js": {
+      "runtime": "nodejs22.x"
+    }
+  },
+  "buildCommand": "bun run build",
+  "outputDirectory": "backend/dist",
+  "installCommand": "bun install"
 }
