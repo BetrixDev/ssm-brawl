@@ -16,6 +16,9 @@ jobs:
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
 
+      - name: Install dependencies
+        run: bun install
+
       - name: Run Ktfmt
         run: bunx ktfmt@latest --kotlinlang-style plugin/src
 
