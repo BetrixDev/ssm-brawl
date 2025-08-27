@@ -1,2 +1,3 @@
 plugin
 !plugin/src
+**/*.gen.ts
