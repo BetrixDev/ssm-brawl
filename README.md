@@ -6,6 +6,6 @@
 
 ![GitHub milestone details](https://img.shields.io/github/milestones/progress/BetrixDev/ssm-brawl/1)
 
-A Minecraft server based on the Mineplex minigame Super Smash Mobs Brawl.
+A Minecraft server based on the Mineplex minigame Super Smash Mobs.
 
 ---
