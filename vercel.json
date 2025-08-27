@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "bun run build:backend",
-  "devCommand": "bun run dev:backend",
+  "buildCommand": "turbo -F backend build",
+  "devCommand": "turbo -F backend dev",
   "rewrites": [
     {
       "source": "/(.*)",
