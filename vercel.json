@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "bun run build:backend",
+  "devCommand": "bun run dev:backend",
+  "rewrites": [
+    {
+        "source": "/(.*)",
+        "destination": "/backend/dist/index.js"
+    }
+]
+}
