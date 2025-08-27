@@ -2,11 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "turbo -F backend build",
   "devCommand": "turbo -F backend dev",
-  "outputDirectory": "./backend/dist",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "./index.js"
-    }
-  ]
+  "outputDirectory": "./backend/dist"
 }
