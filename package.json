@@ -2,9 +2,9 @@
   "name": "super-smash-mobs-brawl",
   "private": true,
   "workspaces": [
-    "apps/*",
     "packages/*",
-    "backend"
+    "backend",
+    "web"
   ],
   "scripts": {
     "format": "prettier --write .",
@@ -26,6 +26,7 @@
   "dependencies": {},
   "devDependencies": {
     "prettier": "^3.6.2",
+    "prettier-plugin-organize-imports": "^4.2.0",
     "turbo": "^2.5.4"
   },
   "packageManager": "bun@1.2.15"
