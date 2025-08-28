@@ -33,8 +33,8 @@ COPY backend/package.json backend/package.json
 RUN corepack enable && pnpm -C backend run build:compile
 
 
-## runner: minimal image containing only the compiled binary (with curl for healthchecks)
-FROM gcr.io/distroless/curl-debian12 AS runner
+## runner: minimal image containing only the compiled binary (debug variant includes BusyBox)
+FROM gcr.io/distroless/base-debian12:debug AS runner
 
 WORKDIR /app
 
