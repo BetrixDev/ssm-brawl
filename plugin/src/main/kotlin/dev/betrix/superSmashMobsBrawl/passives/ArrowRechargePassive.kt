@@ -65,6 +65,11 @@ class ArrowRechargePassive(player: Player) : BrawlPassive("arrow_recharge", play
         super.setup()
     }
 
+    override fun teardown() {
+        player.inventory.clear(arrowHotbarSlot)
+        super.teardown()
+    }
+
     private fun playPickupSound() {
         player.playSound(player.eyeLocation, Sound.ENTITY_ITEM_PICKUP, 1f, 1f)
     }
