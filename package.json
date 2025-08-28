@@ -1,11 +1,6 @@
 {
   "name": "super-smash-mobs-brawl",
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "backend",
-    "web"
-  ],
   "scripts": {
     "format": "prettier --write .",
     "dev": "turbo dev",
@@ -14,7 +9,8 @@
     "dev:native": "turbo -F native dev",
     "dev:web": "turbo -F web dev",
     "dev:backend": "turbo -F backend dev",
-    "build:backend": "turbo -F backend build"
+    "build:backend": "turbo -F backend build",
+    "test": "turbo test"
   },
   "dependencies": {},
   "devDependencies": {
@@ -22,5 +18,5 @@
     "prettier-plugin-organize-imports": "^4.2.0",
     "turbo": "^2.5.4"
   },
-  "packageManager": "bun@1.2.15"
+  "packageManager": "pnpm@9.1.0"
 }
