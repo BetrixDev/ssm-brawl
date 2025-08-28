@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: backend
+    runtime: docker
+    repo: https://github.com/BetrixDev/ssm-brawl
+    plan: starter
+    region: ohio
+    envVars:
+      - key: NODE_ENV
+        value: production
