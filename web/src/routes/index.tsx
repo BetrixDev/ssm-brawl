@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { trpc } from "~/router";
+import { useTRPC } from "~/trpc";
 
 export const Route = createFileRoute("/")({
   component: App,
@@ -10,6 +10,8 @@ export const Route = createFileRoute("/")({
 });
 
 function App() {
+  const trpc = useTRPC();
+
   const { data } = useQuery(trpc.ping.queryOptions());
 
   return (

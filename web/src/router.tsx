@@ -1,24 +1,30 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
+import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import type { AppRouter } from "backend";
 import { routeTree } from "./routeTree.gen";
+import { TRPCProvider } from "./trpc";
 
-const queryClient = new QueryClient();
-
-export const trpc = createTRPCOptionsProxy<AppRouter>({
-  client: createTRPCClient({
-    links: [
-      httpBatchLink({
-        url: `${import.meta.env.VITE_BACKEND_URL}/trpc`,
-      }),
-    ],
-  }),
-  queryClient,
-});
+const isServer = typeof window === "undefined";
 
 export function createRouter() {
+  const queryClient = new QueryClient();
+
+  const trpcClient = createTRPCClient<AppRouter>({
+    links: [
+      httpBatchLink({
+        url: `${isServer ? import.meta.env.VITE_SERVER_BACKEND_URL : import.meta.env.VITE_BACKEND_URL}/trpc`,
+      }),
+    ],
+  });
+
+  const trpc = createTRPCOptionsProxy<AppRouter>({
+    client: trpcClient,
+    queryClient,
+  });
+
   const router = createTanStackRouter({
     routeTree,
     scrollRestoration: true,
@@ -28,8 +34,17 @@ export function createRouter() {
       queryClient,
     },
     Wrap: function WrapComponent({ children }: { children: React.ReactNode }) {
-      return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+      return (
+        <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
+          {children}
+        </TRPCProvider>
+      );
     },
+  });
+
+  setupRouterSsrQueryIntegration({
+    router,
+    queryClient,
   });
 
   return router;
