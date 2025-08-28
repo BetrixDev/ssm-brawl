@@ -11,6 +11,8 @@ node_modules
 **/build
 **/.next
 **/.turbo
+backend/backend
+backend/backend.exe
 
 # Environment files
 .env
