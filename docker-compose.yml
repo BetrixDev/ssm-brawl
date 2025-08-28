@@ -28,3 +28,8 @@ services:
     environment:
       NODE_ENV: production
       PORT: ${BACKEND_PORT:-1337}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1337/hc"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
