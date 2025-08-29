@@ -1,9 +1,10 @@
 import { cors } from "@elysiajs/cors";
+import { node } from "@elysiajs/node";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { Elysia } from "elysia";
 import { appRouter } from "./trpc/routers";
 
-export const app = new Elysia()
+export const app = new Elysia({ adapter: node() })
   .use(cors())
   .get("/hc", () => {
     return {
@@ -20,10 +21,10 @@ export const app = new Elysia()
       },
     });
   })
-  .listen(process.env.PORT ?? 1337);
-
-if (process.env.NODE_ENV !== "test") {
-  console.log(`Backend is running at http://${app.server?.hostname}:${app.server?.port}`);
-}
+  .listen(1337, ({ hostname, port }) => {
+    if (process.env.NODE_ENV !== "test") {
+      console.log(`Backend is running at ${hostname}:${port}`);
+    }
+  });
 
 export type AppRouter = typeof appRouter;
