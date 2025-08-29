@@ -24,10 +24,9 @@ services:
     container_name: ssmb-backend
     restart: unless-stopped
     ports:
-      - "${BACKEND_PORT:-1337}:1337"
+      - "1337:1337"
     environment:
       NODE_ENV: production
-      PORT: ${BACKEND_PORT:-1337}
   web:
     build:
       context: .
@@ -35,7 +34,7 @@ services:
     container_name: ssmb-web
     restart: unless-stopped
     ports:
-      - "${WEB_PORT:-3000}:3000"
+      - "3000:3000"
     environment:
-      VITE_BACKEND_URL: http://localhost:${BACKEND_PORT:-1337}
-      VITE_SERVER_BACKEND_URL: ${VITE_SERVER_BACKEND_URL-http://localhost:${BACKEND_PORT:-1337}}
+      VITE_BACKEND_URL: http://localhost:1337
+      VITE_SERVER_BACKEND_URL: ${VITE_SERVER_BACKEND_URL-http://localhost:1337}

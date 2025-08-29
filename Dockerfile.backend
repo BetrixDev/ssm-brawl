@@ -61,6 +61,8 @@ FROM gcr.io/distroless/base-debian12:debug AS runner
 
 WORKDIR /app
 
-EXPOSE ${PORT:-1337}
+COPY --from=installer /app .
+
+EXPOSE 1337
 ENV NODE_ENV=${NODE_ENV:-production}
-CMD ["backend/dist/bin"]
+CMD ["backend/dist/backend"]

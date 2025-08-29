@@ -4,7 +4,7 @@
   "scripts": {
     "test": "bun test",
     "dev": "bun run --watch src/index.ts",
-    "build:compile": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile ./dist/bin ./src/index.ts",
+    "build:compile": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile ./dist/backend ./src/index.ts",
     "build": "bun build --minify-whitespace --minify-syntax --target node --outfile ./dist/index.js ./src/index.ts"
   },
   "dependencies": {
