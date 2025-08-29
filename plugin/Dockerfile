@@ -31,7 +31,7 @@ FROM itzg/minecraft-server:latest
 
 # Set server type to Leaf (Paper fork focused on performance)
 ENV TYPE=LEAF
-ENV VERSION=1.21.6
+ENV VERSION=1.21.8
 
 # Server configuration
 ENV EULA=TRUE
@@ -43,7 +43,7 @@ ENV OPS=8ebfb8be-0095-49ed-943e-64cc61220b40
 
 # Performance and memory settings
 ENV USE_AIKAR_FLAGS=TRUE
-ENV MEMORY=${MEMORY_SIZE:-4G}
+ENV MEMORY=${MEMORY_SIZE:-6G}
 ENV ENABLE_ROLLING_LOGS=TRUE
 ENV SNOOPER_ENABLED=FALSE
 ENV MAX_TICK_TIME=-1

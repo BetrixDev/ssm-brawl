@@ -27,14 +27,3 @@ services:
       - "1337:1337"
     environment:
       NODE_ENV: production
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile.web
-    container_name: ssmb-web
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      VITE_BACKEND_URL: http://localhost:1337
-      VITE_SERVER_BACKEND_URL: ${VITE_SERVER_BACKEND_URL-http://localhost:1337}

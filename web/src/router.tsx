@@ -7,30 +7,13 @@ import type { AppRouter } from "backend";
 import { routeTree } from "./routeTree.gen";
 import { TRPCProvider } from "./trpc";
 
-const isServer = typeof window === "undefined";
-
 export function createRouter() {
   const queryClient = new QueryClient();
-
-  const baseTrpcUrl = isServer
-    ? import.meta.env.VITE_SERVER_BACKEND_URL
-    : import.meta.env.VITE_BACKEND_URL;
-
-  if (!baseTrpcUrl) {
-    throw new Error(
-      `[router] Missing ${isServer ? "VITE_SERVER_BACKEND_URL" : "VITE_BACKEND_URL"}`,
-    );
-  }
-
-  const trpcUrl = new URL(
-    "trpc",
-    baseTrpcUrl.endsWith("/") ? baseTrpcUrl : `${baseTrpcUrl}/`,
-  ).toString();
 
   const trpcClient = createTRPCClient<AppRouter>({
     links: [
       httpBatchLink({
-        url: trpcUrl,
+        url: `${import.meta.env.VITE_BACKEND_URL}/api/trpc`,
       }),
     ],
   });
