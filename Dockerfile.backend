@@ -55,7 +55,7 @@ RUN pnpm install
 
 COPY --from=builder /app/out/full/ .
 
-RUN pnpm turbo build:compile
+RUN pnpm turbo build
 
 FROM gcr.io/distroless/base-debian12:debug AS runner
 
@@ -65,4 +65,4 @@ COPY --from=installer /app .
 
 EXPOSE 1337
 ENV NODE_ENV=${NODE_ENV:-production}
-CMD ["backend/dist/backend"]
+CMD ["bun", "run", "backend/dist/index.js"]
