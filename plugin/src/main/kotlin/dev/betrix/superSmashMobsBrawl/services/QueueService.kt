@@ -3,13 +3,12 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import dev.betrix.superSmashMobsBrawl.Manageable
-import dev.betrix.superSmashMobsBrawl.events.QueuePopEvent
-import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
+import com.github.quillraven.fleks.World
+import com.github.quillraven.fleks.World.Companion.family
+import dev.betrix.superSmashMobsBrawl.components.PlayerComponent
+import dev.betrix.superSmashMobsBrawl.components.QueueComponent
+import dev.betrix.superSmashMobsBrawl.extensions.ecsEntity
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
-import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
-import gg.flyte.twilight.scheduler.repeatingTask
-import java.util.logging.Logger
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -35,103 +34,81 @@ data class QueueEntry(val player: Player, val minigame: MinigameDef, val partyId
     }
 }
 
-object QueueService : Manageable(), KoinComponent {
-    private val logger: Logger by inject()
-    private val minigameService: MinigameService by inject()
-
-    private val queue = hashSetOf<QueueEntry>()
-
-    init {
-        runnables.add(
-            repeatingTask(20) {
-                // Periodically check if any queued minigame can start
-                checkAllMinigamesCanStart()
-            }
-        )
-    }
+object QueueService : KoinComponent {
+    private val ecsWorld: World by inject()
 
     fun addPlayer(player: Player, minigameDefinition: MinigameDef): Result<QueueEntry, QueueEntry> {
-        val newEntry = QueueEntry(player, minigameDefinition)
+        val entity = player.ecsEntity ?: return Err(QueueEntry(player, minigameDefinition))
 
-        val existingEntry = queue.find { it.player == player }
+        with(ecsWorld) {
+            // Check if player is already in queue
+            if (entity.has(QueueComponent)) {
+                val existingQueueComponent = entity[QueueComponent]
+                return Err(QueueEntry(player, existingQueueComponent.minigame, existingQueueComponent.partyId))
+            }
 
-        if (existingEntry != null) {
-            return Err(existingEntry)
+            // Add queue component to player entity
+            entity.configure {
+                it += QueueComponent(minigameDefinition)
+            }
         }
 
-        queue.add(newEntry)
-
-        return Ok(newEntry)
+        return Ok(QueueEntry(player, minigameDefinition))
     }
 
     fun removePlayer(player: Player): Result<QueueEntry, Unit> {
-        val existingEntry = queue.find { it.player == player }
+        val entity = player.ecsEntity ?: return Err(Unit)
 
-        return if (existingEntry != null) {
-            queue.remove(existingEntry)
-            Ok(existingEntry)
-        } else {
-            Err(Unit)
+        with(ecsWorld) {
+            return if (entity.has(QueueComponent)) {
+                val queueComponent = entity[QueueComponent]
+                val queueEntry = QueueEntry(player, queueComponent.minigame, queueComponent.partyId)
+                entity.configure {
+                    it -= QueueComponent
+                }
+                Ok(queueEntry)
+            } else {
+                Err(Unit)
+            }
         }
     }
 
     fun getQueueEntry(player: Player): QueueEntry? {
-        return queue.find { it.player == player }
+        val entity = player.ecsEntity ?: return null
+
+        with(ecsWorld) {
+            return if (entity.has(QueueComponent)) {
+                val queueComponent = entity[QueueComponent]
+                QueueEntry(player, queueComponent.minigame, queueComponent.partyId)
+            } else {
+                null
+            }
+        }
     }
 
     fun getPlayersInQueue(minigameDef: MinigameDef): List<QueueEntry> {
-        return queue.filter { it.minigame.id == minigameDef.id }
-    }
+        val queuedPlayers = mutableListOf<QueueEntry>()
 
-    private fun getRequiredPlayersForMinigame(minigameDef: MinigameDef): Int {
-        return when (minigameDef) {
-            is TeamBasedStocksMinigameDef -> {
-                minigameDef.playersPerTeam * minigameDef.amountOfTeams
+        with(ecsWorld) {
+            // Get all entities with the required components
+            val queueFamily = family { all(PlayerComponent, QueueComponent) }
+            queueFamily.forEach { entity ->
+                val playerComponent = entity[PlayerComponent]
+                val queueComponent = entity[QueueComponent]
+
+                if (queueComponent.minigame.id == minigameDef.id) {
+                    queuedPlayers.add(
+                        QueueEntry(
+                            playerComponent.player,
+                            queueComponent.minigame,
+                            queueComponent.partyId
+                        )
+                    )
+                }
             }
-
-            is FfaMinigameDef -> {
-                // Use the minimum to allow starting when the game defines it can
-                minigameDef.minPlayers
-            }
-        }
-    }
-
-    private fun checkAllMinigamesCanStart() {
-        // Snapshot the queue to determine which minigame types are present
-        val snapshot = queue.toList()
-
-        // Map unique minigame id -> definition
-        val defsById = snapshot.groupBy { it.minigame.id }.mapValues { it.value.first().minigame }
-
-        defsById.values.forEach { def -> tryStartMinigamesFor(def) }
-    }
-
-    private fun tryStartMinigamesFor(minigameDef: MinigameDef) {
-        val requiredPlayers = getRequiredPlayersForMinigame(minigameDef)
-
-        if (requiredPlayers <= 0) {
-            logger.severe(
-                "Minigame ${minigameDef.id} has invalid player requirement: $requiredPlayers"
-            )
-            return
         }
 
-        // Filter out any players who may have entered a minigame meanwhile
-        var available =
-            getPlayersInQueue(minigameDef)
-                .filter { !minigameService.isPlayerInMinigame(it.player) }
-                .toMutableList()
-
-        while (available.size >= requiredPlayers) {
-            val playersToStart = available.take(requiredPlayers)
-
-            // Remove chosen entries from the master queue
-            playersToStart.forEach { queue.remove(it) }
-
-            QueuePopEvent(minigameDef.id, playersToStart.map { it.player }).callEvent()
-
-            // Drop the used players from the local list and continue if we can start more
-            available = available.drop(requiredPlayers).toMutableList()
-        }
+        return queuedPlayers
     }
+
 }

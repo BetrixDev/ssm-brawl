@@ -21,8 +21,10 @@ import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
+import dev.betrix.superSmashMobsBrawl.services.PlayerEcsEntityService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.systems.PlayerSystem
+import dev.betrix.superSmashMobsBrawl.systems.QueueSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.HubScoreboardSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.MinigameScoreboardSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.ScoreboardSystem
@@ -73,6 +75,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 add(MinigameScoreboardSystem())
                 add(ScoreboardSystem())
                 add(PlayerSystem())
+                add(QueueSystem())
             }
         }
 
@@ -128,16 +131,18 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
 
         event<PlayerJoinEvent> {
             println("creating entity for ${player.name}")
-            ecsWorld.entity {
+            val entity = ecsWorld.entity {
                 it += PlayerComponent(player)
                 it += ScoreboardComponent(TwilightScoreboard(player))
             }
+            PlayerEcsEntityService.onCreateEntityForPlayer(player, entity)
         }
 
         event<PlayerQuitEvent> {
             with(ecsWorld) {
                 player.ecsEntity?.remove()
             }
+            PlayerEcsEntityService.onRemoveEntityForPlayer(player)
         }
 
         event<PlayerDropItemEvent> {
