@@ -62,3 +62,26 @@ fun List<SpawnPoint>.getFarthestFromPlayers(
 
     return bestSpawnPoint
 }
+
+fun <T> List<T>.hasSameElements(other: List<T>): Boolean {
+    if (this.size != other.size) return false
+
+    val counts = mutableMapOf<T, Int>()
+
+    // Count elements in first list
+    for (element in this) {
+        counts[element] = counts.getOrDefault(element, 0) + 1
+    }
+
+    // Subtract counts based on second list
+    for (element in other) {
+        val count = counts[element] ?: return false
+        if (count == 1) {
+            counts.remove(element)
+        } else {
+            counts[element] = count - 1
+        }
+    }
+
+    return counts.isEmpty()
+}

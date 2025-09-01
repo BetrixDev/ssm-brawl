@@ -43,6 +43,7 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation("io.github.quillraven.fleks:Fleks:2.12")
 
     // Testing
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")

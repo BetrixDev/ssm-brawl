@@ -1,8 +1,10 @@
 package dev.betrix.superSmashMobsBrawl.extensions
 
+import com.github.quillraven.fleks.Entity as EcsEntity
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
+import dev.betrix.superSmashMobsBrawl.services.PlayerEcsEntityService
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -68,3 +70,6 @@ fun Player.getLocationInFrontOfEyes(distance: Double): Location {
 fun Player.playSound(sound: Sound, pitch: Float = 1f, volume: Float = 1f) {
     playSound(eyeLocation, sound, pitch, volume)
 }
+
+val Player.ecsEntity: EcsEntity?
+    get() = PlayerEcsEntityService.getEntityForPlayer(this)

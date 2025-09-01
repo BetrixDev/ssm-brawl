@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl
 
+import com.github.quillraven.fleks.configureWorld
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import dev.betrix.superSmashMobsBrawl.commands.DebugCommand
 import dev.betrix.superSmashMobsBrawl.commands.KitCommand
@@ -7,6 +8,9 @@ import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
 import dev.betrix.superSmashMobsBrawl.commands.resolvers.KitDefArgument
 import dev.betrix.superSmashMobsBrawl.commands.resolvers.MinigameDefinitionArgument
+import dev.betrix.superSmashMobsBrawl.components.PlayerComponent
+import dev.betrix.superSmashMobsBrawl.components.ScoreboardComponent
+import dev.betrix.superSmashMobsBrawl.extensions.ecsEntity
 import dev.betrix.superSmashMobsBrawl.extensions.hasPassive
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
@@ -18,11 +22,17 @@ import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
+import dev.betrix.superSmashMobsBrawl.systems.PlayerSystem
+import dev.betrix.superSmashMobsBrawl.systems.scoreboards.HubScoreboardSystem
+import dev.betrix.superSmashMobsBrawl.systems.scoreboards.MinigameScoreboardSystem
+import dev.betrix.superSmashMobsBrawl.systems.scoreboards.ScoreboardSystem
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
 import gg.flyte.twilight.Twilight
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.feed
+import gg.flyte.twilight.scheduler.repeatingTask
+import gg.flyte.twilight.scoreboard.TwilightScoreboard
 import gg.flyte.twilight.twilight
 import java.util.logging.Logger
 import org.bukkit.GameMode
@@ -34,6 +44,8 @@ import org.bukkit.event.entity.PotionSplashEvent
 import org.bukkit.event.inventory.InventoryInteractEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
+import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -45,11 +57,38 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
     private val lang: LangService by inject()
     lateinit var liteCommands: LiteCommands<CommandSender>
     lateinit var twilight: Twilight
-
     override suspend fun onEnableAsync() {
         twilight = twilight(this)
 
         Logger.getLogger("").addHandler(AxiomLoggerHandler(this))
+
+        val ecsWorld = configureWorld {
+            injectables {
+                add(LangService(this@SuperSmashMobsBrawl))
+                add(this@SuperSmashMobsBrawl)
+                add<JavaPlugin>(this@SuperSmashMobsBrawl)
+            }
+            systems {
+                add(HubScoreboardSystem())
+                add(MinigameScoreboardSystem())
+                add(ScoreboardSystem())
+                add(PlayerSystem())
+            }
+        }
+
+        logger.info("Total systems ${ecsWorld.systems.size}")
+
+        ecsWorld.systems.forEach { sys ->
+            logger.info("Has system ${sys::class.java.name}")
+        }
+
+        var lastTick = System.currentTimeMillis()
+
+        repeatingTask(1) {
+            val currentTime = System.currentTimeMillis()
+            ecsWorld.update((currentTime - lastTick) / 1000f)
+            lastTick = currentTime
+        }
 
         startKoin {
             modules(
@@ -60,7 +99,8 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                     single(createdAtStart = true) { DataService() }
                     single { MinigameService() }
                     single { KitService }
-                    single(createdAtStart = true) { LangService() }
+                    single { ecsWorld }
+                    single(createdAtStart = true) { LangService(this@SuperSmashMobsBrawl) }
                     single { WorldService }
                     single { HubService }
                 }
@@ -86,7 +126,19 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 .commands(DebugCommand())
                 .build()
 
-        // Player join events are now handled by HubService
+        event<PlayerJoinEvent> {
+            println("creating entity for ${player.name}")
+            ecsWorld.entity {
+                it += PlayerComponent(player)
+                it += ScoreboardComponent(TwilightScoreboard(player))
+            }
+        }
+
+        event<PlayerQuitEvent> {
+            with(ecsWorld) {
+                player.ecsEntity?.remove()
+            }
+        }
 
         event<PlayerDropItemEvent> {
             if (player.gameMode == GameMode.CREATIVE) {

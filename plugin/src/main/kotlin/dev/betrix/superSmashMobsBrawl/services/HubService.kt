@@ -1,7 +1,10 @@
 package dev.betrix.superSmashMobsBrawl.services
 
+import com.github.quillraven.fleks.World as EcsWorld
 import com.github.michaelbull.result.*
 import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.components.InHubComponent
+import dev.betrix.superSmashMobsBrawl.extensions.ecsEntity
 import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
 import dev.betrix.superSmashMobsBrawl.models.BrawlHubWorld
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
@@ -26,6 +29,7 @@ import org.koin.core.component.inject
 object HubService : KoinComponent {
     private lateinit var defaultHubWorld: BrawlHubWorld
     private lateinit var plugin: JavaPlugin
+    private val ecsWorld: EcsWorld by inject()
     private val dataService: DataService by inject()
     private val lang: LangService by inject()
     private val playersInHub = mutableSetOf<Player>()
@@ -93,8 +97,7 @@ object HubService : KoinComponent {
         }
 
         event<PlayerQuitEvent> {
-            removeHubPassives(player)
-            playersInHub.remove(player)
+            onPlayerLeaveHub(player)
         }
 
         event<PlayerTeleportEvent> {
@@ -102,11 +105,9 @@ object HubService : KoinComponent {
             val toHub = isWorldHub(to.world)
 
             if (!fromHub && toHub) {
-                playersInHub.add(player)
-                giveHubPassives(player)
+                onPlayerJoinHub(player)
             } else if (fromHub && !toHub) {
-                playersInHub.remove(player)
-                removeHubPassives(player)
+                onPlayerLeaveHub(player)
             }
         }
 
@@ -132,14 +133,7 @@ object HubService : KoinComponent {
             return Err(RuntimeException("Teleport to hub failed for ${player.name}"))
         }
 
-        player.inventory.clear()
-        player.feed()
-        player.heal()
-        player.resetWalkSpeed()
-        player.resetFlySpeed()
-        player.gameMode = GameMode.SURVIVAL
-        player.fallDistance = 0f
-        playersInHub.add(player)
+        onPlayerJoinHub(player)
 
         return Ok(Unit)
     }
@@ -182,6 +176,41 @@ object HubService : KoinComponent {
     }
 
     private fun removeHubPassives(player: Player) {
+        val hubKit = playerHubKits.remove(player)
+        hubKit?.teardown()
+
+        plugin.logger.info("Removed hub passives from player: ${player.name}")
+    }
+
+    private fun onPlayerJoinHub(player: Player) {
+        player.inventory.clear()
+        player.feed()
+        player.heal()
+        player.resetWalkSpeed()
+        player.resetFlySpeed()
+        player.gameMode = GameMode.SURVIVAL
+        player.fallDistance = 0f
+        playersInHub.add(player)
+
+        if (playerHubKits.containsKey(player)) {
+            return
+        }
+
+        val hubKit = BrawlKit("hub", player)
+        hubKit.setup()
+
+        playerHubKits[player] = hubKit
+
+        with(ecsWorld) {
+            player.ecsEntity?.configure {
+                it += InHubComponent()
+            }
+        }
+    }
+
+    private fun onPlayerLeaveHub(player: Player) {
+        playersInHub.remove(player)
+
         val hubKit = playerHubKits.remove(player)
         hubKit?.teardown()
 

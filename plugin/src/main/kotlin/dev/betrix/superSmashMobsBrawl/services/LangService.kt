@@ -8,12 +8,9 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-class LangService : KoinComponent {
-    private val plugin: JavaPlugin by inject()
-
+class LangService(private val plugin: JavaPlugin) {
+    
     private val dataFolder = plugin.dataFolder
     private val enLang: YamlConfiguration = loadLangWithDefaults("data/lang/en.yml")
 
