@@ -14,23 +14,10 @@ data class ScoreboardComponent(
 
     companion object : ComponentType<ScoreboardComponent>()
 
-    var virtualTitle: Component = Component.empty()
-        protected set
-    var virtualLines: List<Component> = emptyList()
-        protected set
-
-    var currentTitle: Component = Component.empty()
-    var currentLines: List<Component> = emptyList()
+    var title: Component? = null
+    var lines: List<Component>? = null
 
     override fun World.onRemove(entity: Entity) {
         scoreboard.delete()
-    }
-
-    fun setTitle(component: Component) {
-        virtualTitle = component
-    }
-
-    fun setLines(components: List<Component>) {
-        virtualLines = components
     }
 }

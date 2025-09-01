@@ -14,9 +14,5 @@ class HubScoreboardSystem : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val scoreboard = entity[ScoreboardComponent]
         val player = entity[PlayerComponent].player
-
-    
-
-        scoreboard.setTitle(Component.text("SSM BRAWL"))
     }
 }
