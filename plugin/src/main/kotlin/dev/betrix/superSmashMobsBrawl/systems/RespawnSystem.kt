@@ -12,7 +12,6 @@ import dev.betrix.superSmashMobsBrawl.extensions.getFarthestFromPlayers
 import dev.betrix.superSmashMobsBrawl.extensions.location
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import dev.betrix.superSmashMobsBrawl.minigames.DeathDecision
-import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
@@ -21,8 +20,10 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import org.bukkit.GameMode
 
-class RespawnSystem(private val plugin: SuperSmashMobsBrawl = inject(), private val lang: LangService = inject()) :
-    IteratingSystem(family { all(PlayerComponent, InMinigameComponent, RespawnComponent) }) {
+class RespawnSystem(
+    private val plugin: SuperSmashMobsBrawl = inject(),
+    private val lang: LangService = inject(),
+) : IteratingSystem(family { all(PlayerComponent, InMinigameComponent, RespawnComponent) }) {
 
     override fun onTickEntity(entity: Entity) {
         val player = entity[PlayerComponent].player
@@ -73,10 +74,15 @@ class RespawnSystem(private val plugin: SuperSmashMobsBrawl = inject(), private 
 
         // Compute spawn point
         val spawnPoint =
-            minigame.brawlWorld?.data?.spawnPoints?.getFarthestFromPlayers(
-                minigame.getParticipants().filter { it != player && it.isOnline && it.gameMode != GameMode.SPECTATOR },
-                minigame.brawlWorld!!.world,
-            )
+            minigame.brawlWorld
+                ?.data
+                ?.spawnPoints
+                ?.getFarthestFromPlayers(
+                    minigame.getParticipants().filter {
+                        it != player && it.isOnline && it.gameMode != GameMode.SPECTATOR
+                    },
+                    minigame.brawlWorld!!.world,
+                )
 
         // Teleport and reset stats
         spawnPoint?.let { player.teleport(minigame.brawlWorld!!.world.location(it)) }

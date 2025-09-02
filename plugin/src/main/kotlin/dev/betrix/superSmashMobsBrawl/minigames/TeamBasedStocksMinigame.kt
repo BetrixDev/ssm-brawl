@@ -2,8 +2,8 @@ package dev.betrix.superSmashMobsBrawl.minigames
 
 import com.github.michaelbull.result.onFailure
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.extensions.teleport
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
+import dev.betrix.superSmashMobsBrawl.extensions.teleport
 import dev.betrix.superSmashMobsBrawl.models.MinigamePlayer
 import dev.betrix.superSmashMobsBrawl.models.MinigameState
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam

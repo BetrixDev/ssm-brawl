@@ -7,16 +7,19 @@ import com.github.michaelbull.result.map
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import com.github.michaelbull.result.unwrap
-import com.github.shynixn.mccoroutine.bukkit.launch
+import com.github.quillraven.fleks.World
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
+import dev.betrix.superSmashMobsBrawl.components.DeadComponent
+import dev.betrix.superSmashMobsBrawl.components.InMinigameComponent
+import dev.betrix.superSmashMobsBrawl.components.RespawnComponent
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
 import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
-import dev.betrix.superSmashMobsBrawl.extensions.ecsEntity
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
+import dev.betrix.superSmashMobsBrawl.extensions.ecsEntity
 import dev.betrix.superSmashMobsBrawl.extensions.getEquidistant
 import dev.betrix.superSmashMobsBrawl.extensions.getFarthestFromPlayers
 import dev.betrix.superSmashMobsBrawl.extensions.location
@@ -25,28 +28,15 @@ import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
 import dev.betrix.superSmashMobsBrawl.models.BrawlGameWorld
 import dev.betrix.superSmashMobsBrawl.models.MinigamePlayer
 import dev.betrix.superSmashMobsBrawl.models.MinigameState
-import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitSwitchingMode
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
-import dev.betrix.superSmashMobsBrawl.components.DeadComponent
-import dev.betrix.superSmashMobsBrawl.components.InMinigameComponent
-import dev.betrix.superSmashMobsBrawl.components.RespawnComponent
-import dev.betrix.superSmashMobsBrawl.minigames.DeathDecision
-import com.github.quillraven.fleks.World
 import dev.betrix.superSmashMobsBrawl.services.*
 import gg.flyte.twilight.event.event
-import gg.flyte.twilight.extension.feed
-import gg.flyte.twilight.extension.heal
 import gg.flyte.twilight.scheduler.repeatingTask
-import java.time.Duration
 import java.util.UUID
 import kotlin.math.min
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.title.Title
 import org.bukkit.GameMode
-import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
@@ -235,7 +225,9 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             // Mark player as inside this minigame in ECS
             val ecsEntity = player.player.ecsEntity
             if (ecsEntity != null) {
-                with(ecsWorld) { ecsEntity.configure { it += InMinigameComponent(this@BrawlMinigame) } }
+                with(ecsWorld) {
+                    ecsEntity.configure { it += InMinigameComponent(this@BrawlMinigame) }
+                }
             }
             // Clear offhand to remove shield mechanics (1.8 feel)
             try {

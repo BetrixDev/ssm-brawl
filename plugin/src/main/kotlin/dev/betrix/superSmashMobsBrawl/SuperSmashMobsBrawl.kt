@@ -23,9 +23,9 @@ import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.services.PlayerEcsEntityService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
+import dev.betrix.superSmashMobsBrawl.systems.DeathSystem
 import dev.betrix.superSmashMobsBrawl.systems.PlayerSystem
 import dev.betrix.superSmashMobsBrawl.systems.QueueSystem
-import dev.betrix.superSmashMobsBrawl.systems.DeathSystem
 import dev.betrix.superSmashMobsBrawl.systems.RespawnSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.HubScoreboardSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.MinigameScoreboardSystem

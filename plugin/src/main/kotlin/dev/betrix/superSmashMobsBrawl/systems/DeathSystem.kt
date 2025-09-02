@@ -21,8 +21,7 @@ import org.bukkit.Sound
 class DeathSystem(
     private val plugin: SuperSmashMobsBrawl = inject(),
     private val lang: LangService = inject(),
-) :
-    IteratingSystem(family { all(PlayerComponent, InMinigameComponent, DeadComponent) }) {
+) : IteratingSystem(family { all(PlayerComponent, InMinigameComponent, DeadComponent) }) {
 
     override fun onTickEntity(entity: Entity) {
         val player = entity[PlayerComponent].player
@@ -31,15 +30,15 @@ class DeathSystem(
 
         // Visual/audio feedback
         player.world.strikeLightningEffect(player.location)
-        gg.flyte.twilight.scheduler.delay(1) { player.playSound(player.eyeLocation, Sound.ENTITY_PLAYER_HURT, 1f, 1f) }
+        gg.flyte.twilight.scheduler.delay(1) {
+            player.playSound(player.eyeLocation, Sound.ENTITY_PLAYER_HURT, 1f, 1f)
+        }
 
         // Ensure we remove active kit effects immediately
         minigame.unassignPlayerKit(player)
 
         // Move player to spectator while we decide what to do
-        minigame.brawlWorld?.let { world ->
-            player.teleport(world.data.spectatorSpawnPoint)
-        }
+        minigame.brawlWorld?.let { world -> player.teleport(world.data.spectatorSpawnPoint) }
         player.gameMode = GameMode.SPECTATOR
         player.allowFlight = true
         player.isFlying = true
