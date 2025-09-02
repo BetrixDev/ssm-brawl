@@ -7,7 +7,7 @@ import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 data class QueueComponent(
     val minigame: MinigameDef,
     val partyId: String? = null,
-    val queuedAt: Long = System.currentTimeMillis()
+    val queuedAt: Long = System.currentTimeMillis(),
 ) : Component<QueueComponent> {
     override fun type() = QueueComponent
 

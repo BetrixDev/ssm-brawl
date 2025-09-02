@@ -44,13 +44,17 @@ object QueueService : KoinComponent {
             // Check if player is already in queue
             if (entity.has(QueueComponent)) {
                 val existingQueueComponent = entity[QueueComponent]
-                return Err(QueueEntry(player, existingQueueComponent.minigame, existingQueueComponent.partyId))
+                return Err(
+                    QueueEntry(
+                        player,
+                        existingQueueComponent.minigame,
+                        existingQueueComponent.partyId,
+                    )
+                )
             }
 
             // Add queue component to player entity
-            entity.configure {
-                it += QueueComponent(minigameDefinition)
-            }
+            entity.configure { it += QueueComponent(minigameDefinition) }
         }
 
         return Ok(QueueEntry(player, minigameDefinition))
@@ -63,9 +67,7 @@ object QueueService : KoinComponent {
             return if (entity.has(QueueComponent)) {
                 val queueComponent = entity[QueueComponent]
                 val queueEntry = QueueEntry(player, queueComponent.minigame, queueComponent.partyId)
-                entity.configure {
-                    it -= QueueComponent
-                }
+                entity.configure { it -= QueueComponent }
                 Ok(queueEntry)
             } else {
                 Err(Unit)
@@ -101,7 +103,7 @@ object QueueService : KoinComponent {
                         QueueEntry(
                             playerComponent.player,
                             queueComponent.minigame,
-                            queueComponent.partyId
+                            queueComponent.partyId,
                         )
                     )
                 }
@@ -110,5 +112,4 @@ object QueueService : KoinComponent {
 
         return queuedPlayers
     }
-
 }

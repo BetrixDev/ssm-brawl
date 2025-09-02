@@ -9,19 +9,15 @@ import dev.betrix.superSmashMobsBrawl.components.PlayerComponent
 import dev.betrix.superSmashMobsBrawl.components.ScoreboardComponent
 import dev.betrix.superSmashMobsBrawl.services.LangService
 
-class HubScoreboardSystem(
-    private val lang: LangService = inject()
-) : IteratingSystem(
-    family { all(PlayerComponent, ScoreboardComponent, InHubComponent) }
-) {
+class HubScoreboardSystem(private val lang: LangService = inject()) :
+    IteratingSystem(family { all(PlayerComponent, ScoreboardComponent, InHubComponent) }) {
     override fun onTickEntity(entity: Entity) {
         val scoreboardComponent = entity[ScoreboardComponent]
         val player = entity[PlayerComponent].player
 
         // Example: Hub-specific header with welcome message
-        val headerLines = listOf(
-            lang.t("scoreboards.hub.content.player_info") { "player" to player.name }
-        )
+        val headerLines =
+            listOf(lang.t("scoreboards.hub.content.player_info") { "player" to player.name })
         scoreboardComponent.setHeaderLines(headerLines)
 
         // The hub system only overrides the header section,

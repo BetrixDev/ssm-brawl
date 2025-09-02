@@ -7,9 +7,8 @@ import com.github.quillraven.fleks.World
 import gg.flyte.twilight.scoreboard.TwilightScoreboard
 import net.kyori.adventure.text.Component
 
-data class ScoreboardComponent(
-    val scoreboard: TwilightScoreboard
-) : EcsComponent<ScoreboardComponent> {
+data class ScoreboardComponent(val scoreboard: TwilightScoreboard) :
+    EcsComponent<ScoreboardComponent> {
     override fun type() = ScoreboardComponent
 
     companion object : ComponentType<ScoreboardComponent>()
@@ -92,14 +91,13 @@ data class ScoreboardComponent(
 
         // Update tab list if header or footer is set
         if (tabHeader != null || tabFooter != null) {
-            tabHeader?.let { { it } }?.let {
-                tabFooter?.let { { it } }?.let { it1 ->
-                    scoreboard.updateTabList(
-                        header = it,
-                        footer = it1
-                    )
+            tabHeader
+                ?.let { { it } }
+                ?.let {
+                    tabFooter
+                        ?.let { { it } }
+                        ?.let { it1 -> scoreboard.updateTabList(header = it, footer = it1) }
                 }
-            }
         }
     }
 }

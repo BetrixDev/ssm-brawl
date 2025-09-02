@@ -1,7 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.services
 
-import org.bukkit.entity.Player
 import com.github.quillraven.fleks.Entity as EcsEntity
+import org.bukkit.entity.Player
 
 object PlayerEcsEntityService {
     private val playerEntityMap = hashMapOf<Player, EcsEntity>()

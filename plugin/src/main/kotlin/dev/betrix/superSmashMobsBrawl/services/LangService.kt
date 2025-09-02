@@ -10,7 +10,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 
 class LangService(private val plugin: JavaPlugin) {
-    
+
     private val dataFolder = plugin.dataFolder
     private val enLang: YamlConfiguration = loadLangWithDefaults("data/lang/en.yml")
 

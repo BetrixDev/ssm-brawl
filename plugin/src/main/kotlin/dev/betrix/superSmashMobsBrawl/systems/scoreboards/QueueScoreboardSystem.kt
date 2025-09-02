@@ -14,14 +14,11 @@ import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
 import dev.betrix.superSmashMobsBrawl.services.LangService
-import gg.flyte.twilight.extension.toComponent
 
 class QueueScoreboardSystem(
     private val lang: LangService = inject(),
-    private val plugin: SuperSmashMobsBrawl = inject()
-) : IteratingSystem(
-    family { all(PlayerComponent, ScoreboardComponent, QueueComponent) }
-) {
+    private val plugin: SuperSmashMobsBrawl = inject(),
+) : IteratingSystem(family { all(PlayerComponent, ScoreboardComponent, QueueComponent) }) {
     private val ticker = Ticker(120)
 
     override fun onTickEntity(entity: Entity) {
@@ -36,44 +33,48 @@ class QueueScoreboardSystem(
         val queueTimeSeconds = queueTime / 1000
 
         // Set scoreboard title with animation
-        scoreboardComponent.setTitle(lang.t("scoreboards.common.title") {
-            "percent" to ticker.nextPercent().toString()
-        })
+        scoreboardComponent.setTitle(
+            lang.t("scoreboards.common.title") { "percent" to ticker.nextPercent().toString() }
+        )
 
         // Set header section
-        val headerLines = listOf(
-            lang.t("scoreboards.queue.header.in_queue"),
-            lang.t("minigames.${minigameId}.name")
-        )
+        val headerLines =
+            listOf(
+                lang.t("scoreboards.queue.header.in_queue"),
+                lang.t("minigames.${minigameId}.name"),
+            )
         scoreboardComponent.setHeaderLines(headerLines)
 
         // Set content section with placeholders
-        val contentLines = listOf(
-            lang.t("scoreboards.queue.content.players_label"),
-            lang.t("scoreboards.queue.content.players_count") {
-                "current" to playersInQueue.toString()
-                "required" to requiredPlayers.toString()
-            },
-            lang.t("scoreboards.queue.content.time_label"),
-            lang.t("scoreboards.queue.content.time_value") { "seconds" to queueTimeSeconds.toString() }
-        )
+        val contentLines =
+            listOf(
+                lang.t("scoreboards.queue.content.players_label"),
+                lang.t("scoreboards.queue.content.players_count") {
+                    "current" to playersInQueue.toString()
+                    "required" to requiredPlayers.toString()
+                },
+                lang.t("scoreboards.queue.content.time_label"),
+                lang.t("scoreboards.queue.content.time_value") {
+                    "seconds" to queueTimeSeconds.toString()
+                },
+            )
         scoreboardComponent.setContentLines(contentLines)
 
         // Set tab header and footer with placeholders
         scoreboardComponent.setTabHeader(
-            lang.t("scoreboards.common.tab.header")
+            lang
+                .t("scoreboards.common.tab.header")
                 .appendNewline()
-                .append(lang.t("scoreboards.queue.tab.header") {
-                    "minigameId" to minigameId
-                })
+                .append(lang.t("scoreboards.queue.tab.header") { "minigameId" to minigameId })
         )
 
         scoreboardComponent.setTabFooter(
-            lang.t("scoreboards.queue.tab.footer") {
-                "current" to playersInQueue.toString()
-                "required" to requiredPlayers.toString()
-                "seconds" to queueTimeSeconds.toString()
-            }
+            lang
+                .t("scoreboards.queue.tab.footer") {
+                    "current" to playersInQueue.toString()
+                    "required" to requiredPlayers.toString()
+                    "seconds" to queueTimeSeconds.toString()
+                }
                 .appendNewline()
                 .append(lang.t("scoreboards.common.tab.footer"))
         )
@@ -100,14 +101,16 @@ class QueueScoreboardSystem(
 
         // Count all players with QueueComponent for the same minigame
         // who are not already in a minigame
-        world.family { all(PlayerComponent, QueueComponent) }.forEach { entity ->
-            if (!entity.has(InMinigameComponent)) {
-                val queueComponent = entity[QueueComponent]
-                if (queueComponent.minigame.id == minigameId) {
-                    count++
+        world
+            .family { all(PlayerComponent, QueueComponent) }
+            .forEach { entity ->
+                if (!entity.has(InMinigameComponent)) {
+                    val queueComponent = entity[QueueComponent]
+                    if (queueComponent.minigame.id == minigameId) {
+                        count++
+                    }
                 }
             }
-        }
 
         return count
     }

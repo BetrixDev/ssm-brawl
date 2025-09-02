@@ -9,14 +9,11 @@ import dev.betrix.superSmashMobsBrawl.Ticker
 import dev.betrix.superSmashMobsBrawl.components.PlayerComponent
 import dev.betrix.superSmashMobsBrawl.components.ScoreboardComponent
 import dev.betrix.superSmashMobsBrawl.services.LangService
-import net.kyori.adventure.text.Component
 
 class ScoreboardSystem(
     val lang: LangService = inject(),
-    val plugin: SuperSmashMobsBrawl = inject()
-) : IteratingSystem(
-    family { all(ScoreboardComponent) }
-) {
+    val plugin: SuperSmashMobsBrawl = inject(),
+) : IteratingSystem(family { all(ScoreboardComponent) }) {
     private val ticker = Ticker(120)
 
     override fun onTickEntity(entity: Entity) {
@@ -27,32 +24,35 @@ class ScoreboardSystem(
         val maxPlayers = plugin.server.maxPlayers
 
         // Set scoreboard title with animation
-        scoreboardComponent.setTitle(lang.t("scoreboards.common.title") {
-            "percent" to ticker.nextPercent().toString()
-        })
-
-        // Set content section with player info        
-        val contentLines = listOf(
-            lang.t("scoreboards.hub.content.player_info") { "player" to player.name },
-            lang.t("scoreboards.hub.content.online_count") {
-                "current" to onlinePlayers.toString()
-                "max" to maxPlayers.toString()
-            }
+        scoreboardComponent.setTitle(
+            lang.t("scoreboards.common.title") { "percent" to ticker.nextPercent().toString() }
         )
+
+        // Set content section with player info
+        val contentLines =
+            listOf(
+                lang.t("scoreboards.hub.content.player_info") { "player" to player.name },
+                lang.t("scoreboards.hub.content.online_count") {
+                    "current" to onlinePlayers.toString()
+                    "max" to maxPlayers.toString()
+                },
+            )
         scoreboardComponent.setContentLines(contentLines)
 
         // Set tab header and footer with placeholders
         scoreboardComponent.setTabHeader(
-            lang.t("scoreboards.common.tab.header")
+            lang
+                .t("scoreboards.common.tab.header")
                 .appendNewline()
                 .append(lang.t("scoreboards.hub.tab.header") { "player" to player.name })
         )
 
         scoreboardComponent.setTabFooter(
-            lang.t("scoreboards.hub.tab.footer") {
-                "current" to onlinePlayers.toString()
-                "max" to maxPlayers.toString()
-            }
+            lang
+                .t("scoreboards.hub.tab.footer") {
+                    "current" to onlinePlayers.toString()
+                    "max" to maxPlayers.toString()
+                }
                 .appendNewline()
                 .append(lang.t("scoreboards.common.tab.footer"))
         )

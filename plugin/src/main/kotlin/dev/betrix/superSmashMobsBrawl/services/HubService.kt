@@ -1,7 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.services
 
-import com.github.quillraven.fleks.World as EcsWorld
 import com.github.michaelbull.result.*
+import com.github.quillraven.fleks.World as EcsWorld
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.components.InHubComponent
 import dev.betrix.superSmashMobsBrawl.extensions.ecsEntity
@@ -96,9 +96,7 @@ object HubService : KoinComponent {
             giveHubPassives(player)
         }
 
-        event<PlayerQuitEvent> {
-            onPlayerLeaveHub(player)
-        }
+        event<PlayerQuitEvent> { onPlayerLeaveHub(player) }
 
         event<PlayerTeleportEvent> {
             val fromHub = isWorldHub(from.world)
@@ -201,11 +199,7 @@ object HubService : KoinComponent {
 
         playerHubKits[player] = hubKit
 
-        with(ecsWorld) {
-            player.ecsEntity?.configure {
-                it += InHubComponent()
-            }
-        }
+        with(ecsWorld) { player.ecsEntity?.configure { it += InHubComponent() } }
     }
 
     private fun onPlayerLeaveHub(player: Player) {

@@ -14,11 +14,8 @@ import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
 import org.bukkit.entity.Player
 
-class QueueSystem(
-    private val plugin: SuperSmashMobsBrawl = inject()
-) : IteratingSystem(
-    family { all(PlayerComponent, QueueComponent) }
-) {
+class QueueSystem(private val plugin: SuperSmashMobsBrawl = inject()) :
+    IteratingSystem(family { all(PlayerComponent, QueueComponent) }) {
     private var lastMatchmakingCheck = 0L
     private val matchmakingInterval = 1000L // Check every second (20 ticks)
 
@@ -53,8 +50,7 @@ class QueueSystem(
             }
 
             val minigameId = queueComponent.minigame.id
-            queuedPlayersByMinigame.getOrPut(minigameId) { mutableListOf() }
-                .add(entity to player)
+            queuedPlayersByMinigame.getOrPut(minigameId) { mutableListOf() }.add(entity to player)
         }
 
         // Check each minigame type for possible matches
@@ -65,7 +61,9 @@ class QueueSystem(
             val requiredPlayers = getRequiredPlayersForMinigame(minigameDef)
 
             if (requiredPlayers <= 0) {
-                plugin.logger.severe("Minigame $minigameId has invalid player requirement: $requiredPlayers")
+                plugin.logger.severe(
+                    "Minigame $minigameId has invalid player requirement: $requiredPlayers"
+                )
                 return@forEach
             }
 
@@ -75,11 +73,7 @@ class QueueSystem(
                 val playersToStart = availablePlayers.take(requiredPlayers)
 
                 // Remove queue components from selected players
-                playersToStart.forEach { (entity, _) ->
-                    entity.configure {
-                        it -= QueueComponent
-                    }
-                }
+                playersToStart.forEach { (entity, _) -> entity.configure { it -= QueueComponent } }
 
                 // Fire the queue pop event
                 val players = playersToStart.map { it.second }

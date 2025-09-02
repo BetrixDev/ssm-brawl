@@ -60,6 +60,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
     private val lang: LangService by inject()
     lateinit var liteCommands: LiteCommands<CommandSender>
     lateinit var twilight: Twilight
+
     override suspend fun onEnableAsync() {
         twilight = twilight(this)
 
@@ -82,7 +83,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
         }
 
         logger.info("Total systems ${ecsWorld.systems.size}")
-        
+
         var lastTick = System.currentTimeMillis()
 
         repeatingTask(1) {
@@ -129,17 +130,16 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
 
         event<PlayerJoinEvent> {
             println("creating entity for ${player.name}")
-            val entity = ecsWorld.entity {
-                it += PlayerComponent(player)
-                it += ScoreboardComponent(TwilightScoreboard(player))
-            }
+            val entity =
+                ecsWorld.entity {
+                    it += PlayerComponent(player)
+                    it += ScoreboardComponent(TwilightScoreboard(player))
+                }
             PlayerEcsEntityService.onCreateEntityForPlayer(player, entity)
         }
 
         event<PlayerQuitEvent> {
-            with(ecsWorld) {
-                player.ecsEntity?.remove()
-            }
+            with(ecsWorld) { player.ecsEntity?.remove() }
             PlayerEcsEntityService.onRemoveEntityForPlayer(player)
         }
 
