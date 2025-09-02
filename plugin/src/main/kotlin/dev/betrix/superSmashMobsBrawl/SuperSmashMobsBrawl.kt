@@ -27,6 +27,7 @@ import dev.betrix.superSmashMobsBrawl.systems.PlayerSystem
 import dev.betrix.superSmashMobsBrawl.systems.QueueSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.HubScoreboardSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.MinigameScoreboardSystem
+import dev.betrix.superSmashMobsBrawl.systems.scoreboards.QueueScoreboardSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.ScoreboardSystem
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
@@ -76,15 +77,12 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 add(ScoreboardSystem())
                 add(PlayerSystem())
                 add(QueueSystem())
+                add(QueueScoreboardSystem())
             }
         }
 
         logger.info("Total systems ${ecsWorld.systems.size}")
-
-        ecsWorld.systems.forEach { sys ->
-            logger.info("Has system ${sys::class.java.name}")
-        }
-
+        
         var lastTick = System.currentTimeMillis()
 
         repeatingTask(1) {

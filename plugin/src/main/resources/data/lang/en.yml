@@ -114,3 +114,28 @@ gui:
       title: "<!i><#a6adc8>Abilities"
       entry: "<!i><#a6adc8>• <#fab387>{lang:abilities.{abilityId}.name}"
 motd: "<#89dceb>The brawl reborn <#a6adc8>-- <#89dceb>a wondrous thing<#94e2d5>!"
+scoreboards:
+  common:
+    title: "<bold><transition:#f5c2e7:#cba6f7:#f5c2e7:{percent}>SSM Brawl</transition></bold>"
+    divider: "<#1e1e2e><st>                           "
+    tab:
+      header: "<gradient:#89b4fa:#cba6f7:#f5c2e7>Super Smash Mobs: Brawl</gradient>"
+      footer: "<#f5c2e7>play.ssmbrawl.com"
+  queue:
+    header:
+      in_queue: "<#45475a>» <#cdd6f4>In Queue"
+    content:
+      players_label: "<#45475a>» <#a6e3a1>Players"
+      players_count: "<#89dceb>{current}<#b4befe> / <#89b4fa>{required}"
+      time_label: "<#45475a>» <#f9e2af>Time"
+      time_value: "<#fab387>{seconds}s"
+    tab:
+      header: "<#a6e3a1>In Queue: <#f5c2e7>{lang:minigames.{minigameId}.name}"
+      footer: "<#cdd6f4>Players: <#89dceb>{current}<#b4befe> / <#89b4fa>{required}<newline><#f9e2af>Queue Time: <#fab387>{seconds}s"
+  hub:
+    content:
+      player_info: "<#45475a>» <#cdd6f4>Player <#a6e3a1>{player}"
+      online_count: "<#b4befe>Online <#89dceb>{current}<#b4befe> / <#89b4fa>{max}"
+    tab:
+      header: "<#a6e3a1>Welcome, <#f5c2e7>{player}"
+      footer: "<#ffffff>Players: <#89dceb>{current} <#6c7086>/ <#cba6f7>{max}"
