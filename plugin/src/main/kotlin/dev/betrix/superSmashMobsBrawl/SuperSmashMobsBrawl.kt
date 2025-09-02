@@ -25,6 +25,8 @@ import dev.betrix.superSmashMobsBrawl.services.PlayerEcsEntityService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.systems.PlayerSystem
 import dev.betrix.superSmashMobsBrawl.systems.QueueSystem
+import dev.betrix.superSmashMobsBrawl.systems.DeathSystem
+import dev.betrix.superSmashMobsBrawl.systems.RespawnSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.HubScoreboardSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.MinigameScoreboardSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.QueueScoreboardSystem
@@ -79,6 +81,8 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 add(PlayerSystem())
                 add(QueueSystem())
                 add(QueueScoreboardSystem())
+                add(DeathSystem())
+                add(RespawnSystem())
             }
         }
 

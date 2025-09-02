@@ -15,6 +15,7 @@ import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
 import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
 import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
+import dev.betrix.superSmashMobsBrawl.extensions.ecsEntity
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.extensions.getEquidistant
 import dev.betrix.superSmashMobsBrawl.extensions.getFarthestFromPlayers
@@ -27,6 +28,11 @@ import dev.betrix.superSmashMobsBrawl.models.MinigameState
 import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitSwitchingMode
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
+import dev.betrix.superSmashMobsBrawl.components.DeadComponent
+import dev.betrix.superSmashMobsBrawl.components.InMinigameComponent
+import dev.betrix.superSmashMobsBrawl.components.RespawnComponent
+import dev.betrix.superSmashMobsBrawl.minigames.DeathDecision
+import com.github.quillraven.fleks.World
 import dev.betrix.superSmashMobsBrawl.services.*
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.feed
@@ -57,6 +63,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     private val worldService: WorldService by inject()
     private val langService: LangService by inject()
     private val plugin: SuperSmashMobsBrawl by inject()
+    private val ecsWorld: World by inject()
 
     @Suppress("UNCHECKED_CAST")
     protected val minigameData: TMinigameDef by lazy {
@@ -76,8 +83,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     /** Tracks players who disconnected while in this minigame */
     protected val disconnectedPlayers = mutableSetOf<UUID>()
 
-    /** Tracks players who are currently dead and waiting to respawn */
-    protected val respawningPlayers = mutableSetOf<UUID>()
+    // Respawn state is tracked via ECS RespawnComponent
 
     /** Determine if a passive can be used in a minigame */
     fun isPassiveValid(id: String): Boolean {
@@ -91,14 +97,21 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
     /** Check if a player is currently dead and waiting to respawn */
     fun isPlayerRespawning(player: Player): Boolean {
-        return respawningPlayers.contains(player.uniqueId)
+        val entity = player.ecsEntity ?: return false
+        return with(ecsWorld) { entity.has(RespawnComponent) }
     }
 
     open suspend fun initMinigame(): Result<Unit, Exception> {
         listeners.add(
             BrawlDeathEvent.listen(this) {
-                plugin.logger.info("Player $player died")
-                plugin.launch { onPlayerDeath(player) }
+                val ecsEntity = player.ecsEntity ?: return@listen
+                with(ecsWorld) {
+                    // Avoid double-processing if already in death/respawn flow
+                    if (ecsEntity.has(DeadComponent) || ecsEntity.has(RespawnComponent)) {
+                        return@with
+                    }
+                    ecsEntity.configure { it += DeadComponent(reason) }
+                }
             }
         )
 
@@ -219,6 +232,11 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                 brawlWorld!!.world.location(spawnPoints[min(idx, spawnPoints.lastIndex)])
             )
             assignPlayerKit(player.player)
+            // Mark player as inside this minigame in ECS
+            val ecsEntity = player.player.ecsEntity
+            if (ecsEntity != null) {
+                with(ecsWorld) { ecsEntity.configure { it += InMinigameComponent(this@BrawlMinigame) } }
+            }
             // Clear offhand to remove shield mechanics (1.8 feel)
             try {
                 player.player.inventory.setItemInOffHand(
@@ -232,116 +250,12 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         return Ok(Unit)
     }
 
-    open suspend fun onPlayerDeath(player: Player) {
-        // Check if player is still in the minigame at the start
-        if (!isPlayerInMinigame(player)) {
-            return
-        }
-
-        kitService.unassignKit(player)?.let { assignedKits.removeIf { it.first == player } }
-
-        player.world.strikeLightningEffect(player.location)
-
-        gg.flyte.twilight.scheduler.delay(1) {
-            player.playSound(player.eyeLocation, Sound.ENTITY_PLAYER_HURT, 1f, 1f)
-        }
-
-        var respawnSuccessful = false
-
-        if (minigameData.respawnDelaySeconds != null) {
-            player.teleport(brawlWorld!!.data.spectatorSpawnPoint)
-            player.gameMode = GameMode.SPECTATOR
-            player.allowFlight = true
-            player.isFlying = true
-            player.fallDistance = 0f
-
-            // Mark player as respawning
-            respawningPlayers.add(player.uniqueId)
-
-            try {
-                val respawnDelay = minigameData.respawnDelaySeconds ?: 0
-
-                repeat(respawnDelay) { iteration ->
-                    // Check if player is still in the minigame before each countdown step
-                    if (!isPlayerInMinigame(player)) {
-                        return
-                    }
-
-                    val secondsLeft = respawnDelay - iteration
-
-                    val title =
-                        Title.title(
-                            langService.t("messages.minigames.respawn.timeLeft") {
-                                "secondsLeft" to secondsLeft
-                            },
-                            Component.empty(),
-                            Title.Times.times(
-                                Duration.ofMillis(250),
-                                Duration.ofMillis(500),
-                                Duration.ofMillis(250),
-                            ),
-                        )
-
-                    player.showTitle(title)
-
-                    delay(1.seconds)
-                }
-
-                // Final check before respawning
-                if (!isPlayerInMinigame(player)) {
-                    return
-                }
-
-                // If we reach here, respawn was successful
-                respawnSuccessful = true
-            } finally {
-                // Only remove from respawning if respawn failed (player left during countdown)
-                if (!respawnSuccessful) {
-                    respawningPlayers.remove(player.uniqueId)
-                }
-            }
-        }
-
-        // Remove player from respawning state before respawning (successful case)
-        if (respawnSuccessful || minigameData.respawnDelaySeconds == null) {
-            respawningPlayers.remove(player.uniqueId)
-        }
-
-        val spawnPoint =
-            brawlWorld!!
-                .data
-                .spawnPoints
-                .getFarthestFromPlayers(
-                    players
-                        .map { it.player }
-                        .filter {
-                            it != player && it.isOnline && it.gameMode != GameMode.SPECTATOR
-                        },
-                    brawlWorld!!.world,
-                ) ?: SpawnPoint(0.0, 100.0, 0.0)
-
-        player.teleport(spawnPoint)
-        player.feed()
-        player.heal()
-        player.gameMode = GameMode.SURVIVAL
-
-        // Handle kit switching on respawn for both ON_DEATH and IMMEDIATE modes
-        // (IMMEDIATE mode needs this for cases where kit was selected during spectator countdown)
-        if (
-            minigameData.kitSwitchingMode == KitSwitchingMode.ON_DEATH ||
-                minigameData.kitSwitchingMode == KitSwitchingMode.IMMEDIATE
-        ) {
-            val currentKit = kitService.getKitForPlayer(player)
-            val selectedKit = kitService.currentSelectedKitForPlayer(player)
-
-            if (currentKit?.id != selectedKit.id) {
-                // Unassign current kit and assign the selected one
-                kitService.unassignKit(player)
-            }
-        }
-
-        assignPlayerKit(player)
+    open fun decideDeath(player: Player, reason: DeathReason): DeathDecision {
+        val delay = minigameData.respawnDelaySeconds
+        return DeathDecision.Respawn(delaySeconds = delay)
     }
+
+    open fun onPostDeathProcessed(player: Player, decision: DeathDecision) {}
 
     fun isPlayerInMinigame(player: Player): Boolean {
         return players.find { it.player == player } != null &&
@@ -353,13 +267,21 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     }
 
     open fun onPlayerLeave(player: Player) {
-        kitService.unassignKit(player)
-        assignedKits.removeIf { it.first == player }
+        unassignPlayerKit(player)
         if (!disconnectedPlayers.contains(player.uniqueId)) {
             disconnectedPlayers.add(player.uniqueId)
         }
-        // Clean up respawning state if player leaves while respawning
-        respawningPlayers.remove(player.uniqueId)
+        // Remove ECS minigame marker
+        val ecsEntity = player.ecsEntity
+        if (ecsEntity != null) {
+            with(ecsWorld) {
+                ecsEntity.configure {
+                    it -= InMinigameComponent
+                    it -= RespawnComponent
+                    it -= DeadComponent
+                }
+            }
+        }
     }
 
     /** Called when a player disconnects from the server while in this minigame */
@@ -434,7 +356,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         }
     }
 
-    private fun assignPlayerKit(player: Player) {
+    fun assignPlayerKit(player: Player) {
         kitService
             .assignKit(player)
             .onFailure { err ->
@@ -447,6 +369,26 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
             }
             .onSuccess { kit -> assignedKits.add(Pair(player, kit)) }
     }
+
+    fun unassignPlayerKit(player: Player) {
+        kitService.unassignKit(player)?.let { assignedKits.removeIf { it.first == player } }
+    }
+
+    fun handleKitSwitchOnRespawn(player: Player) {
+        if (
+            minigameData.kitSwitchingMode == KitSwitchingMode.ON_DEATH ||
+                minigameData.kitSwitchingMode == KitSwitchingMode.IMMEDIATE
+        ) {
+            val currentKit = kitService.getKitForPlayer(player)
+            val selectedKit = kitService.currentSelectedKitForPlayer(player)
+
+            if (currentKit?.id != selectedKit.id) {
+                kitService.unassignKit(player)
+            }
+        }
+    }
+
+    fun getParticipants(): List<Player> = players.map { it.player }
 
     private fun createVoidDeathListener(): Result<Unit, Exception> {
         if (brawlWorld == null) {

@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.minigames
 import com.github.michaelbull.result.onFailure
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.extensions.teleport
+import dev.betrix.superSmashMobsBrawl.events.DeathReason
 import dev.betrix.superSmashMobsBrawl.models.MinigamePlayer
 import dev.betrix.superSmashMobsBrawl.models.MinigameState
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
@@ -43,14 +44,13 @@ open class TeamBasedStocksMinigame(
         return super.initMinigame()
     }
 
-    override suspend fun onPlayerDeath(player: Player) {
-        if (state == MinigameState.ENDED) return
+    override fun decideDeath(player: Player, reason: DeathReason): DeathDecision {
+        if (state == MinigameState.ENDED) return DeathDecision.Eliminate
 
         val team = playerToTeam[player]
         if (team == null) {
-            // Fallback: if somehow no team, just use base behavior
-            super.onPlayerDeath(player)
-            return
+            // Fallback to base behavior
+            return super.decideDeath(player, reason)
         }
 
         // Consume a stock for this team
@@ -61,13 +61,15 @@ open class TeamBasedStocksMinigame(
         // If after consuming, team has zero stocks, the dying player is eliminated and should not
         // respawn
         if (team.stocks == 0) {
-            eliminatePlayer(player)
-            checkForWinnerAndEndIfNeeded()
-            return
+            return DeathDecision.Eliminate
         }
 
-        // Otherwise allow normal respawn flow
-        super.onPlayerDeath(player)
+        // Otherwise allow normal respawn flow with game-defined delay
+        return super.decideDeath(player, reason)
+    }
+
+    override fun onPostDeathProcessed(player: Player, decision: DeathDecision) {
+        // After a death resolves (respawn or elimination), check for end condition
         checkForWinnerAndEndIfNeeded()
     }
 
