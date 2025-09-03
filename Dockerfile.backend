@@ -27,10 +27,10 @@ FROM oven/bun:latest AS runner
 
 WORKDIR /app
 
-COPY --from=installer /app .
+COPY --from=installer /app/backend/dist/backend ./backend
 
 EXPOSE 1337
 ENV NODE_ENV=production
 
-RUN chmod +x backend/dist/backend
-CMD ["./backend/dist/backend"]
+RUN chmod +x backend
+CMD ["./backend"]
