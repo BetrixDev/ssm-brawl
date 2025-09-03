@@ -23,9 +23,6 @@ importers:
       '@elysiajs/cors':
         specifier: ^1.3.3
         version: 1.3.3(elysia@1.3.20(exact-mirror@0.2.0(@sinclair/typebox@0.34.40))(file-type@21.0.0)(typescript@5.8.3))
-      '@elysiajs/node':
-        specifier: ^1.3.1
-        version: 1.3.1(elysia@1.3.20(exact-mirror@0.2.0(@sinclair/typebox@0.34.40))(file-type@21.0.0)(typescript@5.8.3))(hono@4.9.4)
       '@trpc/server':
         specifier: ^11.5.0
         version: 11.5.0(typescript@5.8.3)
@@ -330,11 +327,6 @@ packages:
     resolution: {integrity: sha512-mYIU6PyMM6xIJuj7d27Vt0/wuzVKIEnFPjcvlkyd7t/m9xspAG37cwNjFxVOnyvY43oOd2I/oW2DB85utXpA2Q==}
     peerDependencies:
       elysia: '>= 1.3.0'
-
-  '@elysiajs/node@1.3.1':
-    resolution: {integrity: sha512-l+0gmdUCPW+s2MfUg8OtOkam/qJxEQK936WfCfr+rIeZwHXMYNFgbYdkTysrT6jFDdxSpd1nLqlsJjv29RHChw==}
-    peerDependencies:
-      elysia: '>= 1.3.18'
 
   '@esbuild/aix-ppc64@0.25.5':
     resolution: {integrity: sha512-9o3TMmpmftaCMepOdA5k/yDw8SfInyzWWTjYTFCX3kPSDJMROQTb8jg+h9Cnwnmm1vOzvxN7gIfB5V2ewpjtGA==}
@@ -644,12 +636,6 @@ packages:
 
   '@fastify/busboy@3.2.0':
     resolution: {integrity: sha512-m9FVDXU3GT2ITSe0UaMA5rU3QkfC/UXtCU8y0gSN/GugTqtVldOBWIB5V6V3sbmenVZUIpU6f+mPEO2+m5iTaA==}
-
-  '@hono/node-server@1.19.0':
-    resolution: {integrity: sha512-1k8/8OHf5VIymJEcJyVksFpT+AQ5euY0VA5hUkCnlKpD4mr8FSbvXaHblxeTTEr90OaqWzAkQaqD80qHZQKxBA==}
-    engines: {node: '>=18.14.1'}
-    peerDependencies:
-      hono: ^4
 
   '@ioredis/commands@1.3.0':
     resolution: {integrity: sha512-M/T6Zewn7sDaBQEqIZ8Rb+i9y8qfGmq+5SDFSf9sA2lUZTmdDLVdOiQaeDp+Q4wElZ9HG1GAX5KhDaidp6LQsQ==}
@@ -2446,10 +2432,6 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hono@4.9.4:
-    resolution: {integrity: sha512-61hl6MF6ojTl/8QSRu5ran6GXt+6zsngIUN95KzF5v5UjiX/xnrLR358BNRawwIRO49JwUqJqQe3Rb2v559R8Q==}
-    engines: {node: '>=16.9.0'}
-
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
 
@@ -4219,13 +4201,6 @@ snapshots:
     dependencies:
       elysia: 1.3.20(exact-mirror@0.2.0(@sinclair/typebox@0.34.40))(file-type@21.0.0)(typescript@5.8.3)
 
-  '@elysiajs/node@1.3.1(elysia@1.3.20(exact-mirror@0.2.0(@sinclair/typebox@0.34.40))(file-type@21.0.0)(typescript@5.8.3))(hono@4.9.4)':
-    dependencies:
-      '@hono/node-server': 1.19.0(hono@4.9.4)
-      elysia: 1.3.20(exact-mirror@0.2.0(@sinclair/typebox@0.34.40))(file-type@21.0.0)(typescript@5.8.3)
-    transitivePeerDependencies:
-      - hono
-
   '@esbuild/aix-ppc64@0.25.5':
     optional: true
 
@@ -4380,10 +4355,6 @@ snapshots:
     optional: true
 
   '@fastify/busboy@3.2.0': {}
-
-  '@hono/node-server@1.19.0(hono@4.9.4)':
-    dependencies:
-      hono: 4.9.4
 
   '@ioredis/commands@1.3.0': {}
 
@@ -6414,8 +6385,6 @@ snapshots:
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
-
-  hono@4.9.4: {}
 
   hookable@5.5.3: {}
 

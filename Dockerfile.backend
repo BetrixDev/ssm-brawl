@@ -20,14 +20,17 @@ RUN pnpm install
 
 COPY --from=builder /app/out/full/ .
 
-RUN pnpm turbo build
+RUN npm install -g bun
+RUN pnpm turbo build:compile
 
-FROM base AS runner
+FROM oven/bun:latest AS runner
 
 WORKDIR /app
 
-COPY --from=installer /app .
+COPY --from=installer /app/backend/dist/backend ./backend
 
 EXPOSE 1337
-ENV NODE_ENV=${NODE_ENV:-production}
-CMD ["node", "backend/dist/index.js"]
+ENV NODE_ENV=production
+
+RUN chmod +x backend
+CMD ["./backend"]
