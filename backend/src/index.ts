@@ -23,12 +23,13 @@ export const app = new Elysia()
 
 export function createTanstackStartRequestHandler() {
   return async ({ request }: { request: Request }) => {
-    // Remove "/api" from the pathname if present
     const url = new URL(request.url);
-    if (url.pathname.startsWith("/api")) {
-      url.pathname = url.pathname.replace(/^\/api/, "") || "/";
+
+    const prefix = "/api";
+    if (url.pathname === prefix || url.pathname.startsWith(prefix + "/")) {
+      url.pathname = url.pathname.slice(prefix.length) || "/";
     }
-    // Create a new Request with the modified URL
+
     const newRequest = new Request(url.toString(), request);
     return app.handle(newRequest);
   };
