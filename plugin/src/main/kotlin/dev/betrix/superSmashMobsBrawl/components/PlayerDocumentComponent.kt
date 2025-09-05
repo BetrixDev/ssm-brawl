@@ -8,7 +8,7 @@ data class PlayerDocumentComponent(
     var experience: Long = 0L,
     var gems: Long = 0L,
     var unlockedCosmetics: MutableSet<String> = mutableSetOf(),
-    var selectedKit: String = "creeper",
+    var selectedKitId: String = "creeper",
     var selectedCosmetics: MutableMap<String, String> = mutableMapOf(),
     var statistics: PersistentStatistics = PersistentStatistics(),
     var isDity: Boolean = true,

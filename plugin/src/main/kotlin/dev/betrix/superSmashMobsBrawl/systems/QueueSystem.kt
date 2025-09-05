@@ -4,10 +4,7 @@ import com.github.quillraven.fleks.*
 import com.github.quillraven.fleks.World.Companion.family
 import com.github.quillraven.fleks.World.Companion.inject
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.components.InPartyComponent
-import dev.betrix.superSmashMobsBrawl.components.InQueueComponent
-import dev.betrix.superSmashMobsBrawl.components.MinigameComponent
-import dev.betrix.superSmashMobsBrawl.components.PlayerComponent
+import dev.betrix.superSmashMobsBrawl.components.*
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
@@ -15,7 +12,7 @@ import dev.betrix.superSmashMobsBrawl.services.DataService
 
 class QueueSystem(
     private val plugin: SuperSmashMobsBrawl = inject(),
-    private val dataService: DataService = inject(),
+    private val dataService: DataService = inject()
 ) : IntervalSystem(interval = Fixed(1f)) {
 
     // Not supporting parties queueing for minigames currently
@@ -44,9 +41,15 @@ class QueueSystem(
                 entities.size >= getRequiredPlayersForMinigame(minigameDef!!)
             }
             .forEach { minigameDef, entities ->
-                entities.forEach { entity -> entity.configure { it -= InQueueComponent } }
+                val minigameEntity = world.entity { it += MinigameComponent(minigameDef!!, playerEntities = entities) }
 
-                world.entity { it += MinigameComponent(minigameDef!!, playerEntities = entities) }
+                entities.forEach { entity ->
+                    val playerData = entity[PlayerDocumentComponent]
+
+                    entity.configure {
+                    it -= InQueueComponent
+                    it += InMinigameComponent(minigameEntity, playerData.selectedKitId)
+                } }
             }
     }
 

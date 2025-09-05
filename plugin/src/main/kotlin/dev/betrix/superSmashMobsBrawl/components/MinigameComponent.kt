@@ -4,6 +4,7 @@ import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.collection.MutableEntityBag
 import com.github.quillraven.fleks.collection.mutableEntityBagOf
+import dev.betrix.superSmashMobsBrawl.models.BrawlWorld
 import dev.betrix.superSmashMobsBrawl.models.TeamData
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import java.util.UUID
@@ -29,6 +30,8 @@ data class MinigameComponent(
     override fun type() = MinigameComponent
 
     companion object : ComponentType<MinigameComponent>()
+
+    lateinit var loadedWorld: BrawlWorld
 }
 
 private fun generateInstanceId(): String {
