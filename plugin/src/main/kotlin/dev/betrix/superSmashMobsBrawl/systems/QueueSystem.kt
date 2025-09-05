@@ -1,89 +1,56 @@
 package dev.betrix.superSmashMobsBrawl.systems
 
-import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.IteratingSystem
+import com.github.quillraven.fleks.*
 import com.github.quillraven.fleks.World.Companion.family
 import com.github.quillraven.fleks.World.Companion.inject
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.components.InMinigameComponent
+import dev.betrix.superSmashMobsBrawl.components.InPartyComponent
+import dev.betrix.superSmashMobsBrawl.components.InQueueComponent
+import dev.betrix.superSmashMobsBrawl.components.MinigameComponent
 import dev.betrix.superSmashMobsBrawl.components.PlayerComponent
-import dev.betrix.superSmashMobsBrawl.components.QueueComponent
-import dev.betrix.superSmashMobsBrawl.events.QueuePopEvent
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
-import org.bukkit.entity.Player
+import dev.betrix.superSmashMobsBrawl.services.DataService
 
-class QueueSystem(private val plugin: SuperSmashMobsBrawl = inject()) :
-    IteratingSystem(family { all(PlayerComponent, QueueComponent) }) {
-    private var lastMatchmakingCheck = 0L
-    private val matchmakingInterval = 1000L // Check every second (20 ticks)
+class QueueSystem(
+    private val plugin: SuperSmashMobsBrawl = inject(),
+    private val dataService: DataService = inject(),
+) : IntervalSystem(interval = Fixed(1f)) {
+
+    // Not supporting parties queueing for minigames currently
+    private val queuedEntities = family {
+        all(InQueueComponent, PlayerComponent).none(InPartyComponent)
+    }
 
     override fun onTick() {
-        super.onTick()
+        queuedEntities
+            .groupBy { it[InQueueComponent].minigameId }
+            .mapKeys { dataService.getMinigame(it.key) }
+            .filter {
+                if (it.key == null) {
+                    // Remove entity from queue because the minigame they were in was invalid
+                    it.value.forEach { entity ->
+                        plugin.logger.warning(
+                            "Player was queued for minigame with id (${entity[InQueueComponent].minigameId}) was is not valid"
+                        )
+                        entity.configure { it -= InQueueComponent }
+                    }
+                }
 
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - lastMatchmakingCheck >= matchmakingInterval) {
-            checkForMatches()
-            lastMatchmakingCheck = currentTime
-        }
+                return@filter it.key != null
+            }
+            .filter { (minigameDef, entities) ->
+                entities.size >= getRequiredPlayersForMinigame(minigameDef!!)
+            }
+            .forEach { minigameDef, entities ->
+                entities.forEach { entity -> entity.configure { it -= InQueueComponent } }
+
+                world.entity { it += MinigameComponent(minigameDef!!, playerEntities = entities) }
+            }
     }
 
-    override fun onTickEntity(entity: Entity) {
-        // Individual entity processing if needed
-        // Currently just used to maintain the family query
-    }
-
-    private fun checkForMatches() {
-        // Group queued players by minigame type
-        val queuedPlayersByMinigame = mutableMapOf<String, MutableList<Pair<Entity, Player>>>()
-
-        // Iterate through all entities with PlayerComponent and QueueComponent
-        family.forEach { entity ->
-            val playerComponent = entity[PlayerComponent]
-            val queueComponent = entity[QueueComponent]
-            val player = playerComponent.player
-
-            // Skip players who are already in a minigame
-            if (entity.has(InMinigameComponent)) {
-                return@forEach
-            }
-
-            val minigameId = queueComponent.minigame.id
-            queuedPlayersByMinigame.getOrPut(minigameId) { mutableListOf() }.add(entity to player)
-        }
-
-        // Check each minigame type for possible matches
-        queuedPlayersByMinigame.forEach { (minigameId, playersWithEntities) ->
-            if (playersWithEntities.isEmpty()) return@forEach
-
-            val minigameDef = playersWithEntities.first().first[QueueComponent].minigame
-            val requiredPlayers = getRequiredPlayersForMinigame(minigameDef)
-
-            if (requiredPlayers <= 0) {
-                plugin.logger.severe(
-                    "Minigame $minigameId has invalid player requirement: $requiredPlayers"
-                )
-                return@forEach
-            }
-
-            // Start as many games as possible with available players
-            val availablePlayers = playersWithEntities.toMutableList()
-            while (availablePlayers.size >= requiredPlayers) {
-                val playersToStart = availablePlayers.take(requiredPlayers)
-
-                // Remove queue components from selected players
-                playersToStart.forEach { (entity, _) -> entity.configure { it -= QueueComponent } }
-
-                // Fire the queue pop event
-                val players = playersToStart.map { it.second }
-                QueuePopEvent(minigameId, players).callEvent()
-
-                // Remove used players from available list
-                availablePlayers.removeAll(playersToStart)
-            }
-        }
-    }
+    private fun removeEntitiesFromQueue(entities: List<Entity>) {}
 
     private fun getRequiredPlayersForMinigame(minigameDef: MinigameDef): Int {
         return when (minigameDef) {

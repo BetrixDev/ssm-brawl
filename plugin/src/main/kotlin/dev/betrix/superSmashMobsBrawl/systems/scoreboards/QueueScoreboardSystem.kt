@@ -7,8 +7,8 @@ import com.github.quillraven.fleks.World.Companion.inject
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.Ticker
 import dev.betrix.superSmashMobsBrawl.components.InMinigameComponent
+import dev.betrix.superSmashMobsBrawl.components.InQueueComponent
 import dev.betrix.superSmashMobsBrawl.components.PlayerComponent
-import dev.betrix.superSmashMobsBrawl.components.QueueComponent
 import dev.betrix.superSmashMobsBrawl.components.ScoreboardComponent
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
@@ -18,18 +18,18 @@ import dev.betrix.superSmashMobsBrawl.services.LangService
 class QueueScoreboardSystem(
     private val lang: LangService = inject(),
     private val plugin: SuperSmashMobsBrawl = inject(),
-) : IteratingSystem(family { all(PlayerComponent, ScoreboardComponent, QueueComponent) }) {
+) : IteratingSystem(family { all(PlayerComponent, ScoreboardComponent, InQueueComponent) }) {
     private val ticker = Ticker(120)
 
     override fun onTickEntity(entity: Entity) {
         val scoreboardComponent = entity[ScoreboardComponent]
         val player = entity[PlayerComponent].player
-        val queueComponent = entity[QueueComponent]
+        val inQueueComponent = entity[InQueueComponent]
 
-        val minigameId = queueComponent.minigame.id
-        val requiredPlayers = getRequiredPlayersForMinigame(queueComponent.minigame)
+        val minigameId = inQueueComponent.minigame.id
+        val requiredPlayers = getRequiredPlayersForMinigame(inQueueComponent.minigame)
         val playersInQueue = getPlayersInQueue(minigameId)
-        val queueTime = System.currentTimeMillis() - queueComponent.queuedAt
+        val queueTime = System.currentTimeMillis() - inQueueComponent.queuedAt
         val queueTimeSeconds = queueTime / 1000
 
         // Set scoreboard title with animation
@@ -102,11 +102,11 @@ class QueueScoreboardSystem(
         // Count all players with QueueComponent for the same minigame
         // who are not already in a minigame
         world
-            .family { all(PlayerComponent, QueueComponent) }
+            .family { all(PlayerComponent, InQueueComponent) }
             .forEach { entity ->
                 if (!entity.has(InMinigameComponent)) {
-                    val queueComponent = entity[QueueComponent]
-                    if (queueComponent.minigame.id == minigameId) {
+                    val inQueueComponent = entity[InQueueComponent]
+                    if (inQueueComponent.minigame.id == minigameId) {
                         count++
                     }
                 }

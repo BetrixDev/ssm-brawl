@@ -5,8 +5,8 @@ import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.quillraven.fleks.World
 import com.github.quillraven.fleks.World.Companion.family
+import dev.betrix.superSmashMobsBrawl.components.InQueueComponent
 import dev.betrix.superSmashMobsBrawl.components.PlayerComponent
-import dev.betrix.superSmashMobsBrawl.components.QueueComponent
 import dev.betrix.superSmashMobsBrawl.extensions.ecsEntity
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import org.bukkit.entity.Player
@@ -42,19 +42,19 @@ object QueueService : KoinComponent {
 
         with(ecsWorld) {
             // Check if player is already in queue
-            if (entity.has(QueueComponent)) {
-                val existingQueueComponent = entity[QueueComponent]
+            if (entity.has(InQueueComponent)) {
+                val existingInQueueComponent = entity[InQueueComponent]
                 return Err(
                     QueueEntry(
                         player,
-                        existingQueueComponent.minigame,
-                        existingQueueComponent.partyId,
+                        existingInQueueComponent.minigame,
+                        existingInQueueComponent.partyId,
                     )
                 )
             }
 
             // Add queue component to player entity
-            entity.configure { it += QueueComponent(minigameDefinition) }
+            entity.configure { it += InQueueComponent(minigameDefinition) }
         }
 
         return Ok(QueueEntry(player, minigameDefinition))
@@ -64,10 +64,11 @@ object QueueService : KoinComponent {
         val entity = player.ecsEntity ?: return Err(Unit)
 
         with(ecsWorld) {
-            return if (entity.has(QueueComponent)) {
-                val queueComponent = entity[QueueComponent]
-                val queueEntry = QueueEntry(player, queueComponent.minigame, queueComponent.partyId)
-                entity.configure { it -= QueueComponent }
+            return if (entity.has(InQueueComponent)) {
+                val inQueueComponent = entity[InQueueComponent]
+                val queueEntry =
+                    QueueEntry(player, inQueueComponent.minigame, inQueueComponent.partyId)
+                entity.configure { it -= InQueueComponent }
                 Ok(queueEntry)
             } else {
                 Err(Unit)
@@ -79,9 +80,9 @@ object QueueService : KoinComponent {
         val entity = player.ecsEntity ?: return null
 
         with(ecsWorld) {
-            return if (entity.has(QueueComponent)) {
-                val queueComponent = entity[QueueComponent]
-                QueueEntry(player, queueComponent.minigame, queueComponent.partyId)
+            return if (entity.has(InQueueComponent)) {
+                val inQueueComponent = entity[InQueueComponent]
+                QueueEntry(player, inQueueComponent.minigame, inQueueComponent.partyId)
             } else {
                 null
             }
@@ -93,17 +94,17 @@ object QueueService : KoinComponent {
 
         with(ecsWorld) {
             // Get all entities with the required components
-            val queueFamily = family { all(PlayerComponent, QueueComponent) }
+            val queueFamily = family { all(PlayerComponent, InQueueComponent) }
             queueFamily.forEach { entity ->
                 val playerComponent = entity[PlayerComponent]
-                val queueComponent = entity[QueueComponent]
+                val inQueueComponent = entity[InQueueComponent]
 
-                if (queueComponent.minigame.id == minigameDef.id) {
+                if (inQueueComponent.minigame.id == minigameDef.id) {
                     queuedPlayers.add(
                         QueueEntry(
                             playerComponent.player,
-                            queueComponent.minigame,
-                            queueComponent.partyId,
+                            inQueueComponent.minigame,
+                            inQueueComponent.partyId,
                         )
                     )
                 }
