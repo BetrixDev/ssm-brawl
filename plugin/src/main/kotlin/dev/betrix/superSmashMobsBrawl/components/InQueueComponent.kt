@@ -2,9 +2,10 @@ package dev.betrix.superSmashMobsBrawl.components
 
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
+import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 
 data class InQueueComponent(
-    val minigameId: String,
+    val minigame: MinigameDef,
     val startTimestamp: Long = System.currentTimeMillis(),
     var priority: Int = 0,
 ) : Component<InQueueComponent> {

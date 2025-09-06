@@ -132,7 +132,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 .argument(MinigameDef::class.java, MinigameDefinitionArgument())
                 .argument(KitDef::class.java, KitDefArgument())
                 .argument(LeaveSpecifier::class.java, LeaveSpecifierArgument())
-                .commands(QueueCommand())
+                .commands(QueueCommand(this))
                 .commands(KitCommand())
                 .commands(LeaveCommand(this))
                 .commands(DebugCommand())

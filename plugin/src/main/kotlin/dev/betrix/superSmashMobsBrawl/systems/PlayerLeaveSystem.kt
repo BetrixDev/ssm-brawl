@@ -30,6 +30,10 @@ class PlayerLeaveSystem(private val lang: LangService = inject()) : IteratingSys
         all(PartyComponent)
     }
 
+    private val minigames = family {
+        all(MinigameComponent)
+    }
+
     override fun onTickEntity(entity: Entity) {
         val player = entity[PlayerComponent].player
         val specifier = entity[PlayerTryLeaveComponent].specifier

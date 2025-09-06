@@ -5,6 +5,7 @@ import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.PlayerEcsEntityService
+import net.kyori.adventure.text.Component
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -73,3 +74,13 @@ fun Player.playSound(sound: Sound, pitch: Float = 1f, volume: Float = 1f) {
 
 val Player.ecsEntity: EcsEntity?
     get() = PlayerEcsEntityService.getEntityForPlayer(this)
+
+fun Player.sendSuccessMessage(component: Component) {
+    sendMessage(component)
+    playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f)
+}
+
+fun Player.sendErrorMessage(component: Component) {
+    sendMessage(component)
+    playSound(location, Sound.ENTITY_VILLAGER_NO, 1f, 1f)
+}
