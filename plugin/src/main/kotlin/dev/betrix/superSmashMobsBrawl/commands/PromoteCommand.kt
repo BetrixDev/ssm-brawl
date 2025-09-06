@@ -14,12 +14,12 @@ import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-@Command(name = "leave")
-class LeaveCommand(private val plugin: SuperSmashMobsBrawl) : KoinComponent {
+@Command(name = "promote")
+class PromoteCommand(private val plugin: SuperSmashMobsBrawl) : KoinComponent {
     private val lang: LangService by inject()
 
     @Execute
-    fun leave(@Context sender: CommandSender, @OptionalArg specifier: LeaveSpecifier?) {
+    fun promote(@Context sender: CommandSender, @Arg player: Player) {
         if (sender !is Player) {
             sender.sendMessage(lang.t("messages.commands.onlyPlayers"))
             return
@@ -27,7 +27,7 @@ class LeaveCommand(private val plugin: SuperSmashMobsBrawl) : KoinComponent {
 
         with(plugin.ecsWorld) {
             sender.ecsEntity?.configure {
-                it += PlayerTryLeaveComponent(specifier)
+//                it += PlayerTryLeaveComponent(specifier)
             }
         }
     }

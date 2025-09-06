@@ -53,8 +53,6 @@ class QueueSystem(
             }
     }
 
-    private fun removeEntitiesFromQueue(entities: List<Entity>) {}
-
     private fun getRequiredPlayersForMinigame(minigameDef: MinigameDef): Int {
         return when (minigameDef) {
             is TeamBasedStocksMinigameDef -> {

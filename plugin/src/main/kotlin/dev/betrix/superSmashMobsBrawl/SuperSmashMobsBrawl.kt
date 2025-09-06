@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl
 
+import com.github.quillraven.fleks.World
 import com.github.quillraven.fleks.configureWorld
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
 import dev.betrix.superSmashMobsBrawl.commands.DebugCommand
@@ -7,7 +8,9 @@ import dev.betrix.superSmashMobsBrawl.commands.KitCommand
 import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
 import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
 import dev.betrix.superSmashMobsBrawl.commands.resolvers.KitDefArgument
+import dev.betrix.superSmashMobsBrawl.commands.resolvers.LeaveSpecifierArgument
 import dev.betrix.superSmashMobsBrawl.commands.resolvers.MinigameDefinitionArgument
+import dev.betrix.superSmashMobsBrawl.components.LeaveSpecifier
 import dev.betrix.superSmashMobsBrawl.components.PlayerComponent
 import dev.betrix.superSmashMobsBrawl.components.ScoreboardComponent
 import dev.betrix.superSmashMobsBrawl.extensions.ecsEntity
@@ -26,6 +29,7 @@ import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.systems.PlayerSystem
 import dev.betrix.superSmashMobsBrawl.systems.QueueSystem
 import dev.betrix.superSmashMobsBrawl.systems.MinigameWorldLoaderSystem
+import dev.betrix.superSmashMobsBrawl.systems.PlayerLeaveSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.HubScoreboardSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.MinigameScoreboardSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.QueueScoreboardSystem
@@ -62,12 +66,14 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
     lateinit var liteCommands: LiteCommands<CommandSender>
     lateinit var twilight: Twilight
 
+    lateinit var ecsWorld: World
+
     override suspend fun onEnableAsync() {
         twilight = twilight(this)
 
         Logger.getLogger("").addHandler(AxiomLoggerHandler(this))
 
-        val ecsWorld = configureWorld {
+        ecsWorld = configureWorld {
             injectables {
                 add(LangService(this@SuperSmashMobsBrawl))
                 add(this@SuperSmashMobsBrawl)
@@ -81,6 +87,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 add(QueueSystem())
                 add(QueueScoreboardSystem())
                 add(MinigameWorldLoaderSystem())
+                add(PlayerLeaveSystem())
             }
         }
 
@@ -124,9 +131,10 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
             LiteBukkitFactory.builder(this)
                 .argument(MinigameDef::class.java, MinigameDefinitionArgument())
                 .argument(KitDef::class.java, KitDefArgument())
+                .argument(LeaveSpecifier::class.java, LeaveSpecifierArgument())
                 .commands(QueueCommand())
                 .commands(KitCommand())
-                .commands(LeaveCommand())
+                .commands(LeaveCommand(this))
                 .commands(DebugCommand())
                 .build()
 
