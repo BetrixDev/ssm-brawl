@@ -29,7 +29,7 @@ class QueueScoreboardSystem(
         val minigameId = inQueueComponent.minigame.id
         val requiredPlayers = getRequiredPlayersForMinigame(inQueueComponent.minigame)
         val playersInQueue = getPlayersInQueue(minigameId)
-        val queueTime = System.currentTimeMillis() - inQueueComponent.queuedAt
+        val queueTime = System.currentTimeMillis() - inQueueComponent.startTimestamp
         val queueTimeSeconds = queueTime / 1000
 
         // Set scoreboard title with animation

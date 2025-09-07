@@ -35,7 +35,7 @@ class PlayerLeaveSystem(private val lang: LangService = inject()) :
                 return
             }
 
-            val minigameId = queuedEntities.find { it == entity }!![InQueueComponent].minigameId
+            val minigameId = queuedEntities.find { it == entity }!![InQueueComponent].minigame.id
 
             if (isInParty) {
                 val partyId = partiedEntities.find { it == entity }!![InPartyComponent].partyId
