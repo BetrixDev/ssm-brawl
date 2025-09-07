@@ -6,7 +6,7 @@ import com.github.quillraven.fleks.ComponentType
 enum class LeaveSpecifier {
     PARTY,
     QUEUE,
-    DISBAND
+    DISBAND,
 }
 
 class PlayerTryLeaveComponent(val specifier: LeaveSpecifier?) : Component<PlayerTryLeaveComponent> {

@@ -30,8 +30,6 @@ class LeaveSpecifierArgument : ArgumentResolver<CommandSender, LeaveSpecifier>()
         argument: Argument<LeaveSpecifier?>?,
         context: SuggestionContext?,
     ): SuggestionResult? {
-        return SuggestionResult.of(
-            LeaveSpecifier.entries.map { it.name.lowercase() }
-        )
+        return SuggestionResult.of(LeaveSpecifier.entries.map { it.name.lowercase() })
     }
 }

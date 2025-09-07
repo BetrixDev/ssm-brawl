@@ -19,9 +19,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withContext
 
-class MinigameWorldLoaderSystem(private val plugin: SuperSmashMobsBrawl = inject(), private val dataService: DataService = inject(), private val worldService: WorldService = inject()) : IteratingSystem(
-    family { all(MinigameComponent) }
-) {
+class MinigameWorldLoaderSystem(
+    private val plugin: SuperSmashMobsBrawl = inject(),
+    private val dataService: DataService = inject(),
+    private val worldService: WorldService = inject(),
+) : IteratingSystem(family { all(MinigameComponent) }) {
     private val worldLoadingJobs = mutableMapOf<Entity, Job>()
 
     override fun onTickEntity(entity: Entity) {
@@ -35,15 +37,15 @@ class MinigameWorldLoaderSystem(private val plugin: SuperSmashMobsBrawl = inject
 
         val worldToLoad = getWorldToLoad(minigame.minigameDef)
 
-        worldLoadingJobs[entity] = plugin.launch {
-            withContext(Dispatchers.IO) {
-                worldService.copyAndLoadWorld(worldToLoad, minigame.instanceId).onSuccess {
-                    minigame.loadedWorld = it
-                }.onFailure {
-                    TODO("Handle error when loading world fails")
+        worldLoadingJobs[entity] =
+            plugin.launch {
+                withContext(Dispatchers.IO) {
+                    worldService
+                        .copyAndLoadWorld(worldToLoad, minigame.instanceId)
+                        .onSuccess { minigame.loadedWorld = it }
+                        .onFailure { TODO("Handle error when loading world fails") }
                 }
             }
-        }
     }
 
     private fun getWorldToLoad(minigameDef: MinigameDef): GameMapDef {
@@ -61,13 +63,17 @@ class MinigameWorldLoaderSystem(private val plugin: SuperSmashMobsBrawl = inject
             }
 
         if (validMaps.isEmpty()) {
-            plugin.logger.severe("Minigame (${minigameDef.id}) had no valid maps, picking a default")
+            plugin.logger.severe(
+                "Minigame (${minigameDef.id}) had no valid maps, picking a default"
+            )
             return dataService.getAllGameMaps().first()
         }
 
         return validMaps.random()
-
     }
 
-    private suspend fun loadWorld(gameMap: GameMapDef, afterLoad: (result: Result<BrawlWorld>) -> Unit) {}
+    private suspend fun loadWorld(
+        gameMap: GameMapDef,
+        afterLoad: (result: Result<BrawlWorld>) -> Unit,
+    ) {}
 }

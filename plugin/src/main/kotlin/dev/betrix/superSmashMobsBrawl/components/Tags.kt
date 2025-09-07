@@ -5,5 +5,5 @@ import com.github.quillraven.fleks.entityTagOf
 
 enum class Tags : EntityTags by entityTagOf() {
     DEAD,
-    ELIMINATED
+    ELIMINATED,
 }

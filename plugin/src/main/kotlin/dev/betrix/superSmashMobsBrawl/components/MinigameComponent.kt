@@ -20,8 +20,8 @@ enum class MinigameState {
 }
 
 /**
- * Base component for all minigames containing common data and state.
- * This component should be present on every minigame entity.
+ * Base component for all minigames containing common data and state. This component should be
+ * present on every minigame entity.
  */
 data class MinigameComponent(
     val minigameDef: MinigameDef,
@@ -37,13 +37,9 @@ data class MinigameComponent(
     lateinit var loadedWorld: BrawlWorld
 }
 
-/**
- * Component for team-based minigames.
- * Contains team data and management functionality.
- */
-data class TeamMinigameComponent(
-    val teams: MutableMap<String, TeamData> = mutableMapOf(),
-) : Component<TeamMinigameComponent> {
+/** Component for team-based minigames. Contains team data and management functionality. */
+data class TeamMinigameComponent(val teams: MutableMap<String, TeamData> = mutableMapOf()) :
+    Component<TeamMinigameComponent> {
     override fun type() = TeamMinigameComponent
 
     companion object : ComponentType<TeamMinigameComponent>()
@@ -61,9 +57,7 @@ data class TeamMinigameComponent(
     fun getAllTeams(): List<TeamData> = teams.values.toList()
 }
 
-/**
- * Component for stock-based minigames where players/teams have limited lives.
- */
+/** Component for stock-based minigames where players/teams have limited lives. */
 data class StocksMinigameComponent(
     var defaultStocks: Int = 3,
     val playerStocks: MutableMap<String, Int> = mutableMapOf(), // player entity ID -> stocks
@@ -98,13 +92,12 @@ data class StocksMinigameComponent(
     }
 }
 
-/**
- * Component for combat-focused minigames tracking kills, deaths, and damage.
- */
+/** Component for combat-focused minigames tracking kills, deaths, and damage. */
 data class CombatMinigameComponent(
     val playerKills: MutableMap<String, Int> = mutableMapOf(), // player entity ID -> kill count
     val playerDeaths: MutableMap<String, Int> = mutableMapOf(), // player entity ID -> death count
-    val playerDamage: MutableMap<String, Double> = mutableMapOf(), // player entity ID -> damage dealt
+    val playerDamage: MutableMap<String, Double> =
+        mutableMapOf(), // player entity ID -> damage dealt
     val teamKills: MutableMap<String, Int> = mutableMapOf(), // team ID -> total kills
 ) : Component<CombatMinigameComponent> {
     override fun type() = CombatMinigameComponent
@@ -125,14 +118,15 @@ data class CombatMinigameComponent(
     }
 
     fun getKills(playerId: String): Int = playerKills[playerId] ?: 0
+
     fun getDeaths(playerId: String): Int = playerDeaths[playerId] ?: 0
+
     fun getDamage(playerId: String): Double = playerDamage[playerId] ?: 0.0
+
     fun getTeamKills(teamId: String): Int = teamKills[teamId] ?: 0
 }
 
-/**
- * Component for time-based minigames with countdowns and match durations.
- */
+/** Component for time-based minigames with countdowns and match durations. */
 data class TimedMinigameComponent(
     var countdownSeconds: Int = 0,
     var matchDurationSeconds: Int? = null, // null = unlimited time
@@ -182,13 +176,13 @@ data class TimedMinigameComponent(
     }
 }
 
-/**
- * Component for parkour-based minigames tracking checkpoints and completion times.
- */
+/** Component for parkour-based minigames tracking checkpoints and completion times. */
 data class ParkourMinigameComponent(
     val checkpoints: List<ParkourCheckpoint> = listOf(),
-    val playerCheckpoints: MutableMap<String, MutableSet<Int>> = mutableMapOf(), // player ID -> completed checkpoint indices
-    val playerCompletionTimes: MutableMap<String, Long> = mutableMapOf(), // player ID -> completion time in milliseconds
+    val playerCheckpoints: MutableMap<String, MutableSet<Int>> =
+        mutableMapOf(), // player ID -> completed checkpoint indices
+    val playerCompletionTimes: MutableMap<String, Long> =
+        mutableMapOf(), // player ID -> completion time in milliseconds
     val playerBestLaps: MutableMap<String, Long> = mutableMapOf(), // player ID -> best lap time
     val leaderboard: MutableList<ParkourLeaderboardEntry> = mutableListOf(),
 ) : Component<ParkourMinigameComponent> {
@@ -229,10 +223,7 @@ data class ParkourCheckpoint(
     val radius: Double = 2.0,
 )
 
-data class ParkourLeaderboardEntry(
-    val playerId: String,
-    val completionTime: Long,
-)
+data class ParkourLeaderboardEntry(val playerId: String, val completionTime: Long)
 
 private fun generateInstanceId(): String {
     return "minigame_${UUID.randomUUID()}"
