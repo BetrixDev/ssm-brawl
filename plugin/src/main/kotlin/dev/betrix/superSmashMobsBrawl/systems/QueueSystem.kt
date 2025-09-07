@@ -22,14 +22,14 @@ class QueueSystem(
 
     override fun onTick() {
         queuedEntities
-            .groupBy { it[InQueueComponent].minigameId }
+            .groupBy { it[InQueueComponent].minigame.id }
             .mapKeys { dataService.getMinigame(it.key) }
             .filter {
                 if (it.key == null) {
                     // Remove entity from queue because the minigame they were in was invalid
                     it.value.forEach { entity ->
                         plugin.logger.warning(
-                            "Player was queued for minigame with id (${entity[InQueueComponent].minigameId}) was is not valid"
+                            "Player was queued for minigame with id (${entity[InQueueComponent].minigame.id}) was is not valid"
                         )
                         entity.configure { it -= InQueueComponent }
                     }
@@ -47,9 +47,10 @@ class QueueSystem(
                     val playerData = entity[PlayerDocumentComponent]
 
                     entity.configure {
-                    it -= InQueueComponent
-                    it += InMinigameComponent(minigameEntity, playerData.selectedKitId)
-                } }
+                        it -= InQueueComponent
+                        it += InMinigameComponent(minigameEntity, playerData.selectedKitId)
+                    }
+                }
             }
     }
 
