@@ -24,7 +24,7 @@ enum class MinigameState {
  * present on every minigame entity.
  */
 data class MinigameComponent(
-    val minigameDef: MinigameDef,
+    val minigame: MinigameDef,
     val instanceId: String = generateInstanceId(),
     var state: MinigameState = MinigameState.LOADING_WORLD,
     val playerEntities: MutableEntityBag,

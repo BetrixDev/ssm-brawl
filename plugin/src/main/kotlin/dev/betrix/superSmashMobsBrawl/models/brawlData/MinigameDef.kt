@@ -18,6 +18,7 @@ sealed class MinigameDef {
     abstract val id: String
     abstract val isHidden: Boolean
     abstract val allowParties: Boolean
+    abstract val isRanked: Boolean
     abstract val mapBlacklist: List<String>?
     abstract val mapWhitelist: List<String>?
     abstract val passiveBlacklist: List<String>?
@@ -46,6 +47,7 @@ data class FfaMinigameDef(
     override val id: String,
     override val isHidden: Boolean,
     override val allowParties: Boolean,
+    override val isRanked: Boolean = false,
     override val mapBlacklist: List<String>? = null,
     override val mapWhitelist: List<String>? = null,
     override val passiveBlacklist: List<String>? = null,
@@ -64,6 +66,7 @@ data class TeamBasedStocksMinigameDef(
     override val id: String,
     override val isHidden: Boolean,
     override val allowParties: Boolean,
+    override val isRanked: Boolean = false,
     override val mapBlacklist: List<String>? = null,
     override val mapWhitelist: List<String>? = null,
     override val passiveBlacklist: List<String>? = null,

@@ -14,12 +14,9 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import okio.buffer
 import okio.source
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-class DataService : KoinComponent {
-    private val plugin: SuperSmashMobsBrawl by inject()
-
+class DataService(private val plugin: SuperSmashMobsBrawl) {
+    
     private val yaml =
         Yaml(
             serializersModule =

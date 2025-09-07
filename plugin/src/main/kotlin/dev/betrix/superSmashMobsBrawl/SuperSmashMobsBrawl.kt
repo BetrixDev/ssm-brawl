@@ -12,6 +12,7 @@ import dev.betrix.superSmashMobsBrawl.commands.resolvers.LeaveSpecifierArgument
 import dev.betrix.superSmashMobsBrawl.commands.resolvers.MinigameDefinitionArgument
 import dev.betrix.superSmashMobsBrawl.components.LeaveSpecifier
 import dev.betrix.superSmashMobsBrawl.components.PlayerComponent
+import dev.betrix.superSmashMobsBrawl.components.PlayerDocumentComponent
 import dev.betrix.superSmashMobsBrawl.components.ScoreboardComponent
 import dev.betrix.superSmashMobsBrawl.extensions.ecsEntity
 import dev.betrix.superSmashMobsBrawl.extensions.hasPassive
@@ -29,6 +30,7 @@ import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.systems.MinigameWorldLoaderSystem
 import dev.betrix.superSmashMobsBrawl.systems.PlayerLeaveSystem
 import dev.betrix.superSmashMobsBrawl.systems.PlayerSystem
+import dev.betrix.superSmashMobsBrawl.systems.QueueJoinSystem
 import dev.betrix.superSmashMobsBrawl.systems.QueueSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.HubScoreboardSystem
 import dev.betrix.superSmashMobsBrawl.systems.scoreboards.MinigameScoreboardSystem
@@ -78,6 +80,8 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 add(LangService(this@SuperSmashMobsBrawl))
                 add(this@SuperSmashMobsBrawl)
                 add<JavaPlugin>(this@SuperSmashMobsBrawl)
+                add(DataService(this@SuperSmashMobsBrawl))
+                add(WorldService)
             }
             systems {
                 add(HubScoreboardSystem())
@@ -88,6 +92,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 add(QueueScoreboardSystem())
                 add(MinigameWorldLoaderSystem())
                 add(PlayerLeaveSystem())
+                add(QueueJoinSystem())
             }
         }
 
@@ -107,7 +112,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                     single { this@SuperSmashMobsBrawl }
                     single<JavaPlugin> { this@SuperSmashMobsBrawl }
                     single { this@SuperSmashMobsBrawl.logger }
-                    single(createdAtStart = true) { DataService() }
+                    single(createdAtStart = true) { DataService(this@SuperSmashMobsBrawl) }
                     single { MinigameService() }
                     single { KitService }
                     single { ecsWorld }
@@ -143,6 +148,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
             val entity =
                 ecsWorld.entity {
                     it += PlayerComponent(player)
+                    it += PlayerDocumentComponent()
                     it += ScoreboardComponent(TwilightScoreboard(player))
                 }
             PlayerEcsEntityService.onCreateEntityForPlayer(player, entity)

@@ -35,7 +35,7 @@ class MinigameWorldLoaderSystem(
 
         plugin.logger.info("Loading world for minigame (${minigame.instanceId})")
 
-        val worldToLoad = getWorldToLoad(minigame.minigameDef)
+        val worldToLoad = getWorldToLoad(minigame.minigame)
 
         worldLoadingJobs[entity] =
             plugin.launch {

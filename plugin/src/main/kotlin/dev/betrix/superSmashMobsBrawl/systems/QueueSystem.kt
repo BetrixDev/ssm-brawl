@@ -15,19 +15,18 @@ class QueueSystem(
     private val dataService: DataService = inject(),
 ) : IntervalSystem(interval = Fixed(1f)) {
 
-    // Not supporting parties queueing for minigames currently
     private val queuedEntities = family {
-        all(InQueueComponent, PlayerComponent).none(InPartyComponent)
+        all(InQueueComponent, PlayerComponent)
     }
 
     override fun onTick() {
         queuedEntities
             .groupBy { it[InQueueComponent].minigame.id }
             .mapKeys { dataService.getMinigame(it.key) }
-            .filter {
-                if (it.key == null) {
+            .filter { entry ->
+                if (entry.key == null) {
                     // Remove entity from queue because the minigame they were in was invalid
-                    it.value.forEach { entity ->
+                    entry.value.forEach { entity ->
                         plugin.logger.warning(
                             "Player was queued for minigame with id (${entity[InQueueComponent].minigame.id}) was is not valid"
                         )
@@ -35,7 +34,7 @@ class QueueSystem(
                     }
                 }
 
-                return@filter it.key != null
+                return@filter entry.key != null
             }
             .filter { (minigameDef, entities) ->
                 entities.size >= getRequiredPlayersForMinigame(minigameDef!!)

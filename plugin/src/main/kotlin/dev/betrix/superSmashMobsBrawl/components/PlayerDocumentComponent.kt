@@ -11,7 +11,7 @@ data class PlayerDocumentComponent(
     var selectedKitId: String = "creeper",
     var selectedCosmetics: MutableMap<String, String> = mutableMapOf(),
     var statistics: PersistentStatistics = PersistentStatistics(),
-    var isDity: Boolean = true,
+    var isDirty: Boolean = true,
 ) : Component<PlayerDocumentComponent> {
     override fun type() = PlayerDocumentComponent
 
