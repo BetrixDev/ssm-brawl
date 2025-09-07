@@ -26,9 +26,7 @@ class LeaveCommand(private val plugin: SuperSmashMobsBrawl) : KoinComponent {
         }
 
         with(plugin.ecsWorld) {
-            sender.ecsEntity?.configure {
-                it += PlayerTryLeaveComponent(specifier)
-            }
+            sender.ecsEntity?.configure { it += PlayerTryLeaveComponent(specifier) }
         }
     }
 }

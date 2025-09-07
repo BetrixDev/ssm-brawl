@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.commands
 
-import com.github.michaelbull.result.mapBoth
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.components.LeaveSpecifier
 import dev.betrix.superSmashMobsBrawl.components.PlayerGetQueueStatusComponent
@@ -21,27 +20,21 @@ class QueueCommand(private val plugin: SuperSmashMobsBrawl) : KoinComponent {
     @Execute
     fun queue(@Context sender: Player) {
         with(plugin.ecsWorld) {
-            sender.ecsEntity?.configure {
-                it += PlayerGetQueueStatusComponent
-            }
+            sender.ecsEntity?.configure { it += PlayerGetQueueStatusComponent }
         }
     }
 
     @Execute
     fun queue(@Context sender: Player, @Arg minigame: MinigameDef) {
         with(plugin.ecsWorld) {
-            sender.ecsEntity?.configure {
-                it += PlayerTryQueueComponent(minigame)
-            }
+            sender.ecsEntity?.configure { it += PlayerTryQueueComponent(minigame) }
         }
     }
 
     @Execute(name = "leave")
     fun queueLeave(@Context sender: Player) {
         with(plugin.ecsWorld) {
-            sender.ecsEntity?.configure {
-                it += PlayerTryLeaveComponent(LeaveSpecifier.QUEUE)
-            }
+            sender.ecsEntity?.configure { it += PlayerTryLeaveComponent(LeaveSpecifier.QUEUE) }
         }
     }
 }

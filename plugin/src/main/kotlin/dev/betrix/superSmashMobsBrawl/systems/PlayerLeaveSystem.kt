@@ -8,31 +8,18 @@ import com.github.quillraven.fleks.collection.EntityBag
 import dev.betrix.superSmashMobsBrawl.components.*
 import dev.betrix.superSmashMobsBrawl.services.LangService
 
-/**
- * System will handle all scenarios when a player issues the `/leave` command
- */
-class PlayerLeaveSystem(private val lang: LangService = inject()) : IteratingSystem(
-    family { all(PlayerComponent, PlayerTryLeaveComponent) }
-) {
-    private val queuedEntities = family {
-        all(InQueueComponent, PlayerComponent)
-    }
+/** System will handle all scenarios when a player issues the `/leave` command */
+class PlayerLeaveSystem(private val lang: LangService = inject()) :
+    IteratingSystem(family { all(PlayerComponent, PlayerTryLeaveComponent) }) {
+    private val queuedEntities = family { all(InQueueComponent, PlayerComponent) }
 
-    private val inMinigameEntities = family {
-        all(InMinigameComponent, PlayerComponent)
-    }
+    private val inMinigameEntities = family { all(InMinigameComponent, PlayerComponent) }
 
-    private val partiedEntities = family {
-        all(InPartyComponent, PlayerComponent)
-    }
+    private val partiedEntities = family { all(InPartyComponent, PlayerComponent) }
 
-    private val parties = family {
-        all(PartyComponent)
-    }
+    private val parties = family { all(PartyComponent) }
 
-    private val minigames = family {
-        all(MinigameComponent)
-    }
+    private val minigames = family { all(MinigameComponent) }
 
     override fun onTickEntity(entity: Entity) {
         val player = entity[PlayerComponent].player
@@ -56,22 +43,20 @@ class PlayerLeaveSystem(private val lang: LangService = inject()) : IteratingSys
                 val party = partyEntity?.getOrNull(PartyComponent)
 
                 if (party == null) {
-                    entity.configure {
-                        it -= InPartyComponent
-                    }
+                    entity.configure { it -= InPartyComponent }
                 } else {
                     if (party.isLeader(entity)) {
                         getPartyMembers(partyEntity).forEach { partyMember ->
-                            partyMember.configure {
-                                it -= InQueueComponent
-                            }
+                            partyMember.configure { it -= InQueueComponent }
 
                             val partyMemberPlayer = partyMember[PlayerComponent].player
 
-                            partyMemberPlayer.sendMessage(lang.t("messages.leave.queue.party.leaderLeft") {
-                                "leaderName" to player.name
-                                "minigameId" to minigameId
-                            })
+                            partyMemberPlayer.sendMessage(
+                                lang.t("messages.leave.queue.party.leaderLeft") {
+                                    "leaderName" to player.name
+                                    "minigameId" to minigameId
+                                }
+                            )
                         }
                     } else {
                         player.sendMessage(lang.t("messages.leave.queue.onlyLeaderCanLeave"))
@@ -84,10 +69,14 @@ class PlayerLeaveSystem(private val lang: LangService = inject()) : IteratingSys
                 it -= PlayerTryLeaveComponent
             }
 
-            player.sendMessage(lang.t("messages.leave.queue.success") { "minigameId" to minigameId })
+            player.sendMessage(
+                lang.t("messages.leave.queue.success") { "minigameId" to minigameId }
+            )
 
             return
-        } else if (isInParty || specifier == LeaveSpecifier.PARTY || specifier == LeaveSpecifier.DISBAND) {
+        } else if (
+            isInParty || specifier == LeaveSpecifier.PARTY || specifier == LeaveSpecifier.DISBAND
+        ) {
             if (specifier == LeaveSpecifier.DISBAND) {
                 if (!isInParty) {
                     player.sendMessage(lang.t("messages.leave.party.notInParty"))
@@ -99,27 +88,29 @@ class PlayerLeaveSystem(private val lang: LangService = inject()) : IteratingSys
                 val party = partyEntity?.getOrNull(PartyComponent)
 
                 if (party == null) {
-                    entity.configure {
-                        it -= InPartyComponent
-                    }
+                    entity.configure { it -= InPartyComponent }
                 } else {
                     val partyLeaderName = party.leader[PlayerComponent].player.name
 
                     if (party.leader != entity) {
-                        player.sendMessage(lang.t("message.leave.party.onlyLeaderCanDisband") { "leaderName" to partyLeaderName })
+                        player.sendMessage(
+                            lang.t("message.leave.party.onlyLeaderCanDisband") {
+                                "leaderName" to partyLeaderName
+                            }
+                        )
                         return
                     }
 
                     getPartyMembers(partyEntity).forEach { partyMember ->
-                        partyMember.configure {
-                            it -= InPartyComponent
-                        }
+                        partyMember.configure { it -= InPartyComponent }
 
                         val partyMemberPlayer = partyMember[PlayerComponent].player
 
-                        partyMemberPlayer.sendMessage(lang.t("messages.leave.queue.party.leaderDisbanded") {
-                            "leaderName" to partyLeaderName
-                        })
+                        partyMemberPlayer.sendMessage(
+                            lang.t("messages.leave.queue.party.leaderDisbanded") {
+                                "leaderName" to partyLeaderName
+                            }
+                        )
                     }
 
                     partyEntity.remove()
@@ -135,9 +126,7 @@ class PlayerLeaveSystem(private val lang: LangService = inject()) : IteratingSys
                 val party = partyEntity?.getOrNull(PartyComponent)
 
                 if (party == null) {
-                    entity.configure {
-                        it -= InPartyComponent
-                    }
+                    entity.configure { it -= InPartyComponent }
                 } else {
                     if (party.leader == entity) {
                         player.sendMessage(lang.t("messages.leave.party.leaderMustDisband"))
@@ -149,9 +138,7 @@ class PlayerLeaveSystem(private val lang: LangService = inject()) : IteratingSys
                         return
                     }
 
-                    entity.configure {
-                        it -= InPartyComponent
-                    }
+                    entity.configure { it -= InPartyComponent }
 
                     if (getPartyMembers(partyEntity).isEmpty()) {
                         partyEntity.remove()
@@ -162,16 +149,12 @@ class PlayerLeaveSystem(private val lang: LangService = inject()) : IteratingSys
             }
         }
 
-        entity.configure {
-            it -= PlayerTryLeaveComponent
-        }
+        entity.configure { it -= PlayerTryLeaveComponent }
     }
 
     private fun getPartyMembers(partyEntity: Entity): EntityBag {
         val partyId = partyEntity[PartyComponent].partyId
 
-        return partiedEntities.filter {
-            it.getOrNull(InPartyComponent)?.partyId == partyId
-        }
+        return partiedEntities.filter { it.getOrNull(InPartyComponent)?.partyId == partyId }
     }
 }

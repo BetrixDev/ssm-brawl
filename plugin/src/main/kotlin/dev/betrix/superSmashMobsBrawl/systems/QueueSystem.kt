@@ -12,7 +12,7 @@ import dev.betrix.superSmashMobsBrawl.services.DataService
 
 class QueueSystem(
     private val plugin: SuperSmashMobsBrawl = inject(),
-    private val dataService: DataService = inject()
+    private val dataService: DataService = inject(),
 ) : IntervalSystem(interval = Fixed(1f)) {
 
     // Not supporting parties queueing for minigames currently
@@ -41,7 +41,10 @@ class QueueSystem(
                 entities.size >= getRequiredPlayersForMinigame(minigameDef!!)
             }
             .forEach { minigameDef, entities ->
-                val minigameEntity = world.entity { it += MinigameComponent(minigameDef!!, playerEntities = entities) }
+                val minigameEntity =
+                    world.entity {
+                        it += MinigameComponent(minigameDef!!, playerEntities = entities)
+                    }
 
                 entities.forEach { entity ->
                     val playerData = entity[PlayerDocumentComponent]
