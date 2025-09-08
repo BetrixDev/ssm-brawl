@@ -19,8 +19,8 @@ import org.koin.core.component.inject
  *
  * It provides:
  * - A TagResolver that registers token tags like <primary>, <text>, etc.
- * - A lightweight pre-processor that expands token names inside tag arguments for tags
- *   that expect color parameters (e.g. <gradient:primary:muteddark>, <shadow:text>).
+ * - A lightweight pre-processor that expands token names inside tag arguments for tags that expect
+ *   color parameters (e.g. <gradient:primary:muteddark>, <shadow:text>).
  *
  * Tokens are defined in data/theme.yml and can be overridden by server owners.
  */
@@ -54,8 +54,8 @@ class ThemeService : KoinComponent {
     }
 
     /**
-     * Preprocesses a MiniMessage string to expand token names inside tag arguments for tags
-     * that accept colors by name, such as gradient and shadow.
+     * Preprocesses a MiniMessage string to expand token names inside tag arguments for tags that
+     * accept colors by name, such as gradient and shadow.
      */
     fun preprocessMessageColors(message: String): String {
         if (tokenToHex.isEmpty()) return message
@@ -68,10 +68,11 @@ class ThemeService : KoinComponent {
         while (matcher.find()) {
             val tagName = matcher.group(1)
             val args = matcher.group(2)
-            val replacedArgs = args.split(":").joinToString(":") { part ->
-                val key = part.trim().lowercase(Locale.ROOT)
-                tokenToHex[key] ?: part
-            }
+            val replacedArgs =
+                args.split(":").joinToString(":") { part ->
+                    val key = part.trim().lowercase(Locale.ROOT)
+                    tokenToHex[key] ?: part
+                }
             val replacement = "<" + tagName + ":" + replacedArgs + ">"
             matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement))
         }
@@ -100,4 +101,3 @@ class ThemeService : KoinComponent {
         return config
     }
 }
-
