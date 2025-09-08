@@ -22,7 +22,10 @@ class MinigameStartSystem(private val kitService: KitService = inject()) :
         if (minigame.state != MinigameState.STARTING) return
 
         // If a countdown is configured and not finished, wait for countdown system to finish.
-        if ((minigame.minigame.startingCountdownSeconds ?: 0) > 0 && (minigame.remainingCountdownSeconds ?: 0) > 0) {
+        if (
+            (minigame.minigame.startingCountdownSeconds ?: 0) > 0 &&
+                (minigame.remainingCountdownSeconds ?: 0) > 0
+        ) {
             return
         }
 
