@@ -8,7 +8,8 @@ sealed class DeathReason {
     data object Damage : DeathReason()
 }
 
-class BrawlDeathEvent(val player: org.bukkit.entity.Player, val reason: DeathReason) : TwilightEvent() {
+class BrawlDeathEvent(val player: org.bukkit.entity.Player, val reason: DeathReason) :
+    TwilightEvent() {
     companion object {
         fun call(player: org.bukkit.entity.Player, reason: DeathReason): BrawlDeathEvent {
             val event = BrawlDeathEvent(player, reason)

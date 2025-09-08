@@ -2,7 +2,6 @@ package dev.betrix.superSmashMobsBrawl.events
 
 import gg.flyte.twilight.event.TwilightEvent
 import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
 
 sealed class SmashDamageType {
     data object Projectile : SmashDamageType()

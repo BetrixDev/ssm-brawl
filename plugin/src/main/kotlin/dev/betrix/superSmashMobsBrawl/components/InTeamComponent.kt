@@ -9,4 +9,3 @@ data class InTeamComponent(val teamId: String) : Component<InTeamComponent> {
 
     companion object : ComponentType<InTeamComponent>()
 }
-

@@ -33,9 +33,7 @@ class QueueJoinSystem(private val lang: LangService = inject()) :
                 }
             )
 
-            entity.configure {
-                it -= PlayerTryQueueComponent
-            }
+            entity.configure { it -= PlayerTryQueueComponent }
 
             return
         }
@@ -43,13 +41,12 @@ class QueueJoinSystem(private val lang: LangService = inject()) :
         if (entitiesInMinigame.contains(entity)) {
             player.sendErrorMessage(
                 lang.t("messages.queue.join.alreadyInMinigame") {
-                    "minigameId" to entity[InMinigameComponent].minigameEntity[MinigameComponent].minigame.id
+                    "minigameId" to
+                        entity[InMinigameComponent].minigameEntity[MinigameComponent].minigame.id
                 }
             )
 
-            entity.configure {
-                it -= PlayerTryQueueComponent
-            }
+            entity.configure { it -= PlayerTryQueueComponent }
 
             return
         }
@@ -66,7 +63,9 @@ class QueueJoinSystem(private val lang: LangService = inject()) :
                 if (!party.isLeader(entity)) {
                     val leaderName = party.leader[PlayerComponent].player.name
                     player.sendErrorMessage(
-                        lang.t("messages.queue.join.party.onlyLeader") { "leaderName" to leaderName }
+                        lang.t("messages.queue.join.party.onlyLeader") {
+                            "leaderName" to leaderName
+                        }
                     )
 
                     entity.configure { it -= PlayerTryQueueComponent }
@@ -97,11 +96,13 @@ class QueueJoinSystem(private val lang: LangService = inject()) :
                 }
 
                 val partyMembers = getPartyMembers(partyEntity)
-                val capacity = when (minigame) {
-                    is TeamBasedStocksMinigameDef -> minigame.playersPerTeam * minigame.amountOfTeams
-                    is FfaMinigameDef -> minigame.maxPlayers
-                    else -> Int.MAX_VALUE
-                }
+                val capacity =
+                    when (minigame) {
+                        is TeamBasedStocksMinigameDef ->
+                            minigame.playersPerTeam * minigame.amountOfTeams
+                        is FfaMinigameDef -> minigame.maxPlayers
+                        else -> Int.MAX_VALUE
+                    }
 
                 if (partyMembers.size > capacity) {
                     player.sendErrorMessage(
@@ -131,7 +132,9 @@ class QueueJoinSystem(private val lang: LangService = inject()) :
                 if (memberInGame != null) {
                     val name = memberInGame[PlayerComponent].player.name
                     player.sendErrorMessage(
-                        lang.t("messages.queue.join.party.memberInMinigame") { "playerName" to name }
+                        lang.t("messages.queue.join.party.memberInMinigame") {
+                            "playerName" to name
+                        }
                     )
 
                     entity.configure { it -= PlayerTryQueueComponent }
@@ -167,9 +170,9 @@ class QueueJoinSystem(private val lang: LangService = inject()) :
             it += InQueueComponent(minigame)
         }
 
-        player.sendSuccessMessage(lang.t("messages.queue.join.success") {
-            "minigameId" to minigame.id
-        })
+        player.sendSuccessMessage(
+            lang.t("messages.queue.join.success") { "minigameId" to minigame.id }
+        )
     }
 
     private fun getPartyMembers(partyEntity: Entity): EntityBag {

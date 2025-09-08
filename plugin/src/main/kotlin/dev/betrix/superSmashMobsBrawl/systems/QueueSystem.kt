@@ -15,9 +15,7 @@ class QueueSystem(
     private val dataService: DataService = inject(),
 ) : IntervalSystem(interval = Fixed(1f)) {
 
-    private val queuedEntities = family {
-        all(InQueueComponent, PlayerComponent)
-    }
+    private val queuedEntities = family { all(InQueueComponent, PlayerComponent) }
 
     override fun onTick() {
         queuedEntities

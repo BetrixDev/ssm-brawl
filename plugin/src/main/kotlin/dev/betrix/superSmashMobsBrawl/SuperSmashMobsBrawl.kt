@@ -29,8 +29,8 @@ import dev.betrix.superSmashMobsBrawl.services.PlayerEcsEntityService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.systems.MinigameEndSystem
 import dev.betrix.superSmashMobsBrawl.systems.MinigameRespawnSystem
-import dev.betrix.superSmashMobsBrawl.systems.MinigameTeamSetupSystem
 import dev.betrix.superSmashMobsBrawl.systems.MinigameStartSystem
+import dev.betrix.superSmashMobsBrawl.systems.MinigameTeamSetupSystem
 import dev.betrix.superSmashMobsBrawl.systems.MinigameWorldLoaderSystem
 import dev.betrix.superSmashMobsBrawl.systems.PlayerLeaveSystem
 import dev.betrix.superSmashMobsBrawl.systems.PlayerSystem

@@ -14,8 +14,8 @@ import org.koin.core.component.inject
 /**
  * ECS-aware MinigameService.
  *
- * Exposes data lookups and a lightweight view for a player's current minigame
- * without owning minigame instances.
+ * Exposes data lookups and a lightweight view for a player's current minigame without owning
+ * minigame instances.
  */
 class MinigameService : KoinComponent {
     private val dataService: DataService by inject()
@@ -28,9 +28,15 @@ class MinigameService : KoinComponent {
     fun findClosestMinigameById(id: String): MinigameDef? {
         if (id.isBlank()) return null
 
-        getMinigameData(id)?.let { return it }
+        getMinigameData(id)?.let {
+            return it
+        }
 
-        getAllMinigameData().find { it.id.equals(id, ignoreCase = true) }?.let { return it }
+        getAllMinigameData()
+            .find { it.id.equals(id, ignoreCase = true) }
+            ?.let {
+                return it
+            }
 
         return getAllMinigameData().find { it.id.contains(id, ignoreCase = true) }
     }
@@ -46,7 +52,8 @@ class MinigameService : KoinComponent {
 
     fun getMinigameForPlayer(player: Player): MinigameView? {
         val entity = player.ecsEntity ?: return null
-        val minigameEntity = with(ecsWorld) { entity.getOrNull(InMinigameComponent)?.minigameEntity } ?: return null
+        val minigameEntity =
+            with(ecsWorld) { entity.getOrNull(InMinigameComponent)?.minigameEntity } ?: return null
         val comp = with(ecsWorld) { minigameEntity[MinigameComponent] }
         val def = comp.minigame
         return MinigameView(
