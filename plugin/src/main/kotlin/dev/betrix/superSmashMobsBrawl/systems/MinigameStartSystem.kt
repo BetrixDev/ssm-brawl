@@ -21,6 +21,7 @@ class MinigameStartSystem(private val kitService: KitService = inject()) :
         val minigame = entity[MinigameComponent]
         if (minigame.state != MinigameState.STARTING) return
 
+        if (!minigame.hasLoadedWorld()) return
         val world = minigame.loadedWorld as? BrawlGameWorld ?: return
 
         // Teleport players and assign kits

@@ -36,6 +36,8 @@ data class MinigameComponent(
     companion object : ComponentType<MinigameComponent>()
 
     lateinit var loadedWorld: BrawlWorld
+
+    fun hasLoadedWorld(): Boolean = ::loadedWorld.isInitialized
 }
 
 /** Component for team-based minigames. Contains team data and management functionality. */

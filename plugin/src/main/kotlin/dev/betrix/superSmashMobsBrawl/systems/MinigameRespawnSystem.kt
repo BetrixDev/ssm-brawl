@@ -42,6 +42,7 @@ class MinigameRespawnSystem(
             val entity = player.ecsEntity ?: return@event
             val inMinigame = with(world) { entity.getOrNull(InMinigameComponent) } ?: return@event
             val minigame = with(world) { inMinigame.minigameEntity[MinigameComponent] }
+            if (!minigame.hasLoadedWorld()) return@event
             if (minigame.state == MinigameState.ENDING) return@event
 
             // Unassign kit immediately on death

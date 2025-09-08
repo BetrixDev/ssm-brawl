@@ -31,7 +31,7 @@ class PlayerLeaveSystem(private val lang: LangService = inject()) :
 
         if (isInQueue || specifier == LeaveSpecifier.QUEUE) {
             if (specifier == LeaveSpecifier.QUEUE && !isInQueue) {
-                player.sendMessage(lang.t("messages.leave.queue.notInAQueue"))
+                player.sendMessage(lang.t("messages.queue.leave.notInQueue"))
                 return
             }
 
@@ -94,7 +94,7 @@ class PlayerLeaveSystem(private val lang: LangService = inject()) :
 
                     if (party.leader != entity) {
                         player.sendMessage(
-                            lang.t("message.leave.party.onlyLeaderCanDisband") {
+                            lang.t("messages.leave.party.onlyLeaderCanDisband") {
                                 "leaderName" to partyLeaderName
                             }
                         )
