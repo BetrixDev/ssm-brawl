@@ -27,6 +27,10 @@ sealed class MinigameDef {
     abstract val overrides: MinigameDefOverrides?
     abstract val allowRejoinAfterLeave: Boolean
     abstract val kitSwitchingMode: KitSwitchingMode
+    abstract val startingCountdownSeconds: Int?
+    abstract val startTeleportBeforeCountdown: Boolean
+    abstract val startAnnounceGo: Boolean
+    abstract val startSoundEachSecond: Boolean
 
     fun isPassiveValid(passiveId: String): Boolean {
         if (passiveBlacklist?.contains(passiveId) == true) {
@@ -56,6 +60,10 @@ data class FfaMinigameDef(
     override val overrides: MinigameDefOverrides? = null,
     override val allowRejoinAfterLeave: Boolean = true,
     override val kitSwitchingMode: KitSwitchingMode = KitSwitchingMode.NEVER,
+    override val startingCountdownSeconds: Int? = 3,
+    override val startTeleportBeforeCountdown: Boolean = false,
+    override val startAnnounceGo: Boolean = true,
+    override val startSoundEachSecond: Boolean = true,
     val minPlayers: Int,
     val maxPlayers: Int,
 ) : MinigameDef()
@@ -75,6 +83,10 @@ data class TeamBasedStocksMinigameDef(
     override val overrides: MinigameDefOverrides? = null,
     override val allowRejoinAfterLeave: Boolean = true,
     override val kitSwitchingMode: KitSwitchingMode = KitSwitchingMode.NEVER,
+    override val startingCountdownSeconds: Int? = 3,
+    override val startTeleportBeforeCountdown: Boolean = false,
+    override val startAnnounceGo: Boolean = true,
+    override val startSoundEachSecond: Boolean = true,
     val playersPerTeam: Int,
     val amountOfTeams: Int,
     val stocks: Int,

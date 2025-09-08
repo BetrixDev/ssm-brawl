@@ -38,6 +38,9 @@ data class MinigameComponent(
     lateinit var loadedWorld: BrawlWorld
 
     fun hasLoadedWorld(): Boolean = ::loadedWorld.isInitialized
+
+    // Countdown bookkeeping
+    var remainingCountdownSeconds: Int? = null
 }
 
 /** Component for team-based minigames. Contains team data and management functionality. */

@@ -21,6 +21,11 @@ class MinigameStartSystem(private val kitService: KitService = inject()) :
         val minigame = entity[MinigameComponent]
         if (minigame.state != MinigameState.STARTING) return
 
+        // If a countdown is configured and not finished, wait for countdown system to finish.
+        if ((minigame.minigame.startingCountdownSeconds ?: 0) > 0 && (minigame.remainingCountdownSeconds ?: 0) > 0) {
+            return
+        }
+
         if (!minigame.hasLoadedWorld()) return
         val world = minigame.loadedWorld as? BrawlGameWorld ?: return
 
