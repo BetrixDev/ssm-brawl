@@ -4,6 +4,8 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import java.nio.file.Files
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.context.GlobalContext
@@ -11,8 +13,6 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
 
 class LangServiceTest :
     DescribeSpec({
@@ -141,7 +141,8 @@ class LangServiceTest :
                     val segments = flattenTextComponents(comp)
                     // Expect at least 2 segments due to gradient splitting text
                     assert(segments.isNotEmpty())
-                    // First character should start with accent color, last should end with ui-shadow color
+                    // First character should start with accent color, last should end with
+                    // ui-shadow color
                     val firstColor = segments.first().color()!!.asHexString()
                     val lastColor = segments.last().color()!!.asHexString()
                     firstColor shouldBe "#cba6f7"
