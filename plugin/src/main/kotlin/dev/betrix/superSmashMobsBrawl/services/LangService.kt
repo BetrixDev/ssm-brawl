@@ -13,6 +13,7 @@ import org.koin.core.component.inject
 
 class LangService : KoinComponent {
     private val plugin: JavaPlugin by inject()
+    private val theme: ThemeService by inject()
 
     private val dataFolder = plugin.dataFolder
     private val enLang: YamlConfiguration = loadLangWithDefaults("data/lang/en.yml")
@@ -25,7 +26,8 @@ class LangService : KoinComponent {
     fun t(key: String, varsBuilder: VarsBuilder.() -> Unit = {}): Component {
         val vars = VarsBuilder().apply(varsBuilder).build()
         val resolved = resolveAndFormat(key, vars, visited = mutableSetOf())
-        return miniMessage.deserialize(resolved)
+        val preprocessed = theme.preprocessMessageColors(resolved)
+        return miniMessage.deserialize(preprocessed, theme.tokenTagResolver())
     }
 
     private fun resolveAndFormat(

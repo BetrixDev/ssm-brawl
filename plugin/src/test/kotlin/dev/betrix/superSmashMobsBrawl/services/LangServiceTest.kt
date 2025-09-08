@@ -33,7 +33,14 @@ class LangServiceTest :
             yml.set("cycle.b", "{lang:cycle.a}")
             yml.save(enPath.toFile())
 
-            startKoin { modules(module { single { plugin as JavaPlugin } }) }
+            startKoin {
+                modules(
+                    module {
+                        single { plugin as JavaPlugin }
+                        single(createdAtStart = true) { ThemeService() }
+                    }
+                )
+            }
         }
 
         afterSpec {

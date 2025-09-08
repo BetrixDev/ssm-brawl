@@ -51,9 +51,9 @@ minigames:
   two_player_duels:
     name: "1v1 Duels"
     description: "A competitive 1v1 game mode"
-prefix: "<#585b70>[<gradient:#cba6f7:#585b70>Brawl</gradient><#585b70>]<reset>"
+prefix: "<ui-shadow>[<gradient:accent:ui-shadow>Brawl</gradient><ui-shadow>]<reset>"
 messages:
-  debug: "{lang:prefix} <#4c4f69>[DEBUG] {message}"
+  debug: "{lang:prefix} <text-dark>[DEBUG] {message}"
   kick:
     serverStarting: "Server is still starting! Please come back in a moment"
   commands:
@@ -63,42 +63,42 @@ messages:
       disabled: "<red>Debug mode disabled!</red>"
   queue:
     leave:
-      notInQueue: "{lang:prefix} <#f2b8c6>You are not currently in a queue<#e8edff>"
-      success: "{lang:prefix} <#e8edff>You have left the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}"
+      notInQueue: "{lang:prefix} <danger>You are not currently in a queue<text>"
+      success: "{lang:prefix} <text>You have left the queue for <primary>{lang:minigames.{minigameId}.name}"
     join:
-      success: "{lang:prefix} <#e8edff>You have joined the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}"
-      alreadyInQueue: "{lang:prefix} <#f2b8c6>You are already in a queue<newline>leave that one before joining a new one<#e8edff>"
+      success: "{lang:prefix} <text>You have joined the queue for <primary>{lang:minigames.{minigameId}.name}"
+      alreadyInQueue: "{lang:prefix} <danger>You are already in a queue<newline>leave that one before joining a new one<text>"
     status:
-      inQueue: "{lang:prefix} <#e8edff>You are currently in the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}"
+      inQueue: "{lang:prefix} <text>You are currently in the queue for <primary>{lang:minigames.{minigameId}.name}"
       notInQueue: "{lang:messages.queue.leave.notInQueue}"
   abilities:
-    hotbarItemTitle: "<#91d7e3>{lang:abilities.{abilityId}.name}"
-    hotbarItemDescription: "<#cad3f5>{lang:abilities.{abilityId}.description}"
-    cooldown: "{lang:prefix} <red>{lang:abilities.{abilityId}.name}</red> <#e8edff>is on cooldown for</#e8edff> <yellow>{seconds}s</yellow>!"
-    readyToActivate: "{lang:prefix} <#8bd5ff>{lang:abilities.{abilityId}.name} <#e8edff>is ready to activate"
+    hotbarItemTitle: "<primary-soft>{lang:abilities.{abilityId}.name}"
+    hotbarItemDescription: "<text-muted>{lang:abilities.{abilityId}.description}"
+    cooldown: "{lang:prefix} <red>{lang:abilities.{abilityId}.name}</red> <text>is on cooldown for</text> <yellow>{seconds}s</yellow>!"
+    readyToActivate: "{lang:prefix} <primary>{lang:abilities.{abilityId}.name} <text>is ready to activate"
     use:
-      success: "{lang:prefix} <#e8edff>Activated <#8bd5ff>{lang:abilities.{abilityId}.name}"
-      cooldown: "{lang:prefix} <red>{lang:abilities.{abilityId}.name}</red> <#e8edff>is on cooldown for</#e8edff> <yellow>{seconds}s</yellow>!"
+      success: "{lang:prefix} <text>Activated <primary>{lang:abilities.{abilityId}.name}"
+      cooldown: "{lang:prefix} <red>{lang:abilities.{abilityId}.name}</red> <text>is on cooldown for</text> <yellow>{seconds}s</yellow>!"
     explode:
       alreadyCharging: "<red>Already charging explosion!</red>"
   kits:
     select:
-      success: "{lang:prefix} <#e8edff>You have selected kit <#8bd5ff>{lang:kits.{kitId}.name}"
-      success_never: "{lang:prefix} <#e8edff>You have selected kit <#8bd5ff>{lang:kits.{kitId}.name}<#e8edff>, but kit switching is disabled in this minigame"
-      success_on_death: "{lang:prefix} <#e8edff>You have selected kit <#8bd5ff>{lang:kits.{kitId}.name}<#e8edff>. Your kit will switch after you respawn"
-      success_immediate: "{lang:prefix} <#e8edff>You have selected and switched to kit <#8bd5ff>{lang:kits.{kitId}.name}"
+      success: "{lang:prefix} <text>You have selected kit <primary>{lang:kits.{kitId}.name}"
+      success_never: "{lang:prefix} <text>You have selected kit <primary>{lang:kits.{kitId}.name}<text>, but kit switching is disabled in this minigame"
+      success_on_death: "{lang:prefix} <text>You have selected kit <primary>{lang:kits.{kitId}.name}<text>. Your kit will switch after you respawn"
+      success_immediate: "{lang:prefix} <text>You have selected and switched to kit <primary>{lang:kits.{kitId}.name}"
   players:
-    joinServer: "{lang:prefix} <#8bd5ff>{playerName} <#e8edff>has joined the server"
+    joinServer: "{lang:prefix} <primary>{playerName} <text>has joined the server"
   minigames:
     leave:
-      success: "{lang:prefix} <#e8edff>You have left <#8bd5ff>{lang:minigames.{minigameId}.name}"
-      notAllowed: "{lang:prefix} <#f2b8c6>You are not allowed to leave this game"
-      notInGame: "{lang:prefix} <#f2b8c6>You are not in a game"
-      unknown: "{lang:prefix} <#f2b8c6>An unknown error occurred. Please try again"
+      success: "{lang:prefix} <text>You have left <primary>{lang:minigames.{minigameId}.name}"
+      notAllowed: "{lang:prefix} <danger>You are not allowed to leave this game"
+      notInGame: "{lang:prefix} <danger>You are not in a game"
+      unknown: "{lang:prefix} <danger>An unknown error occurred. Please try again"
     respawn:
-      timeLeft: "<#8bd5ff>{secondsLeft}"
+      timeLeft: "<primary>{secondsLeft}"
     teamBasedStocks:
-      winner: "{lang:prefix} <#e8edff>Team <#a6e3a1>{winners}</#a6e3a1> <#e8edff>won <#8bd5ff>{lang:minigames.{minigameId}.name}</#8bd5ff>!"
+      winner: "{lang:prefix} <text>Team <success>{winners}</success> <text>won <primary>{lang:minigames.{minigameId}.name}</primary>!"
   passives:
     hunger:
       attackToRestore: "<red>Attack other players to restore hunger!</red>"
@@ -107,10 +107,10 @@ messages:
     barrage_arrow: "Barrage Arrow"
 gui:
   kitSelection:
-    title: "<!i><#1e1e2e><shadow:#585b70>Select a kit"
-    kitName: "<!i><#e8edff>{lang:kits.{kitId}.name}"
-    selectedKitName: "<!i><#a6e3a1>✔ Selected <#a6adc8>- <#e8edff>{lang:kits.{kitId}.name}"
+    title: "<!i><ui-bg><shadow:ui-shadow>Select a kit"
+    kitName: "<!i><text>{lang:kits.{kitId}.name}"
+    selectedKitName: "<!i><success>✔ Selected <secondary>- <text>{lang:kits.{kitId}.name}"
     abilityList:
-      title: "<!i><#a6adc8>Abilities"
-      entry: "<!i><#a6adc8>• <#fab387>{lang:abilities.{abilityId}.name}"
-motd: "<#89dceb>The brawl reborn <#a6adc8>-- <#89dceb>a wondrous thing<#94e2d5>!"
+      title: "<!i><secondary>Abilities"
+      entry: "<!i><secondary>• <accent-warm>{lang:abilities.{abilityId}.name}"
+motd: "<info>The brawl reborn <secondary>-- <info>a wondrous thing<accent-teal>!"
