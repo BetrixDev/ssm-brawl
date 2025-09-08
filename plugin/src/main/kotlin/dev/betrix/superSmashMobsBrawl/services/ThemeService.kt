@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets
 import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -48,7 +47,7 @@ class ThemeService : KoinComponent {
         val builder = TagResolver.builder()
         for ((name, hex) in tokenToHex) {
             val color = TextColor.fromHexString(hex) ?: continue
-            builder.tag(name) { _, _ -> Tag.styling(Style.style(color)) }
+            builder.tag(name) { _, _ -> Tag.styling { it.color(color) } }
         }
         return builder.build()
     }
