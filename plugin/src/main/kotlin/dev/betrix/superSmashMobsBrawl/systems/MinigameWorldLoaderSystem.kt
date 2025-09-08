@@ -42,7 +42,11 @@ class MinigameWorldLoaderSystem(
                 withContext(Dispatchers.IO) {
                     worldService
                         .copyAndLoadWorld(worldToLoad, minigame.instanceId)
-                        .onSuccess { minigame.loadedWorld = it }
+                        .onSuccess {
+                            minigame.loadedWorld = it
+                            // Advance state so other systems (e.g. start/teleport) can continue
+                            minigame.state = MinigameState.STARTING
+                        }
                         .onFailure { TODO("Handle error when loading world fails") }
                 }
             }

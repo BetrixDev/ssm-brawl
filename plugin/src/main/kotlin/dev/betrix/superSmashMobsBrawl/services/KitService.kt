@@ -50,7 +50,7 @@ object KitService : KoinComponent {
         // Determine if the player should switch kits immediately based on their current minigame
         val currentMinigame = minigameService.getMinigameForPlayer(player)
         val shouldSwitchImmediately =
-            currentMinigame?.getKitSwitchingMode() == KitSwitchingMode.IMMEDIATE
+            currentMinigame?.kitSwitchingMode == KitSwitchingMode.IMMEDIATE
 
         // Dispatch the event
         PlayerSelectKitEvent.call(player, kit, shouldSwitchImmediately)

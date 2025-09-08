@@ -29,6 +29,7 @@ data class MinigameComponent(
     var state: MinigameState = MinigameState.LOADING_WORLD,
     val playerEntities: MutableEntityBag,
     val spectatorEntities: MutableEntityBag = mutableEntityBagOf(),
+    val disconnectedPlayers: MutableSet<UUID> = mutableSetOf(),
 ) : Component<MinigameComponent> {
     override fun type() = MinigameComponent
 

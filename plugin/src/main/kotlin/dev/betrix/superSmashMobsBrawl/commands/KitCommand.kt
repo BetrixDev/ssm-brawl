@@ -32,7 +32,7 @@ class KitCommand : KoinComponent {
         // Determine the message to show based on the player's current minigame
         val currentMinigame = minigameService.getMinigameForPlayer(player)
         val messageKey =
-            when (currentMinigame?.getKitSwitchingMode()) {
+            when (currentMinigame?.kitSwitchingMode) {
                 KitSwitchingMode.NEVER -> "messages.kits.select.success_never"
                 KitSwitchingMode.ON_DEATH -> "messages.kits.select.success_on_death"
                 KitSwitchingMode.IMMEDIATE -> "messages.kits.select.success_immediate"

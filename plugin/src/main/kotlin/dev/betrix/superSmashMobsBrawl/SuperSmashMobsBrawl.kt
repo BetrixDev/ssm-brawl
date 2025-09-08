@@ -27,6 +27,9 @@ import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import dev.betrix.superSmashMobsBrawl.services.PlayerEcsEntityService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
+import dev.betrix.superSmashMobsBrawl.systems.MinigameEndSystem
+import dev.betrix.superSmashMobsBrawl.systems.MinigameRespawnSystem
+import dev.betrix.superSmashMobsBrawl.systems.MinigameTeamSetupSystem
 import dev.betrix.superSmashMobsBrawl.systems.MinigameWorldLoaderSystem
 import dev.betrix.superSmashMobsBrawl.systems.PlayerLeaveSystem
 import dev.betrix.superSmashMobsBrawl.systems.PlayerSystem
@@ -82,6 +85,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 add<JavaPlugin>(this@SuperSmashMobsBrawl)
                 add(DataService(this@SuperSmashMobsBrawl))
                 add(WorldService)
+                add(HubService)
             }
             systems {
                 add(HubScoreboardSystem())
@@ -93,6 +97,10 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 add(MinigameWorldLoaderSystem())
                 add(PlayerLeaveSystem())
                 add(QueueJoinSystem())
+                add(MinigameEndSystem())
+                add(MinigameRespawnSystem())
+                add(MinigameTeamSetupSystem())
+                add(MinigameWorldLoaderSystem())
             }
         }
 
