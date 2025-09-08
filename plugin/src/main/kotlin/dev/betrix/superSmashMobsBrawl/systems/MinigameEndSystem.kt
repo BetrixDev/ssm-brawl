@@ -5,9 +5,8 @@ import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 import com.github.quillraven.fleks.World.Companion.inject
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-import dev.betrix.superSmashMobsBrawl.components.DisconnectedComponent
-import dev.betrix.superSmashMobsBrawl.components.MinigameComponent
 import dev.betrix.superSmashMobsBrawl.components.InMinigameComponent
+import dev.betrix.superSmashMobsBrawl.components.MinigameComponent
 import dev.betrix.superSmashMobsBrawl.components.MinigameState
 import dev.betrix.superSmashMobsBrawl.components.PlayerComponent
 import dev.betrix.superSmashMobsBrawl.components.TeamMinigameComponent
@@ -15,7 +14,6 @@ import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
 import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.LangService
-import net.kyori.adventure.text.Component
 import org.bukkit.GameMode
 
 /** Determines when minigames end and performs wrap-up/teleport. */
@@ -35,14 +33,20 @@ class MinigameEndSystem(
         }
     }
 
-    private fun handleFfa(entity: Entity, minigame: dev.betrix.superSmashMobsBrawl.components.MinigameComponent) {
+    private fun handleFfa(
+        entity: Entity,
+        minigame: dev.betrix.superSmashMobsBrawl.components.MinigameComponent,
+    ) {
         val active = activePlayers(minigame)
         if (active.size <= 1) {
             endMinigame(entity, minigame, winnerName = active.firstOrNull()?.name ?: "Unknown")
         }
     }
 
-    private fun handleTeamStocks(entity: Entity, minigame: dev.betrix.superSmashMobsBrawl.components.MinigameComponent) {
+    private fun handleTeamStocks(
+        entity: Entity,
+        minigame: dev.betrix.superSmashMobsBrawl.components.MinigameComponent,
+    ) {
         val teams = entity.getOrNull(TeamMinigameComponent) ?: return
         val teamsWithStocks = teams.getAllTeams().filter { it.stocks > 0 }
         val teamsWithActive =
@@ -64,14 +68,21 @@ class MinigameEndSystem(
         }
     }
 
-    private fun activePlayers(minigame: dev.betrix.superSmashMobsBrawl.components.MinigameComponent) =
+    private fun activePlayers(
+        minigame: dev.betrix.superSmashMobsBrawl.components.MinigameComponent
+    ) =
         minigame.playerEntities
             .map { it[PlayerComponent].player }
             .filter { p -> p.isOnline && p.gameMode == GameMode.SURVIVAL }
 
-    private fun endMinigame(entity: Entity, minigame: dev.betrix.superSmashMobsBrawl.components.MinigameComponent, winnerName: String? = null) {
+    private fun endMinigame(
+        entity: Entity,
+        minigame: dev.betrix.superSmashMobsBrawl.components.MinigameComponent,
+        winnerName: String? = null,
+    ) {
         // prevent duplicate execution
-        if (minigame.state == MinigameState.ENDING || minigame.state == MinigameState.CLEANUP) return
+        if (minigame.state == MinigameState.ENDING || minigame.state == MinigameState.CLEANUP)
+            return
         minigame.state = MinigameState.ENDING
 
         // Teleport participants and spectators to hub and detach them from the minigame
@@ -85,7 +96,8 @@ class MinigameEndSystem(
         }
         minigame.disconnectedPlayers.clear()
 
-        // Transition to cleanup. Further world cleanup can be handled by a dedicated service/system.
+        // Transition to cleanup. Further world cleanup can be handled by a dedicated
+        // service/system.
         minigame.state = MinigameState.CLEANUP
     }
 }

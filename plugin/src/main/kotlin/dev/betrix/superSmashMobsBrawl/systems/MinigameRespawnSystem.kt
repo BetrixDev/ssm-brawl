@@ -31,7 +31,9 @@ class MinigameRespawnSystem(
     private val kitService: KitService = inject(),
 ) : IntervalSystem(interval = com.github.quillraven.fleks.Fixed(0.05f)) {
 
-    private val respawning = family { all(PlayerComponent, InMinigameComponent, RespawningComponent) }
+    private val respawning = family {
+        all(PlayerComponent, InMinigameComponent, RespawningComponent)
+    }
 
     init {
         // Listen for deaths that occur within any ECS minigame
@@ -40,6 +42,7 @@ class MinigameRespawnSystem(
             val entity = player.ecsEntity ?: return@event
             val inMinigame = with(world) { entity.getOrNull(InMinigameComponent) } ?: return@event
             val minigame = with(world) { inMinigame.minigameEntity[MinigameComponent] }
+            if (!minigame.hasLoadedWorld()) return@event
             if (minigame.state == MinigameState.ENDING) return@event
 
             // Unassign kit immediately on death
@@ -51,11 +54,13 @@ class MinigameRespawnSystem(
                 player.playSound(player.eyeLocation, Sound.ENTITY_PLAYER_HURT, 1f, 1f)
             }
 
-            // Team-based stocks: consume team life. If team out of stocks, eliminate the dying player.
+            // Team-based stocks: consume team life. If team out of stocks, eliminate the dying
+            // player.
             val def = minigame.minigame
             if (def is TeamBasedStocksMinigameDef) {
                 val teamComp = with(world) { entity.getOrNull(InTeamComponent) }
-                val teamsComp = with(world) { inMinigame.minigameEntity.getOrNull(TeamMinigameComponent) }
+                val teamsComp =
+                    with(world) { inMinigame.minigameEntity.getOrNull(TeamMinigameComponent) }
                 val team = teamComp?.let { teamsComp?.getTeam(it.teamId) }
                 if (team != null) {
                     if (team.stocks > 0) team.stocks -= 1
@@ -133,10 +138,7 @@ class MinigameRespawnSystem(
         showRespawnTitle(player, delaySeconds)
     }
 
-    private fun respawnNow(
-        entity: Entity,
-        minigame: MinigameComponent,
-    ) {
+    private fun respawnNow(entity: Entity, minigame: MinigameComponent) {
         val player = entity[PlayerComponent].player
         val world = minigame.loadedWorld as? BrawlGameWorld ?: return
 

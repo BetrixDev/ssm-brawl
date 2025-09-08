@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.systems
 
-import com.github.michaelbull.result.Err
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
@@ -15,14 +14,22 @@ import dev.betrix.superSmashMobsBrawl.services.KitService
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
-class MinigameStartSystem(
-    private val kitService: KitService = inject(),
-) : IteratingSystem(family { all(MinigameComponent) }) {
+class MinigameStartSystem(private val kitService: KitService = inject()) :
+    IteratingSystem(family { all(MinigameComponent) }) {
 
     override fun onTickEntity(entity: Entity) {
         val minigame = entity[MinigameComponent]
         if (minigame.state != MinigameState.STARTING) return
 
+        // If a countdown is configured and not finished, wait for countdown system to finish.
+        if (
+            (minigame.minigame.startingCountdownSeconds ?: 0) > 0 &&
+                (minigame.remainingCountdownSeconds ?: 0) > 0
+        ) {
+            return
+        }
+
+        if (!minigame.hasLoadedWorld()) return
         val world = minigame.loadedWorld as? BrawlGameWorld ?: return
 
         // Teleport players and assign kits

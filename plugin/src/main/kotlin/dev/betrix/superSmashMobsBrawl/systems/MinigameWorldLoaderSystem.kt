@@ -47,7 +47,12 @@ class MinigameWorldLoaderSystem(
                             // Advance state so other systems (e.g. start/teleport) can continue
                             minigame.state = MinigameState.STARTING
                         }
-                        .onFailure { TODO("Handle error when loading world fails") }
+                        .onFailure { err ->
+                            plugin.logger.severe(
+                                "Failed to load world for minigame (${minigame.instanceId}): ${'$'}{err.message}"
+                            )
+                            minigame.state = MinigameState.CLEANUP
+                        }
                 }
             }
     }

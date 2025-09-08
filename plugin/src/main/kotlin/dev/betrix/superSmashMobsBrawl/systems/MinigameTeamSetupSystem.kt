@@ -3,7 +3,6 @@ package dev.betrix.superSmashMobsBrawl.systems
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
-import com.github.quillraven.fleks.World.Companion.inject
 import dev.betrix.superSmashMobsBrawl.components.InTeamComponent
 import dev.betrix.superSmashMobsBrawl.components.MinigameComponent
 import dev.betrix.superSmashMobsBrawl.components.MinigameState

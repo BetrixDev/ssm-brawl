@@ -9,4 +9,3 @@ class DisconnectedComponent : Component<DisconnectedComponent> {
 
     companion object : ComponentType<DisconnectedComponent>()
 }
-

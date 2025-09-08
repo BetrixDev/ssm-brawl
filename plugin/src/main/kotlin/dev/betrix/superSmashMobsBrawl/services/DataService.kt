@@ -16,7 +16,7 @@ import okio.buffer
 import okio.source
 
 class DataService(private val plugin: SuperSmashMobsBrawl) {
-    
+
     private val yaml =
         Yaml(
             serializersModule =
