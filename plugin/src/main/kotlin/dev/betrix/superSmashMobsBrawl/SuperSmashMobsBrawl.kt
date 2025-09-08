@@ -30,6 +30,7 @@ import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.betrix.superSmashMobsBrawl.systems.MinigameEndSystem
 import dev.betrix.superSmashMobsBrawl.systems.MinigameRespawnSystem
 import dev.betrix.superSmashMobsBrawl.systems.MinigameTeamSetupSystem
+import dev.betrix.superSmashMobsBrawl.systems.MinigameStartSystem
 import dev.betrix.superSmashMobsBrawl.systems.MinigameWorldLoaderSystem
 import dev.betrix.superSmashMobsBrawl.systems.PlayerLeaveSystem
 import dev.betrix.superSmashMobsBrawl.systems.PlayerSystem
@@ -88,19 +89,24 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 add(HubService)
             }
             systems {
-                add(HubScoreboardSystem())
-                add(MinigameScoreboardSystem())
+                // Base/UI systems first
                 add(ScoreboardSystem())
+                add(HubScoreboardSystem())
+                add(QueueScoreboardSystem())
+                add(MinigameScoreboardSystem())
+
+                // Player and queue flow
                 add(PlayerSystem())
                 add(QueueSystem())
-                add(QueueScoreboardSystem())
-                add(MinigameWorldLoaderSystem())
-                add(PlayerLeaveSystem())
                 add(QueueJoinSystem())
-                add(MinigameEndSystem())
-                add(MinigameRespawnSystem())
+                add(PlayerLeaveSystem())
+
+                // Minigame lifecycle
                 add(MinigameTeamSetupSystem())
                 add(MinigameWorldLoaderSystem())
+                add(MinigameStartSystem())
+                add(MinigameRespawnSystem())
+                add(MinigameEndSystem())
             }
         }
 

@@ -26,8 +26,8 @@ class PlayerLeaveSystem(private val lang: LangService = inject()) :
         val specifier = entity[PlayerTryLeaveComponent].specifier
 
         val isInQueue = queuedEntities.contains(entity)
-        val isInMinigame = queuedEntities.contains(entity)
-        val isInParty = queuedEntities.contains(entity)
+        val isInMinigame = inMinigameEntities.contains(entity)
+        val isInParty = partiedEntities.contains(entity)
 
         if (isInQueue || specifier == LeaveSpecifier.QUEUE) {
             if (specifier == LeaveSpecifier.QUEUE && !isInQueue) {
