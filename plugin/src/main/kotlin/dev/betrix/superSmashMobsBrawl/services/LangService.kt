@@ -125,9 +125,9 @@ class LangService : KoinComponent {
     }
 
     /**
-     * Replace token tags like <primary> and </primary> with concrete color tags
-     * using hex values from data/theme.yml. Also expand token names in arguments
-     * for tags that accept color parameters (e.g., <gradient:primary:ui-shadow>, <shadow:text>).
+     * Replace token tags like <primary> and </primary> with concrete color tags using hex values
+     * from data/theme.yml. Also expand token names in arguments for tags that accept color
+     * parameters (e.g., <gradient:primary:ui-shadow>, <shadow:text>).
      */
     private fun preprocessThemeTokens(message: String): String {
         if (tokenToHex.isEmpty()) return message
@@ -142,10 +142,11 @@ class LangService : KoinComponent {
             while (matcher.find()) {
                 val tagName = matcher.group(1)
                 val args = matcher.group(2)
-                val replacedArgs = args.split(":").joinToString(":") { part ->
-                    val key = part.trim().lowercase(Locale.ROOT)
-                    tokenToHex[key] ?: part
-                }
+                val replacedArgs =
+                    args.split(":").joinToString(":") { part ->
+                        val key = part.trim().lowercase(Locale.ROOT)
+                        tokenToHex[key] ?: part
+                    }
                 val replacement = "<" + tagName + ":" + replacedArgs + ">"
                 matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement))
             }
