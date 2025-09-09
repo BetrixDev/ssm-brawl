@@ -17,7 +17,6 @@ import dev.betrix.superSmashMobsBrawl.services.HubService
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
-import dev.betrix.superSmashMobsBrawl.services.ThemeService
 import dev.betrix.superSmashMobsBrawl.services.WorldService
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
@@ -59,7 +58,6 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                     single<JavaPlugin> { this@SuperSmashMobsBrawl }
                     single { this@SuperSmashMobsBrawl.logger }
                     single(createdAtStart = true) { DataService() }
-                    single(createdAtStart = true) { ThemeService() }
                     single { MinigameService() }
                     single { KitService }
                     single(createdAtStart = true) { LangService() }

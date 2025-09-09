@@ -50,14 +50,7 @@ class LangServiceTest :
             theme.set("tokens.ui-shadow", "#585b70")
             theme.save(themePath.toFile())
 
-            startKoin {
-                modules(
-                    module {
-                        single { plugin as JavaPlugin }
-                        single(createdAtStart = true) { ThemeService() }
-                    }
-                )
-            }
+            startKoin { modules(module { single { plugin as JavaPlugin } }) }
         }
 
         afterSpec {
