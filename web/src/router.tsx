@@ -13,7 +13,7 @@ export function createRouter() {
   const trpcClient = createTRPCClient<AppRouter>({
     links: [
       httpBatchLink({
-        url: `${import.meta.env.VITE_BACKEND_URL}/trpc`,
+        url: "/api/trpc",
       }),
     ],
   });

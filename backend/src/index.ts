@@ -1,16 +1,10 @@
 import { cors } from "@elysiajs/cors";
-import { node } from "@elysiajs/node";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { Elysia } from "elysia";
 import { appRouter } from "./trpc/routers";
 
-export const app = new Elysia({ adapter: node() })
+export const app = new Elysia()
   .use(cors())
-  .get("/hc", () => {
-    return {
-      message: "Server is healthy",
-    };
-  })
   .all("/trpc/*", ({ request }) => {
     return fetchRequestHandler({
       endpoint: "/trpc",
@@ -21,10 +15,25 @@ export const app = new Elysia({ adapter: node() })
       },
     });
   })
-  .listen(1337, ({ hostname, port }) => {
-    if (process.env.NODE_ENV !== "test") {
-      console.log(`Backend is running at ${hostname}:${port}`);
-    }
+  .get("/hc", () => {
+    return {
+      message: "Server is healthy",
+    };
   });
 
+export function createTanstackStartRequestHandler() {
+  return async ({ request }: { request: Request }) => {
+    const url = new URL(request.url);
+
+    const prefix = "/api";
+    if (url.pathname === prefix || url.pathname.startsWith(prefix + "/")) {
+      url.pathname = url.pathname.slice(prefix.length) || "/";
+    }
+
+    const newRequest = new Request(url.toString(), request);
+    return app.handle(newRequest);
+  };
+}
+
+export type App = typeof app;
 export type AppRouter = typeof appRouter;
