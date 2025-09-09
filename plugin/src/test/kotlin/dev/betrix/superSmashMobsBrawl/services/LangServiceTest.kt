@@ -8,9 +8,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
-import org.koin.core.context.GlobalContext
-import org.koin.core.context.startKoin
-import org.koin.dsl.module
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 
@@ -49,19 +46,16 @@ class LangServiceTest :
             theme.set("tokens.accent", "#cba6f7")
             theme.set("tokens.ui-shadow", "#585b70")
             theme.save(themePath.toFile())
-
-            startKoin { modules(module { single { plugin as JavaPlugin } }) }
         }
 
         afterSpec {
-            GlobalContext.stopKoin()
             MockBukkit.unmock()
         }
 
         describe("LangService") {
             describe("variables") {
                 it("interpolates simple variable values") {
-                    val lang = LangService()
+                    val lang = LangService(plugin)
                     val text = lang.t("greeting") { "name" to "Alex" }
                     text.toString() shouldContain "Hello, Alex!"
                 }
@@ -69,7 +63,7 @@ class LangServiceTest :
 
             describe("lang references") {
                 it("resolves nested lang reference with variables in the key") {
-                    val lang = LangService()
+                    val lang = LangService(plugin)
                     val text =
                         lang.t("withRef") {
                             "minigameId" to "test"
@@ -81,7 +75,7 @@ class LangServiceTest :
 
             describe("missing keys") {
                 it("returns [key] for unknown key") {
-                    val lang = LangService()
+                    val lang = LangService(plugin)
                     val text = lang.t("unknown.key") {}
                     text.toString() shouldContain "[unknown.key]"
                 }
@@ -89,7 +83,7 @@ class LangServiceTest :
 
             describe("cycles") {
                 it("detects cycles and returns [key]") {
-                    val lang = LangService()
+                    val lang = LangService(plugin)
                     lang.t("cycle.a").toString() shouldContain "[cycle.a]"
                     lang.t("cycle.b").toString() shouldContain "[cycle.b]"
                 }
@@ -111,7 +105,7 @@ class LangServiceTest :
                 }
 
                 it("applies token tag color for <primary>") {
-                    val lang = LangService()
+                    val lang = LangService(plugin)
                     val comp = lang.t("colors.primary")
                     val segments = flattenTextComponents(comp)
                     segments.size shouldBe 1
@@ -120,7 +114,7 @@ class LangServiceTest :
                 }
 
                 it("applies token tag color for <text>") {
-                    val lang = LangService()
+                    val lang = LangService(plugin)
                     val comp = lang.t("colors.text")
                     val segments = flattenTextComponents(comp)
                     segments.size shouldBe 1
@@ -129,7 +123,7 @@ class LangServiceTest :
                 }
 
                 it("expands tokens inside gradient arguments and applies gradient colors") {
-                    val lang = LangService()
+                    val lang = LangService(plugin)
                     val comp = lang.t("colors.gradient")
                     val segments = flattenTextComponents(comp)
                     // Expect at least 2 segments due to gradient splitting text

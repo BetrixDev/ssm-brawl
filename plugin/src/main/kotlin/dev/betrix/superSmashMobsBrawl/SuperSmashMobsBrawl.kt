@@ -60,7 +60,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                     single(createdAtStart = true) { DataService() }
                     single { MinigameService() }
                     single { KitService }
-                    single(createdAtStart = true) { LangService() }
+                    single(createdAtStart = true) { LangService(this@SuperSmashMobsBrawl) }
                     single { WorldService }
                     single { HubService }
                 }

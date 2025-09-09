@@ -57,10 +57,10 @@ messages:
   kick:
     serverStarting: "Server is still starting! Please come back in a moment"
   commands:
-    onlyPlayers: "<red>Only players can execute this command</red>"
+    onlyPlayers: "<warning>Only players can execute this command</warning>"
     debug:
-      enabled: "<green>Debug mode enabled!</green>"
-      disabled: "<red>Debug mode disabled!</red>"
+      enabled: "<success>Debug mode enabled!</success>"
+      disabled: "<warning>Debug mode disabled!</warning>"
   queue:
     leave:
       notInQueue: "{lang:prefix} <danger>You are not currently in a queue<text>"
@@ -74,13 +74,13 @@ messages:
   abilities:
     hotbarItemTitle: "<primary-soft>{lang:abilities.{abilityId}.name}"
     hotbarItemDescription: "<text-muted>{lang:abilities.{abilityId}.description}"
-    cooldown: "{lang:prefix} <red>{lang:abilities.{abilityId}.name}</red> <text>is on cooldown for</text> <yellow>{seconds}s</yellow>!"
+    cooldown: "{lang:prefix} <warning>{lang:abilities.{abilityId}.name}</warning> <text>is on cooldown for</text> <yellow>{seconds}s</yellow>!"
     readyToActivate: "{lang:prefix} <primary>{lang:abilities.{abilityId}.name} <text>is ready to activate"
     use:
       success: "{lang:prefix} <text>Activated <primary>{lang:abilities.{abilityId}.name}"
-      cooldown: "{lang:prefix} <red>{lang:abilities.{abilityId}.name}</red> <text>is on cooldown for</text> <yellow>{seconds}s</yellow>!"
+      cooldown: "{lang:prefix} <warning>{lang:abilities.{abilityId}.name}</warning> <text>is on cooldown for</text> <yellow>{seconds}s</yellow>!"
     explode:
-      alreadyCharging: "<red>Already charging explosion!</red>"
+      alreadyCharging: "{lang:prefix} <warning>Already charging explosion!</warning>"
   kits:
     select:
       success: "{lang:prefix} <text>You have selected kit <primary>{lang:kits.{kitId}.name}"
@@ -101,7 +101,7 @@ messages:
       winner: "{lang:prefix} <text>Team <success>{winners}</success> <text>won <primary>{lang:minigames.{minigameId}.name}</primary>!"
   passives:
     hunger:
-      attackToRestore: "<red>Attack other players to restore hunger!</red>"
+      attackToRestore: "<warning>Attack other players to restore hunger!</warning>"
   projectiles:
     arrow: "Arrow"
     barrage_arrow: "Barrage Arrow"
