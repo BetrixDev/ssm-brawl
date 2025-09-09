@@ -2,20 +2,32 @@ package dev.betrix.superSmashMobsBrawl.services
 
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
+import java.util.Locale
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.java.JavaPlugin
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
-class LangService : KoinComponent {
-    private val plugin: JavaPlugin by inject()
+class LangService(private val plugin: JavaPlugin) {
 
     private val dataFolder = plugin.dataFolder
+
     private val enLang: YamlConfiguration = loadLangWithDefaults("data/lang/en.yml")
+    private val themeConfig: YamlConfiguration = loadLangWithDefaults("data/theme.yml")
+
+    private val tokenToHex: Map<String, String> by lazy {
+        val section = themeConfig.getConfigurationSection("tokens")
+        val map = linkedMapOf<String, String>()
+        if (section != null) {
+            for (key in section.getKeys(false)) {
+                val hex = section.getString(key) ?: continue
+                map[key.lowercase(Locale.ROOT)] = hex
+            }
+        }
+        map.toMap()
+    }
 
     private val miniMessage: MiniMessage = MiniMessage.miniMessage()
 
@@ -25,7 +37,8 @@ class LangService : KoinComponent {
     fun t(key: String, varsBuilder: VarsBuilder.() -> Unit = {}): Component {
         val vars = VarsBuilder().apply(varsBuilder).build()
         val resolved = resolveAndFormat(key, vars, visited = mutableSetOf())
-        return miniMessage.deserialize(resolved)
+        val preprocessed = preprocessThemeTokens(resolved)
+        return miniMessage.deserialize(preprocessed)
     }
 
     private fun resolveAndFormat(
@@ -108,6 +121,62 @@ class LangService : KoinComponent {
 
         matcher.appendTail(sb)
         return sb.toString()
+    }
+
+    /**
+     * Replace token tags like <primary> and </primary> with concrete color tags using hex values
+     * from data/theme.yml. Also expand token names in arguments for tags that accept color
+     * parameters (e.g., <gradient:primary:ui-shadow>, <shadow:text>).
+     */
+    private fun preprocessThemeTokens(message: String): String {
+        if (tokenToHex.isEmpty()) return message
+
+        var result = message
+
+        // Replace tokens inside color-accepting tag arguments (gradient, shadow)
+        run {
+            val pattern = Pattern.compile("<(gradient|shadow):([^>]+)>")
+            val matcher = pattern.matcher(result)
+            val sb = StringBuffer()
+            while (matcher.find()) {
+                val tagName = matcher.group(1)
+                val args = matcher.group(2)
+                val replacedArgs =
+                    args.split(":").joinToString(":") { part ->
+                        val key = part.trim().lowercase(Locale.ROOT)
+                        tokenToHex[key] ?: part
+                    }
+                val replacement = "<" + tagName + ":" + replacedArgs + ">"
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement))
+            }
+            matcher.appendTail(sb)
+            result = sb.toString()
+        }
+
+        // Replace simple token tags <token> and </token> with <hex> and </hex>
+        run {
+            val group = tokenToHex.keys.joinToString("|") { Pattern.quote(it) }
+            if (group.isNotEmpty()) {
+                val pattern = Pattern.compile("<(/?)($group)>")
+                val matcher = pattern.matcher(result)
+                val sb = StringBuffer()
+                while (matcher.find()) {
+                    val slash = matcher.group(1)
+                    val name = matcher.group(2).lowercase(Locale.ROOT)
+                    val hex = tokenToHex[name]
+                    if (hex != null) {
+                        val replacement = if (slash.isEmpty()) "<$hex>" else "</$hex>"
+                        matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement))
+                    } else {
+                        matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group()))
+                    }
+                }
+                matcher.appendTail(sb)
+                result = sb.toString()
+            }
+        }
+
+        return result
     }
 
     class VarsBuilder {
