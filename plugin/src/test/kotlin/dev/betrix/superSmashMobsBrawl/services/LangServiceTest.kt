@@ -48,9 +48,7 @@ class LangServiceTest :
             theme.save(themePath.toFile())
         }
 
-        afterSpec {
-            MockBukkit.unmock()
-        }
+        afterSpec { MockBukkit.unmock() }
 
         describe("LangService") {
             describe("variables") {
