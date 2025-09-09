@@ -66,17 +66,17 @@ messages:
       notInQueue: "{lang:prefix} <danger>You are not currently in a queue<text>"
       success: "{lang:prefix} <text>You have left the queue for <primary>{lang:minigames.{minigameId}.name}"
     join:
-      success: "{lang:prefix} <#e8edff>You have joined the queue for <#8bd5ff>{lang:minigames.{minigameId}.name}"
-      alreadyInQueue: "{lang:prefix} <#f2b8c6>You are already in a queue for <#8bd5ff>{lang:minigames.{minigameId}.name}<newline>leave that one before joining a new one<#e8edff>"
-      alreadyInMinigame: "{lang:prefix} <#f2b8c6>You are already in a game: <#8bd5ff>{lang:minigames.{minigameId}.name}"
+      success: "{lang:prefix} <text>You have joined the queue for <primary>{lang:minigames.{minigameId}.name}"
+      alreadyInQueue: "{lang:prefix} <danger>You are already in a queue for <primary>{lang:minigames.{minigameId}.name}<newline>leave that one before joining a new one<text>"
+      alreadyInMinigame: "{lang:prefix} <danger>You are already in a game: <primary>{lang:minigames.{minigameId}.name}"
       party:
-        onlyLeader: "{lang:prefix} <#f2b8c6>Only the party leader (<#fab387>{leaderName}</#fab387>) can queue the party"
-        notAllowedRanked: "{lang:prefix} <#f2b8c6>Ranked modes do not allow parties for <#8bd5ff>{lang:minigames.{minigameId}.name}"
-        notAllowed: "{lang:prefix} <#f2b8c6>Parties are not allowed for <#8bd5ff>{lang:minigames.{minigameId}.name}"
-        tooLarge: "{lang:prefix} <#f2b8c6>Your party is too large for <#8bd5ff>{lang:minigames.{minigameId}.name}</#8bd5ff> <#e8edff>(<#89dceb>{size}</#89dceb>/<#89b4fa>{max}</#89b4fa>)"
-        memberInQueue: "{lang:prefix} <#f2b8c6>Party member <#fab387>{playerName}</#fab387> is already in a queue"
-        memberInMinigame: "{lang:prefix} <#f2b8c6>Party member <#fab387>{playerName}</#fab387> is already in a minigame"
-        queuedByLeader: "{lang:prefix} <#e8edff>Party leader <#a6e3a1>{leaderName}</#a6e3a1> queued you for <#8bd5ff>{lang:minigames.{minigameId}.name}"
+        onlyLeader: "{lang:prefix} <danger>Only the party leader (<accent-warm>{leaderName}</accent-warm>) can queue the party"
+        notAllowedRanked: "{lang:prefix} <danger>Ranked modes do not allow parties for <primary>{lang:minigames.{minigameId}.name}"
+        notAllowed: "{lang:prefix} <danger>Parties are not allowed for <primary>{lang:minigames.{minigameId}.name}"
+        tooLarge: "{lang:prefix} <danger>Your party is too large for <primary>{lang:minigames.{minigameId}.name}</primary> <text>(<info>{size}</info>/<accent>{max}</accent>)"
+        memberInQueue: "{lang:prefix} <danger>Party member <accent-warm>{playerName}</accent-warm> is already in a queue"
+        memberInMinigame: "{lang:prefix} <danger>Party member <accent-warm>{playerName}</accent-warm> is already in a minigame"
+        queuedByLeader: "{lang:prefix} <text>Party leader <success>{leaderName}</success> queued you for <primary>{lang:minigames.{minigameId}.name}"
     status:
       inQueue: "{lang:prefix} <text>You are currently in the queue for <primary>{lang:minigames.{minigameId}.name}"
       notInQueue: "{lang:messages.queue.leave.notInQueue}"
@@ -105,12 +105,12 @@ messages:
       notInGame: "{lang:prefix} <danger>You are not in a game"
       unknown: "{lang:prefix} <danger>An unknown error occurred. Please try again"
     respawn:
-      timeLeft: "<#8bd5ff>{secondsLeft}"
+      timeLeft: "<primary>{secondsLeft}"
     countdown:
-      seconds: "<bold><#89b4fa>{seconds}</#89b4fa></bold>"
-      prep: "<#a6adc8>Get ready..."
-      go: "<bold><#a6e3a1>GO!</#a6e3a1></bold>"
-      good_luck: "<#a6adc8>Good luck!"
+      seconds: "<bold><accent>{seconds}</accent></bold>"
+      prep: "<secondary>Get ready..."
+      go: "<bold><success>GO!</success></bold>"
+      good_luck: "<secondary>Good luck!"
     teamBasedStocks:
       winner: "{lang:prefix} <text>Team <success>{winners}</success> <text>won <primary>{lang:minigames.{minigameId}.name}</primary>!"
   passives:
@@ -125,31 +125,31 @@ gui:
     kitName: "<!i><text>{lang:kits.{kitId}.name}"
     selectedKitName: "<!i><success>✔ Selected <secondary>- <text>{lang:kits.{kitId}.name}"
     abilityList:
-      title: "<!i><#a6adc8>Abilities"
-      entry: "<!i><#a6adc8>• <#fab387>{lang:abilities.{abilityId}.name}"
-motd: "<#89dceb>The brawl reborn <#a6adc8>-- <#89dceb>a wondrous thing<#94e2d5>!"
+      title: "<!i><secondary>Abilities"
+      entry: "<!i><secondary>• <accent-warm>{lang:abilities.{abilityId}.name}"
+motd: "<info>The brawl reborn <secondary>-- <info>a wondrous thing<accent-teal>!"
 scoreboards:
   common:
-    title: "<bold><transition:#f5c2e7:#cba6f7:#f5c2e7:{percent}>SSM Brawl</transition></bold>"
-    divider: "<#1e1e2e><st>                           "
+    title: "<bold><transition:accent:accent:accent:{percent}>SSM Brawl</transition></bold>"
+    divider: "<ui-bg><st>                           "
     tab:
-      header: "<gradient:#89b4fa:#cba6f7:#f5c2e7>Super Smash Mobs: Brawl</gradient>"
-      footer: "<#f5c2e7>play.ssmbrawl.com"
+      header: "<gradient:accent:accent:accent>Super Smash Mobs: Brawl</gradient>"
+      footer: "<accent>play.ssmbrawl.com"
   queue:
     header:
-      in_queue: "<#45475a>» <#cdd6f4>In Queue"
+      in_queue: "<text-dark>» <text-muted>In Queue"
     content:
-      players_label: "<#45475a>» <#a6e3a1>Players"
-      players_count: "<#89dceb>{current}<#b4befe> / <#89b4fa>{required}"
-      time_label: "<#45475a>» <#f9e2af>Time"
-      time_value: "<#fab387>{seconds}s"
+      players_label: "<text-dark>» <success>Players"
+      players_count: "<info>{current}<accent> / <accent>{required}"
+      time_label: "<text-dark>» <accent-warm>Time"
+      time_value: "<accent-warm>{seconds}s"
     tab:
-      header: "<#a6e3a1>In Queue: <#f5c2e7>{lang:minigames.{minigameId}.name}"
-      footer: "<#cdd6f4>Players: <#89dceb>{current}<#b4befe> / <#89b4fa>{required}<newline><#f9e2af>Queue Time: <#fab387>{seconds}s"
+      header: "<success>In Queue: <accent>{lang:minigames.{minigameId}.name}"
+      footer: "<text-muted>Players: <info>{current}<accent> / <accent>{required}<newline><accent-warm>Queue Time: <accent-warm>{seconds}s"
   hub:
     content:
-      player_info: "<#45475a>» <#cdd6f4>Player <#a6e3a1>{player}"
-      online_count: "<#b4befe>Online <#89dceb>{current}<#b4befe> / <#89b4fa>{max}"
+      player_info: "<text-dark>» <text-muted>Player <success>{player}"
+      online_count: "<accent>Online <info>{current}<accent> / <accent>{max}"
     tab:
-      header: "<#a6e3a1>Welcome, <#f5c2e7>{player}"
-      footer: "<#ffffff>Players: <#89dceb>{current} <#6c7086>/ <#cba6f7>{max}"
+      header: "<success>Welcome, <accent>{player}"
+      footer: "<text>Players: <info>{current} <ui-shadow>/ <accent>{max}"
