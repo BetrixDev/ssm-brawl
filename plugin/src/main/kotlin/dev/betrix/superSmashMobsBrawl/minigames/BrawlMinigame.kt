@@ -39,8 +39,8 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
-import org.bukkit.GameMode
 import org.bukkit.EntityEffect
+import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -154,7 +154,12 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                     victimPlayer.playEffect(EntityEffect.HURT)
                 } catch (_: Throwable) {}
                 try {
-                    victimPlayer.playSound(victimPlayer.eyeLocation, Sound.ENTITY_PLAYER_HURT, 1f, 1f)
+                    victimPlayer.playSound(
+                        victimPlayer.eyeLocation,
+                        Sound.ENTITY_PLAYER_HURT,
+                        1f,
+                        1f,
+                    )
                 } catch (_: Throwable) {}
 
                 // Apply 1.8-style melee knockback only for melee damage (no special damage type)
