@@ -40,6 +40,7 @@ import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import org.bukkit.GameMode
+import org.bukkit.EntityEffect
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -69,6 +70,10 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
         protected set
 
     protected val assignedKits = mutableListOf<Pair<Player, BrawlKit>>()
+
+    /** 1.8-style invulnerability frames for melee (10 ticks = 500ms) */
+    private val meleeInvulnerabilityMs: Long = 500
+    private val lastMeleeHitAtByVictim = mutableMapOf<UUID, Long>()
 
     var state = MinigameState.PREFLIGHT
         protected set
@@ -144,6 +149,14 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                     victimPlayer.health = newHealth
                 }
 
+                // Trigger 1.8-style hurtcam/animation and sound on victim
+                try {
+                    victimPlayer.playEffect(EntityEffect.HURT)
+                } catch (_: Throwable) {}
+                try {
+                    victimPlayer.playSound(victimPlayer.eyeLocation, Sound.ENTITY_PLAYER_HURT, 1f, 1f)
+                } catch (_: Throwable) {}
+
                 // Apply 1.8-style melee knockback only for melee damage (no special damage type)
                 if (damageType == null) {
                     val damagerPlayer =
@@ -153,8 +166,6 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                             kitService.getKitForPlayer(damagerPlayer)?.let {
                                 dataService.getKit(it.id)?.knockbackMultiplier
                             } ?: 1.0
-
-                        victimPlayer.noDamageTicks = 0
                         victimPlayer.doKnockback(
                             knockbackMultiplier * kitKnockbackMult,
                             damage,
@@ -162,6 +173,9 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
                             damagerPlayer.location.toVector(),
                             null,
                         )
+                        // Start 1.8-style melee invulnerability window
+                        victimPlayer.noDamageTicks = 10
+                        lastMeleeHitAtByVictim[victimPlayer.uniqueId] = System.currentTimeMillis()
                     }
                 }
             }
@@ -188,6 +202,13 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 // Cancel vanilla damage and route through SmashDamageEvent using kit melee damage
                 isCancelled = true
+
+                // Enforce 1.8-style hit cooldown on victim (10 ticks)
+                val now = System.currentTimeMillis()
+                val lastHitAt = lastMeleeHitAtByVictim[victimPlayer.uniqueId]
+                if (lastHitAt != null && now - lastHitAt < meleeInvulnerabilityMs) {
+                    return@event
+                }
 
                 val attackerKit = kitService.getKitForPlayer(damagerPlayer)
                 val meleeDamage = attackerKit?.getMeleeDamage() ?: damage
