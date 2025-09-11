@@ -35,11 +35,12 @@ import gg.flyte.twilight.scheduler.repeatingTask
 import java.time.Duration
 import java.util.UUID
 import kotlin.math.min
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 import kotlinx.coroutines.delay
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
-import org.bukkit.EntityEffect
 import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -47,8 +48,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.TimeSource
 
 abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
     val minigameId: String,
@@ -153,12 +152,7 @@ abstract class BrawlMinigame<TMinigameDef : MinigameDef>(
 
                 // Trigger 1.8-style hurtcam/animation and sound on victim
                 victimPlayer.playHurtAnimation(1f)
-                victimPlayer.playSound(
-                    victimPlayer.eyeLocation,
-                    Sound.ENTITY_PLAYER_HURT,
-                    1f,
-                    1f,
-                )
+                victimPlayer.playSound(victimPlayer.eyeLocation, Sound.ENTITY_PLAYER_HURT, 1f, 1f)
 
                 // Apply 1.8-style melee knockback only for melee damage (no special damage type)
                 if (damageType == null) {
