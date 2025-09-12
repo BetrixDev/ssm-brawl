@@ -6,8 +6,8 @@ import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 
-open class FfaMinigame(minigameId: String, gameId: String, players: List<MinigamePlayer>) :
-    BrawlMinigame<FfaMinigameDef>(minigameId, gameId, players) {
+open class FfaMinigameOld(minigameId: String, gameId: String, players: List<MinigamePlayer>) :
+    BrawlMinigameOld<FfaMinigameDef>(minigameId, gameId, players) {
 
     override fun canPlayerLeaveMinigame(player: Player): Boolean {
         return true

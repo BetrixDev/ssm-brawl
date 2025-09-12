@@ -4,9 +4,9 @@ import com.github.michaelbull.result.*
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.QueuePopEvent
-import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
-import dev.betrix.superSmashMobsBrawl.minigames.PrototypingMinigame
-import dev.betrix.superSmashMobsBrawl.minigames.TeamBasedStocksMinigame
+import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigameOld
+import dev.betrix.superSmashMobsBrawl.minigames.PrototypingMinigameOld
+import dev.betrix.superSmashMobsBrawl.minigames.TeamBasedStocksMinigameOld
 import dev.betrix.superSmashMobsBrawl.models.MinigamePlayer
 import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
@@ -37,7 +37,7 @@ class MinigameService : KoinComponent {
     private val dataService: DataService by inject()
     private val hubService: HubService by inject()
 
-    private val inFlightMinigames = arrayListOf<BrawlMinigame<*>>()
+    private val inFlightMinigames = arrayListOf<BrawlMinigameOld<*>>()
 
     init {
         event<QueuePopEvent> {
@@ -62,13 +62,13 @@ class MinigameService : KoinComponent {
                                 MinigameTeam(teamPlayers, minigameDef.stocks)
                             }
 
-                        TeamBasedStocksMinigame(minigameDef.id, gameId, teams)
+                        TeamBasedStocksMinigameOld(minigameDef.id, gameId, teams)
                     }
 
                     is FfaMinigameDef -> {
                         when (minigameDef.id) {
                             "prototyping" -> {
-                                PrototypingMinigame(
+                                PrototypingMinigameOld(
                                     minigameDef.id,
                                     gameId,
                                     players.map { MinigamePlayer(it) },
@@ -129,7 +129,7 @@ class MinigameService : KoinComponent {
         return getAllMinigameData().find { it.id.contains(id, ignoreCase = true) }
     }
 
-    private fun handleMinigameSetup(minigameInstance: BrawlMinigame<*>) {
+    private fun handleMinigameSetup(minigameInstance: BrawlMinigameOld<*>) {
         plugin.launch {
             minigameInstance
                 .initMinigame()
@@ -145,7 +145,7 @@ class MinigameService : KoinComponent {
         }
     }
 
-    fun removeMinigameInstance(minigameInstance: BrawlMinigame<*>): Boolean {
+    fun removeMinigameInstance(minigameInstance: BrawlMinigameOld<*>): Boolean {
         return inFlightMinigames.remove(minigameInstance)
     }
 
@@ -153,11 +153,11 @@ class MinigameService : KoinComponent {
         return getMinigameForPlayer(player) != null
     }
 
-    fun getMinigameForPlayer(player: Player): BrawlMinigame<*>? {
+    fun getMinigameForPlayer(player: Player): BrawlMinigameOld<*>? {
         return inFlightMinigames.find { it.isPlayerInMinigame(player) }
     }
 
-    fun handlePlayerLeave(player: Player): Result<BrawlMinigame<*>, MinigameLeaveError> {
+    fun handlePlayerLeave(player: Player): Result<BrawlMinigameOld<*>, MinigameLeaveError> {
         val minigameInstance =
             getMinigameForPlayer(player) ?: return Err(MinigameLeaveError.PlayerNotInMinigame)
 

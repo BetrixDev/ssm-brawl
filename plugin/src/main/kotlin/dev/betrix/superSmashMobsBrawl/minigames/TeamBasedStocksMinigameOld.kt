@@ -16,12 +16,12 @@ import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.koin.core.component.inject
 
-open class TeamBasedStocksMinigame(
+open class TeamBasedStocksMinigameOld(
     minigameId: String,
     gameId: String,
     private val teams: List<MinigameTeam>,
 ) :
-    BrawlMinigame<TeamBasedStocksMinigameDef>(
+    BrawlMinigameOld<TeamBasedStocksMinigameDef>(
         minigameId,
         gameId,
         teams.flatMap { it.players }.map { MinigamePlayer(it) },

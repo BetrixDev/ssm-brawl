@@ -1,6 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.events
 
-import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
+import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigameOld
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import gg.flyte.twilight.event.TwilightEvent
 import org.bukkit.entity.LivingEntity
@@ -28,7 +28,7 @@ class SmashDamageEvent(
     val damageType: SmashDamageType? = null,
 ) : TwilightEvent() {
 
-    fun isValid(minigame: BrawlMinigame<MinigameDef>): Boolean {
+    fun isValid(minigame: BrawlMinigameOld<MinigameDef>): Boolean {
         // TODO: Once we figure out how we want to handle all living entities in minigames, this
         // check will be removed
         if (victim !is Player) {

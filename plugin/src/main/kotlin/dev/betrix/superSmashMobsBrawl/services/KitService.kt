@@ -16,6 +16,7 @@ import io.papermc.paper.datacomponent.DataComponentTypes
 import java.util.concurrent.ConcurrentHashMap
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
+import org.bukkit.OfflinePlayer
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerQuitEvent
@@ -34,8 +35,8 @@ object KitService : KoinComponent {
     private val dataService: DataService by inject()
     private val minigameService: MinigameService by inject()
 
-    private val playerSelectedKits = ConcurrentHashMap<Player, String>() // kit id
-    private val assignedBrawlKits = ConcurrentHashMap<Player, BrawlKit>()
+    private val playerSelectedKits = ConcurrentHashMap<OfflinePlayer, String>() // kit id
+    private val assignedBrawlKits = ConcurrentHashMap<OfflinePlayer, BrawlKit>()
 
     init {
         event<PlayerQuitEvent> {
@@ -56,22 +57,22 @@ object KitService : KoinComponent {
         PlayerSelectKitEvent.call(player, kit, shouldSwitchImmediately)
     }
 
-    fun currentSelectedKitForPlayer(player: Player): KitDef {
+    fun currentSelectedKitForPlayer(player: OfflinePlayer): KitDef {
         val kitId = playerSelectedKits[player]
 
         return kitId?.let { dataService.getKit(kitId) } ?: dataService.getKit(defaultKitId())!!
     }
 
-    fun assignKit(player: Player): Result<BrawlKit, AssignKitError> {
+    fun assignKit(player: OfflinePlayer): Result<BrawlKit, AssignKitError> {
         if (!playerSelectedKits.containsKey(player) || playerSelectedKits[player] == null) {
             playerSelectedKits[player] = defaultKitId()
         }
         return assignKit(player, playerSelectedKits[player] ?: defaultKitId())
     }
 
-    fun assignKit(player: Player, kitId: String): Result<BrawlKit, AssignKitError> {
+    fun assignKit(player: OfflinePlayer, kitId: String): Result<BrawlKit, AssignKitError> {
         if (assignedBrawlKits.containsKey(player)) {
-            return Err(AssignKitError.PLAYER_HAS_KIT)
+            unassignKit(player)
         }
 
         val kitData = dataService.getKit(kitId) ?: dataService.getKit(defaultKitId())!!
@@ -86,7 +87,17 @@ object KitService : KoinComponent {
         return Ok(brawlKit)
     }
 
-    fun unassignKit(player: Player): BrawlKit? {
+    fun assignKit(player: OfflinePlayer, kit: KitDef) {
+        if (assignedBrawlKits.containsKey(player)) {
+            unassignKit(player)
+        }
+
+        if (player.isOnline) {
+            assignedBrawlKits[player] = BrawlKit(kit.id, player.player!!).apply { setup() }
+        }
+    }
+
+    fun unassignKit(player: OfflinePlayer): BrawlKit? {
         val kit = assignedBrawlKits.remove(player)
         kit?.let { instance ->
             plugin.launch {
