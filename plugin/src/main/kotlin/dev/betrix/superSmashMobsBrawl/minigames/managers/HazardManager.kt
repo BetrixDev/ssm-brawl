@@ -3,7 +3,6 @@ package dev.betrix.superSmashMobsBrawl.minigames.managers
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
-import dev.betrix.superSmashMobsBrawl.extensions.teleport
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.GameMode
@@ -30,4 +29,3 @@ class DefaultHazardManager : Manageable(), IHazardManager {
         )
     }
 }
-

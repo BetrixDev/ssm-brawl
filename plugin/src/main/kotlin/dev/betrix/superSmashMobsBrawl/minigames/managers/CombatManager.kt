@@ -13,4 +13,3 @@ class DefaultCombatManager : Manageable(), ICombatManager {
         // Register damage listeners in future
     }
 }
-

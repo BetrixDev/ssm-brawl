@@ -10,12 +10,15 @@ import dev.betrix.superSmashMobsBrawl.services.WorldService
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-/**
- * Responsible for selecting, loading, and cleaning up the game world for a minigame.
- */
+/** Responsible for selecting, loading, and cleaning up the game world for a minigame. */
 interface IWorldManager {
-    suspend fun loadWorld(minigameDef: MinigameDef, gameId: String): Result<BrawlGameWorld, Exception>
+    suspend fun loadWorld(
+        minigameDef: MinigameDef,
+        gameId: String,
+    ): Result<BrawlGameWorld, Exception>
+
     fun getWorld(): BrawlGameWorld?
+
     fun teardown()
 }
 
@@ -40,12 +43,13 @@ class DefaultWorldManager : Manageable(), IWorldManager, KoinComponent {
                 true
             }
 
-        val selectedMap = validMaps.randomOrNull() ?: return com.github.michaelbull.result.Err(
-            RuntimeException("No valid maps found for ${minigameDef.id}")
-        )
+        val selectedMap =
+            validMaps.randomOrNull()
+                ?: return com.github.michaelbull.result.Err(
+                    RuntimeException("No valid maps found for ${minigameDef.id}")
+                )
 
-        val result =
-            worldService.copyAndLoadWorld(selectedMap, gameId).map { it as BrawlGameWorld }
+        val result = worldService.copyAndLoadWorld(selectedMap, gameId).map { it as BrawlGameWorld }
         result.map { loaded -> brawlWorld = loaded }
         return result
     }
@@ -58,4 +62,3 @@ class DefaultWorldManager : Manageable(), IWorldManager, KoinComponent {
         brawlWorld = null
     }
 }
-

@@ -6,12 +6,15 @@ import org.bukkit.OfflinePlayer
 
 sealed class WinResult {
     object None : WinResult()
+
     data class Winners(val winners: List<OfflinePlayer>) : WinResult()
 }
 
 interface IGameObjectiveManager {
     fun initialize(minigame: BrawlMinigame)
+
     fun recordDeath(player: OfflinePlayer)
+
     fun checkWinCondition(): WinResult
 }
 
@@ -22,4 +25,3 @@ class DefaultGameObjectiveManager : Manageable(), IGameObjectiveManager {
 
     override fun checkWinCondition(): WinResult = WinResult.None
 }
-

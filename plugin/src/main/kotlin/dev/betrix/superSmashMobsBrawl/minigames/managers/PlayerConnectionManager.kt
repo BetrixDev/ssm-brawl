@@ -5,7 +5,9 @@ import org.bukkit.OfflinePlayer
 
 interface IPlayerConnectionManager {
     fun markDisconnected(player: OfflinePlayer)
+
     fun markReconnected(player: OfflinePlayer)
+
     fun isDisconnected(player: OfflinePlayer): Boolean
 }
 
@@ -20,6 +22,6 @@ class DefaultPlayerConnectionManager : Manageable(), IPlayerConnectionManager {
         disconnected.remove(player.uniqueId)
     }
 
-    override fun isDisconnected(player: OfflinePlayer): Boolean = disconnected.contains(player.uniqueId)
+    override fun isDisconnected(player: OfflinePlayer): Boolean =
+        disconnected.contains(player.uniqueId)
 }
-

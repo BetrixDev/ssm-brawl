@@ -6,7 +6,9 @@ import org.bukkit.OfflinePlayer
 
 interface IRespawnManager {
     fun markRespawning(player: OfflinePlayer)
+
     fun clearRespawning(player: OfflinePlayer)
+
     fun isRespawning(player: OfflinePlayer): Boolean
 }
 
@@ -25,4 +27,3 @@ class DefaultRespawnManager(private val minigame: BrawlMinigame) : Manageable(),
         return respawning.contains(player.uniqueId)
     }
 }
-

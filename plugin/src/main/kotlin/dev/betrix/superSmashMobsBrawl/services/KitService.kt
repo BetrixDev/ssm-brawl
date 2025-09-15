@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.services
 
-import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.shynixn.mccoroutine.bukkit.launch

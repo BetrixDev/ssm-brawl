@@ -6,6 +6,7 @@ import org.bukkit.OfflinePlayer
 
 interface ISpectatorManager {
     fun setSpectator(player: OfflinePlayer)
+
     fun clearSpectator(player: OfflinePlayer)
 }
 
@@ -27,4 +28,3 @@ class DefaultSpectatorManager : Manageable(), ISpectatorManager {
         }
     }
 }
-
