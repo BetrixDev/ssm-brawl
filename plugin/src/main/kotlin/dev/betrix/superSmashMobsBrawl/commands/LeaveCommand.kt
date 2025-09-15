@@ -39,7 +39,7 @@ class LeaveCommand : KoinComponent {
             .leaveMinigame(sender)
             .onSuccess {
                 sender.sendMessage(
-                    lang.t("messages.minigames.leave.success") { 
+                    lang.t("messages.minigames.leave.success") {
                         "minigameId" to (currentMinigame?.minigameDef?.id ?: "unknown")
                     }
                 )

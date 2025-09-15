@@ -52,37 +52,28 @@ class MinigameService : Manageable(), KoinComponent {
 
             val gameId = UUID.randomUUID().toString()
 
-            val teams = when (minigameDef) {
-                is TeamBasedStocksMinigameDef -> {
-                    val playersPerTeam = minigameDef.playersPerTeam
-                    val amountOfTeams = minigameDef.amountOfTeams
+            val teams =
+                when (minigameDef) {
+                    is TeamBasedStocksMinigameDef -> {
+                        val playersPerTeam = minigameDef.playersPerTeam
+                        val amountOfTeams = minigameDef.amountOfTeams
 
-                    (0 until amountOfTeams).map { teamIndex ->
-                        val startIndex = teamIndex * playersPerTeam
-                        val endIndex = startIndex + playersPerTeam
-                        val teamPlayers = players.subList(startIndex, endIndex)
-                        MinigameTeam(
-                            teamPlayers,
-                            name = "Team ${teamIndex + 1}"
-                        )
+                        (0 until amountOfTeams).map { teamIndex ->
+                            val startIndex = teamIndex * playersPerTeam
+                            val endIndex = startIndex + playersPerTeam
+                            val teamPlayers = players.subList(startIndex, endIndex)
+                            MinigameTeam(teamPlayers, name = "Team ${teamIndex + 1}")
+                        }
+                    }
+
+                    is FfaMinigameDef -> {
+                        // In FFA, each player is their own team
+                        players.map { player -> MinigameTeam(listOf(player), name = player.name) }
                     }
                 }
-
-                is FfaMinigameDef -> {
-                    // In FFA, each player is their own team
-                    players.map { player ->
-                        MinigameTeam(
-                            listOf(player),
-                            name = player.name
-                        )
-                    }
-                }
-            }
 
             val minigameInstance = BrawlMinigame(minigameDef, teams)
-            plugin.launch {
-                handleMinigameSetup(minigameInstance, gameId)
-            }
+            plugin.launch { handleMinigameSetup(minigameInstance, gameId) }
         }
 
         // Handle player disconnect
@@ -96,9 +87,10 @@ class MinigameService : Manageable(), KoinComponent {
         // Handle player reconnect
         listeners.add(
             event<PlayerJoinEvent> {
-                val minigameInstance = inFlightMinigames.find { minigame ->
-                    minigame.allPlayers().any { it.uniqueId == player.uniqueId }
-                } ?: return@event
+                val minigameInstance =
+                    inFlightMinigames.find { minigame ->
+                        minigame.allPlayers().any { it.uniqueId == player.uniqueId }
+                    } ?: return@event
 
                 minigameInstance.connectionManager.handlePlayerReconnect(player)
             }
@@ -130,7 +122,7 @@ class MinigameService : Manageable(), KoinComponent {
     }
 
     private suspend fun handleMinigameSetup(minigameInstance: BrawlMinigame, gameId: String) {
-        val minigameSetupResult = resultRunCatching { 
+        val minigameSetupResult = resultRunCatching {
             minigameInstance.setup(gameId)
             minigameInstance.startGame()
         }
@@ -158,8 +150,10 @@ class MinigameService : Manageable(), KoinComponent {
     fun getMinigameForPlayer(player: Player): BrawlMinigame? {
         return inFlightMinigames.find { minigame ->
             minigame.getState() != MinigameState.ENDED &&
-            minigame.allPlayers().any { it.isOnline && it.player?.uniqueId == player.uniqueId } &&
-            !minigame.connectionManager.isDisconnected(player)
+                minigame.allPlayers().any {
+                    it.isOnline && it.player?.uniqueId == player.uniqueId
+                } &&
+                !minigame.connectionManager.isDisconnected(player)
         }
     }
 
@@ -176,13 +170,16 @@ class MinigameService : Manageable(), KoinComponent {
     }
 
     fun leaveMinigame(player: Player): Result<Unit, MinigameLeaveError> {
-        val minigame = getMinigameForPlayer(player) ?: return Err(MinigameLeaveError.PlayerNotInMinigame)
+        val minigame =
+            getMinigameForPlayer(player) ?: return Err(MinigameLeaveError.PlayerNotInMinigame)
 
         if (!minigame.connectionManager.canPlayerLeaveMinigame(player)) {
             return Err(MinigameLeaveError.NotAllowedToLeave)
         }
 
-        hubService.teleportToDefaultHub(player).onFailure { return Err(MinigameLeaveError.HubNotReady) }
+        hubService.teleportToDefaultHub(player).onFailure {
+            return Err(MinigameLeaveError.HubNotReady)
+        }
 
         minigame.connectionManager.handlePlayerLeave(player)
 

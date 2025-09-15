@@ -17,11 +17,12 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.world.StructureGrowEvent
 
 /**
- * Manager responsible for protecting the minigame environment from player modifications.
- * Prevents block breaking, placing, and other world interactions that could disrupt gameplay.
+ * Manager responsible for protecting the minigame environment from player modifications. Prevents
+ * block breaking, placing, and other world interactions that could disrupt gameplay.
  */
 interface IEnvironmentProtectionManager {
     fun initialize(minigame: BrawlMinigame)
+
     fun teardown()
 }
 
@@ -30,7 +31,7 @@ class DefaultEnvironmentProtectionManager : Manageable(), IEnvironmentProtection
 
     override fun initialize(minigame: BrawlMinigame) {
         this.minigame = minigame
-        
+
         // Prevent block breaking
         listeners.add(
             event<BlockBreakEvent> {
@@ -70,42 +71,78 @@ class DefaultEnvironmentProtectionManager : Manageable(), IEnvironmentProtection
         listeners.add(
             event<PlayerInteractEvent> {
                 if (player == null || !isPlayerInMinigame(player)) return@event
-                
+
                 // Allow interaction with air (for abilities/combat)
                 if (clickedBlock == null) return@event
-                
+
                 // Cancel interactions with containers, machines, etc.
                 when (clickedBlock!!.type.name.uppercase()) {
-                    "CHEST", "TRAPPED_CHEST", "ENDER_CHEST",
-                    "FURNACE", "BLAST_FURNACE", "SMOKER",
-                    "BREWING_STAND", "ENCHANTING_TABLE",
-                    "ANVIL", "CHIPPED_ANVIL", "DAMAGED_ANVIL",
-                    "CRAFTING_TABLE", "CARTOGRAPHY_TABLE",
-                    "FLETCHING_TABLE", "SMITHING_TABLE",
-                    "STONECUTTER", "GRINDSTONE", "LOOM",
-                    "BARREL", "SHULKER_BOX", "HOPPER",
-                    "DISPENSER", "DROPPER", "OBSERVER",
-                    "LECTERN", "BEACON", "JUKEBOX",
-                    "NOTE_BLOCK", "REDSTONE_WIRE", "LEVER",
-                    "STONE_BUTTON", "OAK_BUTTON", "BIRCH_BUTTON",
-                    "SPRUCE_BUTTON", "JUNGLE_BUTTON", "ACACIA_BUTTON",
-                    "DARK_OAK_BUTTON", "CRIMSON_BUTTON", "WARPED_BUTTON",
-                    "POLISHED_BLACKSTONE_BUTTON", "STONE_PRESSURE_PLATE",
-                    "OAK_PRESSURE_PLATE", "BIRCH_PRESSURE_PLATE",
-                    "SPRUCE_PRESSURE_PLATE", "JUNGLE_PRESSURE_PLATE",
-                    "ACACIA_PRESSURE_PLATE", "DARK_OAK_PRESSURE_PLATE",
-                    "CRIMSON_PRESSURE_PLATE", "WARPED_PRESSURE_PLATE",
-                    "LIGHT_WEIGHTED_PRESSURE_PLATE", "HEAVY_WEIGHTED_PRESSURE_PLATE",
-                    "COMPARATOR", "REPEATER", "REDSTONE_TORCH",
-                    "TRIPWIRE_HOOK", "DAYLIGHT_DETECTOR" -> {
+                    "CHEST",
+                    "TRAPPED_CHEST",
+                    "ENDER_CHEST",
+                    "FURNACE",
+                    "BLAST_FURNACE",
+                    "SMOKER",
+                    "BREWING_STAND",
+                    "ENCHANTING_TABLE",
+                    "ANVIL",
+                    "CHIPPED_ANVIL",
+                    "DAMAGED_ANVIL",
+                    "CRAFTING_TABLE",
+                    "CARTOGRAPHY_TABLE",
+                    "FLETCHING_TABLE",
+                    "SMITHING_TABLE",
+                    "STONECUTTER",
+                    "GRINDSTONE",
+                    "LOOM",
+                    "BARREL",
+                    "SHULKER_BOX",
+                    "HOPPER",
+                    "DISPENSER",
+                    "DROPPER",
+                    "OBSERVER",
+                    "LECTERN",
+                    "BEACON",
+                    "JUKEBOX",
+                    "NOTE_BLOCK",
+                    "REDSTONE_WIRE",
+                    "LEVER",
+                    "STONE_BUTTON",
+                    "OAK_BUTTON",
+                    "BIRCH_BUTTON",
+                    "SPRUCE_BUTTON",
+                    "JUNGLE_BUTTON",
+                    "ACACIA_BUTTON",
+                    "DARK_OAK_BUTTON",
+                    "CRIMSON_BUTTON",
+                    "WARPED_BUTTON",
+                    "POLISHED_BLACKSTONE_BUTTON",
+                    "STONE_PRESSURE_PLATE",
+                    "OAK_PRESSURE_PLATE",
+                    "BIRCH_PRESSURE_PLATE",
+                    "SPRUCE_PRESSURE_PLATE",
+                    "JUNGLE_PRESSURE_PLATE",
+                    "ACACIA_PRESSURE_PLATE",
+                    "DARK_OAK_PRESSURE_PLATE",
+                    "CRIMSON_PRESSURE_PLATE",
+                    "WARPED_PRESSURE_PLATE",
+                    "LIGHT_WEIGHTED_PRESSURE_PLATE",
+                    "HEAVY_WEIGHTED_PRESSURE_PLATE",
+                    "COMPARATOR",
+                    "REPEATER",
+                    "REDSTONE_TORCH",
+                    "TRIPWIRE_HOOK",
+                    "DAYLIGHT_DETECTOR" -> {
                         isCancelled = true
                     }
                 }
-                
+
                 // Also cancel door/trapdoor interactions to prevent griefing
-                if (clickedBlock!!.type.name.contains("DOOR") || 
-                    clickedBlock!!.type.name.contains("TRAPDOOR") ||
-                    clickedBlock!!.type.name.contains("FENCE_GATE")) {
+                if (
+                    clickedBlock!!.type.name.contains("DOOR") ||
+                        clickedBlock!!.type.name.contains("TRAPDOOR") ||
+                        clickedBlock!!.type.name.contains("FENCE_GATE")
+                ) {
                     isCancelled = true
                 }
             }
@@ -120,7 +157,7 @@ class DefaultEnvironmentProtectionManager : Manageable(), IEnvironmentProtection
                     if (inventory == player.inventory || inventory == player.enderChest) {
                         return@event
                     }
-                    
+
                     // Cancel opening world containers
                     isCancelled = true
                 }
@@ -145,13 +182,14 @@ class DefaultEnvironmentProtectionManager : Manageable(), IEnvironmentProtection
             }
         )
 
-        // Prevent entity damage to non-players (villagers, animals, etc.) unless it's combat-related
+        // Prevent entity damage to non-players (villagers, animals, etc.) unless it's
+        // combat-related
         listeners.add(
             event<EntityDamageByEntityEvent> {
                 if (damager is Player && isPlayerInMinigame(damager as Player)) {
                     // Allow player vs player damage (handled by combat manager)
                     if (entity is Player) return@event
-                    
+
                     // Prevent damage to other entities (animals, villagers, etc.)
                     isCancelled = true
                 }
@@ -181,8 +219,8 @@ class DefaultEnvironmentProtectionManager : Manageable(), IEnvironmentProtection
     }
 
     private fun isPlayerInMinigame(player: Player): Boolean {
-        return minigame.allPlayers().any { 
-            it.isOnline && it.player?.uniqueId == player.uniqueId 
+        return minigame.allPlayers().any {
+            it.isOnline && it.player?.uniqueId == player.uniqueId
         } && !minigame.connectionManager.isDisconnected(player)
     }
 
