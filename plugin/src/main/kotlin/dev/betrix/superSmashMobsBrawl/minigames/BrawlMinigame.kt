@@ -1,26 +1,43 @@
 package dev.betrix.superSmashMobsBrawl.minigames
 
 import dev.betrix.superSmashMobsBrawl.Manageable
+import dev.betrix.superSmashMobsBrawl.extensions.getEquidistant
+import dev.betrix.superSmashMobsBrawl.extensions.getFarthestFromPlayers
+import dev.betrix.superSmashMobsBrawl.extensions.location
+import dev.betrix.superSmashMobsBrawl.extensions.teleport
 import dev.betrix.superSmashMobsBrawl.minigames.managers.DefaultCombatManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.DefaultCountdownManager
+import dev.betrix.superSmashMobsBrawl.minigames.managers.DefaultEnvironmentProtectionManager
+import dev.betrix.superSmashMobsBrawl.minigames.managers.DefaultGameObjectiveManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.DefaultHazardManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.DefaultPlayerConnectionManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.DefaultRespawnManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.DefaultScoreboardManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.DefaultTeamManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.DefaultWorldManager
+import dev.betrix.superSmashMobsBrawl.minigames.managers.FfaGameObjectiveManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.ICombatManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.ICountdownManager
+import dev.betrix.superSmashMobsBrawl.minigames.managers.IEnvironmentProtectionManager
+import dev.betrix.superSmashMobsBrawl.minigames.managers.IGameObjectiveManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.IHazardManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.IPlayerConnectionManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.IRespawnManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.IScoreboardManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.ITeamManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.IWorldManager
+import dev.betrix.superSmashMobsBrawl.minigames.managers.TeamBasedStocksObjectiveManager
+import dev.betrix.superSmashMobsBrawl.events.MinigameEndAnalyticsEvent
+import dev.betrix.superSmashMobsBrawl.events.PlayerJoinMinigameAnalyticsEvent
+import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
+import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitSwitchingMode
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
+import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
 import dev.betrix.superSmashMobsBrawl.services.KitService
+import dev.betrix.superSmashMobsBrawl.services.LangService
+import gg.flyte.twilight.event.event
 import java.util.UUID
 import org.bukkit.OfflinePlayer
 import org.koin.core.component.KoinComponent
@@ -30,6 +47,7 @@ data class MinigameTeam(
     val players: List<OfflinePlayer>,
     val id: String = UUID.randomUUID().toString(),
     val name: String,
+    val metadata: MutableMap<String, Any> = mutableMapOf(),
 ) {
     init {
         require(players.isNotEmpty()) { "A team must have at least one player." }
@@ -52,17 +70,48 @@ interface ITeleportationHandler {
     fun teleportPlayerRandomSpawnPoint(player: OfflinePlayer)
 }
 
-class DefaultTeleportationHandler(private val minigame: BrawlMinigame) : ITeleportationHandler {
+class DefaultTeleportationHandler(private val minigame: BrawlMinigame) : ITeleportationHandler, KoinComponent {
     override fun teleportTeamToStartingLocation(team: MinigameTeam) {
-        // Default implementation does nothing
+        val world = minigame.worldManager.getWorld() ?: return
+        val spawnPoints = world.data.spawnPoints.getEquidistant(team.players.size)
+        
+        team.players.forEachIndexed { index, player ->
+            if (player.isOnline) {
+                val spawnPoint = spawnPoints.getOrNull(index) ?: spawnPoints.first()
+                player.player?.teleport(world.world.location(spawnPoint))
+                
+                // Clear offhand to remove shield mechanics (1.8 feel)
+                try {
+                    player.player?.inventory?.setItemInOffHand(
+                        org.bukkit.inventory.ItemStack.of(org.bukkit.Material.AIR)
+                    )
+                } catch (_: Throwable) {}
+            }
+        }
     }
 
     override fun teleportPlayerToSpectatorArea(player: OfflinePlayer) {
-        // Default implementation does nothing
+        val world = minigame.worldManager.getWorld() ?: return
+        if (player.isOnline) {
+            player.player?.teleport(world.data.spectatorSpawnPoint)
+        }
     }
 
     override fun teleportPlayerRandomSpawnPoint(player: OfflinePlayer) {
-        // Default implementation does nothing
+        val world = minigame.worldManager.getWorld() ?: return
+        if (player.isOnline) {
+            val bukkitPlayer = player.player ?: return
+            val activePlayers = minigame.allPlayers()
+                .mapNotNull { if (it.isOnline) it.player else null }
+                .filter { it != bukkitPlayer && it.gameMode != org.bukkit.GameMode.SPECTATOR }
+
+            val spawnPoint = world.data.spawnPoints.getFarthestFromPlayers(
+                activePlayers,
+                world.world,
+            ) ?: world.data.spawnPoints.firstOrNull() ?: return
+
+            bukkitPlayer.teleport(world.world.location(spawnPoint))
+        }
     }
 }
 
@@ -98,11 +147,11 @@ class KitHandlerWithSwitching(private val minigame: BrawlMinigame) : IKitHandler
     private val kitService: KitService by inject()
 
     override fun assignKitToPlayer(player: OfflinePlayer) {
-        //        kitService.giveKitWithoutSwitching(player)
+        kitService.assignKit(player)
     }
 
     override fun removeKitFromPlayer(player: OfflinePlayer) {
-        //        kitService.removeKit(player)
+        kitService.unassignKit(player)
     }
 }
 
@@ -116,7 +165,7 @@ class KitHandlerWithSwitchingAfterDeath(private val minigame: BrawlMinigame) :
     }
 
     override fun removeKitFromPlayer(player: OfflinePlayer) {
-        //        kitService.removeKit(player)
+        kitService.unassignKit(player)
     }
 }
 
@@ -125,11 +174,13 @@ interface ICombatHandler {}
 class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>) :
     Manageable(), KoinComponent {
 
+    private val langService: LangService by inject()
     private var state: MinigameState = MinigameState.PREFLIGHT
+    private var gameStartTime: kotlin.time.TimeSource.Monotonic.ValueTimeMark? = null
 
-    private val teleportationHandler: ITeleportationHandler = DefaultTeleportationHandler(this)
+    val teleportationHandler: ITeleportationHandler = DefaultTeleportationHandler(this)
 
-    // Managers (composable)
+    // Managers (composable) - select based on minigame type
     val worldManager: IWorldManager = DefaultWorldManager()
     val teamManager: ITeamManager = DefaultTeamManager()
     val respawnManager: IRespawnManager = DefaultRespawnManager(this)
@@ -138,9 +189,16 @@ class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>)
     val countdownManager: ICountdownManager = DefaultCountdownManager(this)
     val scoreboardManager: IScoreboardManager = DefaultScoreboardManager()
     val connectionManager: IPlayerConnectionManager = DefaultPlayerConnectionManager()
+    val environmentProtectionManager: IEnvironmentProtectionManager = DefaultEnvironmentProtectionManager()
+    
+    // Game objective manager - selected based on minigame definition
+    val objectiveManager: IGameObjectiveManager = when (minigameDef) {
+        is FfaMinigameDef -> FfaGameObjectiveManager()
+        is TeamBasedStocksMinigameDef -> TeamBasedStocksObjectiveManager()
+    }
 
     // Kit handler is pluggable
-    private val kitHandler: IKitHandler =
+    val kitHandler: IKitHandler =
         when (minigameDef.kitSwitchingMode) {
             KitSwitchingMode.NEVER -> DefaultKitHandler(this)
             KitSwitchingMode.ON_DEATH -> KitHandlerWithSwitchingAfterDeath(this)
@@ -148,29 +206,106 @@ class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>)
         }
 
     fun allPlayers(): List<OfflinePlayer> = teams.flatMap { it.players }
-
+    fun getState(): MinigameState = state
     fun getKitSwitchingMode(): KitSwitchingMode = minigameDef.kitSwitchingMode
-
     fun isPassiveValid(id: String): Boolean = minigameDef.isPassiveValid(id)
 
     suspend fun setup(gameId: String) {
-        // Load world
+        // Load world first
         worldManager.loadWorld(minigameDef, gameId)
-        // Teams
+        
+        // Initialize all managers
         teamManager.registerTeams(this)
-        // Hazards and combat
         hazardManager.initialize(this)
         combatManager.initialize(this)
-        // Scoreboard init
+        respawnManager.initialize(this)
+        connectionManager.initialize(this)
+        objectiveManager.initialize(this)
+        environmentProtectionManager.initialize(this)
         scoreboardManager.initialize()
+        
+        // Setup kit switching event handling
+        setupKitSwitchingEvents()
+        
+        // Fire join analytics events
+        allPlayers().forEach { player ->
+            if (player.isOnline) {
+                PlayerJoinMinigameAnalyticsEvent(player.player!!, this).callEvent()
+            }
+        }
+        
+        // Teleport teams to starting locations
+        teams.forEach { team ->
+            teleportationHandler.teleportTeamToStartingLocation(team)
+            // Assign kits to all players in the team
+            team.players.forEach { player ->
+                if (player.isOnline) {
+                    kitHandler.assignKitToPlayer(player)
+                }
+            }
+        }
+        
         state = MinigameState.STARTING
+        gameStartTime = kotlin.time.TimeSource.Monotonic.markNow()
+    }
+    
+    private fun setupKitSwitchingEvents() {
+        // Handle kit selection events based on switching mode
+        listeners.add(
+            event<PlayerSelectKitEvent> {
+                // Only handle if this player is in this minigame
+                if (!allPlayers().any { it.isOnline && it.player?.uniqueId == player.uniqueId }) return@event
+
+                when (minigameDef.kitSwitchingMode) {
+                    KitSwitchingMode.IMMEDIATE -> {
+                        if (shouldSwitchImmediately && !respawnManager.isRespawning(player)) {
+                            // Switch kit immediately (but not if player is currently respawning)
+                            kitHandler.removeKitFromPlayer(player)
+                            kitHandler.assignKitToPlayer(player)
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        )
+    }
+    
+    fun startGame() {
+        if (state != MinigameState.STARTING) return
+        state = MinigameState.IN_PROGRESS
+        gameStartTime = kotlin.time.TimeSource.Monotonic.markNow()
+    }
+    
+    fun endMinigame(reason: String, winners: List<OfflinePlayer> = emptyList()) {
+        if (state == MinigameState.ENDED) return
+        
+        state = MinigameState.ENDING
+        
+        val gameDuration = gameStartTime?.elapsedNow() ?: kotlin.time.Duration.ZERO
+        
+        // Fire analytics event
+        MinigameEndAnalyticsEvent(
+            this, 
+            winners.mapNotNull { if (it.isOnline) it.player else null },
+            gameDuration,
+            reason
+        ).callEvent()
+        
+        // TODO: Show victory screen, handle rewards, etc.
+        
+        state = MinigameState.ENDED
+        teardown()
     }
 
     override fun teardown() {
         super.teardown()
-        hazardManager.teardown()
-        combatManager.teardown()
-        scoreboardManager.teardown()
+        (hazardManager as? Manageable)?.teardown()
+        (combatManager as? Manageable)?.teardown()
+        (scoreboardManager as? Manageable)?.teardown()
+        (respawnManager as? Manageable)?.teardown()
+        (connectionManager as? Manageable)?.teardown()
+        (objectiveManager as? Manageable)?.teardown()
+        (environmentProtectionManager as? Manageable)?.teardown()
         (worldManager as? Manageable)?.teardown()
     }
 }

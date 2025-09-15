@@ -39,10 +39,8 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
     }
 
     protected val minigameData by lazy {
-        val minigameId =
-            minigameService.getMinigameForPlayer(player)?.minigameId ?: return@lazy null
-
-        return@lazy dataService.getMinigame(minigameId)
+        val minigame = minigameService.getMinigameForPlayer(player) ?: return@lazy null
+        return@lazy minigame.minigameDef
     }
 
     protected val kitData by lazy {

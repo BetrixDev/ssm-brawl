@@ -2,18 +2,18 @@ package dev.betrix.superSmashMobsBrawl.services
 
 import com.github.michaelbull.result.*
 import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.QueuePopEvent
-import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigameOld
-import dev.betrix.superSmashMobsBrawl.minigames.PrototypingMinigameOld
-import dev.betrix.superSmashMobsBrawl.minigames.TeamBasedStocksMinigameOld
-import dev.betrix.superSmashMobsBrawl.models.MinigamePlayer
-import dev.betrix.superSmashMobsBrawl.models.MinigameTeam
+import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
+import dev.betrix.superSmashMobsBrawl.minigames.MinigameState
+import dev.betrix.superSmashMobsBrawl.minigames.MinigameTeam
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
 import dev.betrix.superSmashMobsBrawl.utils.resultRunCatching
 import gg.flyte.twilight.event.event
+import gg.flyte.twilight.scheduler.repeatingTask
 import java.util.UUID
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
@@ -32,77 +32,77 @@ enum class MinigameLeaveError {
     Unknown,
 }
 
-class MinigameService : KoinComponent {
+class MinigameService : Manageable(), KoinComponent {
     private val plugin: SuperSmashMobsBrawl by inject()
     private val dataService: DataService by inject()
     private val hubService: HubService by inject()
 
-    private val inFlightMinigames = arrayListOf<BrawlMinigameOld<*>>()
+    private val inFlightMinigames = arrayListOf<BrawlMinigame>()
 
     init {
+        // Cleanup ended minigames periodically to prevent memory leaks
+        runnables.add(
+            repeatingTask(100) { // Every 5 seconds
+                cleanupEndedMinigames()
+            }
+        )
+
         event<QueuePopEvent> {
             val minigameDef = dataService.getMinigame(minigameId) ?: return@event
 
             val gameId = UUID.randomUUID().toString()
 
-            val minigameInstance =
-                when (minigameDef) {
-                    is TeamBasedStocksMinigameDef -> {
-                        val playersPerTeam = minigameDef.playersPerTeam
-                        val amountOfTeams = minigameDef.amountOfTeams
+            val teams = when (minigameDef) {
+                is TeamBasedStocksMinigameDef -> {
+                    val playersPerTeam = minigameDef.playersPerTeam
+                    val amountOfTeams = minigameDef.amountOfTeams
 
-                        val teams: List<MinigameTeam> =
-                            (0 until amountOfTeams).map { teamIndex ->
-                                val startIndex = teamIndex * playersPerTeam
-                                val endIndex = startIndex + playersPerTeam
-                                val teamPlayers =
-                                    players.subList(startIndex, endIndex).toMutableList()
-                                // Initial stocks value will be set during minigame init from
-                                // definition
-                                MinigameTeam(teamPlayers, minigameDef.stocks)
-                            }
-
-                        TeamBasedStocksMinigameOld(minigameDef.id, gameId, teams)
-                    }
-
-                    is FfaMinigameDef -> {
-                        when (minigameDef.id) {
-                            "prototyping" -> {
-                                PrototypingMinigameOld(
-                                    minigameDef.id,
-                                    gameId,
-                                    players.map { MinigamePlayer(it) },
-                                )
-                            }
-
-                            else -> {
-                                // No-op for unknown ids for now
-                                TODO("handle this")
-                            }
-                        }
+                    (0 until amountOfTeams).map { teamIndex ->
+                        val startIndex = teamIndex * playersPerTeam
+                        val endIndex = startIndex + playersPerTeam
+                        val teamPlayers = players.subList(startIndex, endIndex)
+                        MinigameTeam(
+                            teamPlayers,
+                            name = "Team ${teamIndex + 1}"
+                        )
                     }
                 }
 
-            handleMinigameSetup(minigameInstance)
+                is FfaMinigameDef -> {
+                    // In FFA, each player is their own team
+                    players.map { player ->
+                        MinigameTeam(
+                            listOf(player),
+                            name = player.name
+                        )
+                    }
+                }
+            }
+
+            val minigameInstance = BrawlMinigame(minigameDef, teams)
+            plugin.launch {
+                handleMinigameSetup(minigameInstance, gameId)
+            }
         }
 
         // Handle player disconnect
-        event<PlayerQuitEvent> {
-            val minigameInstance = getMinigameForPlayer(player) ?: return@event
-
-            plugin.launch { minigameInstance.onPlayerDisconnect(player) }
-        }
+        listeners.add(
+            event<PlayerQuitEvent> {
+                val minigameInstance = getMinigameForPlayer(player) ?: return@event
+                minigameInstance.connectionManager.handlePlayerDisconnect(player)
+            }
+        )
 
         // Handle player reconnect
-        event<PlayerJoinEvent> {
-            // Check if this player was in any active minigame when they disconnected
-            for (minigameInstance in inFlightMinigames) {
-                if (minigameInstance.onPlayerReconnect(player)) {
-                    // Player was successfully teleported back to a minigame
-                    break
-                }
+        listeners.add(
+            event<PlayerJoinEvent> {
+                val minigameInstance = inFlightMinigames.find { minigame ->
+                    minigame.allPlayers().any { it.uniqueId == player.uniqueId }
+                } ?: return@event
+
+                minigameInstance.connectionManager.handlePlayerReconnect(player)
             }
-        }
+        )
     }
 
     fun getMinigameData(id: String): MinigameDef? {
@@ -129,54 +129,63 @@ class MinigameService : KoinComponent {
         return getAllMinigameData().find { it.id.contains(id, ignoreCase = true) }
     }
 
-    private fun handleMinigameSetup(minigameInstance: BrawlMinigameOld<*>) {
-        plugin.launch {
-            minigameInstance
-                .initMinigame()
-                .onSuccess {
-                    if (!inFlightMinigames.contains(minigameInstance)) {
-                        inFlightMinigames.add(minigameInstance)
+    private suspend fun handleMinigameSetup(minigameInstance: BrawlMinigame, gameId: String) {
+        val minigameSetupResult = resultRunCatching { 
+            minigameInstance.setup(gameId)
+            minigameInstance.startGame()
+        }
+        minigameSetupResult
+            .onSuccess {
+                plugin.logger.info("Started minigame ${minigameInstance.minigameDef.id}")
+                inFlightMinigames.add(minigameInstance)
+            }
+            .onFailure { err ->
+                plugin.logger.severe("Failed to setup minigame: $err")
+                // Teleport all players back to hub or something
+                minigameInstance.allPlayers().forEach { player ->
+                    if (player.isOnline) {
+                        hubService.teleportToDefaultHub(player.player!!)
                     }
                 }
-                .onFailure { err ->
-                    plugin.logger.warning("Minigame init failed: $err")
-                    minigameInstance.teardown()
-                }
+                minigameInstance.teardown()
+            }
+    }
+
+    fun removeMinigameInstance(minigameInstance: BrawlMinigame): Boolean {
+        return inFlightMinigames.remove(minigameInstance)
+    }
+
+    fun getMinigameForPlayer(player: Player): BrawlMinigame? {
+        return inFlightMinigames.find { minigame ->
+            minigame.getState() != MinigameState.ENDED &&
+            minigame.allPlayers().any { it.isOnline && it.player?.uniqueId == player.uniqueId } &&
+            !minigame.connectionManager.isDisconnected(player)
         }
     }
 
-    fun removeMinigameInstance(minigameInstance: BrawlMinigameOld<*>): Boolean {
-        return inFlightMinigames.remove(minigameInstance)
+    private fun cleanupEndedMinigames() {
+        val endedMinigames = inFlightMinigames.filter { it.getState() == MinigameState.ENDED }
+        if (endedMinigames.isNotEmpty()) {
+            plugin.logger.info("Cleaning up ${endedMinigames.size} ended minigames")
+            inFlightMinigames.removeAll(endedMinigames)
+        }
     }
 
     fun isPlayerInMinigame(player: Player): Boolean {
         return getMinigameForPlayer(player) != null
     }
 
-    fun getMinigameForPlayer(player: Player): BrawlMinigameOld<*>? {
-        return inFlightMinigames.find { it.isPlayerInMinigame(player) }
-    }
+    fun leaveMinigame(player: Player): Result<Unit, MinigameLeaveError> {
+        val minigame = getMinigameForPlayer(player) ?: return Err(MinigameLeaveError.PlayerNotInMinigame)
 
-    fun handlePlayerLeave(player: Player): Result<BrawlMinigameOld<*>, MinigameLeaveError> {
-        val minigameInstance =
-            getMinigameForPlayer(player) ?: return Err(MinigameLeaveError.PlayerNotInMinigame)
-
-        val canPlayerLeave = minigameInstance.canPlayerLeaveMinigame(player)
-
-        if (!canPlayerLeave) {
+        if (!minigame.connectionManager.canPlayerLeaveMinigame(player)) {
             return Err(MinigameLeaveError.NotAllowedToLeave)
         }
 
-        resultRunCatching { minigameInstance.onPlayerLeave(player) }
-            .onFailure { err ->
-                plugin.logger.severe("Error calling minigame.onPlayerLeave $err")
-                return Err(MinigameLeaveError.NotAllowedToLeave)
-            }
+        hubService.teleportToDefaultHub(player).onFailure { return Err(MinigameLeaveError.HubNotReady) }
 
-        hubService.teleportToDefaultHub(player).onFailure {
-            return Err(MinigameLeaveError.HubNotReady)
-        }
+        minigame.connectionManager.handlePlayerLeave(player)
 
-        return Ok(minigameInstance)
+        return Ok(Unit)
     }
 }

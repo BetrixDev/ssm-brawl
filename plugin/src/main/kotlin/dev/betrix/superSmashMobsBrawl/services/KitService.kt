@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.services
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.shynixn.mccoroutine.bukkit.launch
@@ -74,11 +75,15 @@ object KitService : KoinComponent {
             unassignKit(player)
         }
 
+        if (!player.isOnline) {
+            return Err(AssignKitError.PLAYER_HAS_KIT) // Player must be online to assign kit
+        }
+
         val kitData = dataService.getKit(kitId) ?: dataService.getKit(defaultKitId())!!
 
         val brawlKit =
             when (kitData.id) {
-                else -> BrawlKit(kitData.id, player)
+                else -> BrawlKit(kitData.id, player.player!!)
             }
 
         assignedBrawlKits[player] = brawlKit
