@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.minigames.managers
 
-import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
@@ -33,16 +32,16 @@ class DefaultCombatManager : Manageable(), ICombatManager, KoinComponent {
     private val kitService: KitService by inject()
     private val dataService: DataService by inject()
     private val plugin: SuperSmashMobsBrawl by inject()
-    
+
     /** 1.8-style melee I-frames (10 ticks) */
     private val meleeIFrame = 500.milliseconds
     private val lastMeleeHitAtByVictim = mutableMapOf<UUID, TimeSource.Monotonic.ValueTimeMark>()
-    
+
     private lateinit var minigame: BrawlMinigame
-    
+
     override fun initialize(minigame: BrawlMinigame) {
         this.minigame = minigame
-        
+
         // Handle SmashDamageEvent - apply damage within the context of this minigame
         listeners.add(
             event<SmashDamageEvent> {
@@ -57,8 +56,16 @@ class DefaultCombatManager : Manageable(), ICombatManager, KoinComponent {
                 val newHealth = (startingHealth - damage).coerceAtLeast(0.0)
 
                 // Fire analytics event
-                val attackerPlayer = (damager as? Damager.DamagerLivingEntity)?.livingEntity as? Player
-                PlayerDamageAnalyticsEvent(victimPlayer, attackerPlayer, damage, minigame, damageType?.toString()).callEvent()
+                val attackerPlayer =
+                    (damager as? Damager.DamagerLivingEntity)?.livingEntity as? Player
+                PlayerDamageAnalyticsEvent(
+                        victimPlayer,
+                        attackerPlayer,
+                        damage,
+                        minigame,
+                        damageType?.toString(),
+                    )
+                    .callEvent()
 
                 if (newHealth <= 0.0) {
                     // Prevent vanilla death and route through our brawl death flow
@@ -74,11 +81,13 @@ class DefaultCombatManager : Manageable(), ICombatManager, KoinComponent {
 
                 // Apply 1.8-style melee knockback only for melee damage (no special damage type)
                 if (damageType == null) {
-                    val damagerPlayer = (damager as? Damager.DamagerLivingEntity)?.livingEntity as? Player
+                    val damagerPlayer =
+                        (damager as? Damager.DamagerLivingEntity)?.livingEntity as? Player
                     if (damagerPlayer != null) {
-                        val kitKnockbackMult = kitService.getKitForPlayer(damagerPlayer)?.let {
-                            dataService.getKit(it.id)?.knockbackMultiplier
-                        } ?: 1.0
+                        val kitKnockbackMult =
+                            kitService.getKitForPlayer(damagerPlayer)?.let {
+                                dataService.getKit(it.id)?.knockbackMultiplier
+                            } ?: 1.0
                         victimPlayer.doKnockback(
                             knockbackMultiplier * kitKnockbackMult,
                             damage,
@@ -91,7 +100,8 @@ class DefaultCombatManager : Manageable(), ICombatManager, KoinComponent {
                             victimPlayer.maximumNoDamageTicks = 10
                         }
                         victimPlayer.noDamageTicks = 10
-                        lastMeleeHitAtByVictim[victimPlayer.uniqueId] = TimeSource.Monotonic.markNow()
+                        lastMeleeHitAtByVictim[victimPlayer.uniqueId] =
+                            TimeSource.Monotonic.markNow()
                     }
                 }
             }
@@ -105,10 +115,14 @@ class DefaultCombatManager : Manageable(), ICombatManager, KoinComponent {
                 val victimPlayer = entity as? Player ?: return@event
                 val damagerPlayer = damager as? Player ?: return@event
 
-                if (!isPlayerInMinigame(victimPlayer) || !isPlayerInMinigame(damagerPlayer)) return@event
+                if (!isPlayerInMinigame(victimPlayer) || !isPlayerInMinigame(damagerPlayer))
+                    return@event
 
-                if (cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK && 
-                    cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) return@event
+                if (
+                    cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
+                        cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
+                )
+                    return@event
 
                 if (victimPlayer.gameMode != GameMode.SURVIVAL) return@event
 
@@ -130,20 +144,21 @@ class DefaultCombatManager : Manageable(), ICombatManager, KoinComponent {
                 val meleeDamage = attackerKit?.getMeleeDamage() ?: damage
 
                 SmashDamageEvent(
-                    victimPlayer,
-                    Damager.DamagerLivingEntity(damagerPlayer),
-                    meleeDamage,
-                ).callEvent()
+                        victimPlayer,
+                        Damager.DamagerLivingEntity(damagerPlayer),
+                        meleeDamage,
+                    )
+                    .callEvent()
             }
         )
     }
-    
+
     private fun isPlayerInMinigame(player: Player?): Boolean {
-        return player != null && minigame.allPlayers().any { 
-            it.isOnline && it.player?.uniqueId == player.uniqueId 
-        } && !minigame.connectionManager.isDisconnected(player)
+        return player != null &&
+            minigame.allPlayers().any { it.isOnline && it.player?.uniqueId == player.uniqueId } &&
+            !minigame.connectionManager.isDisconnected(player)
     }
-    
+
     override fun teardown() {
         super.teardown()
         lastMeleeHitAtByVictim.clear()
