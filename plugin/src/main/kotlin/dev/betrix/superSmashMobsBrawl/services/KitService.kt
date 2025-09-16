@@ -3,7 +3,6 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
 import dev.betrix.superSmashMobsBrawl.extensions.event
 import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
@@ -13,9 +12,12 @@ import gg.flyte.twilight.event.event
 import gg.flyte.twilight.gui.GUI.Companion.openInventory
 import gg.flyte.twilight.gui.gui
 import io.papermc.paper.datacomponent.DataComponentTypes
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.OfflinePlayer
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerQuitEvent
@@ -25,7 +27,9 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 enum class AssignKitError {
-    PLAYER_HAS_KIT
+    PLAYER_HAS_KIT,
+    PLAYER_NOT_ONLINE,
+    SETUP_FAILED,
 }
 
 object KitService : KoinComponent {
@@ -34,18 +38,18 @@ object KitService : KoinComponent {
     private val dataService: DataService by inject()
     private val minigameService: MinigameService by inject()
 
-    private val playerSelectedKits = ConcurrentHashMap<Player, String>() // kit id
-    private val assignedBrawlKits = ConcurrentHashMap<Player, BrawlKit>()
+    private val playerSelectedKits = ConcurrentHashMap<UUID, String>() // kit id
+    private val assignedBrawlKits = ConcurrentHashMap<UUID, BrawlKit>()
 
     init {
         event<PlayerQuitEvent> {
             unassignKit(player)
-            playerSelectedKits.remove(player)
+            playerSelectedKits.remove(player.uniqueId)
         }
     }
 
     fun playerSelectKit(player: Player, kit: KitDef) {
-        playerSelectedKits[player] = kit.id
+        playerSelectedKits[player.uniqueId] = kit.id
 
         // Determine if the player should switch kits immediately based on their current minigame
         val currentMinigame = minigameService.getMinigameForPlayer(player)
@@ -56,40 +60,128 @@ object KitService : KoinComponent {
         PlayerSelectKitEvent.call(player, kit, shouldSwitchImmediately)
     }
 
-    fun currentSelectedKitForPlayer(player: Player): KitDef {
-        val kitId = playerSelectedKits[player]
+    fun currentSelectedKitForPlayer(player: OfflinePlayer): KitDef {
+        val kitId = playerSelectedKits[player.uniqueId]
 
         return kitId?.let { dataService.getKit(kitId) } ?: dataService.getKit(defaultKitId())!!
     }
 
-    fun assignKit(player: Player): Result<BrawlKit, AssignKitError> {
-        if (!playerSelectedKits.containsKey(player) || playerSelectedKits[player] == null) {
-            playerSelectedKits[player] = defaultKitId()
+    fun assignKit(player: OfflinePlayer): Result<BrawlKit, AssignKitError> {
+        if (
+            !playerSelectedKits.containsKey(player.uniqueId) ||
+                playerSelectedKits[player.uniqueId] == null
+        ) {
+            playerSelectedKits[player.uniqueId] = defaultKitId()
         }
-        return assignKit(player, playerSelectedKits[player] ?: defaultKitId())
+        return assignKit(player, playerSelectedKits[player.uniqueId] ?: defaultKitId())
     }
 
-    fun assignKit(player: Player, kitId: String): Result<BrawlKit, AssignKitError> {
-        if (assignedBrawlKits.containsKey(player)) {
-            return Err(AssignKitError.PLAYER_HAS_KIT)
+    fun assignKit(player: OfflinePlayer, kitId: String): Result<BrawlKit, AssignKitError> {
+        if (assignedBrawlKits.containsKey(player.uniqueId)) {
+            unassignKit(player)
+        }
+
+        if (!player.isOnline) {
+            return Err(AssignKitError.PLAYER_NOT_ONLINE)
         }
 
         val kitData = dataService.getKit(kitId) ?: dataService.getKit(defaultKitId())!!
 
-        val brawlKit =
-            when (kitData.id) {
-                else -> BrawlKit(kitData.id, player)
+        val brawlKit = BrawlKit(kitData.id, player.player!!)
+
+        assignedBrawlKits[player.uniqueId] = brawlKit
+
+        // Run setup synchronously on the main thread
+        val setupResult =
+            try {
+                if (Bukkit.isPrimaryThread()) {
+                    brawlKit.setup()
+                    true
+                } else {
+                    val future = java.util.concurrent.CompletableFuture<Boolean>()
+                    Bukkit.getScheduler()
+                        .runTask(
+                            plugin,
+                            Runnable {
+                                try {
+                                    brawlKit.setup()
+                                    future.complete(true)
+                                } catch (e: Exception) {
+                                    future.complete(false)
+                                    plugin.logger.warning(
+                                        "Error during kit setup for player ${player.name}: ${e.message}"
+                                    )
+                                }
+                            },
+                        )
+                    future.get()
+                }
+            } catch (e: Exception) {
+                plugin.logger.warning(
+                    "Error during kit setup for player ${player.name}: ${e.message}"
+                )
+                false
             }
 
-        assignedBrawlKits[player] = brawlKit
-        brawlKit.setup()
+        if (!setupResult) {
+            assignedBrawlKits.remove(player.uniqueId)
+            return Err(AssignKitError.SETUP_FAILED)
+        }
+
         return Ok(brawlKit)
     }
 
-    fun unassignKit(player: Player): BrawlKit? {
-        val kit = assignedBrawlKits.remove(player)
+    fun assignKit(player: OfflinePlayer, kit: KitDef) {
+        if (assignedBrawlKits.containsKey(player.uniqueId)) {
+            unassignKit(player)
+        }
+
+        if (player.isOnline) {
+            val brawlKit = BrawlKit(kit.id, player.player!!)
+            assignedBrawlKits[player.uniqueId] = brawlKit
+
+            // Run setup synchronously on the main thread
+            val setupResult =
+                try {
+                    if (Bukkit.isPrimaryThread()) {
+                        brawlKit.setup()
+                        true
+                    } else {
+                        val future = java.util.concurrent.CompletableFuture<Boolean>()
+                        Bukkit.getScheduler()
+                            .runTask(
+                                plugin,
+                                Runnable {
+                                    try {
+                                        brawlKit.setup()
+                                        future.complete(true)
+                                    } catch (e: Exception) {
+                                        future.complete(false)
+                                        plugin.logger.warning(
+                                            "Error during kit setup for player ${player.name}: ${e.message}"
+                                        )
+                                    }
+                                },
+                            )
+                        future.get()
+                    }
+                } catch (e: Exception) {
+                    plugin.logger.warning(
+                        "Error during kit setup for player ${player.name}: ${e.message}"
+                    )
+                    false
+                }
+
+            if (!setupResult) {
+                assignedBrawlKits.remove(player.uniqueId)
+            }
+        }
+    }
+
+    fun unassignKit(player: OfflinePlayer): BrawlKit? {
+        val kit = assignedBrawlKits.remove(player.uniqueId)
         kit?.let { instance ->
-            plugin.launch {
+            val runTeardown = {
                 try {
                     instance.teardown()
                 } catch (e: Exception) {
@@ -98,13 +190,15 @@ object KitService : KoinComponent {
                     )
                 }
             }
+            if (Bukkit.isPrimaryThread()) runTeardown()
+            else Bukkit.getScheduler().runTask(plugin, Runnable { runTeardown() })
         }
         return kit
     }
 
-    fun getKitForPlayer(player: Player): BrawlKit? = assignedBrawlKits[player]
+    fun getKitForPlayer(player: Player): BrawlKit? = assignedBrawlKits[player.uniqueId]
 
-    fun hasKit(player: Player): Boolean = assignedBrawlKits.containsKey(player)
+    fun hasKit(player: Player): Boolean = assignedBrawlKits.containsKey(player.uniqueId)
 
     fun getKitData(id: String): KitDef? {
         return dataService.getKit(id)

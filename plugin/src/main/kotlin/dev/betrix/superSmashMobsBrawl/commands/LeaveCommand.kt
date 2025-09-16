@@ -34,11 +34,14 @@ class LeaveCommand : KoinComponent {
             return
         }
 
+        val currentMinigame = minigameService.getMinigameForPlayer(sender)
         minigameService
-            .handlePlayerLeave(sender)
+            .leaveMinigame(sender)
             .onSuccess {
                 sender.sendMessage(
-                    lang.t("messages.minigames.leave.success") { "minigameId" to it.minigameId }
+                    lang.t("messages.minigames.leave.success") {
+                        "minigameId" to (currentMinigame?.minigameDef?.id ?: "unknown")
+                    }
                 )
                 return
             }

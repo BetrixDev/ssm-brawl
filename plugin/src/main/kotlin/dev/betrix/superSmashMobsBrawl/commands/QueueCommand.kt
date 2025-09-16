@@ -81,12 +81,13 @@ class QueueCommand : KoinComponent {
                 },
                 failure = {
                     // If not in queue, fall back to leaving a running minigame
+                    val currentMinigame = minigameService.getMinigameForPlayer(sender)
                     minigameService
-                        .handlePlayerLeave(sender)
+                        .leaveMinigame(sender)
                         .mapBoth(
                             success = {
                                 lang.t("messages.minigames.leave.success") {
-                                    "minigameId" to it.minigameId
+                                    "minigameId" to (currentMinigame?.minigameDef?.id ?: "unknown")
                                 }
                             },
                             failure = { lang.t("messages.queue.leave.notInQueue") },

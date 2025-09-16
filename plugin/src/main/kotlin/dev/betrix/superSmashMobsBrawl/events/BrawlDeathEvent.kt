@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.events
 
-import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import gg.flyte.twilight.event.TwilightEvent
 import gg.flyte.twilight.event.TwilightListener
 import gg.flyte.twilight.event.event
@@ -20,17 +19,7 @@ class BrawlDeathEvent(val player: Player, val reason: DeathReason) : TwilightEve
             return event
         }
 
-        fun listen(
-            minigame: BrawlMinigame<*>,
-            callback: BrawlDeathEvent.() -> Unit,
-        ): TwilightListener {
-            return event<BrawlDeathEvent> {
-                if (!minigame.isPlayerInMinigame(player)) {
-                    return@event
-                }
-
-                callback()
-            }
-        }
+        fun listen(callback: BrawlDeathEvent.() -> Unit): TwilightListener =
+            event<BrawlDeathEvent> { callback() }
     }
 }

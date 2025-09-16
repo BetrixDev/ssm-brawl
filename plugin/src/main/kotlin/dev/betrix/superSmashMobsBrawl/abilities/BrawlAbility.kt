@@ -38,18 +38,11 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
             ?: throw RuntimeException("No ability found in DataService with id $id")
     }
 
-    protected val minigameData by lazy {
-        val minigameId =
-            minigameService.getMinigameForPlayer(player)?.minigameId ?: return@lazy null
+    protected val minigameData
+        get() = minigameService.getMinigameForPlayer(player)?.minigameDef
 
-        return@lazy dataService.getMinigame(minigameId)
-    }
-
-    protected val kitData by lazy {
-        val kitId = kitService.getKitForPlayer(player)?.id ?: return@lazy null
-
-        return@lazy dataService.getKit(kitId)
-    }
+    protected val kitData
+        get() = kitService.getKitForPlayer(player)?.let { dataService.getKit(it.id) }
 
     private val abilityKey = NamespacedKey(plugin, "abilityId")
 
