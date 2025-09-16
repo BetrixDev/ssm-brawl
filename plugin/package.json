@@ -1,0 +1,11 @@
+{
+  "name": "plugin",
+  "private": true,
+  "scripts": {
+    "dev": "dotenv -e .env -- nodemon --watch src --ext kt,yaml,yml --exec gradlew.bat runServer"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^10.0.0",
+    "nodemon": "^3.1.10"
+  }
+}

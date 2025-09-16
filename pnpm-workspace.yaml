@@ -1,4 +1,4 @@
 packages:
-  - "backend"
-  - "web"
+  - "apps/*"
   - "packages/*"
+  - "plugin"

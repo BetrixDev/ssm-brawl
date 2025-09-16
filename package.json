@@ -8,9 +8,8 @@
     "check-types": "turbo check-types",
     "dev:native": "turbo -F native dev",
     "dev:web": "turbo -F web dev",
-    "dev:backend": "turbo -F backend dev",
-    "build:backend": "turbo -F backend build",
-    "test": "turbo test"
+    "dev:server": "turbo -F @ssmb/backend dev",
+    "dev:setup": "turbo -F @ssmb/backend dev:setup"
   },
   "dependencies": {},
   "devDependencies": {
