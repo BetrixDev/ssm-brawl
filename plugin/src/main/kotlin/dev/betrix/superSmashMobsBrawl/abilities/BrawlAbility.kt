@@ -42,9 +42,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
         get() = minigameService.getMinigameForPlayer(player)?.minigameDef
 
     protected val kitData
-        get() = kitService.getKitForPlayer(player)?.let {
-            dataService.getKit(it.id)
-        }
+        get() = kitService.getKitForPlayer(player)?.let { dataService.getKit(it.id) }
 
     private val abilityKey = NamespacedKey(plugin, "abilityId")
 

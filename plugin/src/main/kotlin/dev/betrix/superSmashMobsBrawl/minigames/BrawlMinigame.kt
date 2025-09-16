@@ -72,15 +72,16 @@ interface ITeleportationHandler {
 
 class DefaultTeleportationHandler(private val minigame: BrawlMinigame) :
     ITeleportationHandler, KoinComponent {
-        private val plugin: SuperSmashMobsBrawl by inject()
+    private val plugin: SuperSmashMobsBrawl by inject()
 
     override fun teleportTeamToStartingLocation(team: MinigameTeam) {
         val world = minigame.worldManager.getWorld() ?: return
         val spawnPoints = world.data.spawnPoints.getEquidistant(team.players.size)
 
-        if (spawnPoints.isEmpty())
-        {
-            plugin.logger.info("World ${world.world.name} has no spawn points defined, teleporting players to spectator area.")
+        if (spawnPoints.isEmpty()) {
+            plugin.logger.info(
+                "World ${world.world.name} has no spawn points defined, teleporting players to spectator area."
+            )
 
             team.players.forEach { player ->
                 if (player.isOnline) {

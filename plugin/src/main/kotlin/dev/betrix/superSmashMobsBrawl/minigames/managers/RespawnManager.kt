@@ -4,7 +4,6 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
-import dev.betrix.superSmashMobsBrawl.events.DeathReason
 import dev.betrix.superSmashMobsBrawl.events.PlayerDeathAnalyticsEvent
 import dev.betrix.superSmashMobsBrawl.events.PlayerRespawnAnalyticsEvent
 import dev.betrix.superSmashMobsBrawl.extensions.getFarthestFromPlayers
@@ -50,20 +49,22 @@ class DefaultRespawnManager(private val minigame: BrawlMinigame) :
 
     override fun initialize(minigame: BrawlMinigame) {
         // Listen for death events
-                listeners.add(
-                        BrawlDeathEvent.listen {
-                                // Only handle deaths for players in this minigame and not already respawning
-                                if (
-                                       minigame.allPlayers().none { it.isOnline && it.player?.uniqueId == player.uniqueId }
-                                        || isRespawning(player)
-                                   ) return@listen
+        listeners.add(
+            BrawlDeathEvent.listen {
+                // Only handle deaths for players in this minigame and not already respawning
+                if (
+                    minigame.allPlayers().none {
+                        it.isOnline && it.player?.uniqueId == player.uniqueId
+                    } || isRespawning(player)
+                )
+                    return@listen
 
-                                // Fire analytics event with the real reason
-                                PlayerDeathAnalyticsEvent(player, reason, minigame).callEvent()
+                // Fire analytics event with the real reason
+                PlayerDeathAnalyticsEvent(player, reason, minigame).callEvent()
 
-                                plugin.launch { handlePlayerDeath(player) }
-                            }
-                            )
+                plugin.launch { handlePlayerDeath(player) }
+            }
+        )
     }
 
     override fun markRespawning(player: OfflinePlayer) {
