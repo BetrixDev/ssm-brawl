@@ -84,25 +84,6 @@ class MinigameService : Manageable(), KoinComponent {
                 handleMinigameSetup(minigameInstance, gameId)
             }
         }
-
-        // Handle player disconnect
-        listeners.add(
-            event<PlayerQuitEvent> {
-                val minigameInstance = getMinigameForPlayer(player) ?: return@event
-                minigameInstance.connectionManager.handlePlayerDisconnect(player)
-            }
-        )
-
-        // Handle player reconnect
-        listeners.add(
-            event<PlayerJoinEvent> {
-                val minigameInstance = inFlightMinigames.find { minigame ->
-                    minigame.allPlayers().any { it.uniqueId == player.uniqueId }
-                } ?: return@event
-
-                minigameInstance.connectionManager.handlePlayerReconnect(player)
-            }
-        )
     }
 
     fun getMinigameData(id: String): MinigameDef? {
