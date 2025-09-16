@@ -3,7 +3,6 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
-import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
 import dev.betrix.superSmashMobsBrawl.extensions.event
 import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
@@ -66,7 +65,10 @@ object KitService : KoinComponent {
     }
 
     fun assignKit(player: OfflinePlayer): Result<BrawlKit, AssignKitError> {
-        if (!playerSelectedKits.containsKey(player.uniqueId) || playerSelectedKits[player.uniqueId] == null) {
+        if (
+            !playerSelectedKits.containsKey(player.uniqueId) ||
+                playerSelectedKits[player.uniqueId] == null
+        ) {
             playerSelectedKits[player.uniqueId] = defaultKitId()
         }
         return assignKit(player, playerSelectedKits[player.uniqueId] ?: defaultKitId())
@@ -104,17 +106,20 @@ object KitService : KoinComponent {
     }
 
     fun unassignKit(player: OfflinePlayer): BrawlKit? {
-               val kit = assignedBrawlKits.remove(player.uniqueId)
-              kit?.let { instance ->
-                       val runTeardown = {
-                                try {
-                                        instance.teardown()
-                                    } catch (e: Exception) {
-                                        plugin.logger.warning("Error during kit teardown for player ${player.name}: ${e.message}")
-                                    }
-                            }
-                        if (Bukkit.isPrimaryThread()) runTeardown() else Bukkit.getScheduler().runTask(plugin, Runnable { runTeardown() })
-                    }
+        val kit = assignedBrawlKits.remove(player.uniqueId)
+        kit?.let { instance ->
+            val runTeardown = {
+                try {
+                    instance.teardown()
+                } catch (e: Exception) {
+                    plugin.logger.warning(
+                        "Error during kit teardown for player ${player.name}: ${e.message}"
+                    )
+                }
+            }
+            if (Bukkit.isPrimaryThread()) runTeardown()
+            else Bukkit.getScheduler().runTask(plugin, Runnable { runTeardown() })
+        }
         return kit
     }
 

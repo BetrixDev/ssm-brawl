@@ -16,8 +16,6 @@ import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.repeatingTask
 import java.util.UUID
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -58,7 +56,8 @@ class MinigameService : Manageable(), KoinComponent {
                         val playersPerTeam = minigameDef.playersPerTeam
                         val amountOfTeams = minigameDef.amountOfTeams
 
-                        players.chunked(playersPerTeam).take(amountOfTeams).mapIndexed { idx, chunk ->
+                        players.chunked(playersPerTeam).take(amountOfTeams).mapIndexed { idx, chunk
+                            ->
                             MinigameTeam(chunk, name = "Team ${idx + 1}")
                         }
                     }

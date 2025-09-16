@@ -46,12 +46,11 @@ class DefaultWorldManager : Manageable(), IWorldManager, KoinComponent {
 
         val selectedMap =
             validMaps.randomOrNull()
-                ?: return Err(
-                    RuntimeException("No valid maps found for ${minigameDef.id}")
-                )
+                ?: return Err(RuntimeException("No valid maps found for ${minigameDef.id}"))
 
         try {
-            val result = worldService.copyAndLoadWorld(selectedMap, gameId).map { it as BrawlGameWorld }
+            val result =
+                worldService.copyAndLoadWorld(selectedMap, gameId).map { it as BrawlGameWorld }
             result.map { loaded -> brawlWorld = loaded }
             return result
         } catch (e: Exception) {
