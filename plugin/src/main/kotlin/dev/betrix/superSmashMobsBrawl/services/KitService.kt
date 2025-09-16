@@ -28,6 +28,7 @@ import org.koin.core.component.inject
 
 enum class AssignKitError {
     PLAYER_HAS_KIT,
+    PLAYER_NOT_ONLINE,
     SETUP_FAILED,
 }
 
@@ -81,15 +82,12 @@ object KitService : KoinComponent {
         }
 
         if (!player.isOnline) {
-            return Err(AssignKitError.PLAYER_HAS_KIT) // Player must be online to assign kit
+            return Err(AssignKitError.PLAYER_NOT_ONLINE)
         }
 
         val kitData = dataService.getKit(kitId) ?: dataService.getKit(defaultKitId())!!
 
-        val brawlKit =
-            when (kitData.id) {
-                else -> BrawlKit(kitData.id, player.player!!)
-            }
+        val brawlKit = BrawlKit(kitData.id, player.player!!)
 
         assignedBrawlKits[player.uniqueId] = brawlKit
 

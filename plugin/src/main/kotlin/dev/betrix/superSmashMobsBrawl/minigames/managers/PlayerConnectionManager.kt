@@ -49,7 +49,11 @@ class DefaultPlayerConnectionManager : Manageable(), IPlayerConnectionManager {
         )
 
         // Listen for player reconnect events
-        listeners.add(event<PlayerJoinEvent> { handlePlayerReconnect(player) })
+        listeners.add(event<PlayerJoinEvent> {
+            if (disconnected.contains(player.uniqueId)) {
+                handlePlayerReconnect(player)
+            }
+        })
     }
 
     override fun markDisconnected(player: OfflinePlayer) {
@@ -123,6 +127,10 @@ class DefaultPlayerConnectionManager : Manageable(), IPlayerConnectionManager {
             (minigame.kitHandler as? IKitHandler)?.assignKitToPlayer(player)
             player.gameMode = GameMode.SURVIVAL
         }
+
+                // Clear leave flag and mark reconnected
+                hasLeft.remove(player.uniqueId)
+                markReconnected(player)
 
         return true
     }

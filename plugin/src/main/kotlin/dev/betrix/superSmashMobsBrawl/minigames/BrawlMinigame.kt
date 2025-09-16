@@ -30,6 +30,7 @@ import dev.betrix.superSmashMobsBrawl.minigames.managers.IScoreboardManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.ITeamManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.IWorldManager
 import dev.betrix.superSmashMobsBrawl.minigames.managers.TeamBasedStocksObjectiveManager
+import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
 import dev.betrix.superSmashMobsBrawl.models.brawlData.FfaMinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitSwitchingMode
@@ -103,7 +104,9 @@ class DefaultTeleportationHandler(private val minigame: BrawlMinigame) :
                         ?.setItemInOffHand(
                             org.bukkit.inventory.ItemStack.of(org.bukkit.Material.AIR)
                         )
-                } catch (_: Throwable) {}
+                } catch (e: Exception) {
+                    plugin.logger.fine("Offhand clear failed for ${player.name}: ${e.message}")
+                }
             }
         }
     }
@@ -128,7 +131,15 @@ class DefaultTeleportationHandler(private val minigame: BrawlMinigame) :
             val spawnPoint =
                 world.data.spawnPoints.getFarthestFromPlayers(activePlayers, world.world)
                     ?: world.data.spawnPoints.firstOrNull()
-                    ?: return
+                    ?: run {
+                        plugin.logger.warning(
+                            "World ${world.world.name} has no spawn points defined, teleporting to world spawn."
+                        )
+
+                        SpawnPoint(world.world.spawnLocation.x,
+                            world.world.spawnLocation.y,
+                            world.world.spawnLocation.z)
+                    }
 
             bukkitPlayer.teleport(world.world.location(spawnPoint))
         }
@@ -154,7 +165,13 @@ class DefaultKitHandler(private val minigame: BrawlMinigame) : IKitHandler, Koin
             .toMap()
 
     override fun assignKitToPlayer(player: OfflinePlayer) {
-        kitService.assignKit(player, initialPlayerKits[player.uniqueId]!!)
+        val kit = initialPlayerKits[player.uniqueId]
+
+        if (kit != null) {
+            kitService.assignKit(player, kit)
+        } else {
+            kitService.assignKit(player)
+        }
     }
 
     override fun removeKitFromPlayer(player: OfflinePlayer) {
@@ -189,12 +206,9 @@ class KitHandlerWithSwitchingAfterDeath(private val minigame: BrawlMinigame) :
     }
 }
 
-interface ICombatHandler {}
-
 class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>) :
     Manageable(), KoinComponent {
 
-    private val langService: LangService by inject()
     private var state: MinigameState = MinigameState.PREFLIGHT
     private var gameStartTime: kotlin.time.TimeSource.Monotonic.ValueTimeMark? = null
 
@@ -271,7 +285,6 @@ class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>)
         }
 
         state = MinigameState.STARTING
-        gameStartTime = kotlin.time.TimeSource.Monotonic.markNow()
     }
 
     private fun setupKitSwitchingEvents() {
@@ -341,5 +354,7 @@ class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>)
         (objectiveManager as? Manageable)?.teardown()
         (environmentProtectionManager as? Manageable)?.teardown()
         (worldManager as? Manageable)?.teardown()
+        (countdownManager as? Manageable)?.teardown()
+        (teamManager as? Manageable)?.teardown()
     }
 }

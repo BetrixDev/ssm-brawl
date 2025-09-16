@@ -40,6 +40,12 @@ class DefaultCountdownManager(private val minigame: BrawlMinigame) :
         currentCountdown?.cancel()
         currentCountdown = null
 
+        if (seconds == 0) {
+            // No countdown needed, just complete immediately
+            onComplete()
+            return null
+        }
+
         // Create new countdown task
         var remainingSeconds = seconds
         val countdownTask =
