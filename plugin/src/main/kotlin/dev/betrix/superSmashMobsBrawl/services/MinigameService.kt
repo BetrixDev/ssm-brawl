@@ -58,11 +58,8 @@ class MinigameService : Manageable(), KoinComponent {
                         val playersPerTeam = minigameDef.playersPerTeam
                         val amountOfTeams = minigameDef.amountOfTeams
 
-                        (0 until amountOfTeams).map { teamIndex ->
-                            val startIndex = teamIndex * playersPerTeam
-                            val endIndex = startIndex + playersPerTeam
-                            val teamPlayers = players.subList(startIndex, endIndex)
-                            MinigameTeam(teamPlayers, name = "Team ${teamIndex + 1}")
+                        players.chunked(playersPerTeam).take(amountOfTeams).mapIndexed { idx, chunk ->
+                            MinigameTeam(chunk, name = "Team ${idx + 1}")
                         }
                     }
 
