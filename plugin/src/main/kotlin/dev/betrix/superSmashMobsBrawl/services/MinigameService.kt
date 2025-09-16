@@ -157,7 +157,7 @@ class MinigameService : Manageable(), KoinComponent {
             return Err(MinigameLeaveError.HubNotReady)
         }
 
-        minigame.connectionManager.handlePlayerLeave(player)
+        minigame.connectionManager.handlePlayerLeave(player, "manual")
 
         return Ok(Unit)
     }

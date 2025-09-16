@@ -1,6 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.minigames
 
 import dev.betrix.superSmashMobsBrawl.Manageable
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.MinigameEndAnalyticsEvent
 import dev.betrix.superSmashMobsBrawl.events.PlayerJoinMinigameAnalyticsEvent
 import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
@@ -71,9 +72,23 @@ interface ITeleportationHandler {
 
 class DefaultTeleportationHandler(private val minigame: BrawlMinigame) :
     ITeleportationHandler, KoinComponent {
+        private val plugin: SuperSmashMobsBrawl by inject()
+
     override fun teleportTeamToStartingLocation(team: MinigameTeam) {
         val world = minigame.worldManager.getWorld() ?: return
         val spawnPoints = world.data.spawnPoints.getEquidistant(team.players.size)
+
+        if (spawnPoints.isEmpty())
+        {
+            plugin.logger.info("World ${world.world.name} has no spawn points defined, teleporting players to spectator area.")
+
+            team.players.forEach { player ->
+                if (player.isOnline) {
+                    player.player?.teleport(world.data.spectatorSpawnPoint)
+                }
+            }
+            return
+        }
 
         team.players.forEachIndexed { index, player ->
             if (player.isOnline) {
@@ -305,6 +320,13 @@ class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>)
         // TODO: Show victory screen, handle rewards, etc.
 
         state = MinigameState.ENDED
+
+        allPlayers().forEach { player ->
+            if (player.isOnline) {
+                kitHandler.removeKitFromPlayer(player)
+            }
+        }
+
         teardown()
     }
 

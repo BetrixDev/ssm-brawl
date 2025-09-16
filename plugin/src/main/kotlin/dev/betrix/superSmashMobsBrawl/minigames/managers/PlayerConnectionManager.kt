@@ -22,7 +22,7 @@ interface IPlayerConnectionManager {
 
     fun isDisconnected(player: OfflinePlayer): Boolean
 
-    fun handlePlayerLeave(player: Player)
+    fun handlePlayerLeave(player: Player, reason: String = "manual")
 
     fun handlePlayerDisconnect(player: Player)
 
@@ -33,6 +33,7 @@ interface IPlayerConnectionManager {
 
 class DefaultPlayerConnectionManager : Manageable(), IPlayerConnectionManager {
     private val disconnected = mutableSetOf<java.util.UUID>()
+    private val hasLeft = mutableSetOf<java.util.UUID>()
     private lateinit var minigame: BrawlMinigame
 
     override fun initialize(minigame: BrawlMinigame) {
@@ -66,17 +67,23 @@ class DefaultPlayerConnectionManager : Manageable(), IPlayerConnectionManager {
         return true // Default implementation allows leaving
     }
 
-    override fun handlePlayerLeave(player: Player) {
-        // Fire analytics event
-        PlayerLeaveMinigameAnalyticsEvent(player, minigame, "manual").callEvent()
+    override fun handlePlayerLeave(player: Player, reason: String) {
+        // Early return if player has already left (idempotent)
+        if (hasLeft.contains(player.uniqueId)) {
+            return
+        }
+
+        // Mark as left immediately to prevent re-entry
+        hasLeft.add(player.uniqueId)
+
+        // Fire analytics event with provided reason
+        PlayerLeaveMinigameAnalyticsEvent(player, minigame, reason).callEvent()
 
         // Remove kit
         (minigame.kitHandler as? IKitHandler)?.removeKitFromPlayer(player)
 
         // Mark as disconnected
-        if (!isDisconnected(player)) {
-            markDisconnected(player)
-        }
+        markDisconnected(player)
 
         // Clean up respawning state if player leaves while respawning
         minigame.respawnManager.clearRespawning(player)
@@ -88,9 +95,8 @@ class DefaultPlayerConnectionManager : Manageable(), IPlayerConnectionManager {
     override fun handlePlayerDisconnect(player: Player) {
         if (!isPlayerInMinigame(player)) return
 
-        markDisconnected(player)
-        handlePlayerLeave(player)
-        checkAndHandleMinigameEnd()
+        // handlePlayerLeave will handle marking as disconnected and checking minigame end
+        handlePlayerLeave(player, "disconnect")
     }
 
     override fun handlePlayerReconnect(player: Player): Boolean {
@@ -150,5 +156,6 @@ class DefaultPlayerConnectionManager : Manageable(), IPlayerConnectionManager {
     override fun teardown() {
         super.teardown()
         disconnected.clear()
+        hasLeft.clear()
     }
 }

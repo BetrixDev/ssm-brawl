@@ -27,7 +27,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 enum class AssignKitError {
-    PLAYER_HAS_KIT
+    PLAYER_HAS_KIT,
+    SETUP_FAILED
 }
 
 object KitService : KoinComponent {
@@ -91,7 +92,39 @@ object KitService : KoinComponent {
             }
 
         assignedBrawlKits[player.uniqueId] = brawlKit
-        brawlKit.setup()
+        
+        // Run setup synchronously on the main thread
+        val setupResult = try {
+            if (Bukkit.isPrimaryThread()) {
+                brawlKit.setup()
+                true
+            } else {
+                val future = java.util.concurrent.CompletableFuture<Boolean>()
+                Bukkit.getScheduler().runTask(plugin, Runnable {
+                    try {
+                        brawlKit.setup()
+                        future.complete(true)
+                    } catch (e: Exception) {
+                        future.complete(false)
+                        plugin.logger.warning(
+                            "Error during kit setup for player ${player.name}: ${e.message}"
+                        )
+                    }
+                })
+                future.get()
+            }
+        } catch (e: Exception) {
+            plugin.logger.warning(
+                "Error during kit setup for player ${player.name}: ${e.message}"
+            )
+            false
+        }
+        
+        if (!setupResult) {
+            assignedBrawlKits.remove(player.uniqueId)
+            return Err(AssignKitError.SETUP_FAILED)
+        }
+        
         return Ok(brawlKit)
     }
 
@@ -101,7 +134,39 @@ object KitService : KoinComponent {
         }
 
         if (player.isOnline) {
-            assignedBrawlKits[player.uniqueId] = BrawlKit(kit.id, player.player!!).apply { setup() }
+            val brawlKit = BrawlKit(kit.id, player.player!!)
+            assignedBrawlKits[player.uniqueId] = brawlKit
+            
+            // Run setup synchronously on the main thread
+            val setupResult = try {
+                if (Bukkit.isPrimaryThread()) {
+                    brawlKit.setup()
+                    true
+                } else {
+                    val future = java.util.concurrent.CompletableFuture<Boolean>()
+                    Bukkit.getScheduler().runTask(plugin, Runnable {
+                        try {
+                            brawlKit.setup()
+                            future.complete(true)
+                        } catch (e: Exception) {
+                            future.complete(false)
+                            plugin.logger.warning(
+                                "Error during kit setup for player ${player.name}: ${e.message}"
+                            )
+                        }
+                    })
+                    future.get()
+                }
+            } catch (e: Exception) {
+                plugin.logger.warning(
+                    "Error during kit setup for player ${player.name}: ${e.message}"
+                )
+                false
+            }
+            
+            if (!setupResult) {
+                assignedBrawlKits.remove(player.uniqueId)
+            }
         }
     }
 

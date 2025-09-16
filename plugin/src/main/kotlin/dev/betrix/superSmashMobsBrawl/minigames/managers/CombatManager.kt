@@ -58,6 +58,11 @@ class DefaultCombatManager : Manageable(), ICombatManager, KoinComponent {
                 // Fire analytics event
                 val attackerPlayer =
                     (damager as? Damager.DamagerLivingEntity)?.livingEntity as? Player
+
+                if (attackerPlayer != null && !isPlayerInMinigame(attackerPlayer)) {
+                    return@event
+                }
+
                 PlayerDamageAnalyticsEvent(
                         victimPlayer,
                         attackerPlayer,

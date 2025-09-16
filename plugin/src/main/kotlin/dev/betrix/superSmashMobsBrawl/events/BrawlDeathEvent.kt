@@ -19,8 +19,7 @@ class BrawlDeathEvent(val player: Player, val reason: DeathReason) : TwilightEve
             return event
         }
 
-        fun listen(listener: Any, callback: BrawlDeathEvent.() -> Unit): TwilightListener {
-            return event<BrawlDeathEvent> { callback() }
-        }
+        fun listen(callback: BrawlDeathEvent.() -> Unit): TwilightListener =
+            event<BrawlDeathEvent> { callback() }
     }
 }
