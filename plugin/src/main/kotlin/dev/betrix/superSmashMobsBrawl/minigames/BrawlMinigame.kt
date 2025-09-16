@@ -37,7 +37,6 @@ import dev.betrix.superSmashMobsBrawl.models.brawlData.KitSwitchingMode
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.TeamBasedStocksMinigameDef
 import dev.betrix.superSmashMobsBrawl.services.KitService
-import dev.betrix.superSmashMobsBrawl.services.LangService
 import gg.flyte.twilight.event.event
 import java.util.UUID
 import org.bukkit.OfflinePlayer
@@ -136,9 +135,11 @@ class DefaultTeleportationHandler(private val minigame: BrawlMinigame) :
                             "World ${world.world.name} has no spawn points defined, teleporting to world spawn."
                         )
 
-                        SpawnPoint(world.world.spawnLocation.x,
+                        SpawnPoint(
+                            world.world.spawnLocation.x,
                             world.world.spawnLocation.y,
-                            world.world.spawnLocation.z)
+                            world.world.spawnLocation.z,
+                        )
                     }
 
             bukkitPlayer.teleport(world.world.location(spawnPoint))

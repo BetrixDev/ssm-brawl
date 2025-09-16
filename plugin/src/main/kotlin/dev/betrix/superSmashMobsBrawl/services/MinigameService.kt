@@ -97,28 +97,26 @@ class MinigameService : Manageable(), KoinComponent {
         return getAllMinigameData().find { it.id.contains(id, ignoreCase = true) }
     }
 
-        private suspend fun handleMinigameSetup(minigameInstance: BrawlMinigame, gameId: String) {
-                // Register early so /leave and connectionManager can resolve this instance during setup.
-                inFlightMinigames.add(minigameInstance)
-                val minigameSetupResult = resultRunCatching {
-                       minigameInstance.setup(gameId)
-                        minigameInstance.startGame()
+    private suspend fun handleMinigameSetup(minigameInstance: BrawlMinigame, gameId: String) {
+        // Register early so /leave and connectionManager can resolve this instance during setup.
+        inFlightMinigames.add(minigameInstance)
+        val minigameSetupResult = resultRunCatching {
+            minigameInstance.setup(gameId)
+            minigameInstance.startGame()
+        }
+        minigameSetupResult
+            .onSuccess { plugin.logger.info("Started minigame ${minigameInstance.minigameDef.id}") }
+            .onFailure { err ->
+                plugin.logger.severe("Failed to setup minigame: $err")
+                minigameInstance.allPlayers().forEach { player ->
+                    if (player.isOnline) {
+                        hubService.teleportToDefaultHub(player.player!!)
                     }
-                minigameSetupResult
-                    .onSuccess {
-                            plugin.logger.info("Started minigame ${minigameInstance.minigameDef.id}")
-                        }
-                    .onFailure { err ->
-                            plugin.logger.severe("Failed to setup minigame: $err")
-                           minigameInstance.allPlayers().forEach { player ->
-                                   if (player.isOnline) {
-                                            hubService.teleportToDefaultHub(player.player!!)
-                                        }
-                               }
-                            minigameInstance.teardown()
-                            inFlightMinigames.remove(minigameInstance)
-                        }
+                }
+                minigameInstance.teardown()
+                inFlightMinigames.remove(minigameInstance)
             }
+    }
 
     fun removeMinigameInstance(minigameInstance: BrawlMinigame): Boolean {
         return inFlightMinigames.remove(minigameInstance)
@@ -127,9 +125,7 @@ class MinigameService : Manageable(), KoinComponent {
     fun getMinigameForPlayer(player: Player): BrawlMinigame? {
         return inFlightMinigames.find { minigame ->
             minigame.getState() != MinigameState.ENDED &&
-                minigame.allPlayers().any {
-                    it.uniqueId == player.uniqueId
-                } &&
+                minigame.allPlayers().any { it.uniqueId == player.uniqueId } &&
                 !minigame.connectionManager.isDisconnected(player)
         }
     }
