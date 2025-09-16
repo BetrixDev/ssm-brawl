@@ -41,7 +41,7 @@ class FfaGameObjectiveManager : Manageable(), IGameObjectiveManager {
 
         // Listen for death events to check win conditions
         listeners.add(
-            BrawlDeathEvent.listen(this) {
+            BrawlDeathEvent.listen {
                 if (isPlayerInMinigame(player)) {
                     recordDeath(player)
                 }
@@ -110,7 +110,7 @@ class TeamBasedStocksObjectiveManager : Manageable(), IGameObjectiveManager {
 
         // Listen for death events to reduce stocks
         listeners.add(
-            BrawlDeathEvent.listen(this) {
+            BrawlDeathEvent.listen {
                 if (isPlayerInMinigame(player)) {
                     recordDeath(player)
                 }
