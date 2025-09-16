@@ -13,6 +13,7 @@ import gg.flyte.twilight.event.event
 import gg.flyte.twilight.gui.GUI.Companion.openInventory
 import gg.flyte.twilight.gui.gui
 import io.papermc.paper.datacomponent.DataComponentTypes
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -36,18 +37,18 @@ object KitService : KoinComponent {
     private val dataService: DataService by inject()
     private val minigameService: MinigameService by inject()
 
-    private val playerSelectedKits = ConcurrentHashMap<OfflinePlayer, String>() // kit id
-    private val assignedBrawlKits = ConcurrentHashMap<OfflinePlayer, BrawlKit>()
+    private val playerSelectedKits = ConcurrentHashMap<UUID, String>() // kit id
+    private val assignedBrawlKits = ConcurrentHashMap<UUID, BrawlKit>()
 
     init {
         event<PlayerQuitEvent> {
             unassignKit(player)
-            playerSelectedKits.remove(player)
+            playerSelectedKits.remove(player.uniqueId)
         }
     }
 
     fun playerSelectKit(player: Player, kit: KitDef) {
-        playerSelectedKits[player] = kit.id
+        playerSelectedKits[player.uniqueId] = kit.id
 
         // Determine if the player should switch kits immediately based on their current minigame
         val currentMinigame = minigameService.getMinigameForPlayer(player)
@@ -59,20 +60,20 @@ object KitService : KoinComponent {
     }
 
     fun currentSelectedKitForPlayer(player: OfflinePlayer): KitDef {
-        val kitId = playerSelectedKits[player]
+        val kitId = playerSelectedKits[player.uniqueId]
 
         return kitId?.let { dataService.getKit(kitId) } ?: dataService.getKit(defaultKitId())!!
     }
 
     fun assignKit(player: OfflinePlayer): Result<BrawlKit, AssignKitError> {
-        if (!playerSelectedKits.containsKey(player) || playerSelectedKits[player] == null) {
-            playerSelectedKits[player] = defaultKitId()
+        if (!playerSelectedKits.containsKey(player.uniqueId) || playerSelectedKits[player.uniqueId] == null) {
+            playerSelectedKits[player.uniqueId] = defaultKitId()
         }
-        return assignKit(player, playerSelectedKits[player] ?: defaultKitId())
+        return assignKit(player, playerSelectedKits[player.uniqueId] ?: defaultKitId())
     }
 
     fun assignKit(player: OfflinePlayer, kitId: String): Result<BrawlKit, AssignKitError> {
-        if (assignedBrawlKits.containsKey(player)) {
+        if (assignedBrawlKits.containsKey(player.uniqueId)) {
             unassignKit(player)
         }
 
@@ -87,23 +88,23 @@ object KitService : KoinComponent {
                 else -> BrawlKit(kitData.id, player.player!!)
             }
 
-        assignedBrawlKits[player] = brawlKit
+        assignedBrawlKits[player.uniqueId] = brawlKit
         brawlKit.setup()
         return Ok(brawlKit)
     }
 
     fun assignKit(player: OfflinePlayer, kit: KitDef) {
-        if (assignedBrawlKits.containsKey(player)) {
+        if (assignedBrawlKits.containsKey(player.uniqueId)) {
             unassignKit(player)
         }
 
         if (player.isOnline) {
-            assignedBrawlKits[player] = BrawlKit(kit.id, player.player!!).apply { setup() }
+            assignedBrawlKits[player.uniqueId] = BrawlKit(kit.id, player.player!!).apply { setup() }
         }
     }
 
     fun unassignKit(player: OfflinePlayer): BrawlKit? {
-               val kit = assignedBrawlKits.remove(player)
+               val kit = assignedBrawlKits.remove(player.uniqueId)
               kit?.let { instance ->
                        val runTeardown = {
                                 try {
@@ -117,9 +118,9 @@ object KitService : KoinComponent {
         return kit
     }
 
-    fun getKitForPlayer(player: Player): BrawlKit? = assignedBrawlKits[player]
+    fun getKitForPlayer(player: Player): BrawlKit? = assignedBrawlKits[player.uniqueId]
 
-    fun hasKit(player: Player): Boolean = assignedBrawlKits.containsKey(player)
+    fun hasKit(player: Player): Boolean = assignedBrawlKits.containsKey(player.uniqueId)
 
     fun getKitData(id: String): KitDef? {
         return dataService.getKit(id)
