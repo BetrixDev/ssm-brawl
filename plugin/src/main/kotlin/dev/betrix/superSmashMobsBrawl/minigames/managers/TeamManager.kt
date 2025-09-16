@@ -20,6 +20,7 @@ class DefaultTeamManager : Manageable(), ITeamManager {
     private var teams: List<dev.betrix.superSmashMobsBrawl.minigames.MinigameTeam> = emptyList()
 
     override fun registerTeams(minigame: BrawlMinigame) {
+        playerToTeam.clear()
         teams = minigame.teams
         teams.forEach { team -> team.players.forEach { p -> playerToTeam[p.uniqueId] = team } }
     }
