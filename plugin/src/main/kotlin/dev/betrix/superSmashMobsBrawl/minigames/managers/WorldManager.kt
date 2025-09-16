@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.minigames.managers
 
+import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.map
 import dev.betrix.superSmashMobsBrawl.Manageable
@@ -45,13 +46,17 @@ class DefaultWorldManager : Manageable(), IWorldManager, KoinComponent {
 
         val selectedMap =
             validMaps.randomOrNull()
-                ?: return com.github.michaelbull.result.Err(
+                ?: return Err(
                     RuntimeException("No valid maps found for ${minigameDef.id}")
                 )
 
-        val result = worldService.copyAndLoadWorld(selectedMap, gameId).map { it as BrawlGameWorld }
-        result.map { loaded -> brawlWorld = loaded }
-        return result
+        try {
+            val result = worldService.copyAndLoadWorld(selectedMap, gameId).map { it as BrawlGameWorld }
+            result.map { loaded -> brawlWorld = loaded }
+            return result
+        } catch (e: Exception) {
+            return Err(e)
+        }
     }
 
     override fun getWorld(): BrawlGameWorld? = brawlWorld
