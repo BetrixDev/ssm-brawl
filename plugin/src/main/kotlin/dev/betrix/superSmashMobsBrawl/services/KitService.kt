@@ -15,6 +15,7 @@ import gg.flyte.twilight.gui.gui
 import io.papermc.paper.datacomponent.DataComponentTypes
 import java.util.concurrent.ConcurrentHashMap
 import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.Sound
@@ -102,18 +103,17 @@ object KitService : KoinComponent {
     }
 
     fun unassignKit(player: OfflinePlayer): BrawlKit? {
-        val kit = assignedBrawlKits.remove(player)
-        kit?.let { instance ->
-            plugin.launch {
-                try {
-                    instance.teardown()
-                } catch (e: Exception) {
-                    plugin.logger.warning(
-                        "Error during kit teardown for player ${player.name}: ${e.message}"
-                    )
-                }
-            }
-        }
+               val kit = assignedBrawlKits.remove(player)
+              kit?.let { instance ->
+                       val runTeardown = {
+                                try {
+                                        instance.teardown()
+                                    } catch (e: Exception) {
+                                        plugin.logger.warning("Error during kit teardown for player ${player.name}: ${e.message}")
+                                    }
+                            }
+                        if (Bukkit.isPrimaryThread()) runTeardown() else Bukkit.getScheduler().runTask(plugin, Runnable { runTeardown() })
+                    }
         return kit
     }
 
