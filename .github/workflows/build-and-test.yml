@@ -3,11 +3,17 @@ name: Build and Test
 on:
   push:
     branches: ["**"]
+  pull_request:
+    branches: ["**"]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  concurrency:
+    group: build-and-test-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
   build-and-test:
     runs-on: ubuntu-latest
     steps:
@@ -39,4 +45,3 @@ jobs:
 
       - name: Test
         run: pnpm run test
-

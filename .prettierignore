@@ -3,3 +3,4 @@ plugin
 **/*.gen.ts
 pnpm*.yaml
 dist
+.next
