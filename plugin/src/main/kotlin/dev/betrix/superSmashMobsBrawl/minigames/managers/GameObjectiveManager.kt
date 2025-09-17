@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.minigames.managers
 
+import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
@@ -16,29 +17,22 @@ sealed class WinResult {
     data class WinningTeam(val team: MinigameTeam) : WinResult()
 }
 
-interface IGameObjectiveManager {
-    fun initialize(minigame: BrawlMinigame)
-
+interface IGameObjectiveManager : IManageable {
     fun recordDeath(player: OfflinePlayer)
 
     fun checkWinCondition(): WinResult
 }
 
-class DefaultGameObjectiveManager : Manageable(), IGameObjectiveManager {
-    override fun initialize(minigame: BrawlMinigame) {}
-
+class DefaultGameObjectiveManager(private val minigame: BrawlMinigame) : Manageable(), IGameObjectiveManager {
     override fun recordDeath(player: OfflinePlayer) {}
 
     override fun checkWinCondition(): WinResult = WinResult.None
 }
 
 /** FFA minigame objective manager - last player standing wins */
-class FfaGameObjectiveManager : Manageable(), IGameObjectiveManager {
-    private lateinit var minigame: BrawlMinigame
+class FfaGameObjectiveManager(private val minigame: BrawlMinigame) : Manageable(), IGameObjectiveManager {
 
-    override fun initialize(minigame: BrawlMinigame) {
-        this.minigame = minigame
-
+    override fun setup() {
         // Listen for death events to check win conditions
         listeners.add(
             BrawlDeathEvent.listen {
@@ -86,12 +80,8 @@ class FfaGameObjectiveManager : Manageable(), IGameObjectiveManager {
 }
 
 /** Team-based stocks minigame objective manager - teams have lives/stocks */
-class TeamBasedStocksObjectiveManager : Manageable(), IGameObjectiveManager {
-    private lateinit var minigame: BrawlMinigame
-
-    override fun initialize(minigame: BrawlMinigame) {
-        this.minigame = minigame
-
+class TeamBasedStocksObjectiveManager(private val minigame: BrawlMinigame) : Manageable(), IGameObjectiveManager {
+    override fun setup() {
         // Initialize team stocks from minigame definition
         val stocksAmount =
             minigame.minigameDef.let { def ->
@@ -156,12 +146,10 @@ class TeamBasedStocksObjectiveManager : Manageable(), IGameObjectiveManager {
 }
 
 /** Parkour minigame objective manager - first to finish wins */
-class ParkourObjectiveManager : Manageable(), IGameObjectiveManager {
-    private lateinit var minigame: BrawlMinigame
+class ParkourObjectiveManager(private val minigame: BrawlMinigame) : Manageable(), IGameObjectiveManager {
     private val finishedPlayers = mutableSetOf<java.util.UUID>()
 
-    override fun initialize(minigame: BrawlMinigame) {
-        this.minigame = minigame
+    override fun setup() {
         // Future: Listen for checkpoint/finish line events
     }
 

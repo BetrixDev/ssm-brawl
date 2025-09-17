@@ -1,6 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.minigames.managers
 
 import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
@@ -9,7 +10,7 @@ import dev.betrix.superSmashMobsBrawl.events.PlayerRespawnAnalyticsEvent
 import dev.betrix.superSmashMobsBrawl.extensions.getFarthestFromPlayers
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import dev.betrix.superSmashMobsBrawl.minigames.IKitHandler
-import dev.betrix.superSmashMobsBrawl.minigames.ITeleportationHandler
+import dev.betrix.superSmashMobsBrawl.minigames.ITeleportationManager
 import dev.betrix.superSmashMobsBrawl.models.SpawnPoint
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import gg.flyte.twilight.extension.feed
@@ -27,9 +28,7 @@ import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-interface IRespawnManager {
-    fun initialize(minigame: BrawlMinigame)
-
+interface IRespawnManager : IManageable {
     fun markRespawning(player: OfflinePlayer)
 
     fun clearRespawning(player: OfflinePlayer)
@@ -47,7 +46,7 @@ class DefaultRespawnManager(private val minigame: BrawlMinigame) :
 
     private val respawning = mutableSetOf<java.util.UUID>()
 
-    override fun initialize(minigame: BrawlMinigame) {
+    override fun setup() {
         // Listen for death events
         listeners.add(
             BrawlDeathEvent.listen {
@@ -99,7 +98,7 @@ class DefaultRespawnManager(private val minigame: BrawlMinigame) :
             // Teleport to spectator area
             val world = minigame.worldManager.getWorld()
             if (world != null) {
-                (minigame.teleportationHandler as? ITeleportationHandler)
+                (minigame.teleportationManager as? ITeleportationManager)
                     ?.teleportPlayerToSpectatorArea(player)
             }
 
@@ -176,7 +175,7 @@ class DefaultRespawnManager(private val minigame: BrawlMinigame) :
                 ?: SpawnPoint(0.0, 100.0, 0.0)
 
         // Teleport and restore player
-        (minigame.teleportationHandler as? ITeleportationHandler)?.teleportPlayerRandomSpawnPoint(
+        (minigame.teleportationManager as? ITeleportationManager)?.teleportPlayerRandomSpawnPoint(
             player
         )
         player.feed()

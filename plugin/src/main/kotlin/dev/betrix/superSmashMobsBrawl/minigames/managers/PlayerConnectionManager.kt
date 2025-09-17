@@ -1,10 +1,11 @@
 package dev.betrix.superSmashMobsBrawl.minigames.managers
 
+import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.events.PlayerLeaveMinigameAnalyticsEvent
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import dev.betrix.superSmashMobsBrawl.minigames.IKitHandler
-import dev.betrix.superSmashMobsBrawl.minigames.ITeleportationHandler
+import dev.betrix.superSmashMobsBrawl.minigames.ITeleportationManager
 import dev.betrix.superSmashMobsBrawl.minigames.MinigameState
 import gg.flyte.twilight.event.event
 import org.bukkit.GameMode
@@ -13,9 +14,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
-interface IPlayerConnectionManager {
-    fun initialize(minigame: BrawlMinigame)
-
+interface IPlayerConnectionManager : IManageable {
     fun markDisconnected(player: OfflinePlayer)
 
     fun markReconnected(player: OfflinePlayer)
@@ -31,13 +30,11 @@ interface IPlayerConnectionManager {
     fun canPlayerLeaveMinigame(player: Player): Boolean
 }
 
-class DefaultPlayerConnectionManager : Manageable(), IPlayerConnectionManager {
+class DefaultPlayerConnectionManager(private val minigame: BrawlMinigame) : Manageable(), IPlayerConnectionManager {
     private val disconnected = mutableSetOf<java.util.UUID>()
     private val hasLeft = mutableSetOf<java.util.UUID>()
-    private lateinit var minigame: BrawlMinigame
 
-    override fun initialize(minigame: BrawlMinigame) {
-        this.minigame = minigame
+    override fun setup() {
 
         // Listen for player disconnect events
         listeners.add(
@@ -124,7 +121,7 @@ class DefaultPlayerConnectionManager : Manageable(), IPlayerConnectionManager {
         // Teleport player back to the minigame world
         val world = minigame.worldManager.getWorld()
         if (world != null) {
-            (minigame.teleportationHandler as? ITeleportationHandler)
+            (minigame.teleportationManager as? ITeleportationManager)
                 ?.teleportPlayerRandomSpawnPoint(player)
             (minigame.kitHandler as? IKitHandler)?.assignKitToPlayer(player)
             player.gameMode = GameMode.SURVIVAL

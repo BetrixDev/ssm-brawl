@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.minigames.managers
 
+import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
@@ -24,11 +25,9 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-interface ICombatManager : Listener {
-    fun initialize(minigame: BrawlMinigame)
-}
+interface ICombatManager : Listener, IManageable {}
 
-class DefaultCombatManager : Manageable(), ICombatManager, KoinComponent {
+class DefaultCombatManager(private val minigame: BrawlMinigame) : Manageable(), ICombatManager, KoinComponent {
     private val kitService: KitService by inject()
     private val dataService: DataService by inject()
     private val plugin: SuperSmashMobsBrawl by inject()
@@ -37,10 +36,7 @@ class DefaultCombatManager : Manageable(), ICombatManager, KoinComponent {
     private val meleeIFrame = 500.milliseconds
     private val lastMeleeHitAtByVictim = mutableMapOf<UUID, TimeSource.Monotonic.ValueTimeMark>()
 
-    private lateinit var minigame: BrawlMinigame
-
-    override fun initialize(minigame: BrawlMinigame) {
-        this.minigame = minigame
+    override fun setup() {
 
         // Handle SmashDamageEvent - apply damage within the context of this minigame
         listeners.add(

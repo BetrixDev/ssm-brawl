@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.minigames.managers
 
+import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
@@ -9,14 +10,12 @@ import gg.flyte.twilight.scheduler.repeatingTask
 import java.util.UUID
 import org.bukkit.GameMode
 
-interface IHazardManager {
-    fun initialize(minigame: BrawlMinigame)
-}
+interface IHazardManager : IManageable {}
 
-class DefaultHazardManager : Manageable(), IHazardManager {
+class DefaultHazardManager(private val minigame: BrawlMinigame) : Manageable(), IHazardManager {
     private val recentVoidDeaths = mutableSetOf<UUID>()
 
-    override fun initialize(minigame: BrawlMinigame) {
+    override fun setup() {
         val world = minigame.worldManager.getWorld() ?: return
         val voidLevel = world.data.voidLevel
 

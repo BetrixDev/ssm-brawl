@@ -1,36 +1,39 @@
 package dev.betrix.superSmashMobsBrawl.minigames.managers
 
+import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.Manageable
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import gg.flyte.twilight.event.event
 import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityExplodeEvent
+import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent
 import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerPickupArrowEvent
+import org.bukkit.event.player.PlayerPickupItemEvent
 import org.bukkit.event.world.StructureGrowEvent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 /**
  * Manager responsible for protecting the minigame environment from player modifications. Prevents
  * block breaking, placing, and other world interactions that could disrupt gameplay.
  */
-interface IEnvironmentProtectionManager {
-    fun initialize(minigame: BrawlMinigame)
+interface IEnvironmentProtectionManager : IManageable {}
 
-    fun teardown()
-}
+class DefaultEnvironmentProtectionManager(private val minigame: BrawlMinigame) : Manageable(), IEnvironmentProtectionManager, KoinComponent {
+    private val plugin: SuperSmashMobsBrawl by inject()
 
-class DefaultEnvironmentProtectionManager : Manageable(), IEnvironmentProtectionManager {
-    private lateinit var minigame: BrawlMinigame
-
-    override fun initialize(minigame: BrawlMinigame) {
-        this.minigame = minigame
+    override fun setup() {
 
         // Prevent block breaking
         listeners.add(
@@ -45,6 +48,32 @@ class DefaultEnvironmentProtectionManager : Manageable(), IEnvironmentProtection
         listeners.add(
             event<BlockPlaceEvent> {
                 if (isPlayerInMinigame(player)) {
+                    isCancelled = true
+                }
+            }
+        )
+
+        // Prevent normal damage event since we do it ourselves
+        listeners.add(
+            event<EntityDamageEvent> {
+                plugin.logger.info("Cancelling EntityDamageEvent for ${entity.name} of type ${entity.type} with cause $cause due to minigame")
+                if (entity is Player && isPlayerInMinigame(entity as Player)) {
+                    isCancelled = true
+                }
+            }
+        )
+
+        listeners.add(
+            event<PlayerPickupArrowEvent> {
+                if (isPlayerInMinigame(player)) {
+                    isCancelled = true
+                }
+            }
+        )
+
+        listeners.add(
+            event<EntityPickupItemEvent> {
+                if (entity is Player && isPlayerInMinigame(entity as Player)) {
                     isCancelled = true
                 }
             }
@@ -70,7 +99,7 @@ class DefaultEnvironmentProtectionManager : Manageable(), IEnvironmentProtection
         // Prevent interaction with blocks that have GUIs or functionality
         listeners.add(
             event<PlayerInteractEvent> {
-                if (player == null || !isPlayerInMinigame(player)) return@event
+                if (!isPlayerInMinigame(player)) return@event
 
                 // Allow interaction with air (for abilities/combat)
                 if (clickedBlock == null) return@event
@@ -222,10 +251,5 @@ class DefaultEnvironmentProtectionManager : Manageable(), IEnvironmentProtection
         return minigame.allPlayers().any {
             it.isOnline && it.player?.uniqueId == player.uniqueId
         } && !minigame.connectionManager.isDisconnected(player)
-    }
-
-    override fun teardown() {
-        super.teardown()
-        // Listeners are automatically cleaned up by parent Manageable class
     }
 }

@@ -62,7 +62,7 @@ enum class MinigameState {
     ENDED,
 }
 
-interface ITeleportationHandler {
+interface ITeleportationManager {
     fun teleportTeamToStartingLocation(team: MinigameTeam)
 
     fun teleportPlayerToSpectatorArea(player: OfflinePlayer)
@@ -70,8 +70,8 @@ interface ITeleportationHandler {
     fun teleportPlayerRandomSpawnPoint(player: OfflinePlayer)
 }
 
-class DefaultTeleportationHandler(private val minigame: BrawlMinigame) :
-    ITeleportationHandler, KoinComponent {
+class DefaultTeleportationManager(private val minigame: BrawlMinigame) :
+    ITeleportationManager, KoinComponent {
     private val plugin: SuperSmashMobsBrawl by inject()
 
     override fun teleportTeamToStartingLocation(team: MinigameTeam) {
@@ -213,25 +213,25 @@ class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>)
     private var state: MinigameState = MinigameState.PREFLIGHT
     private var gameStartTime: kotlin.time.TimeSource.Monotonic.ValueTimeMark? = null
 
-    val teleportationHandler: ITeleportationHandler = DefaultTeleportationHandler(this)
 
     // Managers (composable) - select based on minigame type
-    val worldManager: IWorldManager = DefaultWorldManager()
-    val teamManager: ITeamManager = DefaultTeamManager()
+    val teleportationManager: ITeleportationManager = DefaultTeleportationManager(this)
+    val worldManager: IWorldManager = DefaultWorldManager(this)
+    val teamManager: ITeamManager = DefaultTeamManager(this)
     val respawnManager: IRespawnManager = DefaultRespawnManager(this)
-    val combatManager: ICombatManager = DefaultCombatManager()
-    val hazardManager: IHazardManager = DefaultHazardManager()
+    val combatManager: ICombatManager = DefaultCombatManager(this)
+    val hazardManager: IHazardManager = DefaultHazardManager(this)
     val countdownManager: ICountdownManager = DefaultCountdownManager(this)
     val scoreboardManager: IScoreboardManager = DefaultScoreboardManager()
-    val connectionManager: IPlayerConnectionManager = DefaultPlayerConnectionManager()
+    val connectionManager: IPlayerConnectionManager = DefaultPlayerConnectionManager(this)
     val environmentProtectionManager: IEnvironmentProtectionManager =
-        DefaultEnvironmentProtectionManager()
+        DefaultEnvironmentProtectionManager(this)
 
     // Game objective manager - selected based on minigame definition
     val objectiveManager: IGameObjectiveManager =
         when (minigameDef) {
-            is FfaMinigameDef -> FfaGameObjectiveManager()
-            is TeamBasedStocksMinigameDef -> TeamBasedStocksObjectiveManager()
+            is FfaMinigameDef -> FfaGameObjectiveManager(this)
+            is TeamBasedStocksMinigameDef -> TeamBasedStocksObjectiveManager(this)
         }
 
     // Kit handler is pluggable
@@ -252,17 +252,17 @@ class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>)
 
     suspend fun setup(gameId: String) {
         // Load world first
-        worldManager.loadWorld(minigameDef, gameId)
+        worldManager.loadWorld(gameId)
 
         // Initialize all managers
-        teamManager.registerTeams(this)
-        hazardManager.initialize(this)
-        combatManager.initialize(this)
-        respawnManager.initialize(this)
-        connectionManager.initialize(this)
-        objectiveManager.initialize(this)
-        environmentProtectionManager.initialize(this)
-        scoreboardManager.initialize()
+        teamManager.setup()
+        hazardManager.setup()
+        combatManager.setup()
+        respawnManager.setup()
+        connectionManager.setup()
+        objectiveManager.setup()
+        environmentProtectionManager.setup()
+        scoreboardManager.setup()
 
         // Setup kit switching event handling
         setupKitSwitchingEvents()
@@ -276,7 +276,7 @@ class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>)
 
         // Teleport teams to starting locations
         teams.forEach { team ->
-            teleportationHandler.teleportTeamToStartingLocation(team)
+            teleportationManager.teleportTeamToStartingLocation(team)
             // Assign kits to all players in the team
             team.players.forEach { player ->
                 if (player.isOnline) {
