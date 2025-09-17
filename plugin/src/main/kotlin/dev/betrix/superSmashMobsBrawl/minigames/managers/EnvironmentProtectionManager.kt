@@ -19,7 +19,6 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerPickupArrowEvent
-import org.bukkit.event.player.PlayerPickupItemEvent
 import org.bukkit.event.world.StructureGrowEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -30,7 +29,8 @@ import org.koin.core.component.inject
  */
 interface IEnvironmentProtectionManager : IManageable {}
 
-class DefaultEnvironmentProtectionManager(private val minigame: BrawlMinigame) : Manageable(), IEnvironmentProtectionManager, KoinComponent {
+class DefaultEnvironmentProtectionManager(private val minigame: BrawlMinigame) :
+    Manageable(), IEnvironmentProtectionManager, KoinComponent {
     private val plugin: SuperSmashMobsBrawl by inject()
 
     override fun setup() {
@@ -56,7 +56,9 @@ class DefaultEnvironmentProtectionManager(private val minigame: BrawlMinigame) :
         // Prevent normal damage event since we do it ourselves
         listeners.add(
             event<EntityDamageEvent> {
-                plugin.logger.info("Cancelling EntityDamageEvent for ${entity.name} of type ${entity.type} with cause $cause due to minigame")
+                plugin.logger.info(
+                    "Cancelling EntityDamageEvent for ${entity.name} of type ${entity.type} with cause $cause due to minigame"
+                )
                 if (entity is Player && isPlayerInMinigame(entity as Player)) {
                     isCancelled = true
                 }

@@ -27,7 +27,8 @@ import org.koin.core.component.inject
 
 interface ICombatManager : Listener, IManageable {}
 
-class DefaultCombatManager(private val minigame: BrawlMinigame) : Manageable(), ICombatManager, KoinComponent {
+class DefaultCombatManager(private val minigame: BrawlMinigame) :
+    Manageable(), ICombatManager, KoinComponent {
     private val kitService: KitService by inject()
     private val dataService: DataService by inject()
     private val plugin: SuperSmashMobsBrawl by inject()

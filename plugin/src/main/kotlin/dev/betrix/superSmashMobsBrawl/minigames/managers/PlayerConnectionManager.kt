@@ -30,7 +30,8 @@ interface IPlayerConnectionManager : IManageable {
     fun canPlayerLeaveMinigame(player: Player): Boolean
 }
 
-class DefaultPlayerConnectionManager(private val minigame: BrawlMinigame) : Manageable(), IPlayerConnectionManager {
+class DefaultPlayerConnectionManager(private val minigame: BrawlMinigame) :
+    Manageable(), IPlayerConnectionManager {
     private val disconnected = mutableSetOf<java.util.UUID>()
     private val hasLeft = mutableSetOf<java.util.UUID>()
 

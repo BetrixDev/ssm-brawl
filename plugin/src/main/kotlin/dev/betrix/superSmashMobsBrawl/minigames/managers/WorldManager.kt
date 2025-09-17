@@ -14,22 +14,19 @@ import org.koin.core.component.inject
 
 /** Responsible for selecting, loading, and cleaning up the game world for a minigame. */
 interface IWorldManager : IManageable {
-    suspend fun loadWorld(
-        gameId: String,
-    ): Result<BrawlGameWorld, Exception>
+    suspend fun loadWorld(gameId: String): Result<BrawlGameWorld, Exception>
 
     fun getWorld(): BrawlGameWorld?
 }
 
-class DefaultWorldManager(private val minigame: BrawlMinigame) : Manageable(), IWorldManager, KoinComponent {
+class DefaultWorldManager(private val minigame: BrawlMinigame) :
+    Manageable(), IWorldManager, KoinComponent {
     private val worldService: WorldService by inject()
     private val dataService: DataService by inject()
 
     private var brawlWorld: BrawlGameWorld? = null
 
-    override suspend fun loadWorld(
-        gameId: String,
-    ): Result<BrawlGameWorld, Exception> {
+    override suspend fun loadWorld(gameId: String): Result<BrawlGameWorld, Exception> {
         val validMaps =
             dataService.getAllGameMaps().filter { map ->
                 minigame.minigameDef.mapWhitelist?.let { whitelist ->
@@ -43,7 +40,9 @@ class DefaultWorldManager(private val minigame: BrawlMinigame) : Manageable(), I
 
         val selectedMap =
             validMaps.randomOrNull()
-                ?: return Err(RuntimeException("No valid maps found for ${minigame.minigameDef.id}"))
+                ?: return Err(
+                    RuntimeException("No valid maps found for ${minigame.minigameDef.id}")
+                )
 
         try {
             val result =

@@ -5,7 +5,7 @@ import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import org.bukkit.OfflinePlayer
 
-interface ITeamManager: IManageable {
+interface ITeamManager : IManageable {
     fun findTeamOf(player: OfflinePlayer): dev.betrix.superSmashMobsBrawl.minigames.MinigameTeam?
 
     fun getTeams(): List<dev.betrix.superSmashMobsBrawl.minigames.MinigameTeam>

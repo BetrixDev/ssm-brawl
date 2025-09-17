@@ -213,7 +213,6 @@ class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>)
     private var state: MinigameState = MinigameState.PREFLIGHT
     private var gameStartTime: kotlin.time.TimeSource.Monotonic.ValueTimeMark? = null
 
-
     // Managers (composable) - select based on minigame type
     val teleportationManager: ITeleportationManager = DefaultTeleportationManager(this)
     val worldManager: IWorldManager = DefaultWorldManager(this)

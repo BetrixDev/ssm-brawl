@@ -23,14 +23,16 @@ interface IGameObjectiveManager : IManageable {
     fun checkWinCondition(): WinResult
 }
 
-class DefaultGameObjectiveManager(private val minigame: BrawlMinigame) : Manageable(), IGameObjectiveManager {
+class DefaultGameObjectiveManager(private val minigame: BrawlMinigame) :
+    Manageable(), IGameObjectiveManager {
     override fun recordDeath(player: OfflinePlayer) {}
 
     override fun checkWinCondition(): WinResult = WinResult.None
 }
 
 /** FFA minigame objective manager - last player standing wins */
-class FfaGameObjectiveManager(private val minigame: BrawlMinigame) : Manageable(), IGameObjectiveManager {
+class FfaGameObjectiveManager(private val minigame: BrawlMinigame) :
+    Manageable(), IGameObjectiveManager {
 
     override fun setup() {
         // Listen for death events to check win conditions
@@ -80,7 +82,8 @@ class FfaGameObjectiveManager(private val minigame: BrawlMinigame) : Manageable(
 }
 
 /** Team-based stocks minigame objective manager - teams have lives/stocks */
-class TeamBasedStocksObjectiveManager(private val minigame: BrawlMinigame) : Manageable(), IGameObjectiveManager {
+class TeamBasedStocksObjectiveManager(private val minigame: BrawlMinigame) :
+    Manageable(), IGameObjectiveManager {
     override fun setup() {
         // Initialize team stocks from minigame definition
         val stocksAmount =
@@ -146,7 +149,8 @@ class TeamBasedStocksObjectiveManager(private val minigame: BrawlMinigame) : Man
 }
 
 /** Parkour minigame objective manager - first to finish wins */
-class ParkourObjectiveManager(private val minigame: BrawlMinigame) : Manageable(), IGameObjectiveManager {
+class ParkourObjectiveManager(private val minigame: BrawlMinigame) :
+    Manageable(), IGameObjectiveManager {
     private val finishedPlayers = mutableSetOf<java.util.UUID>()
 
     override fun setup() {
