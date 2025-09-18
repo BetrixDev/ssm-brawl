@@ -19,6 +19,7 @@ data class KitDef(
     val passives: List<KitPassiveDef> = emptyList(),
     val abilities: List<KitAbilityDef> = emptyList(),
     val armorItems: KitArmorItemsDef? = null,
+    val meleeReach: Double = 3.0,
     @Serializable(with = MaterialSerializer::class) val displayItem: Material? = null,
     @Serializable(with = SoundSerializer::class) val selectionSound: Sound? = null,
     val userFacing: Boolean = true,

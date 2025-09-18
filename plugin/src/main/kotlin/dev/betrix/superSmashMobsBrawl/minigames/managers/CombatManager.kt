@@ -8,6 +8,8 @@ import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
 import dev.betrix.superSmashMobsBrawl.events.PlayerDamageAnalyticsEvent
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
+import dev.betrix.superSmashMobsBrawl.extensions.disguise
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import dev.betrix.superSmashMobsBrawl.services.DataService
@@ -17,11 +19,16 @@ import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource
 import org.bukkit.GameMode
+import org.bukkit.OfflinePlayer
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.util.BoundingBox
+import org.bukkit.util.Vector
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -38,6 +45,60 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
     private val lastMeleeHitAtByVictim = mutableMapOf<UUID, TimeSource.Monotonic.ValueTimeMark>()
 
     override fun setup() {
+        listeners.add(
+            event<PlayerInteractEvent> {
+                if (action != Action.LEFT_CLICK_AIR || !isPlayerInMinigame(player)) {
+                    return@event
+                }
+
+                val playerKit = kitService.getKitForPlayer(player) ?: return@event
+
+                val playerMeleeReach = playerKit.kitData.meleeReach
+                val playerMeleeDamage = playerKit.kitData.meleeDamage
+
+                player.world.livingEntities.filter { entity ->
+                    if (entity == player) {
+                        return@filter false
+                    }
+
+                    // Players on same team should not be targetable
+                    if (entity is OfflinePlayer && minigame.arePlayersOnSameTeam(player, entity)) {
+                        return@filter false
+                    }
+
+                    val candidateBox = (entity as? Player)?.disguise?.boundingBox ?: entity.boundingBox
+
+                    return@filter isEntityInMeleeReach(player, candidateBox, playerMeleeReach)
+                }.minByOrNull {
+                    it.location.distance(player.location)
+                }?.let {
+                    BrawlDamageEvent(
+                        it,
+                        Damager.DamagerLivingEntity(player),
+                        playerMeleeDamage,
+                        damageType = BrawlDamageType.MeleeAttack
+                    ).callEvent()
+                }
+            }
+        )
+
+        listeners.add(
+            event<EntityDamageByEntityEvent> {
+                if (isCancelled) return@event
+
+                val victimPlayer = entity as? Player ?: return@event
+
+                if (!isPlayerInMinigame(victimPlayer)) return@event
+
+                // Cancel all non-melee damage within this minigame - handled by BrawlDamageEvent
+                if (
+                    cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
+                        cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
+                ) {
+                    isCancelled = true
+                }
+            }
+        )
 
         // Handle SmashDamageEvent - apply damage within the context of this minigame
         listeners.add(
@@ -46,6 +107,13 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
                 if (!isPlayerInMinigame(victim as? Player)) return@event
 
                 val victimPlayer = victim as? Player ?: return@event
+
+                // Don't let players on same team damage each other
+                ((damager as? Damager.DamagerLivingEntity)?.livingEntity as? Player)?.let {
+                    if (minigame.arePlayersOnSameTeam(it, victimPlayer)) {
+                        return@event
+                    }
+                }
 
                 if (victimPlayer.gameMode != GameMode.SURVIVAL) return@event
 
@@ -87,9 +155,7 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
                         (damager as? Damager.DamagerLivingEntity)?.livingEntity as? Player
                     if (damagerPlayer != null) {
                         val kitKnockbackMult =
-                            kitService.getKitForPlayer(damagerPlayer)?.let {
-                                dataService.getKit(it.id)?.knockbackMultiplier
-                            } ?: 1.0
+                            kitService.getKitForPlayer(damagerPlayer)?.kitData?.knockbackMultiplier ?: 1.0
                         victimPlayer.doKnockback(
                             knockbackMultiplier * kitKnockbackMult,
                             damage,
@@ -164,5 +230,76 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
     override fun teardown() {
         super.teardown()
         lastMeleeHitAtByVictim.clear()
+    }
+
+    private fun isEntityInMeleeReach(
+        player: Player,
+        boundingBox: BoundingBox,
+        meleeReach: Double
+    ): Boolean {
+        val eyeLocation = player.eyeLocation
+        val direction = eyeLocation.direction
+
+        // Cast ray from player's eye location in their looking direction
+        val rayStart = eyeLocation.toVector()
+
+        // Check intersection with bounding box
+        val intersection = rayIntersectsBoundingBox(rayStart, direction, boundingBox)
+
+        return intersection != null && intersection.distance(rayStart) <= meleeReach
+    }
+
+    private fun rayIntersectsBoundingBox(
+        rayStart: Vector,
+        rayDirection: Vector,
+        boundingBox: BoundingBox
+    ): Vector? {
+        val min = Vector(boundingBox.minX, boundingBox.minY, boundingBox.minZ)
+        val max = Vector(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ)
+
+        var tMin = (min.x - rayStart.x) / rayDirection.x
+        var tMax = (max.x - rayStart.x) / rayDirection.x
+
+        if (tMin > tMax) {
+            val temp = tMin
+            tMin = tMax
+            tMax = temp
+        }
+
+        var tyMin = (min.y - rayStart.y) / rayDirection.y
+        var tyMax = (max.y - rayStart.y) / rayDirection.y
+
+        if (tyMin > tyMax) {
+            val temp = tyMin
+            tyMin = tyMax
+            tyMax = temp
+        }
+
+        if (tMin > tyMax || tyMin > tMax) {
+            return null
+        }
+
+        if (tyMin > tMin) tMin = tyMin
+        if (tyMax < tMax) tMax = tyMax
+
+        var tzMin = (min.z - rayStart.z) / rayDirection.z
+        var tzMax = (max.z - rayStart.z) / rayDirection.z
+
+        if (tzMin > tzMax) {
+            val temp = tzMin
+            tzMin = tzMax
+            tzMax = temp
+        }
+
+        if (tMin > tzMax || tzMin > tMax) {
+            return null
+        }
+
+        if (tzMin > tMin) tMin = tzMin
+
+        // Return intersection point
+        return if (tMin >= 0) {
+            rayStart.clone().add(rayDirection.clone().multiply(tMin))
+        } else null
     }
 }

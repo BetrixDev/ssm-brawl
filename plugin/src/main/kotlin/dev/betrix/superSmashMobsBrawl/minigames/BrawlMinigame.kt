@@ -344,6 +344,15 @@ class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>)
         teardown()
     }
 
+    fun arePlayersOnSameTeam(playerA: OfflinePlayer, playerB: OfflinePlayer): Boolean {
+        val teamA = teamManager.findTeamOf(playerA)
+        val teamB = teamManager.findTeamOf(playerB)
+
+        if (teamA == null || teamB == null) return false
+
+        return teamA.id == teamB.id
+    }
+
     override fun teardown() {
         super.teardown()
         (hazardManager as? Manageable)?.teardown()

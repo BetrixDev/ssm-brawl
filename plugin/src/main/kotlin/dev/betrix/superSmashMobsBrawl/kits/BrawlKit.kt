@@ -23,7 +23,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
     private val logger: Logger by inject()
 
     protected val minigameInstance = minigameService.getMinigameForPlayer(player)
-    protected val kitData =
+    val kitData =
         dataService.getKit(id) ?: throw RuntimeException("No kit found in DataService with id $id")
 
     protected val abilities = arrayListOf<BrawlAbility>()
