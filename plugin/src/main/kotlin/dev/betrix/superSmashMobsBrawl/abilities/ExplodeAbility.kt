@@ -3,8 +3,8 @@ package dev.betrix.superSmashMobsBrawl.abilities
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.ticks
 import dev.betrix.superSmashMobsBrawl.events.Damager
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
 import gg.flyte.twilight.event.event
@@ -126,12 +126,12 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
                         )
 
                         val damageEvent =
-                            SmashDamageEvent(
+                            BrawlDamageEvent(
                                 entity,
                                 Damager.DamagerLivingEntity(player),
                                 damage,
                                 explosionKnockbackMultiplier,
-                                SmashDamageType.Explosion,
+                                BrawlDamageType.Explosion,
                             )
 
                         damageEvent.callEvent()

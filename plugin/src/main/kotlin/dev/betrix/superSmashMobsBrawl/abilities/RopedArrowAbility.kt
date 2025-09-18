@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.abilities
 
 import dev.betrix.superSmashMobsBrawl.events.Damager
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
 import dev.betrix.superSmashMobsBrawl.projectiles.BrawlProjectile
 import dev.betrix.superSmashMobsBrawl.projectiles.ProjectileAction
@@ -30,11 +30,11 @@ class RopedArrowAbility(player: Player) : BrawlAbility("roped_arrow", player) {
                 .onHitEntity { entity, projectile ->
                     pullPlayerToLocation(entity.location, projectile.velocityBeforeImpact)
 
-                    SmashDamageEvent(
+                    BrawlDamageEvent(
                             entity,
                             Damager.DamagerLivingEntity(player),
                             arrowDamage,
-                            damageType = SmashDamageType.Projectile,
+                            damageType = BrawlDamageType.Projectile,
                         )
                         .callEvent()
 

@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.passives
 
 import dev.betrix.superSmashMobsBrawl.events.Damager
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import dev.betrix.superSmashMobsBrawl.projectiles.BrawlProjectile
 import dev.betrix.superSmashMobsBrawl.projectiles.ProjectileAction
 import gg.flyte.twilight.event.event
@@ -111,11 +111,11 @@ class BarragePassive(player: Player) : BrawlPassive("barrage", player) {
                     BrawlProjectile.arrow(player, 3.0, "messages.projectiles.barrage_arrow")
                         .velocityAddend(spread)
                         .onHitEntity { entity, _ ->
-                            SmashDamageEvent(
+                            BrawlDamageEvent(
                                     entity,
                                     Damager.DamagerLivingEntity(player),
                                     arrowDamage,
-                                    damageType = SmashDamageType.Projectile,
+                                    damageType = BrawlDamageType.Projectile,
                                 )
                                 .callEvent()
 

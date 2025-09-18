@@ -1,7 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.passives
 
 import dev.betrix.superSmashMobsBrawl.events.Damager
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
 import dev.betrix.superSmashMobsBrawl.services.LangService
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.feed
@@ -22,7 +22,7 @@ class HungerPassive(player: Player) : BrawlPassive("hunger", player), KoinCompon
 
     override fun setup() {
         val damageListener =
-            event<SmashDamageEvent> {
+            event<BrawlDamageEvent> {
                 val isThisPlayerDamager =
                     when (damager) {
                         is Damager.DamagerLivingEntity ->
@@ -65,7 +65,7 @@ class HungerPassive(player: Player) : BrawlPassive("hunger", player), KoinCompon
             player.sendMessage(lang.t("messages.passives.hunger.attackToRestore"))
 
             val damageEvent =
-                SmashDamageEvent(
+                BrawlDamageEvent(
                     victim = player,
                     damager = Damager.System,
                     damage = 1.0,

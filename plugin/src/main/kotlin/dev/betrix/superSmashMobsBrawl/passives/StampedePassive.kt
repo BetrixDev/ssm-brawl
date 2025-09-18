@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.passives
 
 import dev.betrix.superSmashMobsBrawl.events.Damager
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
@@ -84,7 +84,7 @@ class StampedePassive(player: Player) : BrawlPassive("stampede", player) {
         runnable?.let { runnables.add(it) }
 
         listeners.add(
-            event<SmashDamageEvent> {
+            event<BrawlDamageEvent> {
                 when (victim) {
                     player -> {
                         if (isCancelled || damage < stopSprintDamage) {
@@ -109,7 +109,7 @@ class StampedePassive(player: Player) : BrawlPassive("stampede", player) {
                             return@event
                         }
 
-                        if (damageType != null && damageType != SmashDamageType.MeleeAttack) {
+                        if (damageType != null && damageType != BrawlDamageType.MeleeAttack) {
                             return@event
                         }
 

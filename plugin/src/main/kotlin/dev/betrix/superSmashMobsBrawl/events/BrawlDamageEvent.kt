@@ -3,12 +3,12 @@ package dev.betrix.superSmashMobsBrawl.events
 import gg.flyte.twilight.event.TwilightEvent
 import org.bukkit.entity.LivingEntity
 
-sealed class SmashDamageType {
-    data object Projectile : SmashDamageType()
+sealed class BrawlDamageType {
+    data object Projectile : BrawlDamageType()
 
-    data object Explosion : SmashDamageType()
+    data object Explosion : BrawlDamageType()
 
-    data object MeleeAttack : SmashDamageType()
+    data object MeleeAttack : BrawlDamageType()
 }
 
 sealed class Damager {
@@ -17,10 +17,10 @@ sealed class Damager {
     data class DamagerLivingEntity(val livingEntity: LivingEntity) : Damager()
 }
 
-class SmashDamageEvent(
+class BrawlDamageEvent(
     val victim: LivingEntity,
     val damager: Damager?,
     var damage: Double,
     var knockbackMultiplier: Double = 1.0,
-    val damageType: SmashDamageType? = null,
+    val damageType: BrawlDamageType? = null,
 ) : TwilightEvent()

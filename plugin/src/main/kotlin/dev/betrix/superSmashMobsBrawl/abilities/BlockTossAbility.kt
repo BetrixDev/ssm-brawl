@@ -2,7 +2,7 @@ package dev.betrix.superSmashMobsBrawl.abilities
 
 import dev.betrix.superSmashMobsBrawl.disguises.EndermanDisguise
 import dev.betrix.superSmashMobsBrawl.events.Damager
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
 import dev.betrix.superSmashMobsBrawl.extensions.disguise
 import dev.betrix.superSmashMobsBrawl.projectiles.BrawlProjectile
 import dev.betrix.superSmashMobsBrawl.projectiles.ProjectileAction
@@ -120,7 +120,7 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
                     val blockDamage =
                         Math.min(maxDamage, projectile.velocityBeforeImpact.length() * damage)
 
-                    SmashDamageEvent(entity, Damager.DamagerLivingEntity(player), blockDamage)
+                    BrawlDamageEvent(entity, Damager.DamagerLivingEntity(player), blockDamage)
                         .apply { knockbackMultiplier *= this@BlockTossAbility.knockbackMultiplier }
                         .callEvent()
 

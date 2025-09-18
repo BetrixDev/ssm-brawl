@@ -7,7 +7,7 @@ import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
 import dev.betrix.superSmashMobsBrawl.events.PlayerDamageAnalyticsEvent
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import dev.betrix.superSmashMobsBrawl.services.DataService
@@ -41,7 +41,7 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
 
         // Handle SmashDamageEvent - apply damage within the context of this minigame
         listeners.add(
-            event<SmashDamageEvent> {
+            event<BrawlDamageEvent> {
                 // Only handle if this damage concerns players in this minigame
                 if (!isPlayerInMinigame(victim as? Player)) return@event
 
@@ -145,7 +145,7 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
                 val attackerKit = kitService.getKitForPlayer(damagerPlayer)
                 val meleeDamage = attackerKit?.getMeleeDamage() ?: damage
 
-                SmashDamageEvent(
+                BrawlDamageEvent(
                         victimPlayer,
                         Damager.DamagerLivingEntity(damagerPlayer),
                         meleeDamage,

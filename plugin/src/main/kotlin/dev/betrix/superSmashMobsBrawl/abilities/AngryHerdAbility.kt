@@ -1,7 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.abilities
 
 import dev.betrix.superSmashMobsBrawl.events.Damager
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.Location
@@ -158,7 +158,7 @@ class AngryHerdAbility(player: Player) : BrawlAbility("angry_herd", player) {
 
                         lastDamageTime[it] = System.currentTimeMillis()
 
-                        SmashDamageEvent(it, Damager.DamagerLivingEntity(player), damage).apply {
+                        BrawlDamageEvent(it, Damager.DamagerLivingEntity(player), damage).apply {
                             knockbackMultiplier *= knockback
                             //                        isIgnoreDamageDelay = true
                             //                        reason = name

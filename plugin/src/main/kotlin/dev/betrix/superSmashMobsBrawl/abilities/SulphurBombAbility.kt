@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.abilities
 
 import dev.betrix.superSmashMobsBrawl.events.Damager
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.extensions.playSound
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
@@ -75,12 +75,12 @@ class SulphurBombAbility(player: Player) : BrawlAbility("sulphur_bomb", player) 
             player.sendDebugMessage("[SB] ${entity.name} was hit")
 
             val damageEvent =
-                SmashDamageEvent(
+                BrawlDamageEvent(
                     entity,
                     Damager.DamagerLivingEntity(player),
                     projectileDamage,
                     0.0,
-                    SmashDamageType.Projectile,
+                    BrawlDamageType.Projectile,
                 )
 
             damageEvent.callEvent()

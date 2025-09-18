@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.abilities
 
 import dev.betrix.superSmashMobsBrawl.events.Damager
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageEvent
-import dev.betrix.superSmashMobsBrawl.events.SmashDamageType
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.itemEffect
 import kotlin.math.max
 import org.bukkit.Material
@@ -32,12 +32,12 @@ class BoneExplosionAbility(player: Player) : BrawlAbility("bone_explosion", play
                 )
 
             val damageEvent =
-                SmashDamageEvent(
+                BrawlDamageEvent(
                     entity,
                     Damager.DamagerLivingEntity(player),
                     damage,
                     2.5,
-                    SmashDamageType.Explosion,
+                    BrawlDamageType.Explosion,
                 )
 
             damageEvent.callEvent()
