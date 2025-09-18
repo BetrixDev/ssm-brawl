@@ -1,6 +1,5 @@
 package dev.betrix.superSmashMobsBrawl.gui
 
-
 import dev.betrix.superSmashMobsBrawl.extensions.isBrawlInventory
 import gg.flyte.twilight.event.event
 import net.kyori.adventure.text.Component
@@ -14,30 +13,35 @@ fun brawlGui(
     title: Component = Component.text("Custom GUI"),
     size: Int = 27,
     type: InventoryType = InventoryType.CHEST,
-    context: BrawlGui.() -> Unit
+    context: BrawlGui.() -> Unit,
 ): BrawlGui {
     return BrawlGui(title, size, type, context)
 }
 
-class BrawlGui(val title: Component, val size: Int, val type: InventoryType, val context: BrawlGui.() -> Unit) {
+class BrawlGui(
+    val title: Component,
+    val size: Int,
+    val type: InventoryType,
+    val context: BrawlGui.() -> Unit,
+) {
 
-    val inventory = when (type) {
-        InventoryType.CHEST -> Bukkit.createInventory(null, size, title)
-        else -> Bukkit.createInventory(null, type, title)
-    }.apply {
-        isBrawlInventory = true
-    }
+    val inventory =
+        when (type) {
+            InventoryType.CHEST -> Bukkit.createInventory(null, size, title)
+            else -> Bukkit.createInventory(null, type, title)
+        }.apply { isBrawlInventory = true }
 
     private val keySlot = mutableMapOf<Char, MutableList<Int>>()
     private val slotAction = mutableMapOf<Int, InventoryClickEvent.() -> Unit>()
 
     lateinit var viewer: Player
 
-    private val clickEvent = event<InventoryClickEvent> {
-        if (inventory == this@BrawlGui.inventory) slotAction[-1]?.invoke(this)
-        if (clickedInventory != this@BrawlGui.inventory) return@event
-        slotAction[slot]?.invoke(this)
-    }
+    private val clickEvent =
+        event<InventoryClickEvent> {
+            if (inventory == this@BrawlGui.inventory) slotAction[-1]?.invoke(this)
+            if (clickedInventory != this@BrawlGui.inventory) return@event
+            slotAction[slot]?.invoke(this)
+        }
 
     fun pattern(vararg pattern: String) {
         for ((index, value) in pattern.joinToString("").withIndex()) {
@@ -45,9 +49,7 @@ class BrawlGui(val title: Component, val size: Int, val type: InventoryType, val
         }
     }
 
-    /**
-     * Set the action to be executed when the player clicks on any slot while the GUI is open.
-     */
+    /** Set the action to be executed when the player clicks on any slot while the GUI is open. */
     fun onClick(action: InventoryClickEvent.() -> Unit) {
         slotAction[-1] = action
     }
@@ -59,7 +61,11 @@ class BrawlGui(val title: Component, val size: Int, val type: InventoryType, val
     }
 
     @JvmName("setSlots")
-    fun set(indexes: Collection<Int>, item: ItemStack, action: InventoryClickEvent.() -> Unit = {}) {
+    fun set(
+        indexes: Collection<Int>,
+        item: ItemStack,
+        action: InventoryClickEvent.() -> Unit = {},
+    ) {
         indexes.forEach { set(it, item, action) }
     }
 
