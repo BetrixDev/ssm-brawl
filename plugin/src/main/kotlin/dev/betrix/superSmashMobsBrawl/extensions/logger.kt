@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.extensions
 
 import dev.betrix.superSmashMobsBrawl.AxiomLoggerHandler
-import java.util.logging.Logger
 import java.util.logging.Level
+import java.util.logging.Logger
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -54,25 +54,27 @@ private fun Any?.toJsonElement(): JsonElement {
 
 private data class FormattedMessage(
     val formatted: String,
-    val properties: LinkedHashMap<String, JsonElement>
+    val properties: LinkedHashMap<String, JsonElement>,
 )
 
 private fun formatMessage(template: String, args: Array<out Any?>): FormattedMessage {
     var argIndex = 0
     val props = LinkedHashMap<String, JsonElement>()
 
-    val formatted = placeholderRegex.replace(template) { matchResult ->
-        val name = matchResult.groupValues[1]
-        val replacement: String = if (argIndex < args.size) {
-            val value = args[argIndex++]
-            // Keep first occurrence if duplicate property names appear
-            props.putIfAbsent(name, value.toJsonElement())
-            value.toDisplayString()
-        } else {
-            matchResult.value
+    val formatted =
+        placeholderRegex.replace(template) { matchResult ->
+            val name = matchResult.groupValues[1]
+            val replacement: String =
+                if (argIndex < args.size) {
+                    val value = args[argIndex++]
+                    // Keep first occurrence if duplicate property names appear
+                    props.putIfAbsent(name, value.toJsonElement())
+                    value.toDisplayString()
+                } else {
+                    matchResult.value
+                }
+            replacement
         }
-        replacement
-    }
 
     return FormattedMessage(formatted = formatted, properties = props)
 }
