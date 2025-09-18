@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.abilities
 
-import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
+import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
 import dev.betrix.superSmashMobsBrawl.projectiles.BrawlProjectile
 import dev.betrix.superSmashMobsBrawl.projectiles.ProjectileAction

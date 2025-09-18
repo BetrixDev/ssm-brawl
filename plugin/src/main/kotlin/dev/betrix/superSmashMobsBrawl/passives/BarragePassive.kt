@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.passives
 
-import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
+import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.projectiles.BrawlProjectile
 import dev.betrix.superSmashMobsBrawl.projectiles.ProjectileAction
 import gg.flyte.twilight.event.event

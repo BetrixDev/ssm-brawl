@@ -1,7 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.abilities
 
-import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.Damager
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.Location
