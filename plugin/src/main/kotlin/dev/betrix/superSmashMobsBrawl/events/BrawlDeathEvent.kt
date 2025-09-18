@@ -5,8 +5,13 @@ import gg.flyte.twilight.event.TwilightListener
 import gg.flyte.twilight.event.event
 import org.bukkit.entity.Player
 
+enum class HazardType {
+    LIQUID,
+    VOID
+}
+
 sealed class DeathReason {
-    data object Void : DeathReason()
+    data class Hazard(val type: HazardType) : DeathReason()
 
     data object Damage : DeathReason()
 }
