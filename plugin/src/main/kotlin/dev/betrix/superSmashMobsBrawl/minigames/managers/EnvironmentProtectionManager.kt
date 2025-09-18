@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.minigames.managers
 import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
+import dev.betrix.superSmashMobsBrawl.extensions.isBrawlInventory
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import gg.flyte.twilight.event.event
 import org.bukkit.entity.Player
@@ -182,6 +183,11 @@ class DefaultEnvironmentProtectionManager(private val minigame: BrawlMinigame) :
         // Prevent opening containers
         listeners.add(
             event<InventoryOpenEvent> {
+                // Always allow opening inventory created by the plugin
+                if (inventory.isBrawlInventory) {
+                    return@event
+                }
+
                 val player = this.player as? Player ?: return@event
                 if (isPlayerInMinigame(player)) {
                     // Allow opening own inventory and equipment

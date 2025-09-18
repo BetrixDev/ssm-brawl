@@ -4,13 +4,12 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
-import dev.betrix.superSmashMobsBrawl.extensions.event
+import dev.betrix.superSmashMobsBrawl.gui.BrawlGui.Companion.openInventory
+import dev.betrix.superSmashMobsBrawl.gui.brawlGui
 import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitSwitchingMode
 import gg.flyte.twilight.event.event
-import gg.flyte.twilight.gui.GUI.Companion.openInventory
-import gg.flyte.twilight.gui.gui
 import io.papermc.paper.datacomponent.DataComponentTypes
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -235,7 +234,7 @@ object KitService : KoinComponent {
         val filledSlots = hashSetOf<Int>()
 
         val kitSelectionGui =
-            gui(lang.t("gui.kitSelection.title"), guiColumns * guiRows) {
+            brawlGui(lang.t("gui.kitSelection.title"), guiColumns * guiRows) {
                 onClick { isCancelled = true }
 
                 getAllKitData()
