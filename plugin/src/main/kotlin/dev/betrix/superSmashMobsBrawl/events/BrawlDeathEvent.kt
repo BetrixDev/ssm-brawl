@@ -7,7 +7,7 @@ import org.bukkit.entity.Player
 
 enum class HazardType {
     LIQUID,
-    VOID
+    VOID,
 }
 
 sealed class DeathReason {
