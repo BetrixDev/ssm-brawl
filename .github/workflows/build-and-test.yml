@@ -11,9 +11,6 @@ permissions:
   contents: read
 
 jobs:
-  concurrency:
-    group: build-and-test-${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
   build-and-test:
     runs-on: ubuntu-latest
     steps:

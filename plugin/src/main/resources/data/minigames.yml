@@ -17,6 +17,7 @@ minigames:
     isHidden: false
     playersPerTeam: 1
     amountOfTeams: 2
+    kitSwitchingMode: never
     stocks: 4
     allowParties: false
     respawnDelaySeconds: 5
