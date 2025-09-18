@@ -1,7 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.extensions
 
-import org.bukkit.inventory.Inventory
 import java.util.WeakHashMap
+import org.bukkit.inventory.Inventory
 
 private val brawlInventories = WeakHashMap<Inventory, Boolean>()
 
