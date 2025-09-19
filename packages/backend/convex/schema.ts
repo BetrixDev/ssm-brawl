@@ -13,7 +13,7 @@ export default defineSchema({
     lastJoinedAt: v.number(),
     stats: v.record(v.string(), v.any()),
   })
-    .index("by_minecraftUsername", ["minecraftUsername"]) 
-    .index("by_minecraftUuid", ["minecraftUuid"]) 
+    .index("by_minecraftUsername", ["minecraftUsername"])
+    .index("by_minecraftUuid", ["minecraftUuid"])
     .index("by_lastJoinedAt", ["lastJoinedAt"]),
 });
