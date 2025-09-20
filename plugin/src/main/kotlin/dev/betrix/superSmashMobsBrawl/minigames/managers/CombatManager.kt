@@ -3,11 +3,11 @@ package dev.betrix.superSmashMobsBrawl.minigames.managers
 import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
 import dev.betrix.superSmashMobsBrawl.events.PlayerDamageAnalyticsEvent
-import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.disguise
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
@@ -52,29 +52,34 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
                 val playerMeleeReach = playerKit.getMeleeReach()
                 val playerMeleeDamage = playerKit.getMeleeDamage()
 
-                player.world.livingEntities.filter { entity ->
-                    if (entity == player) {
-                        return@filter false
+                player.world.livingEntities
+                    .filter { entity ->
+                        if (entity == player) {
+                            return@filter false
+                        }
+
+                        // Players on same team should not be targetable
+                        if (
+                            entity is OfflinePlayer && minigame.arePlayersOnSameTeam(player, entity)
+                        ) {
+                            return@filter false
+                        }
+
+                        val candidateBox =
+                            (entity as? Player)?.disguise?.boundingBox ?: entity.boundingBox
+
+                        return@filter isEntityInMeleeReach(player, candidateBox, playerMeleeReach)
                     }
-
-                    // Players on same team should not be targetable
-                    if (entity is OfflinePlayer && minigame.arePlayersOnSameTeam(player, entity)) {
-                        return@filter false
+                    .minByOrNull { it.location.distance(player.location) }
+                    ?.let {
+                        BrawlDamageEvent(
+                                it,
+                                Damager.DamagerLivingEntity(player),
+                                playerMeleeDamage,
+                                damageType = BrawlDamageType.MeleeAttack,
+                            )
+                            .callEvent()
                     }
-
-                    val candidateBox = (entity as? Player)?.disguise?.boundingBox ?: entity.boundingBox
-
-                    return@filter isEntityInMeleeReach(player, candidateBox, playerMeleeReach)
-                }.minByOrNull {
-                    it.location.distance(player.location)
-                }?.let {
-                    BrawlDamageEvent(
-                        it,
-                        Damager.DamagerLivingEntity(player),
-                        playerMeleeDamage,
-                        damageType = BrawlDamageType.MeleeAttack
-                    ).callEvent()
-                }
             }
         )
 
@@ -151,7 +156,8 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
                         (damager as? Damager.DamagerLivingEntity)?.livingEntity as? Player
                     if (damagerPlayer != null) {
                         val kitKnockbackMult =
-                            kitService.getKitForPlayer(damagerPlayer)?.getKnockbackMultiplier() ?: 1.0
+                            kitService.getKitForPlayer(damagerPlayer)?.getKnockbackMultiplier()
+                                ?: 1.0
                         victimPlayer.doKnockback(
                             knockbackMultiplier * kitKnockbackMult,
                             damage,
@@ -231,7 +237,7 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
     private fun isEntityInMeleeReach(
         player: Player,
         boundingBox: BoundingBox,
-        meleeReach: Double
+        meleeReach: Double,
     ): Boolean {
         val eyeLocation = player.eyeLocation
         val direction = eyeLocation.direction
@@ -248,13 +254,17 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
     private fun rayIntersectsBoundingBox(
         rayStart: Vector,
         rayDirection: Vector,
-        boundingBox: BoundingBox
+        boundingBox: BoundingBox,
     ): Vector? {
         val min = Vector(boundingBox.minX, boundingBox.minY, boundingBox.minZ)
         val max = Vector(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ)
 
-        var tMin = if (rayDirection.x != 0.0) (min.x - rayStart.x) / rayDirection.x else Double.NEGATIVE_INFINITY
-        var tMax = if (rayDirection.x != 0.0) (max.x - rayStart.x) / rayDirection.x else Double.POSITIVE_INFINITY
+        var tMin =
+            if (rayDirection.x != 0.0) (min.x - rayStart.x) / rayDirection.x
+            else Double.NEGATIVE_INFINITY
+        var tMax =
+            if (rayDirection.x != 0.0) (max.x - rayStart.x) / rayDirection.x
+            else Double.POSITIVE_INFINITY
 
         if (tMin > tMax) {
             val temp = tMin
@@ -262,8 +272,12 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
             tMax = temp
         }
 
-        var tyMin = if (rayDirection.y != 0.0) (min.y - rayStart.y) / rayDirection.y else Double.NEGATIVE_INFINITY
-        var tyMax = if (rayDirection.y != 0.0) (max.y - rayStart.y) / rayDirection.y else Double.POSITIVE_INFINITY
+        var tyMin =
+            if (rayDirection.y != 0.0) (min.y - rayStart.y) / rayDirection.y
+            else Double.NEGATIVE_INFINITY
+        var tyMax =
+            if (rayDirection.y != 0.0) (max.y - rayStart.y) / rayDirection.y
+            else Double.POSITIVE_INFINITY
 
         if (tyMin > tyMax) {
             val temp = tyMin
@@ -278,8 +292,12 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
         if (tyMin > tMin) tMin = tyMin
         if (tyMax < tMax) tMax = tyMax
 
-        var tzMin = if (rayDirection.z != 0.0) (min.z - rayStart.z) / rayDirection.z else Double.NEGATIVE_INFINITY
-        var tzMax = if (rayDirection.z != 0.0) (max.z - rayStart.z) / rayDirection.z else Double.POSITIVE_INFINITY
+        var tzMin =
+            if (rayDirection.z != 0.0) (min.z - rayStart.z) / rayDirection.z
+            else Double.NEGATIVE_INFINITY
+        var tzMax =
+            if (rayDirection.z != 0.0) (max.z - rayStart.z) / rayDirection.z
+            else Double.POSITIVE_INFINITY
 
         if (tzMin > tzMax) {
             val temp = tzMin

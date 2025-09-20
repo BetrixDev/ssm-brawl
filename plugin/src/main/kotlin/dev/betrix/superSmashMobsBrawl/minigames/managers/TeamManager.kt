@@ -15,8 +15,7 @@ interface ITeamManager : IManageable {
 }
 
 class DefaultTeamManager(private val minigame: BrawlMinigame) : Manageable(), ITeamManager {
-    private val playerToTeam =
-        mutableMapOf<java.util.UUID, MinigameTeam>()
+    private val playerToTeam = mutableMapOf<java.util.UUID, MinigameTeam>()
     private var teams: List<MinigameTeam> = emptyList()
 
     override fun setup() {
@@ -25,9 +24,7 @@ class DefaultTeamManager(private val minigame: BrawlMinigame) : Manageable(), IT
         teams.forEach { team -> team.players.forEach { p -> playerToTeam[p.uniqueId] = team } }
     }
 
-    override fun findTeamOf(
-        player: OfflinePlayer
-    ): MinigameTeam? {
+    override fun findTeamOf(player: OfflinePlayer): MinigameTeam? {
         return playerToTeam[player.uniqueId]
     }
 
