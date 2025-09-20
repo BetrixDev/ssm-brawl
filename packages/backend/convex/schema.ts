@@ -9,8 +9,8 @@ export default defineSchema({
   players: defineTable({
     username: v.string(),
     uuid: v.string(),
-    firstJoinedAt: v.number(),
-    lastJoinedAt: v.number(),
+    firstJoinedAt: v.string(),
+    lastJoinedAt: v.string(),
     stats: v.record(v.string(), v.any()),
   })
     .index("by_username", ["username"])
