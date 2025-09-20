@@ -21,12 +21,12 @@ fun Logger.logJson(json: JsonElement) {
     }
 }
 
-private val placeholderRegex = Regex("\\{([^{}]+)\\}")
+internal val placeholderRegex = Regex("\\{(\\d+|\\w+)\\}")
 
 private fun Any?.toDisplayString(): String {
     return when (this) {
         null -> "null"
-        is Throwable -> this.message?.let { "${this::class.simpleName}: $it" } ?: this.toString()
+        is Throwable -> this.message?.let { "${this::class.simpleName ?: "Throwable"}: $it" } ?: this.toString()
         is Array<*> -> this.contentToString()
         is IntArray -> this.contentToString()
         is LongArray -> this.contentToString()
@@ -35,7 +35,7 @@ private fun Any?.toDisplayString(): String {
         is ShortArray -> this.contentToString()
         is ByteArray -> this.contentToString()
         is BooleanArray -> this.contentToString()
-        is Iterable<*> -> this.joinToString(", ") { it.toDisplayString() }
+        is Iterable<*> -> this.joinToString(", ", prefix = "[", postfix = "]") { it?.toString() ?: "null" }
         else -> this.toString()
     }
 }
@@ -52,26 +52,42 @@ private fun Any?.toJsonElement(): JsonElement {
     }
 }
 
-private data class FormattedMessage(
+internal data class FormattedMessage(
     val formatted: String,
     val properties: LinkedHashMap<String, JsonElement>,
 )
 
-private fun formatMessage(template: String, args: Array<out Any?>): FormattedMessage {
-    var argIndex = 0
+internal fun formatMessage(template: String, args: Array<out Any?>): FormattedMessage {
     val props = LinkedHashMap<String, JsonElement>()
+    var namedArgIndex = 0
 
     val formatted =
         placeholderRegex.replace(template) { matchResult ->
-            val name = matchResult.groupValues[1]
+            val placeholder = matchResult.groupValues[1]
+
             val replacement: String =
-                if (argIndex < args.size) {
-                    val value = args[argIndex++]
-                    // Keep first occurrence if duplicate property names appear
-                    props.putIfAbsent(name, value.toJsonElement())
-                    value.toDisplayString()
+                if (placeholder.matches(Regex("\\d+"))) {
+                    // Indexed placeholder (e.g., {0}, {1})
+                    val index = placeholder.toInt()
+                    if (index < args.size) {
+                        val value = args[index]
+                        // Use the index as the property name for consistency
+                        props.putIfAbsent(index.toString(), value.toJsonElement())
+                        value.toDisplayString()
+                    } else {
+                        matchResult.value // Keep placeholder if index is out of bounds
+                    }
                 } else {
-                    matchResult.value
+                    // Named placeholder (e.g., {name})
+                    // Consume arguments sequentially starting from 0
+                    if (namedArgIndex < args.size) {
+                        val value = args[namedArgIndex]
+                        props[placeholder] = value.toJsonElement()
+                        namedArgIndex++
+                        value.toDisplayString()
+                    } else {
+                        matchResult.value // Keep placeholder if no more args
+                    }
                 }
             replacement
         }
