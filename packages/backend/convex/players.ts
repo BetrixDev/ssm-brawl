@@ -4,6 +4,18 @@ import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 import { internalAction, internalMutation, query } from "./_generated/server";
 
+export const getPlayerDocument = query({
+  args: {
+    uuid: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("players")
+      .withIndex("by_uuid", (q) => q.eq("uuid", args.uuid))
+      .unique();
+  },
+});
+
 export const getPlayerByUuid = query({
   args: {
     uuid: v.string(),
@@ -16,7 +28,7 @@ export const getPlayerByUuid = query({
   },
 });
 
-const playerDbSchema = z.object({
+const playerDbApiSchema = z.object({
   data: z.object({
     player: z.object({
       username: z.string(),
@@ -36,7 +48,7 @@ export const createPlayer = internalAction({
     const response = await fetch(`https://playerdb.co/api/player/minecraft/${args.uuid}`);
     const json = await response.json();
 
-    const { data } = playerDbSchema.parse(json);
+    const { data } = playerDbApiSchema.parse(json);
 
     const minecraftPlayerData: Id<"players"> = await ctx.runMutation(
       internal.players.insertPlayer,

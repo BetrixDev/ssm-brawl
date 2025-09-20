@@ -60,11 +60,9 @@ app.get("/players/:uuid/joinData", async (c) => {
   const uuid = c.req.param("uuid");
 
   const playerData = await c.env.runQuery(api.players.getPlayerByUuid, { uuid });
-  let firstTimeJoin = false;
+  const firstTimeJoin = !playerData;
 
-  if (!playerData) {
-    firstTimeJoin = true;
-
+  if (firstTimeJoin) {
     await c.env.runAction(internal.players.createPlayer, {
       uuid,
     });
@@ -72,9 +70,16 @@ app.get("/players/:uuid/joinData", async (c) => {
     await c.env.runMutation(internal.players.updatePlayerJoin, { uuid });
   }
 
+  const playerDocument = await c.env.runQuery(api.players.getPlayerDocument, { uuid });
+
+  if (!playerDocument) {
+    return c.json({ error: "Player not found" }, 404);
+  }
+
   return c.json({
-    firstTimeJoin,
-    playerData: firstTimeJoin ? null : playerData,
+    avatarUrl: playerDocument.avatarUrl,
+    isFirstTimeOnServer: firstTimeJoin,
+    stats: playerDocument.stats,
   });
 });
 

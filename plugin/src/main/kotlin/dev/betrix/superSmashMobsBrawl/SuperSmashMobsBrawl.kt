@@ -10,6 +10,7 @@ import dev.betrix.superSmashMobsBrawl.commands.resolvers.MinigameDefinitionArgum
 import dev.betrix.superSmashMobsBrawl.extensions.hasPassive
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
+import dev.betrix.superSmashMobsBrawl.services.ApiService
 import dev.betrix.superSmashMobsBrawl.services.DataService
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
@@ -57,6 +58,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                     single { this@SuperSmashMobsBrawl }
                     single<JavaPlugin> { this@SuperSmashMobsBrawl }
                     single { this@SuperSmashMobsBrawl.logger }
+                    single { ApiService }
                     single(createdAtStart = true) { DataService() }
                     single { MinigameService() }
                     single { KitService }
