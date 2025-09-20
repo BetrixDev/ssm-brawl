@@ -95,95 +95,54 @@ internal fun formatMessage(template: String, args: Array<out Any?>): FormattedMe
     return FormattedMessage(formatted = formatted, properties = props)
 }
 
+private fun buildLogJson(
+    level: String,
+    formatted: String,
+    template: String,
+    properties: LinkedHashMap<String, JsonElement>,
+    exception: Throwable? = null
+): JsonElement = buildJsonObject {
+    put("level", level)
+    put("message", formatted)
+    put("messageTemplate", template)
+    if (properties.isNotEmpty()) {
+        putJsonObject("properties") { properties.forEach { (k, v) -> put(k, v) } }
+    }
+    exception?.let { put("exception", it.stackTraceToString()) }
+}
+
 fun Logger.info(template: String, vararg args: Any?) {
     val (formatted, properties) = formatMessage(template, args)
     this.info(formatted)
-    this.logJson(
-        buildJsonObject {
-            put("level", "info")
-            put("message", formatted)
-            put("messageTemplate", template)
-            if (properties.isNotEmpty()) {
-                putJsonObject("properties") { properties.forEach { (k, v) -> put(k, v) } }
-            }
-        }
-    )
+    this.logJson(buildLogJson("info", formatted, template, properties))
 }
 
 fun Logger.warn(template: String, vararg args: Any?) {
     val (formatted, properties) = formatMessage(template, args)
     this.warning(formatted)
-    this.logJson(
-        buildJsonObject {
-            put("level", "warn")
-            put("message", formatted)
-            put("messageTemplate", template)
-            if (properties.isNotEmpty()) {
-                putJsonObject("properties") { properties.forEach { (k, v) -> put(k, v) } }
-            }
-        }
-    )
+    this.logJson(buildLogJson("warn", formatted, template, properties))
 }
 
 fun Logger.error(template: String, vararg args: Any?) {
     val (formatted, properties) = formatMessage(template, args)
     this.severe(formatted)
-    this.logJson(
-        buildJsonObject {
-            put("level", "error")
-            put("message", formatted)
-            put("messageTemplate", template)
-            if (properties.isNotEmpty()) {
-                putJsonObject("properties") { properties.forEach { (k, v) -> put(k, v) } }
-            }
-        }
-    )
+    this.logJson(buildLogJson("error", formatted, template, properties))
 }
 
 fun Logger.info(ex: Throwable, template: String, vararg args: Any?) {
     val (formatted, properties) = formatMessage(template, args)
     this.log(Level.INFO, formatted, ex)
-    this.logJson(
-        buildJsonObject {
-            put("level", "info")
-            put("message", formatted)
-            put("messageTemplate", template)
-            if (properties.isNotEmpty()) {
-                putJsonObject("properties") { properties.forEach { (k, v) -> put(k, v) } }
-            }
-            put("exception", ex.stackTraceToString())
-        }
-    )
+    this.logJson(buildLogJson("info", formatted, template, properties, ex))
 }
 
 fun Logger.warn(ex: Throwable, template: String, vararg args: Any?) {
     val (formatted, properties) = formatMessage(template, args)
     this.log(Level.WARNING, formatted, ex)
-    this.logJson(
-        buildJsonObject {
-            put("level", "warn")
-            put("message", formatted)
-            put("messageTemplate", template)
-            if (properties.isNotEmpty()) {
-                putJsonObject("properties") { properties.forEach { (k, v) -> put(k, v) } }
-            }
-            put("exception", ex.stackTraceToString())
-        }
-    )
+    this.logJson(buildLogJson("warn", formatted, template, properties, ex))
 }
 
 fun Logger.error(ex: Throwable, template: String, vararg args: Any?) {
     val (formatted, properties) = formatMessage(template, args)
     this.log(Level.SEVERE, formatted, ex)
-    this.logJson(
-        buildJsonObject {
-            put("level", "error")
-            put("message", formatted)
-            put("messageTemplate", template)
-            if (properties.isNotEmpty()) {
-                putJsonObject("properties") { properties.forEach { (k, v) -> put(k, v) } }
-            }
-            put("exception", ex.stackTraceToString())
-        }
-    )
+    this.logJson(buildLogJson("error", formatted, template, properties, ex))
 }
