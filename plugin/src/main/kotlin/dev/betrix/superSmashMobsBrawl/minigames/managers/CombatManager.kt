@@ -37,8 +37,6 @@ interface ICombatManager : Listener, IManageable {}
 class DefaultCombatManager(private val minigame: BrawlMinigame) :
     Manageable(), ICombatManager, KoinComponent {
     private val kitService: KitService by inject()
-    private val dataService: DataService by inject()
-    private val plugin: SuperSmashMobsBrawl by inject()
 
     /** 1.8-style melee I-frames (10 ticks) */
     private val meleeIFrame = 500.milliseconds
@@ -53,8 +51,8 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
 
                 val playerKit = kitService.getKitForPlayer(player) ?: return@event
 
-                val playerMeleeReach = playerKit.kitData.meleeReach
-                val playerMeleeDamage = playerKit.kitData.meleeDamage
+                val playerMeleeReach = playerKit.getMeleeReach()
+                val playerMeleeDamage = playerKit.getMeleeDamage()
 
                 player.world.livingEntities.filter { entity ->
                     if (entity == player) {
@@ -155,7 +153,7 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
                         (damager as? Damager.DamagerLivingEntity)?.livingEntity as? Player
                     if (damagerPlayer != null) {
                         val kitKnockbackMult =
-                            kitService.getKitForPlayer(damagerPlayer)?.kitData?.knockbackMultiplier ?: 1.0
+                            kitService.getKitForPlayer(damagerPlayer)?.getKnockbackMultiplier() ?: 1.0
                         victimPlayer.doKnockback(
                             knockbackMultiplier * kitKnockbackMult,
                             damage,
@@ -257,8 +255,8 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
         val min = Vector(boundingBox.minX, boundingBox.minY, boundingBox.minZ)
         val max = Vector(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ)
 
-        var tMin = (min.x - rayStart.x) / rayDirection.x
-        var tMax = (max.x - rayStart.x) / rayDirection.x
+        var tMin = if (rayDirection.x != 0.0) (min.x - rayStart.x) / rayDirection.x else Double.NEGATIVE_INFINITY
+        var tMax = if (rayDirection.x != 0.0) (max.x - rayStart.x) / rayDirection.x else Double.POSITIVE_INFINITY
 
         if (tMin > tMax) {
             val temp = tMin
@@ -266,8 +264,8 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
             tMax = temp
         }
 
-        var tyMin = (min.y - rayStart.y) / rayDirection.y
-        var tyMax = (max.y - rayStart.y) / rayDirection.y
+        var tyMin = if (rayDirection.y != 0.0) (min.y - rayStart.y) / rayDirection.y else Double.NEGATIVE_INFINITY
+        var tyMax = if (rayDirection.y != 0.0) (max.y - rayStart.y) / rayDirection.y else Double.POSITIVE_INFINITY
 
         if (tyMin > tyMax) {
             val temp = tyMin
@@ -282,8 +280,8 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
         if (tyMin > tMin) tMin = tyMin
         if (tyMax < tMax) tMax = tyMax
 
-        var tzMin = (min.z - rayStart.z) / rayDirection.z
-        var tzMax = (max.z - rayStart.z) / rayDirection.z
+        var tzMin = if (rayDirection.z != 0.0) (min.z - rayStart.z) / rayDirection.z else Double.NEGATIVE_INFINITY
+        var tzMax = if (rayDirection.z != 0.0) (max.z - rayStart.z) / rayDirection.z else Double.POSITIVE_INFINITY
 
         if (tzMin > tzMax) {
             val temp = tzMin
