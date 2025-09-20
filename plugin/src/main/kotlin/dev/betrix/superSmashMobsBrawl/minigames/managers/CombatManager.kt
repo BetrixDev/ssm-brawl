@@ -2,18 +2,15 @@ package dev.betrix.superSmashMobsBrawl.minigames.managers
 
 import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.Manageable
-import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
 import dev.betrix.superSmashMobsBrawl.events.PlayerDamageAnalyticsEvent
-import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import dev.betrix.superSmashMobsBrawl.extensions.disguise
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
-import dev.betrix.superSmashMobsBrawl.services.DataService
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import gg.flyte.twilight.event.event
 import java.util.UUID
