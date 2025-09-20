@@ -32,7 +32,9 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
     protected var disguise: BrawlDisguise? = null
 
     fun getMeleeDamage(): Double = kitData.meleeDamage
+
     fun getMeleeReach(): Double = kitData.meleeReach
+
     fun getKnockbackMultiplier(): Double = kitData.knockbackMultiplier
 
     fun getPassive(id: String): BrawlPassive? {
