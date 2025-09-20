@@ -27,7 +27,8 @@ internal val placeholderRegex = Regex("\\{(\\d+|\\w+)\\}")
 private fun Any?.toDisplayString(): String {
     return when (this) {
         null -> "null"
-        is Throwable -> this.message?.let { "${this::class.simpleName ?: "Throwable"}: $it" } ?: this.toString()
+        is Throwable ->
+            this.message?.let { "${this::class.simpleName ?: "Throwable"}: $it" } ?: this.toString()
         is Array<*> -> this.contentToString()
         is IntArray -> this.contentToString()
         is LongArray -> this.contentToString()
@@ -36,7 +37,8 @@ private fun Any?.toDisplayString(): String {
         is ShortArray -> this.contentToString()
         is ByteArray -> this.contentToString()
         is BooleanArray -> this.contentToString()
-        is Iterable<*> -> this.joinToString(", ", prefix = "[", postfix = "]") { it?.toString() ?: "null" }
+        is Iterable<*> ->
+            this.joinToString(", ", prefix = "[", postfix = "]") { it?.toString() ?: "null" }
         else -> this.toString()
     }
 }
@@ -101,7 +103,7 @@ private fun buildLogJson(
     formatted: String,
     template: String,
     properties: ConcurrentHashMap<String, JsonElement>,
-    exception: Throwable? = null
+    exception: Throwable? = null,
 ): JsonElement = buildJsonObject {
     put("level", level)
     put("message", formatted)

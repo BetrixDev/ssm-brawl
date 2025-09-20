@@ -14,10 +14,12 @@ class LoggerExtensionsTest :
                 val args = arrayOf("john_doe", "2023-01-01T10:00:00Z", "login")
                 val (formatted, properties) = formatMessage(template, args)
 
-                formatted shouldBe "User john_doe logged in at 2023-01-01T10:00:00Z and performed action john_doe"
+                formatted shouldBe
+                    "User john_doe logged in at 2023-01-01T10:00:00Z and performed action john_doe"
                 properties.size shouldBe 2
                 properties["0"] shouldBe kotlinx.serialization.json.JsonPrimitive("john_doe")
-                properties["1"] shouldBe kotlinx.serialization.json.JsonPrimitive("2023-01-01T10:00:00Z")
+                properties["1"] shouldBe
+                    kotlinx.serialization.json.JsonPrimitive("2023-01-01T10:00:00Z")
             }
 
             it("handles named placeholders correctly") {
@@ -28,7 +30,8 @@ class LoggerExtensionsTest :
                 formatted shouldBe "User john_doe logged in at 2023-01-01T10:00:00Z"
                 properties.size shouldBe 2
                 properties["username"] shouldBe kotlinx.serialization.json.JsonPrimitive("john_doe")
-                properties["timestamp"] shouldBe kotlinx.serialization.json.JsonPrimitive("2023-01-01T10:00:00Z")
+                properties["timestamp"] shouldBe
+                    kotlinx.serialization.json.JsonPrimitive("2023-01-01T10:00:00Z")
             }
 
             it("handles mixed indexed and named placeholders") {
@@ -36,11 +39,13 @@ class LoggerExtensionsTest :
                 val args = arrayOf("admin_user", "2023-01-01T10:00:00Z", "admin")
                 val (formatted, properties) = formatMessage(template, args)
 
-                formatted shouldBe "User admin_user with role admin_user logged in at 2023-01-01T10:00:00Z"
+                formatted shouldBe
+                    "User admin_user with role admin_user logged in at 2023-01-01T10:00:00Z"
                 properties.size shouldBe 3
                 properties["0"] shouldBe kotlinx.serialization.json.JsonPrimitive("admin_user")
                 properties["role"] shouldBe kotlinx.serialization.json.JsonPrimitive("admin_user")
-                properties["1"] shouldBe kotlinx.serialization.json.JsonPrimitive("2023-01-01T10:00:00Z")
+                properties["1"] shouldBe
+                    kotlinx.serialization.json.JsonPrimitive("2023-01-01T10:00:00Z")
             }
 
             it("handles out of bounds indexed placeholders") {
@@ -61,7 +66,8 @@ class LoggerExtensionsTest :
                 formatted shouldBe "User john_doe logged in at 2023-01-01T10:00:00Z from {location}"
                 properties.size shouldBe 2
                 properties["username"] shouldBe kotlinx.serialization.json.JsonPrimitive("john_doe")
-                properties["timestamp"] shouldBe kotlinx.serialization.json.JsonPrimitive("2023-01-01T10:00:00Z")
+                properties["timestamp"] shouldBe
+                    kotlinx.serialization.json.JsonPrimitive("2023-01-01T10:00:00Z")
             }
 
             it("handles duplicate indexed placeholders") {
