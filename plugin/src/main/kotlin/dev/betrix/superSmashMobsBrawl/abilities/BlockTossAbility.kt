@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.abilities
 
 import dev.betrix.superSmashMobsBrawl.disguises.EndermanDisguise
-import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
+import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.extensions.disguise
 import dev.betrix.superSmashMobsBrawl.projectiles.BrawlProjectile
 import dev.betrix.superSmashMobsBrawl.projectiles.ProjectileAction

@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.abilities
 
-import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
+import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.extensions.playSound
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
