@@ -1,6 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.extensions
 
 import dev.betrix.superSmashMobsBrawl.AxiomLoggerHandler
+import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.serialization.json.JsonElement
@@ -54,11 +55,11 @@ private fun Any?.toJsonElement(): JsonElement {
 
 internal data class FormattedMessage(
     val formatted: String,
-    val properties: LinkedHashMap<String, JsonElement>,
+    val properties: ConcurrentHashMap<String, JsonElement>,
 )
 
 internal fun formatMessage(template: String, args: Array<out Any?>): FormattedMessage {
-    val props = LinkedHashMap<String, JsonElement>()
+    val props = ConcurrentHashMap<String, JsonElement>()
     var namedArgIndex = 0
 
     val formatted =
@@ -99,7 +100,7 @@ private fun buildLogJson(
     level: String,
     formatted: String,
     template: String,
-    properties: LinkedHashMap<String, JsonElement>,
+    properties: ConcurrentHashMap<String, JsonElement>,
     exception: Throwable? = null
 ): JsonElement = buildJsonObject {
     put("level", level)
