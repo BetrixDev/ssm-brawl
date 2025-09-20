@@ -13,6 +13,9 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "convex": "^1.25.4"
+    "convex": "^1.25.4",
+    "convex-helpers": "^0.1.104",
+    "hono": "^4.9.8",
+    "zod": "^4.0.2"
   }
 }

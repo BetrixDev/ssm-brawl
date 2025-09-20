@@ -9,6 +9,8 @@ export default defineSchema({
   players: defineTable({
     username: v.string(),
     uuid: v.string(),
+    skinTextureUrl: v.string(),
+    avatarUrl: v.string(),
     firstJoinedAt: v.string(),
     lastJoinedAt: v.string(),
     stats: v.record(v.string(), v.any()),
