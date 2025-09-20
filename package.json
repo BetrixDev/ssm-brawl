@@ -9,6 +9,7 @@
     "check-types": "turbo check-types",
     "dev:native": "turbo -F native dev",
     "dev:web": "turbo -F web dev",
+    "dev:wiki": "turbo -F fumadocs dev",
     "dev:server": "turbo -F @ssmb/backend dev",
     "dev:setup": "turbo -F @ssmb/backend dev:setup"
   },
