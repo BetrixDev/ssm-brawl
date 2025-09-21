@@ -1,0 +1,97 @@
+---
+globs: **/*.kt
+description: An overview of Super Smash Mobs Brawl, and how the Minecraft plugin works.
+---
+
+Plugin Main Class: `plugin\src\main\kotlin\dev\betrix\superSmashMobsBrawl\SuperSmashMobsBrawl.kt`
+
+# Overview
+
+Super Smash Mobs Brawl is a Minecraft plugin / server that is based off of the Super Smash Mobs minigame from the Mineplex Minecraft server.
+
+# How it works
+
+Players join minigames and are give a kit. A kit disguises the player as a mob, and gives them abilities and passives. Abilities are items in the player's hotbar that can be activated with either right or left click. Passives are an instance of a class that can act based on events or intervals.
+
+## User Flow
+
+1. Player join the server
+2. Plugin grabs the player's document. A data structure that stores most of the player's data and can be mutated by the plugin at any time (PlayerDocumentService.kt, PlayerDocument.kt).
+3. Player is placed into the Hub (HubService.kt).
+4. Player joins a queue for a minigame. Example: `/queue two_player_duels` (QueueCommand.kt).
+5. Plugin checks if the minigame can start (QueueService.kt).
+6. Plugin starts the minigame (QueueSerivce.kt, MinigameService.kt).
+7. Minigame is composed from many different classes, based on the needs of the defined minigame (BrawlMinigame.kt).
+8. When a minigame is determined to be over, the plugin will end the minigame (BrawlMinigame.kt).
+9. Player is placed back into the Hub (HubService.kt).
+10. Player is teleported back to the Hub (HubService.kt).
+11. Player leaves the server (HubService.kt).
+12. Player document is saved to backend (PlayerDocumentService.kt).
+
+### Patterns
+
+#### Events
+
+Events are handled using the Twilight library. The Managable class and IManageable interface can be used to store event listeners.
+
+```kotlin
+class MyEvent : TwilightEvent()
+
+event<MyEvent> {
+    println("MyEvent")
+}
+```
+
+```kotlin
+event<PlayerDropItemEvent> {
+    if (player.gameMode == GameMode.CREATIVE) {
+        return@event
+    }
+
+    isCancelled = true
+}
+```
+
+#### Commands
+
+Commands are handled using the LiteCommands library. The LiteCommands class and ICommandHandler interface can be used to store commands.
+
+Commands Directory: `plugin\src\main\kotlin\dev\betrix\superSmashMobsBrawl\commands`
+
+```kotlin
+class MyCommand : ICommandHandler {
+    override fun execute(sender: CommandSender, args: Array<String>) {
+        println("MyCommand")
+    }
+}
+```
+
+#### Kits
+
+Kits are handled using the Kit class. The Kit class is a base class for all kits. It is responsible for handling the kit's abilities, passives, and metadata.
+
+Kits Directory: `plugin\src\main\kotlin\dev\betrix\superSmashMobsBrawl\kits`
+
+#### Abilities
+
+Abilities are handled using the BrawlAbility class. The BrawlAbility class is a base class for all abilities. It is responsible for handling the ability's cooldown, usage, and metadata.
+
+Abilities Directory: `plugin\src\main\kotlin\dev\betrix\superSmashMobsBrawl\abilities`
+
+#### Passives
+
+Passives are handled using the BrawlPassive class. The BrawlPassive class is a base class for all passives. It is responsible for handling the passive's metadata.
+
+Passives Directory: `plugin\src\main\kotlin\dev\betrix\superSmashMobsBrawl\passives`
+
+#### Disguises
+
+Disguises are handled using the BrawlDisguise class. The BrawlDisguise class is a base class for all disguises. It is responsible for handling the disguise's metadata.
+
+Disguises Directory: `plugin\src\main\kotlin\dev\betrix\superSmashMobsBrawl\disguises`
+
+#### Projectiles
+
+Projectiles are handled using the BrawlProjectile class. The BrawlProjectile class is a base class for all projectiles. It is responsible for handling the projectile's metadata. Projectiles are very common in for abilities and must be implemented correctly to ensure smooth gameplay.
+
+Projectiles Directory: `plugin\src\main\kotlin\dev\betrix\superSmashMobsBrawl\projectiles`

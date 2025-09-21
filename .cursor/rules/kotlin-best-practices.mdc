@@ -1,0 +1,18 @@
+---
+name: kotlin-best-practices.mdc
+description: Best practices for Kotlin development in Minecraft plugins
+globs: **/*.kt
+---
+
+- Use data classes for immutable data structures like PlayerDocument.
+- Leverage extension functions to enhance existing classes without modifying them.
+- Implement sealed classes for representing different states or types, such as game states or player statuses.
+- Use coroutines for asynchronous operations to avoid blocking the main thread.
+- Koin is used for dependency injection.
+- LiteCommands is used for commands.
+- Twilight is used for events.
+- Ktor is used for HTTP requests.
+- Kaml is used for configuration.
+- Okio is used for file operations.
+- Kotlinx Coroutines is used for asynchronous operations.
+- Kotlinx Serialization is used for serialization.
