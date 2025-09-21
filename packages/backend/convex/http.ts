@@ -30,6 +30,7 @@ app.get("/kv/:key", async (c) => {
   if (value === undefined) {
     return c.json({ error: "Key not found" }, 404);
   }
+
   return c.json({ key, value });
 });
 

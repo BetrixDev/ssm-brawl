@@ -64,13 +64,17 @@ object ApiService {
     }
 
     suspend inline fun <reified T> kvGetAsync(key: String): T? {
-        val response: T = convexClient.get("/kv/$key").body()
+        val response = convexClient.get("kv/$key")
 
-        return response
+        if (response.status.value != 200) {
+            return null
+        }
+
+        return response.body()
     }
 
     suspend inline fun kvSetAsync(key: String, value: Any) {
-        convexClient.put("/kv/$key") {
+        convexClient.put("kv/$key") {
             contentType(ContentType.Application.Json)
             setBody(value)
         }
