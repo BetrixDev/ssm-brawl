@@ -1,24 +1,12 @@
 package dev.betrix.superSmashMobsBrawl
 
 import com.github.shynixn.mccoroutine.bukkit.SuspendingJavaPlugin
-import dev.betrix.superSmashMobsBrawl.commands.DebugCommand
-import dev.betrix.superSmashMobsBrawl.commands.KitCommand
-import dev.betrix.superSmashMobsBrawl.commands.LeaveCommand
-import dev.betrix.superSmashMobsBrawl.commands.QueueCommand
-import dev.betrix.superSmashMobsBrawl.commands.resolvers.KitDefArgument
-import dev.betrix.superSmashMobsBrawl.commands.resolvers.MinigameDefinitionArgument
+import dev.betrix.superSmashMobsBrawl.commands.*
+import dev.betrix.superSmashMobsBrawl.commands.resolvers.*
 import dev.betrix.superSmashMobsBrawl.extensions.hasPassive
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.MinigameDef
-import dev.betrix.superSmashMobsBrawl.services.ApiService
-import dev.betrix.superSmashMobsBrawl.services.DataService
-import dev.betrix.superSmashMobsBrawl.services.DebugService
-import dev.betrix.superSmashMobsBrawl.services.HubProtectionService
-import dev.betrix.superSmashMobsBrawl.services.HubService
-import dev.betrix.superSmashMobsBrawl.services.KitService
-import dev.betrix.superSmashMobsBrawl.services.LangService
-import dev.betrix.superSmashMobsBrawl.services.MinigameService
-import dev.betrix.superSmashMobsBrawl.services.WorldService
+import dev.betrix.superSmashMobsBrawl.services.*
 import dev.rollczi.litecommands.LiteCommands
 import dev.rollczi.litecommands.bukkit.LiteBukkitFactory
 import gg.flyte.twilight.Twilight
@@ -59,6 +47,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                     single<JavaPlugin> { this@SuperSmashMobsBrawl }
                     single { this@SuperSmashMobsBrawl.logger }
                     single { ApiService }
+                    single { PlayerDocumentService }
                     single(createdAtStart = true) { DataService() }
                     single { MinigameService() }
                     single { KitService }
@@ -71,7 +60,6 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
 
         StatisticsBroadcaster()
 
-        // Initialize services
         HubService.initialize(this)
         HubProtectionService.registerEvents()
         DebugService.initialize(this)
@@ -87,8 +75,6 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 .commands(LeaveCommand())
                 .commands(DebugCommand())
                 .build()
-
-        // Player join events are now handled by HubService
 
         event<PlayerDropItemEvent> {
             if (player.gameMode == GameMode.CREATIVE) {
