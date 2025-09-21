@@ -1,41 +1,41 @@
 abilities:
   - id: sulphur_bomb
     cooldown: 3.0
-    type: projectile
+    type: PROJECTILE
     itemSlot: 0
-    usage: right_click
+    usage: RIGHT_CLICK
     hotbarItem: iron_axe
     displayItem: coal
 
   - id: explode
     cooldown: 8.0
-    type: aoe
+    type: AOE
     itemSlot: 1
-    usage: right_click
+    usage: RIGHT_CLICK
     hotbarItem: iron_shovel
     displayItem: creeper_spawn_egg
 
   - id: bone_explosion
     cooldown: 10.0
     itemSlot: 0
-    type: aoe
-    usage: right_click
+    type: AOE
+    usage: RIGHT_CLICK
     hotbarItem: iron_axe
     displayItem: bone
 
   - id: roped_arrow
     cooldown: 5.0
     itemSlot: 1
-    type: projectile
-    usage: left_click
+    type: PROJECTILE
+    usage: LEFT_CLICK
     hotbarItem: bow
     displayItem: arrow
 
   - id: angry_herd
     cooldown: 13.0
     itemSlot: 0
-    type: aoe
-    usage: right_click
+    type: AOE
+    usage: RIGHT_CLICK
     hotbarItem: iron_axe
     displayItem: cow_spawn_egg
     metadata:
@@ -50,8 +50,8 @@ abilities:
   - id: milk_spiral
     cooldown: 9.0
     itemSlot: 1
-    type: projectile
-    usage: right_click
+    type: PROJECTILE
+    usage: RIGHT_CLICK
     hotbarItem: iron_shovel
     displayItem: milk_bucket
     metadata:
@@ -67,8 +67,8 @@ abilities:
   - id: blink
     cooldown: 6.0
     itemSlot: 1
-    type: recovery
-    usage: right_click
+    type: RECOVERY
+    usage: RIGHT_CLICK
     hotbarItem: iron_axe
     displayItem: ender_pearl
     metadata:
@@ -77,8 +77,38 @@ abilities:
   - id: block_toss
     cooldown: 2.5
     itemSlot: 0
-    type: projectile
-    usage: right_click
+    type: PROJECTILE
+    usage: RIGHT_CLICK
     hotbarItem: iron_sword
     displayItem: grass_block
     metadata:
+
+  - id: fissure
+    cooldown: 8.0
+    itemSlot: 0
+    type: AOE
+    usage: RIGHT_CLICK
+    hotbarItem: iron_axe
+    displayItem: cracked_stone_bricks
+
+  - id: iron_hook
+    cooldown: 6.0
+    itemSlot: 1
+    type: PROJECTILE
+    usage: RIGHT_CLICK
+    hotbarItem: iron_pickaxe
+    displayItem: tripwire_hook
+
+  - id: seismic_slam
+    cooldown: 8.0
+    itemSlot: 2
+    type: AOE
+    usage: RIGHT_CLICK
+    hotbarItem: iron_shovel
+    displayItem: iron_block
+    metadata:
+      launchVelocity: 1.2
+      forwardVelocity: 0.8
+      slamRadius: 4.0
+      slamDamage: 8.0
+      slamKnockbackMultiplier: 2.0

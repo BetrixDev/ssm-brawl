@@ -4,39 +4,53 @@ kits:
     description: "This is the hub kit"
   creeper:
     name: "Creeper"
-    description: "He's a creeper"
+    description: "Explosive specialist with devastating area attacks"
   skeleton:
     name: "Skeleton"
-    description: "He got bones"
+    description: "Archer with bone projectiles and roped arrows"
   cow:
     name: "Cow"
+    description: "Farm animal with milk attacks and stampede abilities"
   enderman:
     name: "Enderman"
+    description: "Teleporting mob that can pick up and throw blocks"
+  iron_golem:
+    name: "Iron Golem"
+    description: "Strong and sturdy with fissure attacks, iron hooks, and devastating ground slams"
 abilities:
   sulphur_bomb:
     name: "Sulphur Bomb"
-    description: ""
+    description: "Throw an explosive projectile that damages and knocks back enemies"
   explode:
     name: "Explode"
-    description: ""
+    description: "Charge up and create a devastating explosion"
   bone_explosion:
     name: "Bone Explosion"
-    description: ""
+    description: "Launch bone fragments that explode on impact"
   roped_arrow:
     name: "Roped Arrow"
-    description: ""
+    description: "Fire an arrow with a rope that pulls you to the impact location"
   blink:
     name: "Blink"
-    description: ""
+    description: "Teleport a short distance away"
   block_toss:
     name: "Block Toss"
-    description: ""
+    description: "Pick up and throw blocks at your enemies"
   angry_herd:
     name: "Angry Herd"
-    description: ""
+    description: "Spawn a herd of angry cows that charge at your enemies"
   milk_spiral:
     name: "Milk Spiral"
-    description: ""
+    description: "Create a spiraling milk attack that damages nearby enemies"
+  fissure:
+    name: "Fissure"
+    description: "Create a ground fissure that damages enemies in a line"
+  iron_hook:
+    name: "Iron Hook"
+    description: "Launch a hook projectile that pulls enemies or creates an effect"
+  seismic_slam:
+    name: "Seismic Slam"
+    description: "Launch into the air and slam down to damage nearby enemies"
 maps:
   blue_forest:
     name: "Blue Forest"

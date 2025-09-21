@@ -261,7 +261,7 @@ object KitService : KoinComponent {
                                     )
                                 }
 
-                                val loreList = arrayListOf<Component>()
+                                val loreList = arrayListOf<Component>(Component.empty())
 
                                 loreList.add(lang.t("gui.kitSelection.abilityList.title"))
 

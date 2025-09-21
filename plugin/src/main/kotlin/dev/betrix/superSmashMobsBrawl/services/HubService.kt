@@ -8,6 +8,7 @@ import dev.betrix.superSmashMobsBrawl.utils.createLocation
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.extension.feed
 import gg.flyte.twilight.extension.heal
+import gg.flyte.twilight.extension.removeActivePotionEffects
 import gg.flyte.twilight.extension.resetFlySpeed
 import gg.flyte.twilight.extension.resetWalkSpeed
 import java.util.UUID
@@ -137,8 +138,9 @@ object HubService : KoinComponent {
         player.heal()
         player.resetWalkSpeed()
         player.resetFlySpeed()
-        player.gameMode = GameMode.SURVIVAL
+        player.gameMode = GameMode.ADVENTURE
         player.fallDistance = 0f
+        player.removeActivePotionEffects()
         playersInHub.add(player)
 
         return Ok(Unit)
