@@ -1,5 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.serializers
 
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -7,8 +9,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.nullable
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
 object InstantIsoSerializer : KSerializer<Instant> {
@@ -26,7 +26,8 @@ object InstantIsoSerializer : KSerializer<Instant> {
 
 @OptIn(ExperimentalTime::class)
 object NullableInstantIsoSerializer : KSerializer<Instant?> {
-    override val descriptor = PrimitiveSerialDescriptor("NullableInstant", PrimitiveKind.STRING).nullable
+    override val descriptor =
+        PrimitiveSerialDescriptor("NullableInstant", PrimitiveKind.STRING).nullable
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun serialize(encoder: Encoder, value: Instant?) {

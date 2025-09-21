@@ -20,7 +20,10 @@ object ApiService {
     private val httpAuthToken = System.getenv("HTTP_AUTH_TOKEN")
     private val httpBaseUrl = System.getenv("HTTP_BASE_URL")
     private val convexBase =
-        (httpBaseUrl ?: error("HTTP_BASE_URL is required (e.g., https://adjective-animal-number.convex.cloud)")) + "/convex"
+        (httpBaseUrl
+            ?: error(
+                "HTTP_BASE_URL is required (e.g., https://adjective-animal-number.convex.cloud)"
+            )) + "/convex"
 
     @PublishedApi
     internal val convexClient =

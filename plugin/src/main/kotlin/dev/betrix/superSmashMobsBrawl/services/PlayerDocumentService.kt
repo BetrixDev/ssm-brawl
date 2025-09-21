@@ -27,9 +27,8 @@ object PlayerDocumentService : KoinComponent, Manageable() {
     override fun setup() {
         plugin.server.onlinePlayers.forEach { player ->
             plugin.launch {
-                val document = withContext(Dispatchers.IO) {
-                    api.playersGetDocumentAsync(player, true)
-                }
+                val document =
+                    withContext(Dispatchers.IO) { api.playersGetDocumentAsync(player, true) }
 
                 documents[player] = document
             }
@@ -42,7 +41,11 @@ object PlayerDocumentService : KoinComponent, Manageable() {
                     plugin.launch {
                         withContext(Dispatchers.IO) {
                             runCatching { api.playersSetDocumentAsync(player, document) }
-                                .onFailure { plugin.logger.warning("Failed to persist document for ${player.name}: ${it.message}") }
+                                .onFailure {
+                                    plugin.logger.warning(
+                                        "Failed to persist document for ${player.name}: ${it.message}"
+                                    )
+                                }
                         }
                     }
                 }
@@ -53,9 +56,10 @@ object PlayerDocumentService : KoinComponent, Manageable() {
             event<PlayerJoinEvent>(priority = EventPriority.LOWEST) {
                 runBlocking {
                     plugin.launch {
-                        val document = withContext(Dispatchers.IO) {
-                            api.playersGetDocumentAsync(player, true)
-                        }
+                        val document =
+                            withContext(Dispatchers.IO) {
+                                api.playersGetDocumentAsync(player, true)
+                            }
 
                         documents[player] = document
                     }
@@ -80,7 +84,9 @@ object PlayerDocumentService : KoinComponent, Manageable() {
             entries.forEach { (player, doc) ->
                 withContext(Dispatchers.IO) {
                     runCatching { api.playersSetDocumentAsync(player, doc) }
-                        .onFailure { plugin.logger.warning("Flush failed for ${player.name}: ${it.message}") }
+                        .onFailure {
+                            plugin.logger.warning("Flush failed for ${player.name}: ${it.message}")
+                        }
                 }
             }
         }
