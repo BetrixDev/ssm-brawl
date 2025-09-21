@@ -95,3 +95,19 @@ Disguises Directory: `plugin\src\main\kotlin\dev\betrix\superSmashMobsBrawl\disg
 Projectiles are handled using the BrawlProjectile class. The BrawlProjectile class is a base class for all projectiles. It is responsible for handling the projectile's metadata. Projectiles are very common in for abilities and must be implemented correctly to ensure smooth gameplay.
 
 Projectiles Directory: `plugin\src\main\kotlin\dev\betrix\superSmashMobsBrawl\projectiles`
+
+## Yaml Configuration
+
+Many things related to Brawl can be configured using yaml files. The configuration files are located in the `plugin\src\main\resources\data` directory.
+
+Current Yaml Files:
+
+- `abilities.yml`
+- `disguises.yml`
+- `maps.yml`
+- `kits.yml`
+- `minigames.yml`
+- `passives.yml`
+- `projectiles.yml`
+- `theme.yml`
+- `lang/en.yml`
