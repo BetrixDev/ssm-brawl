@@ -43,11 +43,11 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
     // Testing
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
-    testImplementation("io.kotest:kotest-property:5.9.1")
 
     testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.20.0")
     testImplementation("io.insert-koin:koin-test:3.5.6")

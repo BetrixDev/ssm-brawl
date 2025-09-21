@@ -36,7 +36,7 @@ export const savePlayerDocument = zInternalMutation({
     }
 
     return await ctx.db.patch(args.uuid, {
-      lastJoinedAt: args.document.lastJoinTime,
+      lastJoinDate: args.document.lastJoinDate,
       stats: args.document.stats,
       avatarUrl: args.document.avatarUrl,
     });
@@ -48,7 +48,18 @@ export const deletePlayerDocument = internalMutation({
     uuid: v.id("players"),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.delete(args.uuid);
+    const player = await ctx.db
+      .query("players")
+      .withIndex("by_uuid", (q) => q.eq("uuid", args.uuid))
+      .unique();
+
+    if (!player) {
+      throw new Error("Player not found");
+    }
+
+    await ctx.db.delete(player._id);
+
+    return null;
   },
 });
 
@@ -93,7 +104,12 @@ export const createPlayer = internalAction({
   },
   returns: v.id("players"),
   handler: async (ctx, args) => {
-    const response = await fetch(`https://playerdb.co/api/player/minecraft/${args.uuid}`);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(`https://playerdb.co/api/player/minecraft/${args.uuid}`, {
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeout));
 
     if (!response.ok) {
       if (response.status >= 400 && response.status < 500) {
@@ -141,10 +157,10 @@ export const insertPlayer = internalMutation({
     return await ctx.db.insert("players", {
       username: args.player.username,
       uuid: args.player.uuid,
-      firstJoinedAt: new Date().toISOString(),
+      firstJoinDate: new Date().toISOString(),
+      lastJoinDate: new Date().toISOString(),
       skinTextureUrl: args.minecraftPlayerData.skinTextureUrl,
       avatarUrl: args.minecraftPlayerData.avatarUrl,
-      lastJoinedAt: new Date().toISOString(),
       stats: {
         joinCount: 1,
       },
@@ -169,7 +185,7 @@ export const updatePlayerJoin = internalMutation({
     const currentJoinCount = (player.stats?.joinCount as number) || 0;
 
     await ctx.db.patch(player._id, {
-      lastJoinedAt: new Date().toISOString(),
+      lastJoinDate: new Date().toISOString(),
       stats: {
         ...player.stats,
         joinCount: currentJoinCount + 1,

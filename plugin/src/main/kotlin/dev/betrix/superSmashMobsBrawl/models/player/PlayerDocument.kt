@@ -1,5 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.models.player
 
+import dev.betrix.superSmashMobsBrawl.serializers.BannedBySerializer
+import dev.betrix.superSmashMobsBrawl.serializers.InstantIsoSerializer
+import dev.betrix.superSmashMobsBrawl.serializers.NullableInstantIsoSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
@@ -9,13 +12,16 @@ import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.floatOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.longOrNull
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @Serializable
-data class PlayerDocument(
+data class PlayerDocument @OptIn(ExperimentalTime::class) constructor(
     val isFirstTimeOnServer: Boolean,
-    val lastJoinTime: String,
+    @Serializable(with = InstantIsoSerializer::class)
+    val lastJoinDate: Instant,
     val avatarUrl: String,
-    val stats: HashMap<String, JsonElement>,
+    val stats: MutableMap<String, JsonElement>,
     val banData: PlayerBanData?,
 ) {
     /**
@@ -78,11 +84,18 @@ data class PlayerDocument(
     }
 }
 
+@Serializable(with = BannedBySerializer::class)
+sealed class BannedBy {
+    data object System : BannedBy()
+    data class Moderator(val uuid: String) : BannedBy()
+}
+
 @Serializable
-data class PlayerBanData(
+data class PlayerBanData @OptIn(ExperimentalTime::class) constructor(
     val isBanned: Boolean,
     val reason: String,
-    val expiresAt: String,
+    @Serializable(with = NullableInstantIsoSerializer::class)
+    val expiresAt: Instant?,
     val bannedAt: String,
-    val bannedBy: String,
+    val bannedBy: BannedBy,
 )

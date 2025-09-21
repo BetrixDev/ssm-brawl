@@ -19,6 +19,8 @@ import org.bukkit.entity.Player
 object ApiService {
     private val httpAuthToken = System.getenv("HTTP_AUTH_TOKEN")
     private val httpBaseUrl = System.getenv("HTTP_BASE_URL")
+    private val convexBase =
+        (httpBaseUrl ?: error("HTTP_BASE_URL is required (e.g., https://adjective-animal-number.convex.cloud)")) + "/convex"
 
     @PublishedApi
     internal val convexClient =
@@ -28,7 +30,7 @@ object ApiService {
                     header("Authorization", "Bearer $httpAuthToken")
                 }
                 contentType(ContentType.Application.Json)
-                url("$httpBaseUrl/convex")
+                url(convexBase)
             }
             install(ContentNegotiation) {
                 json(

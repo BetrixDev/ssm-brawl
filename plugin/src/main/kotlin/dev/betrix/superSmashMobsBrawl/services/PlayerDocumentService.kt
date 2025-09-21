@@ -25,12 +25,24 @@ object PlayerDocumentService : KoinComponent, Manageable() {
     private val documents = hashMapOf<Player, PlayerDocument>()
 
     override fun setup() {
+        plugin.server.onlinePlayers.forEach { player ->
+            plugin.launch {
+                val document = withContext(Dispatchers.IO) {
+                    api.playersGetDocumentAsync(player, true)
+                }
+
+                documents[player] = document
+            }
+        }
+
         runnables.add(
             repeatingTask(5.minutes.ticks) {
-                documents.forEach { player, document ->
+                val entries = documents.entries.toList()
+                entries.forEach { (player, document) ->
                     plugin.launch {
                         withContext(Dispatchers.IO) {
-                            api.playersSetDocumentAsync(player, document)
+                            runCatching { api.playersSetDocumentAsync(player, document) }
+                                .onFailure { plugin.logger.warning("Failed to persist document for ${player.name}: ${it.message}") }
                         }
                     }
                 }
@@ -41,10 +53,11 @@ object PlayerDocumentService : KoinComponent, Manageable() {
             event<PlayerJoinEvent>(priority = EventPriority.LOWEST) {
                 runBlocking {
                     plugin.launch {
-                        withContext(Dispatchers.IO) {
-                            val document = api.playersGetDocumentAsync(player, true)
-                            documents[player] = document
+                        val document = withContext(Dispatchers.IO) {
+                            api.playersGetDocumentAsync(player, true)
                         }
+
+                        documents[player] = document
                     }
                 }
             }
@@ -61,13 +74,19 @@ object PlayerDocumentService : KoinComponent, Manageable() {
         )
     }
 
-    fun getPlayerDocument(player: Player): PlayerDocument {
-        val document = documents[player]
-
-        if (document == null) {
-            throw IllegalStateException("Player document for ${player.name} not found in cache.")
-        } else {
-            return document
+    override fun teardown() {
+        val entries = documents.entries.toList()
+        runBlocking {
+            entries.forEach { (player, doc) ->
+                withContext(Dispatchers.IO) {
+                    runCatching { api.playersSetDocumentAsync(player, doc) }
+                        .onFailure { plugin.logger.warning("Flush failed for ${player.name}: ${it.message}") }
+                }
+            }
         }
+        documents.clear()
     }
+
+    fun getPlayerDocument(player: Player): PlayerDocument =
+        documents[player] ?: error("Player document for ${player.name} not found in cache.")
 }
