@@ -88,11 +88,22 @@ app.get("/players/:uuid/document", async (c) => {
     return c.json({ message: "Player data was not able to be created" }, { status: 500 });
   }
 
+  const banData = await c.env.runQuery(internal.players.getPlayerBanByUuid, { uuid });
+
   const document: PlayerDocument = {
     avatarUrl: playerData.avatarUrl,
     isFirstTimeOnServer,
     lastJoinTime: playerData.lastJoinedAt,
     stats: playerData.stats,
+    banData: banData
+      ? {
+          isBanned: true,
+          reason: banData.reason,
+          expiresAt: banData.expiresAt,
+          bannedAt: banData.bannedAt,
+          bannedBy: banData.bannedBy,
+        }
+      : null,
   };
 
   return c.json(document);

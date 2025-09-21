@@ -11,7 +11,7 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.longOrNull
 
 @Serializable
-data class PlayerDocument(val isFirstTimeOnServer: Boolean, val lastJoinTime: String, val avatarUrl: String, val stats: HashMap<String, JsonElement>) {
+data class PlayerDocument(val isFirstTimeOnServer: Boolean, val lastJoinTime: String, val avatarUrl: String, val stats: HashMap<String, JsonElement>, val banData: PlayerBanData?) {
     /**
      * Type-safe getter for stats values
      * @return The value of the stat if it exists and can be cast to the specified type, null otherwise
@@ -67,3 +67,6 @@ data class PlayerDocument(val isFirstTimeOnServer: Boolean, val lastJoinTime: St
         stats.remove(key)
     }
 }
+
+@Serializable
+data class PlayerBanData(val isBanned: Boolean, val reason: String, val expiresAt: String, val bannedAt: String, val bannedBy: String)

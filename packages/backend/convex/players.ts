@@ -13,6 +13,28 @@ export const savePlayerDocument = zInternalMutation({
     document: playerDocumentSchema,
   },
   handler: async (ctx, args) => {
+    if (args.document.banData) {
+      const existingBan = await ctx.db
+        .query("playerBans")
+        .withIndex("by_uuid", (q) => q.eq("uuid", args.uuid))
+        .unique();
+
+      if (existingBan) {
+        await ctx.db.patch(existingBan._id, {
+          reason: args.document.banData.reason,
+          expiresAt: args.document.banData.expiresAt,
+        });
+      } else {
+        await ctx.db.insert("playerBans", {
+          uuid: args.uuid,
+          reason: args.document.banData.reason,
+          expiresAt: args.document.banData.expiresAt,
+          bannedAt: args.document.banData.bannedAt,
+          bannedBy: args.document.banData.bannedBy,
+        });
+      }
+    }
+
     return await ctx.db.patch(args.uuid, {
       lastJoinedAt: args.document.lastJoinTime,
       stats: args.document.stats,
@@ -37,6 +59,18 @@ export const getPlayerByUuid = internalQuery({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("players")
+      .withIndex("by_uuid", (q) => q.eq("uuid", args.uuid))
+      .unique();
+  },
+});
+
+export const getPlayerBanByUuid = internalQuery({
+  args: {
+    uuid: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("playerBans")
       .withIndex("by_uuid", (q) => q.eq("uuid", args.uuid))
       .unique();
   },

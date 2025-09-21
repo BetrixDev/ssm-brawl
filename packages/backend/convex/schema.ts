@@ -17,4 +17,11 @@ export default defineSchema({
   })
     .index("by_username", ["username"])
     .index("by_uuid", ["uuid"]),
+  playerBans: defineTable({
+    uuid: v.string(),
+    reason: v.string(),
+    expiresAt: v.optional(v.string()),
+    bannedAt: v.string(),
+    bannedBy: v.string(),
+  }).index("by_uuid", ["uuid"]),
 });
