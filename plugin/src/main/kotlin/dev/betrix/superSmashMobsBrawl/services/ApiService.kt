@@ -41,10 +41,17 @@ object ApiService {
             }
         }
 
-    suspend fun playersGetDocumentAsync(player: Player): PlayerDocument {
-        val response: PlayerDocument = convexClient.get("players/${player.uniqueId}/document").body()
+    suspend fun playersGetDocumentAsync(player: Player, isJoinEvent: Boolean = false): PlayerDocument {
+        val response: PlayerDocument = convexClient.get("players/${player.uniqueId}/document?joinEvent=${isJoinEvent}").body()
 
         return response
+    }
+
+    suspend fun playersSetDocumentAsync(player: Player, document: PlayerDocument) {
+        convexClient.put("players/${player.uniqueId}/document") {
+            contentType(ContentType.Application.Json)
+            setBody(document)
+        }
     }
 
     suspend inline fun <reified T> kvGetAsync(key: String): T? {

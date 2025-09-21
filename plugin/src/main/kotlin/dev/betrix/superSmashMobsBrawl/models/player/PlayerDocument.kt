@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.models.player
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.floatOrNull
@@ -10,7 +11,7 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.longOrNull
 
 @Serializable
-data class PlayerDocument(val isFirstTimeOnServer: Boolean, val avatarUrl: String, val stats: HashMap<String, JsonElement>) {
+data class PlayerDocument(val isFirstTimeOnServer: Boolean, val lastJoinTime: String, val avatarUrl: String, val stats: HashMap<String, JsonElement>) {
     /**
      * Type-safe getter for stats values
      * @return The value of the stat if it exists and can be cast to the specified type, null otherwise
@@ -24,6 +25,7 @@ data class PlayerDocument(val isFirstTimeOnServer: Boolean, val avatarUrl: Strin
             Int::class -> element.intOrNull as? T
             Long::class -> element.longOrNull as? T
             Float::class -> element.floatOrNull as? T
+            Boolean::class -> element.booleanOrNull as? T
             else -> null
         }
     }
@@ -51,7 +53,8 @@ data class PlayerDocument(val isFirstTimeOnServer: Boolean, val avatarUrl: Strin
         val jsonElement = when (value) {
             is String -> JsonPrimitive(value)
             is Number -> JsonPrimitive(value)
-            else -> throw IllegalArgumentException("Stats only support String or Number types")
+            is Boolean -> JsonPrimitive(value)
+            else -> throw IllegalArgumentException("Stats only support String, Number, or Boolean types")
         }
 
         stats[key] = jsonElement

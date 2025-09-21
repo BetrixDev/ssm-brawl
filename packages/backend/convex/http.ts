@@ -1,9 +1,11 @@
+import { zValidator } from "@hono/zod-validator";
 import { HonoWithConvex, HttpRouterWithHono } from "convex-helpers/server/hono";
 import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
 import { timing } from "hono/timing";
 import { api, internal } from "./_generated/api";
 import { ActionCtx } from "./_generated/server";
+import { PlayerDocument, playerDocumentSchema } from "./schemas";
 
 const app: HonoWithConvex<ActionCtx> = new Hono();
 
@@ -56,31 +58,61 @@ app.put("/kv/:key", async (c) => {
   return c.json({ message: "Key-Value pair updated successfully", key, value });
 });
 
-app.get("/players/:uuid/joinData", async (c) => {
+app.get("/players/:uuid/document", async (c) => {
   const uuid = c.req.param("uuid");
+  const isJoinEvent = c.req.query("joinEvent") === "true";
 
-  const playerData = await c.env.runQuery(api.players.getPlayerByUuid, { uuid });
-  const firstTimeJoin = !playerData;
+  let playerData = await c.env.runQuery(internal.players.getPlayerByUuid, { uuid });
 
-  if (firstTimeJoin) {
-    await c.env.runAction(internal.players.createPlayer, {
-      uuid,
-    });
-  } else {
+  const isFirstTimeOnServer = !playerData;
+
+  if (isFirstTimeOnServer) {
+    try {
+      await c.env.runAction(internal.players.createPlayer, {
+        uuid,
+      });
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("Player not found on playerdb.co")) {
+        return c.json({ message: `"${uuid}" is not a valid minecraft uuid` }, { status: 404 });
+      }
+
+      return c.json({ message: "Player data was not able to be created" }, { status: 500 });
+    }
+  } else if (isJoinEvent) {
     await c.env.runMutation(internal.players.updatePlayerJoin, { uuid });
   }
 
-  const playerDocument = await c.env.runQuery(api.players.getPlayerDocument, { uuid });
+  playerData ??= await c.env.runQuery(internal.players.getPlayerByUuid, { uuid });
 
-  if (!playerDocument) {
-    return c.json({ error: "Player not found" }, 404);
+  if (!playerData) {
+    return c.json({ message: "Player data was not able to be created" }, { status: 500 });
   }
 
-  return c.json({
-    avatarUrl: playerDocument.avatarUrl,
-    isFirstTimeOnServer: firstTimeJoin,
-    stats: playerDocument.stats,
+  const document: PlayerDocument = {
+    avatarUrl: playerData.avatarUrl,
+    isFirstTimeOnServer,
+    lastJoinTime: playerData.lastJoinedAt,
+    stats: playerData.stats,
+  };
+
+  return c.json(document);
+});
+
+app.put("/players/:uuid/document", zValidator("json", playerDocumentSchema), async (c) => {
+  const uuid = c.req.param("uuid");
+  const document = c.req.valid("json");
+
+  await c.env.runMutation(internal.players.savePlayerDocument, {
+    uuid: uuid as any,
+    document,
   });
+});
+
+app.delete("/players/:uuid/document", async (c) => {
+  const uuid = c.req.param("uuid");
+  await c.env.runMutation(internal.players.deletePlayerDocument, { uuid: uuid as any });
+
+  return c.json({ message: "Player data deleted successfully" });
 });
 
 export default new HttpRouterWithHono(app);

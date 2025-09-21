@@ -24,7 +24,7 @@ object PlayerDocumentService : KoinComponent, Manageable() {
 
     suspend fun fetchPlayerDocument(player: Player) {
         withContext(Dispatchers.IO) {
-            val document = api.playersDocumentAsync(player)
+            val document = api.playersGetDocumentAsync(player)
         }
     }
 

@@ -1,22 +1,36 @@
+import { zid } from "convex-helpers/server/zod";
 import { v } from "convex/values";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
-import { internalAction, internalMutation, query } from "./_generated/server";
+import { internalAction, internalMutation, internalQuery } from "./_generated/server";
+import { zInternalMutation } from "./common";
+import { playerDocumentSchema } from "./schemas";
 
-export const getPlayerDocument = query({
+export const savePlayerDocument = zInternalMutation({
   args: {
-    uuid: v.string(),
+    uuid: zid("players"),
+    document: playerDocumentSchema,
   },
   handler: async (ctx, args) => {
-    return await ctx.db
-      .query("players")
-      .withIndex("by_uuid", (q) => q.eq("uuid", args.uuid))
-      .unique();
+    return await ctx.db.patch(args.uuid, {
+      lastJoinedAt: args.document.lastJoinTime,
+      stats: args.document.stats,
+      avatarUrl: args.document.avatarUrl,
+    });
   },
 });
 
-export const getPlayerByUuid = query({
+export const deletePlayerDocument = internalMutation({
+  args: {
+    uuid: v.id("players"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.delete(args.uuid);
+  },
+});
+
+export const getPlayerByUuid = internalQuery({
   args: {
     uuid: v.string(),
   },
@@ -46,6 +60,15 @@ export const createPlayer = internalAction({
   returns: v.id("players"),
   handler: async (ctx, args) => {
     const response = await fetch(`https://playerdb.co/api/player/minecraft/${args.uuid}`);
+
+    if (!response.ok) {
+      if (response.status >= 400 && response.status < 500) {
+        throw new Error("Player not found on playerdb.co");
+      }
+
+      throw new Error("Failed to fetch player data from playerdb.co");
+    }
+
     const json = await response.json();
 
     const { data } = playerDbApiSchema.parse(json);
