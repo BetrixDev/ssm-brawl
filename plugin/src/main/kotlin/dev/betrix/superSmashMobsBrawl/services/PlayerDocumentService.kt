@@ -7,6 +7,7 @@ import dev.betrix.superSmashMobsBrawl.extensions.ticks
 import dev.betrix.superSmashMobsBrawl.models.player.PlayerDocument
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.repeatingTask
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -16,7 +17,6 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import kotlin.time.Duration.Companion.minutes
 
 object PlayerDocumentService : KoinComponent, Manageable() {
     private val api: ApiService by inject()
@@ -25,15 +25,17 @@ object PlayerDocumentService : KoinComponent, Manageable() {
     private val documents = hashMapOf<Player, PlayerDocument>()
 
     override fun setup() {
-        runnables.add(repeatingTask(5.minutes.ticks) {
-            documents.forEach { player, document ->
-                plugin.launch {
-                    withContext(Dispatchers.IO) {
-                        api.playersSetDocumentAsync(player, document)
+        runnables.add(
+            repeatingTask(5.minutes.ticks) {
+                documents.forEach { player, document ->
+                    plugin.launch {
+                        withContext(Dispatchers.IO) {
+                            api.playersSetDocumentAsync(player, document)
+                        }
                     }
                 }
             }
-        })
+        )
 
         listeners.add(
             event<PlayerJoinEvent>(priority = EventPriority.LOWEST) {
@@ -52,9 +54,7 @@ object PlayerDocumentService : KoinComponent, Manageable() {
             event<PlayerQuitEvent>(priority = EventPriority.LOWEST) {
                 documents.remove(player)?.let {
                     plugin.launch {
-                        withContext(Dispatchers.IO) {
-                            api.playersSetDocumentAsync(player, it)
-                        }
+                        withContext(Dispatchers.IO) { api.playersSetDocumentAsync(player, it) }
                     }
                 }
             }

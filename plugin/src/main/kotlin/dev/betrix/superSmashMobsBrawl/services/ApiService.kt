@@ -41,8 +41,12 @@ object ApiService {
             }
         }
 
-    suspend fun playersGetDocumentAsync(player: Player, isJoinEvent: Boolean = false): PlayerDocument {
-        val response: PlayerDocument = convexClient.get("players/${player.uniqueId}/document?joinEvent=${isJoinEvent}").body()
+    suspend fun playersGetDocumentAsync(
+        player: Player,
+        isJoinEvent: Boolean = false,
+    ): PlayerDocument {
+        val response: PlayerDocument =
+            convexClient.get("players/${player.uniqueId}/document?joinEvent=${isJoinEvent}").body()
 
         return response
     }

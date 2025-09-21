@@ -11,10 +11,18 @@ import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.longOrNull
 
 @Serializable
-data class PlayerDocument(val isFirstTimeOnServer: Boolean, val lastJoinTime: String, val avatarUrl: String, val stats: HashMap<String, JsonElement>, val banData: PlayerBanData?) {
+data class PlayerDocument(
+    val isFirstTimeOnServer: Boolean,
+    val lastJoinTime: String,
+    val avatarUrl: String,
+    val stats: HashMap<String, JsonElement>,
+    val banData: PlayerBanData?,
+) {
     /**
      * Type-safe getter for stats values
-     * @return The value of the stat if it exists and can be cast to the specified type, null otherwise
+     *
+     * @return The value of the stat if it exists and can be cast to the specified type, null
+     *   otherwise
      */
     inline fun <reified T> getStat(key: String): T? {
         val element = stats[key] as? JsonPrimitive ?: return null
@@ -31,10 +39,12 @@ data class PlayerDocument(val isFirstTimeOnServer: Boolean, val lastJoinTime: St
     }
 
     /**
-     * Type-safe getter for stats values with a default value if the stat does not exist.
-     * If the stat does not exist, it will be created with the default value.
-     * **Mutates the stats map if the stat does not exist.**
-     * @return The value of the stat if it exists and can be cast to the specified type, otherwise the default value
+     * Type-safe getter for stats values with a default value if the stat does not exist. If the
+     * stat does not exist, it will be created with the default value. **Mutates the stats map if
+     * the stat does not exist.**
+     *
+     * @return The value of the stat if it exists and can be cast to the specified type, otherwise
+     *   the default value
      */
     inline fun <reified T> getStat(key: String, default: T): T {
         val value = getStat<T>(key)
@@ -46,27 +56,33 @@ data class PlayerDocument(val isFirstTimeOnServer: Boolean, val lastJoinTime: St
         return value ?: default
     }
 
-    /**
-     * Type-safe setter for stats values. Mutates the stats map
-     */
+    /** Type-safe setter for stats values. Mutates the stats map */
     inline fun <reified T> setStat(key: String, value: T) {
-        val jsonElement = when (value) {
-            is String -> JsonPrimitive(value)
-            is Number -> JsonPrimitive(value)
-            is Boolean -> JsonPrimitive(value)
-            else -> throw IllegalArgumentException("Stats only support String, Number, or Boolean types")
-        }
+        val jsonElement =
+            when (value) {
+                is String -> JsonPrimitive(value)
+                is Number -> JsonPrimitive(value)
+                is Boolean -> JsonPrimitive(value)
+                else ->
+                    throw IllegalArgumentException(
+                        "Stats only support String, Number, or Boolean types"
+                    )
+            }
 
         stats[key] = jsonElement
     }
 
-    /**
-     * Remove a stat from the stats map.
-     */
+    /** Remove a stat from the stats map. */
     fun removeStat(key: String) {
         stats.remove(key)
     }
 }
 
 @Serializable
-data class PlayerBanData(val isBanned: Boolean, val reason: String, val expiresAt: String, val bannedAt: String, val bannedBy: String)
+data class PlayerBanData(
+    val isBanned: Boolean,
+    val reason: String,
+    val expiresAt: String,
+    val bannedAt: String,
+    val bannedBy: String,
+)
