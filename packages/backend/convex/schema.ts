@@ -11,10 +11,17 @@ export default defineSchema({
     uuid: v.string(),
     skinTextureUrl: v.string(),
     avatarUrl: v.string(),
-    firstJoinedAt: v.string(),
-    lastJoinedAt: v.string(),
-    stats: v.record(v.string(), v.any()),
+    firstJoinDate: v.string(),
+    lastJoinDate: v.string(),
+    stats: v.record(v.string(), v.union(v.string(), v.number(), v.boolean())),
   })
     .index("by_username", ["username"])
     .index("by_uuid", ["uuid"]),
+  playerBans: defineTable({
+    uuid: v.string(),
+    reason: v.string(),
+    expiresAt: v.optional(v.string()),
+    bannedAt: v.string(),
+    bannedBy: v.union(v.string(), v.literal("system")),
+  }).index("by_uuid", ["uuid"]),
 });

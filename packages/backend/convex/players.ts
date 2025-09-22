@@ -1,10 +1,69 @@
+import { zid } from "convex-helpers/server/zod";
 import { v } from "convex/values";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
-import { internalAction, internalMutation, query } from "./_generated/server";
+import { internalAction, internalMutation, internalQuery } from "./_generated/server";
+import { zInternalMutation } from "./common";
+import { playerDocumentSchema } from "./schemas";
 
-export const getPlayerByUuid = query({
+export const savePlayerDocument = zInternalMutation({
+  args: {
+    uuid: zid("players"),
+    document: playerDocumentSchema,
+  },
+  handler: async (ctx, args) => {
+    if (args.document.banData) {
+      const existingBan = await ctx.db
+        .query("playerBans")
+        .withIndex("by_uuid", (q) => q.eq("uuid", args.uuid))
+        .unique();
+
+      if (existingBan) {
+        await ctx.db.patch(existingBan._id, {
+          reason: args.document.banData.reason,
+          expiresAt: args.document.banData.expiresAt,
+        });
+      } else {
+        await ctx.db.insert("playerBans", {
+          uuid: args.uuid,
+          reason: args.document.banData.reason,
+          expiresAt: args.document.banData.expiresAt,
+          bannedAt: args.document.banData.bannedAt,
+          bannedBy: args.document.banData.bannedBy,
+        });
+      }
+    }
+
+    return await ctx.db.patch(args.uuid, {
+      lastJoinDate: args.document.lastJoinDate,
+      stats: args.document.stats,
+      avatarUrl: args.document.avatarUrl,
+    });
+  },
+});
+
+export const deletePlayerDocument = internalMutation({
+  args: {
+    uuid: v.id("players"),
+  },
+  handler: async (ctx, args) => {
+    const player = await ctx.db
+      .query("players")
+      .withIndex("by_uuid", (q) => q.eq("uuid", args.uuid))
+      .unique();
+
+    if (!player) {
+      throw new Error("Player not found");
+    }
+
+    await ctx.db.delete(player._id);
+
+    return null;
+  },
+});
+
+export const getPlayerByUuid = internalQuery({
   args: {
     uuid: v.string(),
   },
@@ -16,7 +75,19 @@ export const getPlayerByUuid = query({
   },
 });
 
-const playerDbSchema = z.object({
+export const getPlayerBanByUuid = internalQuery({
+  args: {
+    uuid: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("playerBans")
+      .withIndex("by_uuid", (q) => q.eq("uuid", args.uuid))
+      .unique();
+  },
+});
+
+const playerDbApiSchema = z.object({
   data: z.object({
     player: z.object({
       username: z.string(),
@@ -33,10 +104,24 @@ export const createPlayer = internalAction({
   },
   returns: v.id("players"),
   handler: async (ctx, args) => {
-    const response = await fetch(`https://playerdb.co/api/player/minecraft/${args.uuid}`);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(`https://playerdb.co/api/player/minecraft/${args.uuid}`, {
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeout));
+
+    if (!response.ok) {
+      if (response.status >= 400 && response.status < 500) {
+        throw new Error("Player not found on playerdb.co");
+      }
+
+      throw new Error("Failed to fetch player data from playerdb.co");
+    }
+
     const json = await response.json();
 
-    const { data } = playerDbSchema.parse(json);
+    const { data } = playerDbApiSchema.parse(json);
 
     const minecraftPlayerData: Id<"players"> = await ctx.runMutation(
       internal.players.insertPlayer,
@@ -72,10 +157,10 @@ export const insertPlayer = internalMutation({
     return await ctx.db.insert("players", {
       username: args.player.username,
       uuid: args.player.uuid,
-      firstJoinedAt: new Date().toISOString(),
+      firstJoinDate: new Date().toISOString(),
+      lastJoinDate: new Date().toISOString(),
       skinTextureUrl: args.minecraftPlayerData.skinTextureUrl,
       avatarUrl: args.minecraftPlayerData.avatarUrl,
-      lastJoinedAt: new Date().toISOString(),
       stats: {
         joinCount: 1,
       },
@@ -100,7 +185,7 @@ export const updatePlayerJoin = internalMutation({
     const currentJoinCount = (player.stats?.joinCount as number) || 0;
 
     await ctx.db.patch(player._id, {
-      lastJoinedAt: new Date().toISOString(),
+      lastJoinDate: new Date().toISOString(),
       stats: {
         ...player.stats,
         joinCount: currentJoinCount + 1,

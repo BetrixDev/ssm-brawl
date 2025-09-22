@@ -9,10 +9,12 @@
  */
 
 import type { ApiFromModules, FilterApi, FunctionReference } from "convex/server";
+import type * as common from "../common.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
 import type * as kv from "../kv.js";
 import type * as players from "../players.js";
+import type * as schemas from "../schemas.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -23,10 +25,12 @@ import type * as players from "../players.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  common: typeof common;
   healthCheck: typeof healthCheck;
   http: typeof http;
   kv: typeof kv;
   players: typeof players;
+  schemas: typeof schemas;
 }>;
 export declare const api: FilterApi<typeof fullApi, FunctionReference<any, "public">>;
 export declare const internal: FilterApi<typeof fullApi, FunctionReference<any, "internal">>;
