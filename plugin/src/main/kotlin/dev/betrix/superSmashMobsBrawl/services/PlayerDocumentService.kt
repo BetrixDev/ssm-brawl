@@ -8,6 +8,7 @@ import dev.betrix.superSmashMobsBrawl.extensions.warn
 import dev.betrix.superSmashMobsBrawl.models.player.PlayerDocument
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.repeatingTask
+import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -18,7 +19,6 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.UUID
 
 object PlayerDocumentService : KoinComponent, Manageable() {
     private val api: ApiService by inject()
@@ -45,7 +45,10 @@ object PlayerDocumentService : KoinComponent, Manageable() {
                             val player = plugin.server.getPlayer(uuid)
 
                             if (player == null) {
-                                plugin.logger.warn("Player with UUID {uuid} not found, removing from cache and skipping persistence.", uuid)
+                                plugin.logger.warn(
+                                    "Player with UUID {uuid} not found, removing from cache and skipping persistence.",
+                                    uuid,
+                                )
                                 documents.remove(uuid)
                                 return@withContext
                             }
@@ -55,7 +58,7 @@ object PlayerDocumentService : KoinComponent, Manageable() {
                                     plugin.logger.warn(
                                         "Failed to persist document for {playerName}: {errorMessage}",
                                         player.name,
-                                        it.message ?: "No error message"
+                                        it.message ?: "No error message",
                                     )
                                 }
                         }
@@ -97,14 +100,21 @@ object PlayerDocumentService : KoinComponent, Manageable() {
                 val player = plugin.server.getPlayer(uuid)
 
                 if (player == null) {
-                    plugin.logger.warn("Player with UUID {uuid} not found, skipping persistence.", uuid)
+                    plugin.logger.warn(
+                        "Player with UUID {uuid} not found, skipping persistence.",
+                        uuid,
+                    )
                     return@forEach
                 }
 
                 withContext(Dispatchers.IO) {
                     runCatching { api.playersSetDocumentAsync(player, doc) }
                         .onFailure {
-                            plugin.logger.warn("Flush failed for {playerName}: {errorMessage}", player.name, it.message ?: "No error message")
+                            plugin.logger.warn(
+                                "Flush failed for {playerName}: {errorMessage}",
+                                player.name,
+                                it.message ?: "No error message",
+                            )
                         }
                 }
             }
@@ -113,16 +123,17 @@ object PlayerDocumentService : KoinComponent, Manageable() {
     }
 
     fun getPlayerDocument(player: Player): PlayerDocument =
-        documents[player.uniqueId] ?: error("Player document for ${player.name} not found in cache.")
-
-    fun getPlayerDocumentOrNull(player: Player): PlayerDocument? =
         documents[player.uniqueId]
+            ?: error("Player document for ${player.name} not found in cache.")
+
+    fun getPlayerDocumentOrNull(player: Player): PlayerDocument? = documents[player.uniqueId]
 
     suspend fun getPlayerDocumentOrFetch(player: Player): PlayerDocument {
-        return documents[player.uniqueId] ?: withContext(Dispatchers.IO) {
-            val document = api.playersGetDocumentAsync(player, true)
-            documents[player.uniqueId] = document
-            document
-        }
+        return documents[player.uniqueId]
+            ?: withContext(Dispatchers.IO) {
+                val document = api.playersGetDocumentAsync(player, true)
+                documents[player.uniqueId] = document
+                document
+            }
     }
 }
