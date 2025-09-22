@@ -21,6 +21,9 @@ class SulphurBombAbility(player: Player) : BrawlAbility("sulphur_bomb", player) 
 
     private val projectileKnockbackModifier = metadata.double("projectileKnockbackModifier") ?: 2.5
     private val projectileDamage = metadata.double("projectileDamage") ?: 6.5
+    private val projectileVelocityMultiplier = metadata.double("projectileVelocityMultiplier") ?: 1.55
+    private val projectileSize = metadata.double("projectileSize") ?: 0.65
+    private val projectileTrailMaxParticles = metadata.int("projectileTrailMaxParticles") ?: 8
 
     private val activeProjectiles = mutableListOf<BrawlProjectile>()
 
@@ -44,9 +47,9 @@ class SulphurBombAbility(player: Player) : BrawlAbility("sulphur_bomb", player) 
                     ItemStack.of(Material.COAL),
                     "abilities.sulphur_bomb.name",
                 )
-                .velocityMultiplier(1.55)
-                .projectileSize(0.65)
-                .trailEffect(Particle.SMOKE, count = 8)
+                .velocityMultiplier(projectileVelocityMultiplier)
+                .projectileSize(projectileSize)
+                .trailEffect(Particle.SMOKE, count = projectileTrailMaxParticles)
                 .impactEffect(Particle.EXPLOSION, Sound.ENTITY_GENERIC_EXPLODE)
                 .onHitEntity { entity, projectile ->
                     handleSulphurBombHit(entity, projectile)

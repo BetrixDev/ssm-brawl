@@ -13,12 +13,15 @@ class BoneExplosionAbility(player: Player) : BrawlAbility("bone_explosion", play
 
     private val explosionRadius = metadata.double("explosionRadius") ?: 7.0
     private val baseDamage = metadata.double("baseDamage") ?: 6.0
+    private val explosionKnockbackMultiplier = metadata.double("explosionKnockbackMultiplier") ?: 2.5
+    private val explosionBoneCount = metadata.int("explosionBoneCount") ?: 48
+    private val explosionBoneVelocity = metadata.double("explosionBoneVelocity") ?: 0.8
 
     override fun activate() {
         player.location
             .clone()
             .add(0.0, 0.5, 0.5)
-            .itemEffect(48, 0.8, Sound.ENTITY_SKELETON_HURT, 2f, 1.2f, Material.BONE, 40)
+            .itemEffect(explosionBoneCount, explosionBoneVelocity, Sound.ENTITY_SKELETON_HURT, 2f, 1.2f, Material.BONE, 40)
 
         val validEntities =
             player.location.getNearbyPlayers(explosionRadius).filter { it != player }
@@ -36,7 +39,7 @@ class BoneExplosionAbility(player: Player) : BrawlAbility("bone_explosion", play
                     entity,
                     Damager.DamagerLivingEntity(player),
                     damage,
-                    2.5,
+                    explosionKnockbackMultiplier,
                     BrawlDamageType.Explosion,
                 )
 

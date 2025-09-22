@@ -18,6 +18,7 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
     private val damage = metadata.double("damage") ?: 5.0
     private val maxTimesHit = metadata.int("maxTimesHit") ?: 2
     private val damageCooldownMs = metadata.long("damageCooldownMs") ?: 250
+    private val particleSpiralRadius = metadata.double("particleSpiralRadius") ?: 1.5
 
     private val lastDamageTime = hashMapOf<Player, Long>()
     private val timesHit = hashMapOf<Player, Int>()
@@ -60,7 +61,6 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
                 val circleSecond = direction.clone().crossProduct(circleFirst).normalize()
 
                 val speed = 3
-                val radius = 1.5
                 var theta = player.ticksLived.toDouble() / speed
                 var totalAddedDistance = 0.0
 
@@ -68,11 +68,11 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
                     val firstParticle =
                         oldLocation
                             .clone()
-                            .add(getCirclePoint(circleFirst, circleSecond, theta, radius))
+                            .add(getCirclePoint(circleFirst, circleSecond, theta, particleSpiralRadius))
                     val secondParticle =
                         oldLocation
                             .clone()
-                            .add(getCirclePoint(circleFirst, circleSecond, theta + Math.PI, radius))
+                            .add(getCirclePoint(circleFirst, circleSecond, theta + Math.PI, particleSpiralRadius))
 
                     if (first) {
                         firstParticle.world.playSound(

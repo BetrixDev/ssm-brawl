@@ -29,6 +29,7 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
     private val explosionRadius = metadata.double("explosionRadius") ?: 8.0
     private val explosionKnockbackMultiplier =
         metadata.double("explosionKnockbackMultiplier") ?: 2.5
+    private val explosionVelocityStrength = metadata.double("explosionVelocityStrength") ?: 1.8
 
     override fun canActivate(sendMessage: Boolean): Boolean {
         if (isExplodeActive) {
@@ -137,7 +138,7 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
                         damageEvent.callEvent()
                     }
 
-                player.setVelocity(1.8, 0.2, 1.4, true)
+                player.setVelocity(explosionVelocityStrength, 0.2, 1.4, true)
 
                 setCooldown(currentTimeAtActivation)
             }
