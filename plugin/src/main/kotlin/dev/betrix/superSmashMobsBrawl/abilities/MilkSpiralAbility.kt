@@ -68,11 +68,25 @@ class MilkSpiralAbility(player: Player) : BrawlAbility("milk_spiral", player) {
                     val firstParticle =
                         oldLocation
                             .clone()
-                            .add(getCirclePoint(circleFirst, circleSecond, theta, particleSpiralRadius))
+                            .add(
+                                getCirclePoint(
+                                    circleFirst,
+                                    circleSecond,
+                                    theta,
+                                    particleSpiralRadius,
+                                )
+                            )
                     val secondParticle =
                         oldLocation
                             .clone()
-                            .add(getCirclePoint(circleFirst, circleSecond, theta + Math.PI, particleSpiralRadius))
+                            .add(
+                                getCirclePoint(
+                                    circleFirst,
+                                    circleSecond,
+                                    theta + Math.PI,
+                                    particleSpiralRadius,
+                                )
+                            )
 
                     if (first) {
                         firstParticle.world.playSound(
