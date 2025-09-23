@@ -1,9 +1,10 @@
 import { zid } from "convex-helpers/server/zod";
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { z } from "zod/v3";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
-import { internalAction, internalMutation, internalQuery } from "./_generated/server";
+import { internalAction, internalMutation, internalQuery, query } from "./_generated/server";
 import { zInternalMutation } from "./common";
 import { playerDocumentSchema } from "./schemas";
 
@@ -193,5 +194,27 @@ export const updatePlayerJoin = internalMutation({
     });
 
     return null;
+  },
+});
+
+export const searchPlayersByUsername = query({
+  args: {
+    query: v.string(),
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const playersResults = await ctx.db
+      .query("players")
+      .withSearchIndex("search_username", (q) => q.search("username", args.query))
+      .paginate(args.paginationOpts);
+
+    return {
+      ...playersResults,
+      page: playersResults.page.map((player) => ({
+        username: player.username,
+        uuid: player.uuid,
+        avatarUrl: player.avatarUrl,
+      })),
+    };
   },
 });

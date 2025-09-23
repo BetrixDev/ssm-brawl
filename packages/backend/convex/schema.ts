@@ -16,7 +16,10 @@ export default defineSchema({
     stats: v.record(v.string(), v.union(v.string(), v.number(), v.boolean())),
   })
     .index("by_username", ["username"])
-    .index("by_uuid", ["uuid"]),
+    .index("by_uuid", ["uuid"])
+    .searchIndex("search_username", {
+      searchField: "username",
+    }),
   playerBans: defineTable({
     uuid: v.string(),
     reason: v.string(),
