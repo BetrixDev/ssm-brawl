@@ -2,7 +2,7 @@ name: Build and Test
 
 on:
   push:
-    branches: ["**"]
+    branches: ["reimagined"]
   pull_request:
     branches: ["**"]
   workflow_dispatch:
