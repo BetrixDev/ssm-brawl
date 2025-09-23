@@ -4,3 +4,4 @@ plugin
 pnpm*.yaml
 dist
 .next
+packages/backend/convex/_generated
