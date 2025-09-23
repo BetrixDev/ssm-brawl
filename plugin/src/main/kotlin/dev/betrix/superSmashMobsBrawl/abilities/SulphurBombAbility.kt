@@ -23,7 +23,7 @@ class SulphurBombAbility(player: Player) : BrawlAbility("sulphur_bomb", player) 
     private val projectileDamage = metadata.double("projectileDamage") ?: 6.5
     private val projectileVelocityMultiplier =
         metadata.double("projectileVelocityMultiplier") ?: 1.55
-    private val projectileSize = metadata.double("projectileSize") ?: 0.65
+    private val projectileSize = (metadata.double("projectileSize") ?: 0.65).coerceAtLeast(0.1)
     private val projectileTrailMaxParticles = metadata.int("projectileTrailMaxParticles") ?: 8
 
     private val activeProjectiles = mutableListOf<BrawlProjectile>()

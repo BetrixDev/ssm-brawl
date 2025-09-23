@@ -9,6 +9,9 @@ abilities:
     metadata:
       projectileKnockbackModifier: 2.5
       projectileDamage: 6.5
+      projectileVelocityMultiplier: 1.55
+      projectileSize: 0.65
+      projectileTrailMaxParticles: 8
 
   - id: explode
     cooldown: 8.0
@@ -21,6 +24,7 @@ abilities:
       fuseTimeTicks: 30
       explosionRadius: 8.0
       explosionKnockbackMultiplier: 2.5
+      explosionVelocityStrength: 1.8
 
   - id: bone_explosion
     cooldown: 10.0
@@ -32,6 +36,9 @@ abilities:
     metadata:
       explosionRadius: 7.0
       baseDamage: 6.0
+      explosionKnockbackMultiplier: 2.5
+      explosionBoneCount: 48
+      explosionBoneVelocity: 0.8
 
   - id: roped_arrow
     cooldown: 5.0
@@ -76,6 +83,7 @@ abilities:
       damage: 5.0
       maxTimesHit: 2
       damageCooldownMs: 250
+      particleSpiralRadius: 1.5
 
   - id: blink
     cooldown: 6.0
@@ -100,3 +108,4 @@ abilities:
       maxDamage: 9.0
       damage: 8.0
       knockbackMultiplier: 2.5
+      blockRotationStepSpeedTicks: 4
