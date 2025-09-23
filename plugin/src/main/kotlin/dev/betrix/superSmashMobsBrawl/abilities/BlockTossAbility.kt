@@ -29,7 +29,8 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
     private val maxDamage = metadata.double("maxDamage") ?: 9.0
     private val damage = metadata.double("damage") ?: 8.0
     private val knockbackMultiplier = metadata.double("knockbackMultiplier") ?: 2.5
-    private val blockRotationStepSpeedTicks = (metadata.int("blockRotationStepSpeedTicks") ?: 4).coerceAtLeast(1)
+    private val blockRotationStepSpeedTicks =
+        (metadata.int("blockRotationStepSpeedTicks") ?: 4).coerceAtLeast(1)
 
     private val activeProjectiles = mutableListOf<BrawlProjectile>()
 
