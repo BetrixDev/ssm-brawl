@@ -6,6 +6,12 @@ abilities:
     usage: right_click
     hotbarItem: iron_axe
     displayItem: coal
+    metadata:
+      projectileKnockbackModifier: 2.5
+      projectileDamage: 6.5
+      projectileVelocityMultiplier: 1.55
+      projectileSize: 0.65
+      projectileTrailMaxParticles: 8
 
   - id: explode
     cooldown: 8.0
@@ -14,6 +20,11 @@ abilities:
     usage: right_click
     hotbarItem: iron_shovel
     displayItem: creeper_spawn_egg
+    metadata:
+      fuseTimeTicks: 30
+      explosionRadius: 8.0
+      explosionKnockbackMultiplier: 2.5
+      explosionVelocityStrength: 1.8
 
   - id: bone_explosion
     cooldown: 10.0
@@ -22,6 +33,12 @@ abilities:
     usage: right_click
     hotbarItem: iron_axe
     displayItem: bone
+    metadata:
+      explosionRadius: 7.0
+      baseDamage: 6.0
+      explosionKnockbackMultiplier: 2.5
+      explosionBoneCount: 48
+      explosionBoneVelocity: 0.8
 
   - id: roped_arrow
     cooldown: 5.0
@@ -30,6 +47,9 @@ abilities:
     usage: left_click
     hotbarItem: bow
     displayItem: arrow
+    metadata:
+      arrowVelocityModifier: 2.4
+      arrowDamage: 6.0
 
   - id: angry_herd
     cooldown: 13.0
@@ -39,13 +59,15 @@ abilities:
     hotbarItem: iron_axe
     displayItem: cow_spawn_egg
     metadata:
-      cowsCount: 5
-      cowSpeed: 0.9
-      contactRadius: 1.2
-      durationTicks: 60
-      damagePerHit: 5.0
-      knockbackMultiplier: 1.25
-      hitCooldownTicks: 10
+      cowAmountRadius: 3
+      cowAmountHeight: 1
+      stuckTimeMs: 300
+      forceMoveTimeMs: 350
+      durationMs: 2500
+      hitboxRadius: 2.2
+      damageCooldownMs: 600
+      damage: 5.0
+      knockback: 1.25
 
   - id: milk_spiral
     cooldown: 9.0
@@ -55,14 +77,13 @@ abilities:
     hotbarItem: iron_shovel
     displayItem: milk_bucket
     metadata:
-      durationTicks: 160
-      propelTicks: 80
-      helixRadius: 1.5
-      centerSpeed: 0.9
-      playerSpeed: 1.0
+      spiralDurationMs: 3000
+      velocityDurationMs: 1800
+      hitboxRadius: 2.0
       damage: 5.0
-      maxTargets: 2
-      hitCooldownTicks: 10
+      maxTimesHit: 2
+      damageCooldownMs: 250
+      particleSpiralRadius: 1.5
 
   - id: blink
     cooldown: 6.0
@@ -82,3 +103,9 @@ abilities:
     hotbarItem: iron_sword
     displayItem: grass_block
     metadata:
+      chargeTimeMs: 1200
+      maxCharge: 1.4
+      maxDamage: 9.0
+      damage: 8.0
+      knockbackMultiplier: 2.5
+      blockRotationStepSpeedTicks: 4

@@ -29,6 +29,8 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
     private val maxDamage = metadata.double("maxDamage") ?: 9.0
     private val damage = metadata.double("damage") ?: 8.0
     private val knockbackMultiplier = metadata.double("knockbackMultiplier") ?: 2.5
+    private val blockRotationStepSpeedTicks =
+        (metadata.int("blockRotationStepSpeedTicks") ?: 4).coerceAtLeast(1)
 
     private val activeProjectiles = mutableListOf<BrawlProjectile>()
 
@@ -137,10 +139,10 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
         var tumbleAngleY = 0f
         var tumbleAngleX = 0f
 
-        val rotatationStepSpeedTicks = 4
+        val rotationStepSpeedTicks = blockRotationStepSpeedTicks
 
         runnables.add(
-            repeatingTask(rotatationStepSpeedTicks.toLong()) {
+            repeatingTask(rotationStepSpeedTicks.toLong()) {
                 if (!displayBlock.isValid) {
                     cancel()
                     return@repeatingTask
@@ -164,7 +166,7 @@ class BlockTossAbility(player: Player) : BrawlAbility("block_toss", player) {
 
                 displayBlock.setTransformationMatrix(transform)
                 displayBlock.interpolationDelay = 0
-                displayBlock.interpolationDuration = rotatationStepSpeedTicks
+                displayBlock.interpolationDuration = rotationStepSpeedTicks
             }
         )
 

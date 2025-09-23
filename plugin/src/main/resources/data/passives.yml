@@ -1,28 +1,42 @@
 passives:
   - id: double_jump
     userFacing: false
+    metadata:
+      # Motion tuning
+      horizontalMultiplier: 0.9
+      verticalBoost: 0.9
+      allowMidairReset: false
 
   - id: hunger
     userFacing: false
+    metadata:
+      hungerRestoreDelayMs: 250
 
   - id: regeneration
     userFacing: false
+    metadata:
+      healAmount: 1.0
+      healIntervalTicks: 60
 
   - id: arrow_recharge
     displayItem: bundle
     userFacing: true
     metadata:
-      arrowIntervalTicks: 20
+      arrowHotbarSlot: 2
+      maximumArrowCount: 3
+      arrowIntervalTicks: 40
 
   - id: barrage
     displayItem: spectral_arrow
     userFacing: true
+    metadata:
+      maxCharge: 5
+      arrowDamage: 6.0
 
   - id: stampede
     displayItem: leather
     userFacing: true
     metadata:
-      maxLevel: 4
-      ticksPerLevel: 60
-      extraDamagePerLevel: 0.5
-      extraKnockbackPerLevel: 0.1
+      stackIncreaseTimeMs: 3000
+      maxStacks: 3
+      stopSprintDamage: 3
