@@ -10,4 +10,3 @@ class SpinWebAbility(player: Player) : BrawlAbility("spin_web", player) {
         player.sendDebugMessage("Spin Web ability not implemented yet")
     }
 }
-

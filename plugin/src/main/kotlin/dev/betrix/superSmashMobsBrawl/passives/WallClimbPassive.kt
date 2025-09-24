@@ -15,4 +15,3 @@ class WallClimbPassive(player: Player) : BrawlPassive("wall_climb", player) {
         super.teardown()
     }
 }
-

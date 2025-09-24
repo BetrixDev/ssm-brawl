@@ -15,4 +15,3 @@ class SpiderLeapPassive(player: Player) : BrawlPassive("spider_leap", player) {
         super.teardown()
     }
 }
-
