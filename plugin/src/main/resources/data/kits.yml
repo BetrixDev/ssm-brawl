@@ -116,3 +116,25 @@ kits:
       chestplate: chainmail_chestplate
       leggings: chainmail_leggings
       boots: chainmail_boots
+
+  # Chicken
+  - id: chicken
+    meleeDamage: 9.0    # 4.5 hearts
+    armor: 2.5
+    knockbackMultiplier: 2.0
+    disguiseId: "chicken"
+    selectionSound: "entity.chicken.ambient"
+    displayItem: "feather"
+    passives:
+      - id: flap
+      - id: regeneration
+        overrides:
+          metadata:
+            healAmount: 0.2
+            healIntervalTicks: 20
+    abilities:
+      - id: egg_blaster
+      - id: chicken_missile
+    armorItems:
+      chestplate: chainmail_chestplate
+      boots: chainmail_boots
