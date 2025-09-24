@@ -10,4 +10,3 @@ class NeedlerAbility(player: Player) : BrawlAbility("needler", player) {
         player.sendDebugMessage("Needler ability not implemented yet")
     }
 }
-
