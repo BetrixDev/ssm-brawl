@@ -10,6 +10,9 @@ kits:
     description: "He got bones"
   cow:
     name: "Cow"
+  chicken:
+    name: "Chicken"
+    description: "High mobility flier with eggs and a peck of explosives"
   enderman:
     name: "Enderman"
 abilities:
@@ -37,6 +40,12 @@ abilities:
   milk_spiral:
     name: "Milk Spiral"
     description: ""
+  egg_blaster:
+    name: "Egg Blaster"
+    description: "Hold to fire rapid eggs that slow foes"
+  chicken_missile:
+    name: "Chicken Missile"
+    description: "Launch a baby chick that explodes on impact"
 maps:
   blue_forest:
     name: "Blue Forest"

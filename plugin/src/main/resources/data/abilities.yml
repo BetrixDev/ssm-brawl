@@ -109,3 +109,32 @@ abilities:
       damage: 8.0
       knockbackMultiplier: 2.5
       blockRotationStepSpeedTicks: 4
+
+  - id: egg_blaster
+    cooldown: 2.0
+    itemSlot: 0
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_sword
+    displayItem: egg
+    metadata:
+      eggPairs: 8
+      eggDamage: 1.0
+      slownessLevel: 1
+      slownessDuration: 40
+      cooldownTicks: 40
+
+  - id: chicken_missile
+    cooldown: 8.0
+    itemSlot: 1
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: chicken_spawn_egg
+    metadata:
+      missileDamage: 3.0
+      missileKnockback: 1.5
+      aoeRadius: 2.5
+      cooldownTicks: 160
+      earlyDeathTimeMin: 20
+      earlyDeathTimeMax: 60

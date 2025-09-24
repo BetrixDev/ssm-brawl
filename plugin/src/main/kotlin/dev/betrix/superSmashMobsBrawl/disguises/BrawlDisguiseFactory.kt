@@ -8,6 +8,7 @@ object BrawlDisguiseFactory {
             "creeper" to ::CreeperDisguise,
             "skeleton" to ::SkeletonDisguise,
             "cow" to ::CowDisguise,
+            "chicken" to ::ChickenDisguise,
             "enderman" to ::EndermanDisguise,
             "mooshroom" to ::MooshroomDisguise,
             "mushroom_cow" to ::MooshroomDisguise,

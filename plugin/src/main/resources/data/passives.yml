@@ -18,6 +18,16 @@ passives:
       healAmount: 1.0
       healIntervalTicks: 60
 
+  - id: flap
+    displayItem: feather
+    userFacing: true
+    metadata:
+      maxFlaps: 8
+      energyPerFlap: 12.5
+      maxEnergy: 100.0
+      energyRegenRate: 4.0
+      flapStrengthMultiplier: 0.95
+
   - id: arrow_recharge
     displayItem: bundle
     userFacing: true
