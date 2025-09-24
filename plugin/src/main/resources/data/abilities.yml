@@ -163,3 +163,27 @@ abilities:
       cooldownTicks: 160
       earlyDeathTimeMin: 20
       earlyDeathTimeMax: 60
+
+  - id: daze_potion
+    cooldown: 2.0
+    itemSlot: 0
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: potion
+    metadata:
+      effectRadius: 3.0
+      potionDurationTicks: 40
+      potionAmplifier: 1
+
+  - id: bat_wave
+    cooldown: 8.0
+    itemSlot: 1
+    type: melee
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: bat_spawn_egg
+    metadata:
+      launchVelocity: 1.2
+      damage: 4.0
+      knockback: 1.5

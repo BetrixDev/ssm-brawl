@@ -167,3 +167,23 @@ kits:
       helmet: chainmail_helmet
       chestplate: chainmail_chestplate
       boots: iron_boots
+
+  # Witch
+  - id: witch
+    meleeDamage: 6.0
+    armor: 5.0
+    knockbackMultiplier: 1.5
+    disguiseId: "witch"
+    selectionSound: "entity.witch.ambient"
+    displayItem: "potion"
+    passives:
+      - id: double_jump
+      - id: regeneration
+      - id: hunger
+    abilities:
+      - id: daze_potion
+      - id: bat_wave
+    armorItems:
+      chestplate: chainmail_chestplate
+      leggings: chainmail_leggings
+      boots: chainmail_boots
