@@ -10,5 +10,3 @@ class BatWaveAbility(player: Player) : BrawlAbility("bat_wave", player) {
         player.sendDebugMessage("Bat Wave pending implementation")
     }
 }
-
-
