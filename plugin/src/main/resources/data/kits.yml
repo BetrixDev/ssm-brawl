@@ -138,3 +138,32 @@ kits:
     armorItems:
       chestplate: chainmail_chestplate
       boots: chainmail_boots
+
+  # Spider
+  - id: spider
+    meleeDamage: 6.0
+    armor: 6.0
+    knockbackMultiplier: 1.5
+    disguiseId: "spider"
+    selectionSound: "entity.spider.ambient"
+    displayItem: "cobweb"
+    passives:
+      - id: double_jump
+        overrides:
+          metadata:
+            allowMidairReset: true
+            horizontalMultiplier: 1.0
+            verticalBoost: 1.0
+      - id: wall_climb
+      - id: spider_leap
+      - id: regeneration
+        overrides:
+          metadata:
+            healAmount: 0.25
+    abilities:
+      - id: needler
+      - id: spin_web
+    armorItems:
+      helmet: chainmail_helmet
+      chestplate: chainmail_chestplate
+      boots: iron_boots

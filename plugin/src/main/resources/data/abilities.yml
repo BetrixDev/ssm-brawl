@@ -85,6 +85,31 @@ abilities:
       damageCooldownMs: 250
       particleSpiralRadius: 1.5
 
+  - id: needler
+    cooldown: 2.0
+    itemSlot: 0
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_sword
+    displayItem: arrow
+    metadata:
+      arrowCount: 6
+      arrowSpread: 0.25
+      arrowVelocity: 2.0
+      baseDamage: 4.5
+
+  - id: spin_web
+    cooldown: 10.0
+    itemSlot: 0
+    type: recovery
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: cobweb
+    metadata:
+      launchVelocity: 1.0
+      dragDurationTicks: 20
+      slowDurationTicks: 40
+
   - id: blink
     cooldown: 6.0
     itemSlot: 1

@@ -50,3 +50,20 @@ passives:
       stackIncreaseTimeMs: 3000
       maxStacks: 3
       stopSprintDamage: 3
+
+  - id: wall_climb
+    displayItem: spider_eye
+    userFacing: true
+    metadata:
+      climbSpeed: 0.15
+      energyCostPerTick: 1.0
+      maxEnergy: 100.0
+      energyRegenRate: 3.0
+
+  - id: spider_leap
+    displayItem: spider_spawn_egg
+    userFacing: true
+    metadata:
+      leapStrength: 1.25
+      horizontalMultiplier: 1.0
+      verticalMultiplier: 1.0

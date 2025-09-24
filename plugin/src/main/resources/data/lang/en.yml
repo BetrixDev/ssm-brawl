@@ -15,6 +15,9 @@ kits:
     description: "High mobility flier with eggs and a peck of explosives"
   enderman:
     name: "Enderman"
+  spider:
+    name: "Spider"
+    description: "Web-slinging skirmisher with agile mobility"
 abilities:
   sulphur_bomb:
     name: "Sulphur Bomb"
@@ -46,6 +49,12 @@ abilities:
   chicken_missile:
     name: "Chicken Missile"
     description: "Launch a baby chick that explodes on impact"
+  needler:
+    name: "Needler"
+    description: "Spray a burst of piercing arrows at nearby foes"
+  spin_web:
+    name: "Spin Web"
+    description: "Launch forward while leaving a slowing web trail"
 maps:
   blue_forest:
     name: "Blue Forest"
@@ -111,6 +120,12 @@ messages:
   passives:
     hunger:
       attackToRestore: "<warning>Attack other players to restore hunger!</warning>"
+    wall_climb:
+      name: "Wall Climb"
+      description: "Hold sneak on a wall to climb and regain a midair reset"
+    spider_leap:
+      name: "Spider Leap"
+      description: "Double jump in any direction you face for rapid mobility"
   projectiles:
     arrow: "Arrow"
     barrage_arrow: "Barrage Arrow"
