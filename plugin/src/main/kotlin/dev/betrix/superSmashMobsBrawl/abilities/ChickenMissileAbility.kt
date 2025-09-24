@@ -10,5 +10,3 @@ class ChickenMissileAbility(player: Player) : BrawlAbility("chicken_missile", pl
         TODO("Implement Chicken Missile Ability")
     }
 }
-
-

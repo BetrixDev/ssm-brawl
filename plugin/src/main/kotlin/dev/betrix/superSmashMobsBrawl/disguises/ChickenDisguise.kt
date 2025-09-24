@@ -9,6 +9,3 @@ class ChickenDisguise(player: Player) : BrawlDisguise(player) {
     override val disguise = MobDisguise(DisguiseType.CHICKEN)
     override val hitbox = Hitbox(0.4, 0.7)
 }
-
-
-

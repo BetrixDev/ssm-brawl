@@ -7,7 +7,8 @@ import org.bukkit.entity.Player
 class RegenerationPassive(player: Player) : BrawlPassive("regeneration", player) {
 
     private val healAmount: Double = (metadata.double("healAmount") ?: 1.0)
-    private val healIntervalTicks: Long = ((metadata.long("healIntervalTicks") ?: 60L)).coerceAtLeast(1L)
+    private val healIntervalTicks: Long =
+        ((metadata.long("healIntervalTicks") ?: 60L)).coerceAtLeast(1L)
 
     override fun setup() {
         val regenTask =
