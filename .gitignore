@@ -1,4 +1,6 @@
 node_modules
 .turbo
-
 plugin/.gradle/**
+.alchemy
+.env
+*.jsonc

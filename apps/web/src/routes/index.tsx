@@ -1,6 +1,5 @@
-import { convexQuery } from "@convex-dev/react-query";
-import { api } from "@ssmb/backend/convex/_generated/api";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useRpc } from "@/contexts/rpc-context";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -8,7 +7,9 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeComponent() {
-  const healthCheck = useSuspenseQuery(convexQuery(api.healthCheck.get, {}));
+  const rpc = useRpc();
+
+  const healthCheck = useQuery(rpc.healthCheck.queryOptions());
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-2">

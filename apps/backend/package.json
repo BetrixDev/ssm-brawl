@@ -1,0 +1,42 @@
+{
+  "name": "@ssmbrawl/backend",
+  "private": true,
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsdown",
+    "check-types": "tsc -b",
+    "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "auth:generate": "npx @better-auth/cli@latest generate",
+    "dev": "alchemy dev",
+    "deploy": "alchemy deploy",
+    "destroy": "alchemy destroy"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.9",
+    "@orpc/client": "^1.9.0",
+    "@orpc/openapi": "^1.9.0",
+    "@orpc/server": "^1.9.0",
+    "@orpc/zod": "^1.9.0",
+    "@polar-sh/better-auth": "^1.1.3",
+    "@polar-sh/sdk": "^0.34.16",
+    "better-auth": "^1.3.13",
+    "dotenv": "^17.2.1",
+    "drizzle-orm": "^0.44.2",
+    "drizzle-zod": "^0.8.3",
+    "hono": "^4.8.2",
+    "zod": "^4.0.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250822.0",
+    "@types/node": "^22.13.11",
+    "alchemy": "^0.67.0",
+    "dotenv": "^17.2.1",
+    "drizzle-kit": "^0.31.2",
+    "tsdown": "^0.15.1",
+    "typescript": "^5.8.2",
+    "wrangler": "^4.23.0"
+  }
+}

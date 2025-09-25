@@ -1,32 +1,30 @@
-import { ConvexQueryClient } from "@convex-dev/react-query";
+import { createORPCClient } from "@orpc/client";
+import { RPCLink } from "@orpc/client/fetch";
+import { createORPCReactQueryUtils } from "@orpc/react-query";
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { routerWithQueryClient } from "@tanstack/react-router-with-query";
-import { ConvexProvider, ConvexReactClient } from "convex/react";
+import type { AppRouterClient } from "../../backend/src/routers";
 import Loader from "./components/loader";
+import { RpcContext } from "./contexts/rpc-context";
 import "./index.css";
 import { routeTree } from "./routeTree.gen";
 
 export function createRouter() {
-  const CONVEX_URL = (import.meta as any).env.VITE_CONVEX_URL!;
-  if (!CONVEX_URL) {
-    console.error("missing envar VITE_CONVEX_URL");
-  }
-  const convex = new ConvexReactClient(CONVEX_URL, {
-    unsavedChangesWarning: false,
-  });
+  const queryClient: QueryClient = new QueryClient();
 
-  const convexQueryClient = new ConvexQueryClient(convex);
-
-  const queryClient: QueryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        queryKeyHashFn: convexQueryClient.hashFn(),
-        queryFn: convexQueryClient.queryFn(),
-      },
+  const link = new RPCLink({
+    url: `${import.meta.env.VITE_SERVER_URL}/rpc`,
+    fetch(url, options) {
+      return fetch(url, {
+        ...options,
+        credentials: "include",
+      });
     },
   });
-  convexQueryClient.connect(queryClient);
+
+  const rpcClient: AppRouterClient = createORPCClient(link);
+  const rpc = createORPCReactQueryUtils(rpcClient);
 
   const router = routerWithQueryClient(
     createTanStackRouter({
@@ -34,10 +32,8 @@ export function createRouter() {
       defaultPreload: "intent",
       defaultPendingComponent: () => <Loader />,
       defaultNotFoundComponent: () => <div>Not Found</div>,
-      context: { queryClient, convexClient: convex, convexQueryClient },
-      Wrap: ({ children }) => (
-        <ConvexProvider client={convexQueryClient.convexClient}>{children}</ConvexProvider>
-      ),
+      context: { queryClient, rpc },
+      Wrap: ({ children }) => <RpcContext.Provider value={rpc}>{children}</RpcContext.Provider>,
     }),
     queryClient,
   );

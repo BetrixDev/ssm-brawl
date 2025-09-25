@@ -1,20 +1,19 @@
 {
   "name": "super-smash-mobs-brawl",
   "private": true,
+  "type": "module",
   "scripts": {
     "format": "prettier --write .",
-    "dev": "turbo dev",
+    "dev": "alchemy dev",
+    "deploy": "alchemy deploy",
     "build": "turbo build",
     "test": "turbo test",
-    "check-types": "turbo check-types",
-    "dev:native": "turbo -F native dev",
-    "dev:web": "turbo -F web dev",
-    "dev:wiki": "turbo -F fumadocs dev",
-    "dev:server": "turbo -F @ssmb/backend dev",
-    "dev:setup": "turbo -F @ssmb/backend dev:setup"
+    "check-types": "turbo check-types"
   },
   "dependencies": {},
   "devDependencies": {
+    "alchemy": "^0.67.0",
+    "dotenv": "^17.2.1",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.2.0",
     "turbo": "^2.5.4"

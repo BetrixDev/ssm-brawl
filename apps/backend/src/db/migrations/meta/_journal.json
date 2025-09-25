@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1758762650721,
+      "tag": "0000_eminent_mac_gargan",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1758766468767,
+      "tag": "0001_eminent_leper_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1758768936727,
+      "tag": "0002_living_dracula",
+      "breakpoints": true
+    }
+  ]
+}
