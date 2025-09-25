@@ -225,3 +225,27 @@ abilities:
       durationTicks: 40
       damagePerTick: 1.0
       tickIntervalTicks: 5
+
+  - id: bouncy_bacon
+    cooldown: 5.0
+    itemSlot: 0
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: porkchop
+    metadata:
+      healAmount: 2.0
+      projectileSpeed: 1.2
+      projectileKnockback: 0.9
+
+  - id: baby_bacon_bomb
+    cooldown: 5.0
+    itemSlot: 1
+    type: aoe
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: saddle
+    metadata:
+      explosionRadius: 4.0
+      launchVerticalBoost: 0.8
+      damage: 4.0

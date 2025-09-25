@@ -67,3 +67,9 @@ passives:
       leapStrength: 1.25
       horizontalMultiplier: 1.0
       verticalMultiplier: 1.0
+
+  - id: nether_pig
+    displayItem: nether_wart
+    userFacing: true
+    metadata:
+      lowHealthThreshold: 4.0

@@ -10,6 +10,9 @@ kits:
     description: "He got bones"
   cow:
     name: "Cow"
+  pig:
+    name: "Pig"
+    description: "Spam energy bacon to harass foes, but mind your weak recovery"
   chicken:
     name: "Chicken"
     description: "High mobility flier with eggs and a peck of explosives"
@@ -49,6 +52,12 @@ abilities:
   milk_spiral:
     name: "Milk Spiral"
     description: ""
+  bouncy_bacon:
+    name: "Bouncy Bacon"
+    description: "Hurl sizzling bacon that heals you as it bounces through foes"
+  baby_bacon_bomb:
+    name: "Baby Bacon Bomb"
+    description: "Detonate a baby piglet blast that pops you upward and scorches enemies"
   egg_blaster:
     name: "Egg Blaster"
     description: "Hold to fire rapid eggs that slow foes"
@@ -155,6 +164,9 @@ messages:
     spider_leap:
       name: "Spider Leap"
       description: "Double jump in any direction you face for rapid mobility"
+    nether_pig:
+      name: "Nether Pig"
+      description: "Gain fiery resilience when your health nears collapse"
   projectiles:
     arrow: "Arrow"
     barrage_arrow: "Barrage Arrow"

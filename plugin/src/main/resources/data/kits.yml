@@ -93,6 +93,25 @@ kits:
       leggings: iron_leggings
       boots: iron_boots
 
+  # Pig
+  - id: pig
+    meleeDamage: 5.0
+    armor: 5.0
+    knockbackMultiplier: 1.5
+    disguiseId: "pig"
+    selectionSound: "entity.pig.ambient"
+    displayItem: "porkchop"
+    passives:
+      - id: nether_pig
+    abilities:
+      - id: bouncy_bacon
+      - id: baby_bacon_bomb
+    armorItems:
+      helmet: null
+      chestplate: null
+      leggings: null
+      boots: null
+
   # Enderman
   - id: enderman
     meleeDamage: 7.0
