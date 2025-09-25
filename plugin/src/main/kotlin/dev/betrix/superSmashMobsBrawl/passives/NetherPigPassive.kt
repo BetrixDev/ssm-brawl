@@ -8,7 +8,9 @@ class NetherPigPassive(player: Player) : BrawlPassive("nether_pig", player) {
 
     override fun setup() {
         super.setup()
-        player.sendDebugMessage("Nether Pig passive pending implementation. Threshold: $lowHealthThreshold hearts.")
+        player.sendDebugMessage(
+            "Nether Pig passive pending implementation. Threshold: $lowHealthThreshold hearts."
+        )
     }
 
     override fun teardown() {
@@ -16,4 +18,3 @@ class NetherPigPassive(player: Player) : BrawlPassive("nether_pig", player) {
         super.teardown()
     }
 }
-

@@ -9,4 +9,3 @@ class BabyBaconBombAbility(player: Player) : BrawlAbility("baby_bacon_bomb", pla
         player.sendDebugMessage("Baby Bacon Bomb ability pending implementation.")
     }
 }
-

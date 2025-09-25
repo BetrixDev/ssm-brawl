@@ -9,4 +9,3 @@ class BouncyBaconAbility(player: Player) : BrawlAbility("bouncy_bacon", player) 
         player.sendDebugMessage("Bouncy Bacon ability pending implementation.")
     }
 }
-
