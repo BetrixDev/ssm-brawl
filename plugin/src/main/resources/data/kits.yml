@@ -187,3 +187,24 @@ kits:
       chestplate: chainmail_chestplate
       leggings: chainmail_leggings
       boots: chainmail_boots
+
+  # Squid
+  - id: squid
+    meleeDamage: 6.0
+    armor: 5.0
+    knockbackMultiplier: 1.5
+    disguiseId: "squid"
+    selectionSound: "entity.squid.ambient"
+    displayItem: "ink_sac"
+    passives:
+      - id: double_jump
+      - id: regeneration
+      - id: hunger
+    abilities:
+      - id: ink_shotgun
+      - id: super_squid
+      - id: fish_flurry
+    armorItems:
+      chestplate: chainmail_chestplate
+      leggings: chainmail_leggings
+      boots: chainmail_boots

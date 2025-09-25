@@ -187,3 +187,41 @@ abilities:
       launchVelocity: 1.2
       damage: 4.0
       knockback: 1.5
+
+  - id: ink_shotgun
+    cooldown: 6.0
+    itemSlot: 0
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: ink_sac
+    metadata:
+      pelletCount: 6
+      pelletDamage: 1.5
+      spreadAngle: 18.0
+      range: 12.0
+
+  - id: super_squid
+    cooldown: 8.0
+    itemSlot: 1
+    type: recovery
+    usage: right_click
+    hotbarItem: iron_sword
+    displayItem: trident
+    metadata:
+      dashDistance: 10.0
+      launchVerticalBoost: 0.8
+      invulnerabilityDurationTicks: 20
+
+  - id: fish_flurry
+    cooldown: 13.0
+    itemSlot: 2
+    type: aoe
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: tropical_fish
+    metadata:
+      radius: 4.0
+      durationTicks: 40
+      damagePerTick: 1.0
+      tickIntervalTicks: 5

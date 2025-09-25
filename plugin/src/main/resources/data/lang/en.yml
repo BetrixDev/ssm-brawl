@@ -21,6 +21,9 @@ kits:
   witch:
     name: "Witch"
     description: "Zone with potions and bats, but beware fragile recovery"
+  squid:
+    name: "Squid"
+    description: "Squid is an all-around solid defensive kit"
 abilities:
   sulphur_bomb:
     name: "Sulphur Bomb"
@@ -64,6 +67,15 @@ abilities:
   bat_wave:
     name: "Bat Wave"
     description: "Burst forward on a surge of bats to swat enemies aside"
+  ink_shotgun:
+    name: "Ink Shotgun"
+    description: "Blast close foes with a spread of ink pellets"
+  super_squid:
+    name: "Super Squid"
+    description: "Dash in a slick ink burst to reposition safely"
+  fish_flurry:
+    name: "Fish Flurry"
+    description: "Summon a whirl of fish that batters nearby enemies"
 maps:
   blue_forest:
     name: "Blue Forest"
