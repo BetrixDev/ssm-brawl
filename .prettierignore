@@ -4,4 +4,7 @@ plugin
 pnpm*.yaml
 dist
 .next
-packages/backend/convex/_generated
+.nitro
+.vercel
+.output
+.tanstack

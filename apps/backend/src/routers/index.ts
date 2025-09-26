@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import type { RouterClient } from "@orpc/server";
+import { env } from "cloudflare:workers";
 import { publicProcedure } from "../lib/orpc";
 import { pluginRouter } from "./plugin";
 
@@ -13,9 +14,16 @@ export const appRouter = {
 
     const dbCheckDuration = dbCheckEnd - dbCheckStart;
 
+    const kvCheckStart = performance.now();
+    await env.KV.put("test", "test");
+    await env.KV.get("test");
+    const kvCheckEnd = performance.now();
+    const kvCheckDuration = kvCheckEnd - kvCheckStart;
+
     return {
       status: "OK",
       dbCheckDurationMs: dbCheckDuration,
+      kvCheckDurationMs: kvCheckDuration,
     };
   }),
   plugin: pluginRouter,

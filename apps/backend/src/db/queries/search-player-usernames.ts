@@ -1,4 +1,4 @@
-import type { PaginationOptions } from "@/types/pagination-options";
+import type { PaginationOptions } from "@/schemas/pagination-options";
 import { sql } from "drizzle-orm";
 import { db, Table } from "..";
 
@@ -10,5 +10,6 @@ export function searchPlayerUsernames(query: string, paginationOptions: Paginati
       sql`to_tsvector('english', ${Table.players.username}) @@ to_tsquery('english', ${query})`,
     )
     .limit(paginationOptions.limit)
-    .offset((paginationOptions.page - 1) * paginationOptions.limit);
+    .offset((paginationOptions.page - 1) * paginationOptions.limit)
+    .$withCache();
 }

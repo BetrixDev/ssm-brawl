@@ -4,9 +4,9 @@
   "type": "module",
   "scripts": {
     "format": "prettier --write .",
-    "dev": "concurrently \"alchemy dev\" \"turbo run dev -F plugin\"",
+    "dev": "concurrently \"alchemy dev --stage dev\" \"turbo run dev -F plugin\"",
     "dev:plugin": "turbo run dev -F plugin",
-    "dev:ts": "alchemy dev",
+    "dev:ts": "alchemy dev --stage dev",
     "deploy": "alchemy deploy",
     "build": "turbo build",
     "test": "turbo test",

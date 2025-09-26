@@ -21,7 +21,7 @@ data class PlayerDocument
 constructor(
     val isFirstTimeOnServer: Boolean,
     @Serializable(with = InstantIsoSerializer::class) val lastJoinDate: Instant,
-    val avatarUrl: String,
+    val headSkinBase64: String?,
     val stats: MutableMap<String, JsonElement>,
     val banData: PlayerBanData?,
 ) {
