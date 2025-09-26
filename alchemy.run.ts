@@ -19,19 +19,6 @@ const app = await alchemy("super-smash-mobs-brawl", {
     }),
 });
 
-// const serverImage = await docker.Image("minecraft", {
-//   name: "ssmbrawl-minecraft",
-//   tag: "latest",
-//   build: {
-//     context: "./plugin",
-//   },
-// });
-
-const server = await Exec("plugin-dev", {
-  cwd: "plugin",
-  command: "pnpm dev",
-});
-
 await Exec("db-generate", {
   cwd: "apps/backend",
   command: "pnpm run db:generate",
@@ -62,6 +49,7 @@ export const backend = await Worker("backend", {
   entrypoint: "src/index.ts",
   compatibility: "node",
   bindings: {
+    NODE_ENV: stage,
     DATABASE_URL: neonDb.connection_uris[0].connection_uri,
     KV: kv,
     CORS_ORIGIN: process.env.CORS_ORIGIN || "http://localhost:3001",

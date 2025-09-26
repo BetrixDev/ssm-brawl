@@ -4,13 +4,17 @@
   "type": "module",
   "scripts": {
     "format": "prettier --write .",
-    "dev": "alchemy dev",
+    "dev": "concurrently \"alchemy dev\" \"turbo run dev -F plugin\"",
+    "dev:plugin": "turbo run dev -F plugin",
+    "dev:ts": "turbo run dev -F www",
     "deploy": "alchemy deploy",
     "build": "turbo build",
     "test": "turbo test",
     "check-types": "turbo check-types"
   },
-  "dependencies": {},
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  },
   "devDependencies": {
     "alchemy": "^0.67.0",
     "dotenv": "^17.2.1",
