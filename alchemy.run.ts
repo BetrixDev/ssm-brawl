@@ -57,6 +57,7 @@ export const backend = await Worker("backend", {
     POLAR_ACCESS_TOKEN: alchemy.secret(process.env.POLAR_ACCESS_TOKEN),
     POLAR_SUCCESS_URL: process.env.POLAR_SUCCESS_URL || "",
     POLAR_SERVER: process.env.POLAR_SERVER || "sandbox",
+    PLUGIN_SECRET: alchemy.secret(process.env.PLUGIN_SECRET),
   },
   domains: [
     {

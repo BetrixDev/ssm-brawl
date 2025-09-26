@@ -1,16 +1,24 @@
+import { db } from "@/db";
 import type { RouterClient } from "@orpc/server";
-import { protectedProcedure, publicProcedure } from "../lib/orpc";
+import { publicProcedure } from "../lib/orpc";
+import { pluginRouter } from "./plugin";
 
 export const appRouter = {
-  healthCheck: publicProcedure.handler(() => {
-    return "OK";
-  }),
-  privateData: protectedProcedure.handler(({ context }) => {
+  healthCheck: publicProcedure.route({ method: "GET", path: "/health-check" }).handler(async () => {
+    const dbCheckStart = performance.now();
+
+    await db.$client.query("SELECT 1");
+
+    const dbCheckEnd = performance.now();
+
+    const dbCheckDuration = dbCheckEnd - dbCheckStart;
+
     return {
-      message: "This is private",
-      user: context.session?.user,
+      status: "OK",
+      dbCheckDurationMs: dbCheckDuration,
     };
   }),
+  plugin: pluginRouter,
 };
 
 export type AppRouter = typeof appRouter;
