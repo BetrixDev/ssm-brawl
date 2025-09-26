@@ -1,10 +1,7 @@
-import { sql } from "drizzle-orm";
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-export const players = sqliteTable("players", {
-  uuid: text("uuid").primaryKey(),
-  username: text("username").notNull(),
-  lastJoinedDate: text("last_joined_date")
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
+export const players = pgTable("players", {
+  uuid: text().primaryKey(),
+  username: text().notNull(),
+  lastJoinedDate: timestamp().defaultNow().notNull(),
 });

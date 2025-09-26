@@ -22,6 +22,7 @@ enum class AbilityType {
     AOE,
     PROJECTILE,
     RECOVERY,
+    MELEE,
 }
 
 @Serializable

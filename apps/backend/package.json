@@ -9,6 +9,7 @@
     "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "auth:generate": "npx @better-auth/cli@latest generate",
     "dev": "alchemy dev",
     "deploy": "alchemy deploy",
@@ -27,11 +28,14 @@
     "drizzle-orm": "^0.44.2",
     "drizzle-zod": "^0.8.3",
     "hono": "^4.8.2",
+    "pg": "^8.16.3",
+    "postgres": "^3.4.7",
     "zod": "^4.0.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250822.0",
     "@types/node": "^22.13.11",
+    "@types/pg": "^8.15.5",
     "alchemy": "^0.67.0",
     "dotenv": "^17.2.1",
     "drizzle-kit": "^0.31.2",

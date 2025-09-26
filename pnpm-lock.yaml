@@ -10,7 +10,7 @@ importers:
     devDependencies:
       alchemy:
         specifier: ^0.67.0
-        version: 0.67.0(@aws-sdk/client-dynamodb@3.896.0)(@aws-sdk/client-lambda@3.896.0)(@aws-sdk/client-s3@3.896.0)(@aws-sdk/client-sqs@3.896.0)(@aws-sdk/client-sts@3.398.0)(@cloudflare/vite-plugin@1.13.5(workerd@1.20250924.0)(wrangler@4.40.0(@cloudflare/workers-types@4.20250924.0)))(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@opennextjs/cloudflare@1.8.5(wrangler@4.40.0(@cloudflare/workers-types@4.20250924.0)))(drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(kysely@0.28.7))(workerd@1.20250924.0)
+        version: 0.67.0(@aws-sdk/client-dynamodb@3.896.0)(@aws-sdk/client-lambda@3.896.0)(@aws-sdk/client-s3@3.896.0)(@aws-sdk/client-sqs@3.896.0)(@aws-sdk/client-sts@3.398.0)(@cloudflare/vite-plugin@1.13.5(workerd@1.20250924.0))(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@opennextjs/cloudflare@1.8.5)(drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15))(workerd@1.20250924.0)
       dotenv:
         specifier: ^17.2.1
         version: 17.2.1
@@ -55,13 +55,19 @@ importers:
         version: 17.2.1
       drizzle-orm:
         specifier: ^0.44.2
-        version: 0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(kysely@0.28.7)
+        version: 0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@types/pg@8.15.5)(kysely@0.28.7)(pg@8.16.3)(postgres@3.4.7)
       drizzle-zod:
         specifier: ^0.8.3
-        version: 0.8.3(drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(kysely@0.28.7))(zod@4.1.8)
+        version: 0.8.3(drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@types/pg@8.15.5)(kysely@0.28.7)(pg@8.16.3)(postgres@3.4.7))(zod@4.1.8)
       hono:
         specifier: ^4.8.2
         version: 4.9.8
+      pg:
+        specifier: ^8.16.3
+        version: 8.16.3
+      postgres:
+        specifier: ^3.4.7
+        version: 3.4.7
       zod:
         specifier: ^4.0.2
         version: 4.1.8
@@ -72,9 +78,12 @@ importers:
       '@types/node':
         specifier: ^22.13.11
         version: 22.18.6
+      '@types/pg':
+        specifier: ^8.15.5
+        version: 8.15.5
       alchemy:
         specifier: ^0.67.0
-        version: 0.67.0(@aws-sdk/client-dynamodb@3.896.0)(@aws-sdk/client-lambda@3.896.0)(@aws-sdk/client-s3@3.896.0)(@aws-sdk/client-sqs@3.896.0)(@aws-sdk/client-sts@3.398.0)(@cloudflare/vite-plugin@1.13.5(workerd@1.20250924.0)(wrangler@4.40.0(@cloudflare/workers-types@4.20250924.0)))(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@opennextjs/cloudflare@1.8.5(wrangler@4.40.0(@cloudflare/workers-types@4.20250924.0)))(drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(kysely@0.28.7))(workerd@1.20250924.0)
+        version: 0.67.0(@aws-sdk/client-dynamodb@3.896.0)(@aws-sdk/client-lambda@3.896.0)(@aws-sdk/client-s3@3.896.0)(@aws-sdk/client-sqs@3.896.0)(@aws-sdk/client-sts@3.398.0)(@cloudflare/vite-plugin@1.13.5(workerd@1.20250924.0))(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@opennextjs/cloudflare@1.8.5)(drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15))(workerd@1.20250924.0)
       drizzle-kit:
         specifier: ^0.31.2
         version: 0.31.4
@@ -87,6 +96,55 @@ importers:
       wrangler:
         specifier: ^4.23.0
         version: 4.40.0(@cloudflare/workers-types@4.20250924.0)
+
+  apps/fumadocs:
+    dependencies:
+      '@opennextjs/cloudflare':
+        specifier: ^1.8.5
+        version: 1.8.5(wrangler@4.40.0(@cloudflare/workers-types@4.20250924.0))
+      fumadocs-core:
+        specifier: 15.7.12
+        version: 15.7.12(@tanstack/react-router@1.132.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(@types/react@19.1.13)(next@15.5.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      fumadocs-mdx:
+        specifier: 11.10.0
+        version: 11.10.0(fumadocs-core@15.7.12(@tanstack/react-router@1.132.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(@types/react@19.1.13)(next@15.5.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(next@15.5.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1)(vite@7.1.5(@types/node@24.3.3))
+      fumadocs-ui:
+        specifier: 15.7.12
+        version: 15.7.12(@tanstack/react-router@1.132.2(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(@types/react-dom@19.1.9(@types/react@19.1.13))(@types/react@19.1.13)(next@15.5.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(tailwindcss@4.1.13)
+      next:
+        specifier: 15.5.3
+        version: 15.5.3(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      react:
+        specifier: ^19.1.1
+        version: 19.1.1
+      react-dom:
+        specifier: ^19.1.1
+        version: 19.1.1(react@19.1.1)
+    devDependencies:
+      '@tailwindcss/postcss':
+        specifier: ^4.1.13
+        version: 4.1.13
+      '@types/mdx':
+        specifier: ^2.0.13
+        version: 2.0.13
+      '@types/node':
+        specifier: 24.3.3
+        version: 24.3.3
+      '@types/react':
+        specifier: ^19.1.13
+        version: 19.1.13
+      '@types/react-dom':
+        specifier: ^19.1.9
+        version: 19.1.9(@types/react@19.1.13)
+      postcss:
+        specifier: ^8.5.6
+        version: 8.5.6
+      tailwindcss:
+        specifier: ^4.1.13
+        version: 4.1.13
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.2
 
   apps/web:
     dependencies:
@@ -4260,6 +4318,9 @@ packages:
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
 
+  '@types/pg@8.15.5':
+    resolution: {integrity: sha512-LF7lF6zWEKxuT3/OR8wAZGzkg4ENGXFNyiV/JeOt9z5B+0ZVwbql9McqX5c/WStFq1GaGso7H1AzP/qSzmlCKQ==}
+
   '@types/react-dom@19.1.9':
     resolution: {integrity: sha512-qXRuZaOsAdXKFyOhRBg6Lqqc0yay13vN7KrIg4L7N4aaHN68ma9OK3NE1BoDFgFOTfM7zg+3/8+2n8rLUH3OKQ==}
     peerDependencies:
@@ -6894,6 +6955,40 @@ packages:
   perfect-debounce@1.0.0:
     resolution: {integrity: sha512-xCy9V055GLEqoFaHoC1SoLIaLmWctgCUaBaWxDZ7/Zx4CTyX7cJQLJOok/orfjZAh9kEYpjJa4d0KcJmCbctZA==}
 
+  pg-cloudflare@1.2.7:
+    resolution: {integrity: sha512-YgCtzMH0ptvZJslLM1ffsY4EuGaU0cx4XSdXLRFae8bPP4dS5xL1tNB3k2o/N64cHJpwU7dxKli/nZ2lUa5fLg==}
+
+  pg-connection-string@2.9.1:
+    resolution: {integrity: sha512-nkc6NpDcvPVpZXxrreI/FOtX3XemeLl8E0qFr6F2Lrm/I8WOnaWNhIPK2Z7OHpw7gh5XJThi6j6ppgNoaT1w4w==}
+
+  pg-int8@1.0.1:
+    resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
+    engines: {node: '>=4.0.0'}
+
+  pg-pool@3.10.1:
+    resolution: {integrity: sha512-Tu8jMlcX+9d8+QVzKIvM/uJtp07PKr82IUOYEphaWcoBhIYkoHpLXN3qO59nAI11ripznDsEzEv8nUxBVWajGg==}
+    peerDependencies:
+      pg: '>=8.0'
+
+  pg-protocol@1.10.3:
+    resolution: {integrity: sha512-6DIBgBQaTKDJyxnXaLiLR8wBpQQcGWuAESkRBX/t6OwA8YsqP+iVSiond2EDy6Y/dsGk8rh/jtax3js5NeV7JQ==}
+
+  pg-types@2.2.0:
+    resolution: {integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==}
+    engines: {node: '>=4'}
+
+  pg@8.16.3:
+    resolution: {integrity: sha512-enxc1h0jA/aq5oSDMvqyW3q89ra6XIIDZgCX9vkMrnz5DFTw/Ny3Li2lFQ+pt3L6MCgm/5o2o8HW9hiJji+xvw==}
+    engines: {node: '>= 16.0.0'}
+    peerDependencies:
+      pg-native: '>=3.0.1'
+    peerDependenciesMeta:
+      pg-native:
+        optional: true
+
+  pgpass@1.0.5:
+    resolution: {integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==}
+
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
@@ -6928,6 +7023,26 @@ packages:
   postcss@8.5.6:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
+
+  postgres-array@2.0.0:
+    resolution: {integrity: sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA==}
+    engines: {node: '>=4'}
+
+  postgres-bytea@1.0.0:
+    resolution: {integrity: sha512-xy3pmLuQqRBZBXDULy7KbaitYqLcmxigw14Q5sj8QBVLqEwXfeybIKVWiqAXTlcvdvb0+xkOtDbfQMOf4lST1w==}
+    engines: {node: '>=0.10.0'}
+
+  postgres-date@1.0.7:
+    resolution: {integrity: sha512-suDmjLVQg78nMK2UZ454hAG+OAW+HQPZ6n++TNDUX+L0+uUlLywnoxJKDou51Zm+zTCjrCl0Nq6J9C5hP9vK/Q==}
+    engines: {node: '>=0.10.0'}
+
+  postgres-interval@1.2.0:
+    resolution: {integrity: sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==}
+    engines: {node: '>=0.10.0'}
+
+  postgres@3.4.7:
+    resolution: {integrity: sha512-Jtc2612XINuBjIl/QTWsV5UvE8UHuNblcO3vVADSrKsrc6RqGX6lOW1cEo3CM2v0XG4Nat8nI+YM7/f26VxXLw==}
+    engines: {node: '>=12'}
 
   precinct@12.2.0:
     resolution: {integrity: sha512-NFBMuwIfaJ4SocE9YXPU/n4AcNSoFMVFjP72nvl3cx69j/ke61/hPOWFREVxLkFhhEGnA8ZuVfTqJBa+PK3b5w==}
@@ -7450,6 +7565,10 @@ packages:
 
   spdx-license-ids@3.0.22:
     resolution: {integrity: sha512-4PRT4nh1EImPbt2jASOKHX7PB7I+e4IWNLvkKFDxNhJlfjbYlleYQh285Z/3mPTHSAK/AvdMmw5BNNuYH8ShgQ==}
+
+  split2@4.2.0:
+    resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
+    engines: {node: '>= 10.x'}
 
   sprintf-js@1.0.3:
     resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
@@ -8213,6 +8332,10 @@ packages:
 
   xmlchars@2.2.0:
     resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==}
+
+  xtend@4.0.2:
+    resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
+    engines: {node: '>=0.4'}
 
   y18n@5.0.8:
     resolution: {integrity: sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==}
@@ -13598,6 +13721,12 @@ snapshots:
 
   '@types/normalize-package-data@2.4.4': {}
 
+  '@types/pg@8.15.5':
+    dependencies:
+      '@types/node': 22.18.6
+      pg-protocol: 1.10.3
+      pg-types: 2.2.0
+
   '@types/react-dom@19.1.9(@types/react@19.1.13)':
     dependencies:
       '@types/react': 19.1.13
@@ -13783,7 +13912,7 @@ snapshots:
     dependencies:
       humanize-ms: 1.2.1
 
-  alchemy@0.67.0(@aws-sdk/client-dynamodb@3.896.0)(@aws-sdk/client-lambda@3.896.0)(@aws-sdk/client-s3@3.896.0)(@aws-sdk/client-sqs@3.896.0)(@aws-sdk/client-sts@3.398.0)(@cloudflare/vite-plugin@1.13.5(workerd@1.20250924.0)(wrangler@4.40.0(@cloudflare/workers-types@4.20250924.0)))(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@opennextjs/cloudflare@1.8.5(wrangler@4.40.0(@cloudflare/workers-types@4.20250924.0)))(drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(kysely@0.28.7))(workerd@1.20250924.0):
+  alchemy@0.67.0(@aws-sdk/client-dynamodb@3.896.0)(@aws-sdk/client-lambda@3.896.0)(@aws-sdk/client-s3@3.896.0)(@aws-sdk/client-sqs@3.896.0)(@aws-sdk/client-sts@3.398.0)(@cloudflare/vite-plugin@1.13.5(workerd@1.20250924.0))(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@opennextjs/cloudflare@1.8.5)(drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15))(workerd@1.20250924.0):
     dependencies:
       '@aws-sdk/credential-providers': 3.896.0
       '@cloudflare/unenv-preset': 2.7.4(unenv@2.0.0-rc.19)(workerd@1.20250924.0)
@@ -13819,7 +13948,7 @@ snapshots:
       '@cloudflare/workers-types': 4.20250924.0
       '@libsql/client': 0.15.15
       '@opennextjs/cloudflare': 1.8.5(wrangler@4.40.0(@cloudflare/workers-types@4.20250924.0))
-      drizzle-orm: 0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(kysely@0.28.7)
+      drizzle-orm: 0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@types/pg@8.15.5)(kysely@0.28.7)(pg@8.16.3)(postgres@3.4.7)
     transitivePeerDependencies:
       - aws-crt
       - bufferutil
@@ -14327,7 +14456,7 @@ snapshots:
   db0@0.3.2(@libsql/client@0.15.15)(drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)):
     optionalDependencies:
       '@libsql/client': 0.15.15
-      drizzle-orm: 0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(kysely@0.28.7)
+      drizzle-orm: 0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@types/pg@8.15.5)(kysely@0.28.7)(pg@8.16.3)(postgres@3.4.7)
 
   debug@4.3.6:
     dependencies:
@@ -14500,15 +14629,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(kysely@0.28.7):
+  drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@types/pg@8.15.5)(kysely@0.28.7)(pg@8.16.3)(postgres@3.4.7):
     optionalDependencies:
       '@cloudflare/workers-types': 4.20250924.0
       '@libsql/client': 0.15.15
+      '@types/pg': 8.15.5
       kysely: 0.28.7
+      pg: 8.16.3
+      postgres: 3.4.7
 
-  drizzle-zod@0.8.3(drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(kysely@0.28.7))(zod@4.1.8):
+  drizzle-zod@0.8.3(drizzle-orm@0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@types/pg@8.15.5)(kysely@0.28.7)(pg@8.16.3)(postgres@3.4.7))(zod@4.1.8):
     dependencies:
-      drizzle-orm: 0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(kysely@0.28.7)
+      drizzle-orm: 0.44.5(@cloudflare/workers-types@4.20250924.0)(@libsql/client@0.15.15)(@types/pg@8.15.5)(kysely@0.28.7)(pg@8.16.3)(postgres@3.4.7)
       zod: 4.1.8
 
   dts-resolver@2.1.2: {}
@@ -16737,6 +16869,41 @@ snapshots:
 
   perfect-debounce@1.0.0: {}
 
+  pg-cloudflare@1.2.7:
+    optional: true
+
+  pg-connection-string@2.9.1: {}
+
+  pg-int8@1.0.1: {}
+
+  pg-pool@3.10.1(pg@8.16.3):
+    dependencies:
+      pg: 8.16.3
+
+  pg-protocol@1.10.3: {}
+
+  pg-types@2.2.0:
+    dependencies:
+      pg-int8: 1.0.1
+      postgres-array: 2.0.0
+      postgres-bytea: 1.0.0
+      postgres-date: 1.0.7
+      postgres-interval: 1.2.0
+
+  pg@8.16.3:
+    dependencies:
+      pg-connection-string: 2.9.1
+      pg-pool: 3.10.1(pg@8.16.3)
+      pg-protocol: 1.10.3
+      pg-types: 2.2.0
+      pgpass: 1.0.5
+    optionalDependencies:
+      pg-cloudflare: 1.2.7
+
+  pgpass@1.0.5:
+    dependencies:
+      split2: 4.2.0
+
   picocolors@1.1.1: {}
 
   picomatch@2.3.1: {}
@@ -16778,6 +16945,18 @@ snapshots:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  postgres-array@2.0.0: {}
+
+  postgres-bytea@1.0.0: {}
+
+  postgres-date@1.0.7: {}
+
+  postgres-interval@1.2.0:
+    dependencies:
+      xtend: 4.0.2
+
+  postgres@3.4.7: {}
 
   precinct@12.2.0:
     dependencies:
@@ -17528,6 +17707,8 @@ snapshots:
 
   spdx-license-ids@3.0.22: {}
 
+  split2@4.2.0: {}
+
   sprintf-js@1.0.3: {}
 
   stack-trace@0.0.10: {}
@@ -18242,6 +18423,8 @@ snapshots:
       js-yaml: 3.14.1
 
   xmlchars@2.2.0: {}
+
+  xtend@4.0.2: {}
 
   y18n@5.0.8: {}
 

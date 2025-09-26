@@ -1,13 +1,36 @@
 import alchemy from "alchemy";
-import { D1Database, KVNamespace, Vite, Worker } from "alchemy/cloudflare";
+import { KVNamespace, Vite, Worker } from "alchemy/cloudflare";
+import { NeonProject } from "alchemy/neon";
 import { Exec } from "alchemy/os";
+import { CloudflareStateStore } from "alchemy/state";
+
 import { config } from "dotenv";
 
 config({ path: "./.env" });
 config({ path: "./apps/backend/.env" });
 config({ path: "./apps/web/.env" });
 
-const app = await alchemy("super-smash-mobs-brawl");
+const stage = process.env.STAGE ?? "dev";
+
+const app = await alchemy("super-smash-mobs-brawl", {
+  stateStore: (scope) =>
+    new CloudflareStateStore(scope, {
+      scriptName: `ssmbrawl-state-${stage}`,
+    }),
+});
+
+// const serverImage = await docker.Image("minecraft", {
+//   name: "ssmbrawl-minecraft",
+//   tag: "latest",
+//   build: {
+//     context: "./plugin",
+//   },
+// });
+
+const server = await Exec("plugin-dev", {
+  cwd: "plugin",
+  command: "pnpm dev",
+});
 
 await Exec("db-generate", {
   cwd: "apps/backend",
@@ -18,9 +41,19 @@ const kv = await KVNamespace("kv", {
   adopt: true,
 });
 
-const db = await D1Database("database", {
-  adopt: true,
-  migrationsDir: "apps/backend/src/db/migrations",
+const neonDb = await NeonProject("db", {
+  name: `Super Smash Mobs Brawl ${stage}`,
+  apiKey: alchemy.secret(process.env.NEON_API_KEY),
+  region_id: "aws-us-east-1",
+  pg_version: 18 as any,
+});
+
+await Exec("db-generate", {
+  cwd: "apps/backend",
+  command: `pnpm run db:migrate`,
+  env: {
+    DATABASE_URL: neonDb.connection_uris[0].connection_uri,
+  },
 });
 
 export const backend = await Worker("backend", {
@@ -29,7 +62,7 @@ export const backend = await Worker("backend", {
   entrypoint: "src/index.ts",
   compatibility: "node",
   bindings: {
-    DB: db,
+    DATABASE_URL: neonDb.connection_uris[0].connection_uri,
     KV: kv,
     CORS_ORIGIN: process.env.CORS_ORIGIN || "http://localhost:3001",
     BETTER_AUTH_SECRET: alchemy.secret(process.env.BETTER_AUTH_SECRET),
