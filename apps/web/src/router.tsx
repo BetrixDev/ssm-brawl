@@ -2,7 +2,7 @@ import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { createORPCReactQueryUtils } from "@orpc/react-query";
 import { QueryClient } from "@tanstack/react-query";
-import { createRouter as createTanStackRouter } from "@tanstack/react-router";
+import { createRouter } from "@tanstack/react-router";
 import { routerWithQueryClient } from "@tanstack/react-router-with-query";
 import type { AppRouterClient } from "../../backend/src/routers";
 import Loader from "./components/loader";
@@ -10,7 +10,7 @@ import { RpcContext } from "./contexts/rpc-context";
 import "./index.css";
 import { routeTree } from "./routeTree.gen";
 
-export function createRouter() {
+export function getRouter() {
   const queryClient: QueryClient = new QueryClient();
 
   const link = new RPCLink({
@@ -27,7 +27,7 @@ export function createRouter() {
   const rpc = createORPCReactQueryUtils(rpcClient);
 
   const router = routerWithQueryClient(
-    createTanStackRouter({
+    createRouter({
       routeTree,
       defaultPreload: "intent",
       defaultPendingComponent: () => <Loader />,
@@ -42,6 +42,6 @@ export function createRouter() {
 
 declare module "@tanstack/react-router" {
   interface Register {
-    router: ReturnType<typeof createRouter>;
+    router: ReturnType<typeof getRouter>;
   }
 }

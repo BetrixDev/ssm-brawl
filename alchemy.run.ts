@@ -25,11 +25,11 @@ await Exec("db-generate", {
 });
 
 const kv = await KVNamespace("kv", {
-  adopt: true,
+  title: `${app.name}-${app.stage}-kv`,
 });
 
 const neonDb = await NeonProject("db", {
-  name: `Super Smash Mobs Brawl ${stage}`,
+  name: `${app.name}-${app.stage}-db`,
   apiKey: alchemy.secret(process.env.NEON_API_KEY),
   region_id: "aws-us-east-1",
   pg_version: 18 as any,
@@ -44,7 +44,6 @@ await Exec("db-generate", {
 });
 
 export const backend = await Worker("backend", {
-  adopt: true,
   cwd: "apps/backend",
   entrypoint: "src/index.ts",
   compatibility: "node",
@@ -62,21 +61,20 @@ export const backend = await Worker("backend", {
   domains: [
     {
       domainName: "api.ssmbrawl.com",
-      adopt: true,
+      zoneId: "9650a3553c9c2b48b3a6d142ac97fb5d",
     },
   ],
   dev: {
     port: 3000,
   },
-  name: "ssmbrawl-backend",
+  name: `${app.name}-${app.stage}-backend`,
 });
 
 export const web = await Vite("web", {
-  adopt: true,
+  name: `${app.name}-${app.stage}-web`,
   cwd: "apps/web",
-  assets: "dist",
   bindings: {
-    VITE_SERVER_URL: process.env.VITE_SERVER_URL || backend.url || "",
+    VITE_SERVER_URL: removeTrailingSlash(process.env.VITE_SERVER_URL || backend.url) || "",
   },
   dev: {
     command: "pnpm run dev",
@@ -84,15 +82,15 @@ export const web = await Vite("web", {
       VITE_SERVER_URL: removeTrailingSlash(backend.url) || "http://localhost:3000",
     },
   },
+  compatibilityFlags: ["nodejs_compat"],
+  compatibilityDate: "2025-09-02",
+  entrypoint: "@tanstack/react-start/server-entry",
   domains: [
     {
       domainName: "ssmbrawl.com",
-      adopt: true,
+      zoneId: "9650a3553c9c2b48b3a6d142ac97fb5d",
     },
   ],
-  compatibilityDate: "2025-09-02",
-  compatibilityFlags: ["nodejs_compat"],
-  name: "ssmbrawl-web",
 });
 
 console.log(`Backend -> ${backend.url}`);

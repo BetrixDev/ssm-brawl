@@ -6,7 +6,7 @@
     "format": "prettier --write .",
     "dev": "concurrently \"alchemy dev\" \"turbo run dev -F plugin\"",
     "dev:plugin": "turbo run dev -F plugin",
-    "dev:ts": "turbo run dev -F www",
+    "dev:ts": "alchemy dev",
     "deploy": "alchemy deploy",
     "build": "turbo build",
     "test": "turbo test",
