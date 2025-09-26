@@ -1,5 +1,5 @@
 import alchemy from "alchemy";
-import { D1Database, KVNamespace, Nextjs, Vite, Worker } from "alchemy/cloudflare";
+import { D1Database, KVNamespace, Vite, Worker } from "alchemy/cloudflare";
 import { Exec } from "alchemy/os";
 import { config } from "dotenv";
 
@@ -74,17 +74,8 @@ export const web = await Vite("web", {
   name: "ssmbrawl-web",
 });
 
-export const wiki = await Nextjs("wiki", {
-  adopt: true,
-  cwd: "apps/wiki",
-  dev: {
-    command: "pnpm run dev",
-  },
-});
-
 console.log(`Backend -> ${backend.url}`);
 console.log(`Web -> ${web.url}`);
-console.log(`Wiki -> ${wiki.url}`);
 
 await app.finalize();
 
