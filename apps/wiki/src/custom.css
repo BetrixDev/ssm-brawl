@@ -1,0 +1,7 @@
+.hero {
+  display: flex;
+
+  & div {
+    width: 100%;
+  }
+}

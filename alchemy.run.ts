@@ -1,5 +1,5 @@
 import alchemy from "alchemy";
-import { KVNamespace, Vite, Worker } from "alchemy/cloudflare";
+import { Astro, KVNamespace, Vite, Worker } from "alchemy/cloudflare";
 import { NeonProject } from "alchemy/neon";
 import { Exec } from "alchemy/os";
 import { CloudflareStateStore } from "alchemy/state";
@@ -93,8 +93,30 @@ export const web = await Vite("web", {
   ],
 });
 
+const wikiSessionKv = await KVNamespace("wiki-session", {
+  title: `${app.name}-${app.stage}-wiki-session`,
+});
+
+export const wiki = await Astro("wiki", {
+  name: `${app.name}-${app.stage}-wiki`,
+  cwd: "apps/wiki",
+  dev: {
+    command: "pnpm run dev",
+  },
+  bindings: {
+    SESSION: wikiSessionKv,
+  },
+  domains: [
+    {
+      domainName: "wiki.ssmbrawl.com",
+      zoneId: "9650a3553c9c2b48b3a6d142ac97fb5d",
+    },
+  ],
+});
+
 console.log(`Backend -> ${backend.url}`);
 console.log(`Web -> ${web.url}`);
+console.log(`Wiki -> ${wiki.url}`);
 
 await app.finalize();
 
