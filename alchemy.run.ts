@@ -1,9 +1,9 @@
 import alchemy from "alchemy";
 import { Astro, KVNamespace, Vite, Worker } from "alchemy/cloudflare";
+import { GitHubComment } from "alchemy/github";
 import { NeonProject } from "alchemy/neon";
 import { Exec } from "alchemy/os";
 import { CloudflareStateStore } from "alchemy/state";
-
 import { config } from "dotenv";
 
 config({ path: "./.env" });
@@ -43,6 +43,12 @@ await Exec("db-generate", {
   },
 });
 
+let apiDomainName = "api.ssmbrawl.com";
+
+if (app.stage !== "prod") {
+  apiDomainName = `${app.stage}-api.ssmbrawl.com`;
+}
+
 export const backend = await Worker("backend", {
   cwd: "apps/backend",
   entrypoint: "src/index.ts",
@@ -59,17 +65,26 @@ export const backend = await Worker("backend", {
     POLAR_SERVER: process.env.POLAR_SERVER || "sandbox",
     PLUGIN_SECRET_KEY: alchemy.secret(process.env.PLUGIN_SECRET_KEY),
   },
-  domains: [
-    {
-      domainName: "api.ssmbrawl.com",
-      zoneId: "9650a3553c9c2b48b3a6d142ac97fb5d",
-    },
-  ],
+  domains:
+    app.stage !== "dev"
+      ? [
+          {
+            domainName: apiDomainName,
+            zoneId: process.env.CLOUDFLARE_ZONE_ID,
+          },
+        ]
+      : undefined,
   dev: {
     port: 3000,
   },
   name: `${app.name}-${app.stage}-backend`,
 });
+
+let webDomainName = "ssmbrawl.com";
+
+if (app.stage !== "prod") {
+  webDomainName = `${app.stage}-ssmbrawl.com`;
+}
 
 export const web = await Vite("web", {
   name: `${app.name}-${app.stage}-web`,
@@ -86,17 +101,26 @@ export const web = await Vite("web", {
   compatibilityFlags: ["nodejs_compat"],
   compatibilityDate: "2025-09-02",
   entrypoint: "@tanstack/react-start/server-entry",
-  domains: [
-    {
-      domainName: "ssmbrawl.com",
-      zoneId: "9650a3553c9c2b48b3a6d142ac97fb5d",
-    },
-  ],
+  domains:
+    app.stage !== "dev"
+      ? [
+          {
+            domainName: webDomainName,
+            zoneId: process.env.CLOUDFLARE_ZONE_ID,
+          },
+        ]
+      : undefined,
 });
 
 const wikiSessionKv = await KVNamespace("wiki-session", {
   title: `${app.name}-${app.stage}-wiki-session`,
 });
+
+let wikiDomainName = "wiki.ssmbrawl.com";
+
+if (app.stage !== "prod") {
+  wikiDomainName = `${app.stage}-wiki.ssmbrawl.com`;
+}
 
 export const wiki = await Astro("wiki", {
   name: `${app.name}-${app.stage}-wiki`,
@@ -107,17 +131,41 @@ export const wiki = await Astro("wiki", {
   bindings: {
     SESSION: wikiSessionKv,
   },
-  domains: [
-    {
-      domainName: "wiki.ssmbrawl.com",
-      zoneId: "9650a3553c9c2b48b3a6d142ac97fb5d",
-    },
-  ],
+  domains:
+    app.stage !== "dev"
+      ? [
+          {
+            domainName: wikiDomainName,
+            zoneId: process.env.CLOUDFLARE_ZONE_ID,
+          },
+        ]
+      : undefined,
 });
 
 console.log(`Backend -> ${backend.url}`);
 console.log(`Web -> ${web.url}`);
 console.log(`Wiki -> ${wiki.url}`);
+
+if (process.env.PULL_REQUEST) {
+  await GitHubComment("preview-comment", {
+    owner: "your-username",
+    repository: "your-repo",
+    issueNumber: Number(process.env.PULL_REQUEST),
+    body: `
+     ## 🚀 Preview Deployed
+
+     Your changes have been deployed to a preview environment:
+
+     **🌐 Website:** ${web.url}
+     **🌐 Backend:** ${backend.url}
+     **🌐 Wiki:** ${wiki.url}
+
+     Built from commit ${process.env.GITHUB_SHA?.slice(0, 7)}
+
+     ---
+     <sub>🤖 This comment updates automatically with each push.</sub>`,
+  });
+}
 
 await app.finalize();
 
