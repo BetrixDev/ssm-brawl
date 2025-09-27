@@ -4,3 +4,4 @@ plugin/.gradle/**
 .env
 *.jsonc
 .env.development
+*.exe

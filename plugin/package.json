@@ -2,9 +2,9 @@
   "name": "@ssmbrawl/plugin",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e .env -- nodemon --watch src --ext kt,yaml,yml --exec gradlew.bat runServer",
-    "build": "bash ./gradlew build",
-    "test": "bash ./gradlew test"
+    "dev": "dotenv -e .env -- nodemon --watch src --ext kt,yaml,yml --exec \"node ./scripts/run-gradle.mjs\" runServer",
+    "build": "node ./scripts/run-gradle.mjs build",
+    "test": "node ./scripts/run-gradle.mjs test"
   },
   "devDependencies": {
     "dotenv-cli": "^10.0.0",

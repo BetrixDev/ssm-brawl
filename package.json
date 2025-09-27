@@ -7,8 +7,8 @@
     "dev": "turbo run dev",
     "dev:plugin": "turbo run dev -F plugin",
     "dev:ts": "turbo run dev -F !plugin",
-    "build": "turbo build",
-    "test": "turbo test",
+    "build": "turbo run build",
+    "test": "turbo run test",
     "check-types": "turbo check-types"
   },
   "devDependencies": {
