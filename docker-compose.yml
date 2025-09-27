@@ -29,7 +29,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: "postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-postgres}"
+      DATABASE_URL: "postgres://${POSTGRES_USER:-brawl}:${POSTGRES_PASSWORD:-brawl}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-brawl}"
     command: ["bun", "run", "db:migrate"]
     restart: "no"
   redis:
@@ -71,7 +71,7 @@ services:
       POLAR_SERVER: ${POLAR_SERVER:-sandbox}
       PLUGIN_SECRET_KEY: ${PLUGIN_SECRET_KEY:-changeme}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
-      DATABASE_URL: "postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-postgres}"
+      DATABASE_URL: "postgres://${POSTGRES_USER:-brawl}:${POSTGRES_PASSWORD:-brawl}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-brawl}"
   minecraft:
     build:
       context: ./plugin

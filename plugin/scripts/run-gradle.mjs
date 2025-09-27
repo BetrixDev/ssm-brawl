@@ -16,6 +16,18 @@ const gradleProcess = spawn(gradleCommand, gradleArgs, {
   shell: isWindows,
 });
 
+const terminate = () => {
+  if (gradleProcess.exitCode === null) {
+    gradleProcess.kill();
+  }
+};
+
+['SIGINT', 'SIGTERM', 'SIGQUIT', 'SIGUSR2'].forEach((signal) => {
+  process.once(signal, terminate);
+});
+
+process.once('exit', terminate);
+
 gradleProcess.on('error', (error) => {
   console.error('[run-gradle]', error.message);
   process.exitCode = 1;

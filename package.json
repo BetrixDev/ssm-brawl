@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "format": "prettier --write .",
+    "format": "prettier --write . && bunx ktfmt@latest --kotlinlang-style plugin/src",
     "dev": "turbo run dev",
     "dev:plugin": "turbo run dev -F plugin",
     "dev:ts": "turbo run dev -F !plugin",
