@@ -13,6 +13,10 @@ FROM debian:bookworm-slim
 
 WORKDIR /app
 
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y curl \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /app/server ./server
 
 EXPOSE 3000/tcp

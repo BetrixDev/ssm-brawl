@@ -10,7 +10,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "auth:generate": "npx @better-auth/cli@latest generate",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --env-file=../../.env.development --watch src/index.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.15.15",

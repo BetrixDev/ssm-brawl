@@ -37,19 +37,19 @@ export async function createInitialPlayerDocument(
   db: Database,
   uuid: string,
 ): Promise<PlayerDocument> {
-  const [[insertResult], headSkinBase64] = await Promise.all([
-    db
-      .insert(Table.players)
-      .values({
-        uuid,
-        username: uuid,
-        lastJoinedDate: new Date(),
-        firstJoinedDate: new Date(),
-        stats: {},
-      })
-      .returning(),
-    getPlayerHeadSkinBase64(uuid),
-  ]);
+  const headSkinBase64 = await getPlayerHeadSkinBase64(uuid);
+
+  const [insertResult] = await db
+    .insert(Table.players)
+    .values({
+      uuid,
+      username: uuid,
+      lastJoinedDate: new Date(),
+      firstJoinedDate: new Date(),
+      stats: {},
+      headSkinBase64,
+    })
+    .returning();
 
   return {
     isFirstTimeOnServer: true,

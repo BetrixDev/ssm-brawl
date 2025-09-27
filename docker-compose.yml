@@ -14,7 +14,7 @@ services:
       POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-brawl}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -63,15 +63,20 @@ services:
     ports:
       - "3000:3000"
     environment:
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-changeme}
-      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000/api/auth}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
       POLAR_ACCESS_TOKEN: ${POLAR_ACCESS_TOKEN:-}
       POLAR_SUCCESS_URL: ${POLAR_SUCCESS_URL:-http://localhost:3000/checkout/success}
       POLAR_SERVER: ${POLAR_SERVER:-sandbox}
       PLUGIN_SECRET_KEY: ${PLUGIN_SECRET_KEY:-changeme}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       DATABASE_URL: "postgres://${POSTGRES_USER:-brawl}:${POSTGRES_PASSWORD:-brawl}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-brawl}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health-check"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   minecraft:
     build:
       context: ./plugin
