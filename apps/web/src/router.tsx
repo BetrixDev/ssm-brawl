@@ -11,7 +11,13 @@ import "./index.css";
 import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {
-  const queryClient: QueryClient = new QueryClient();
+  const queryClient: QueryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
 
   const link = new RPCLink({
     url: `${import.meta.env.VITE_SERVER_URL}/rpc`,
