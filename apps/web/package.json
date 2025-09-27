@@ -36,15 +36,14 @@
     "zod": "^4.0.2"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.13.7",
     "@tanstack/react-router-devtools": "^1.132.7",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@types/react": "~19.1.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^5.0.1",
-    "alchemy": "^0.67.0",
     "jsdom": "^26.0.0",
+    "nitro-nightly": "^3.0.0-20250925-181710-5191890e",
     "typescript": "^5.7.2",
     "vite": "^7.0.2",
     "web-vitals": "^5.0.3"

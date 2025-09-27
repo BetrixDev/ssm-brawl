@@ -1,11 +1,11 @@
 import type { RouterClient } from "@orpc/server";
-import { env } from "cloudflare:workers";
-import { dbProvider, o, publicProcedure } from "../lib/orpc";
+import { dbProvider, kvProvider, o, publicProcedure } from "../lib/orpc";
 import { pluginRouter } from "./plugin";
 
 export const appRouter = {
   healthCheck: publicProcedure
     .use(dbProvider)
+    .use(kvProvider)
     .route({ method: "GET", path: "/health-check" })
     .handler(async ({ context }) => {
       const dbCheckStart = performance.now();
@@ -25,8 +25,8 @@ export const appRouter = {
       const kvCheckStart = performance.now();
 
       try {
-        await env.KV.put("test", "test");
-        await env.KV.get("test");
+        await context.kv.set("test", "test");
+        await context.kv.get("test");
       } catch (error) {
         console.error(error);
         return {

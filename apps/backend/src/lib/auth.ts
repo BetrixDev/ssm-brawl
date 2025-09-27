@@ -2,9 +2,9 @@ import { checkout, polar, portal } from "@polar-sh/better-auth";
 import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
-import { env } from "cloudflare:workers";
 import type { Database } from "../db";
 import * as schema from "../db/schema/auth";
+import { env } from "./env";
 import { polarClient } from "./payments";
 
 export function getAuth(db: Database) {
@@ -14,11 +14,10 @@ export function getAuth(db: Database) {
       usePlural: true,
       schema: schema,
     }),
-    trustedOrigins: [env.CORS_ORIGIN],
+    trustedOrigins: env.CORS_ORIGIN ? [env.CORS_ORIGIN] : [],
     emailAndPassword: {
       enabled: true,
     },
-    // uncomment cookieCache setting when ready to deploy to Cloudflare using *.workers.dev domains
     // session: {
     //   cookieCache: {
     //     enabled: true,

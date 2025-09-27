@@ -1,15 +1,13 @@
 // @ts-check
-import cloudflare from "@astrojs/cloudflare";
 import starlight from "@astrojs/starlight";
+import vercelServerless from "@astrojs/vercel/serverless";
 import { defineConfig } from "astro/config";
 import starlightThemeRapide from "starlight-theme-rapide";
 
 // https://astro.build/config
 export default defineConfig({
   output: "server",
-  adapter: cloudflare({
-    imageService: "compile",
-  }),
+  adapter: vercelServerless({}),
   integrations: [
     starlight({
       title: "Super Smash Mobs Brawl Wiki",

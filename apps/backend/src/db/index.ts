@@ -1,9 +1,9 @@
-import { drizzle } from "drizzle-orm/neon-serverless";
-
+import { env } from "@/lib/env";
+import { drizzle } from "drizzle-orm/postgres-js";
 import * as schema from "./schema";
 
 export function getDb() {
-  const db = drizzle(process.env.DATABASE_URL!, {
+  const db = drizzle(env.DATABASE_URL, {
     schema,
     casing: "snake_case",
   });

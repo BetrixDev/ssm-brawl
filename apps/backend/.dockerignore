@@ -1,0 +1,18 @@
+node_modules
+**/node_modules
+
+# Test and build outputs
+dist
+build
+*.log
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# VCS metadata
+.git
+.gitignore
+
+

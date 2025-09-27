@@ -1,10 +1,23 @@
 import { getDb, type Database } from "@/db";
 import { getAuth } from "@/lib/auth";
 import { ORPCError, os } from "@orpc/server";
-import { env } from "cloudflare:workers";
 import type { Context } from "./context";
+import { env } from "./env";
+import { getRedis } from "./redis";
 
 export const o = os.$context<Context>();
+
+export const kvProvider = o
+  .$context<{ kv?: Awaited<ReturnType<typeof getRedis>> }>()
+  .middleware(async ({ context, next }) => {
+    context.kv ??= await getRedis();
+
+    return next({
+      context: {
+        kv: context.kv,
+      },
+    });
+  });
 
 export const dbProvider = o.$context<{ db?: Database }>().middleware(async ({ context, next }) => {
   context.db ??= getDb();
