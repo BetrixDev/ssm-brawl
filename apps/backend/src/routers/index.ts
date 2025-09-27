@@ -8,22 +8,38 @@ export const appRouter = {
   healthCheck: publicProcedure.route({ method: "GET", path: "/health-check" }).handler(async () => {
     const dbCheckStart = performance.now();
 
-    await db.$client.query("SELECT 1");
+    try {
+      await db.execute("select 1");
+    } catch (error) {
+      console.error(error);
+      return {
+        status: "ERROR",
+        message: "Database connection failed",
+      };
+    }
 
-    const dbCheckEnd = performance.now();
-
-    const dbCheckDuration = dbCheckEnd - dbCheckStart;
+    const dbCheckDuration = performance.now() - dbCheckStart;
 
     const kvCheckStart = performance.now();
-    await env.KV.put("test", "test");
-    await env.KV.get("test");
-    const kvCheckEnd = performance.now();
-    const kvCheckDuration = kvCheckEnd - kvCheckStart;
+
+    try {
+      await env.KV.put("test", "test");
+      await env.KV.get("test");
+    } catch (error) {
+      console.error(error);
+      return {
+        status: "ERROR",
+        message: "KV connection failed",
+      };
+    }
+
+    const kvCheckDuration = performance.now() - kvCheckStart;
 
     return {
       status: "OK",
       dbCheckDurationMs: dbCheckDuration,
       kvCheckDurationMs: kvCheckDuration,
+      timestamp: new Date().toISOString(),
     };
   }),
   plugin: pluginRouter,

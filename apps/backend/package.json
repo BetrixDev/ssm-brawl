@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@libsql/client": "^0.15.9",
+    "@neondatabase/serverless": "^1.0.1",
     "@orpc/client": "^1.9.0",
     "@orpc/openapi": "^1.9.0",
     "@orpc/server": "^1.9.0",

@@ -17,7 +17,7 @@ env:
     github.event.number) }}
 jobs:
   deploy:
-    if: ${{ github.event.action != 'closed' }}
+    if: if: ${{ github.event.action != 'closed' && (github.event_name == 'push' || github.event.pull_request.head.repo.fork == false) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -50,7 +50,7 @@ jobs:
           NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
   cleanup:
     runs-on: ubuntu-latest
-    if: ${{ github.event.action == 'closed' && github.ref != 'refs/heads/main' }}
+    if: if: ${{ github.event.action == 'closed' && github.ref != 'refs/heads/main' && github.event.pull_request.head.repo.fork == false }}
     permissions:
       id-token: write
       contents: read

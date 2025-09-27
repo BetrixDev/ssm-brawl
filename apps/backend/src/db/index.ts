@@ -1,17 +1,10 @@
-import { env } from "cloudflare:workers";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
-import { CloudflareKvCache } from "./cache";
+import { drizzle } from "drizzle-orm/neon-serverless";
+
 import * as schema from "./schema";
 
-const pool = new Pool({
-  connectionString: env.DATABASE_URL,
-});
-
-export const db = drizzle(pool, {
+export const db = drizzle(process.env.DATABASE_URL!, {
   schema,
   casing: "snake_case",
-  cache: new CloudflareKvCache(env.KV),
 });
 
 export const Table = schema;

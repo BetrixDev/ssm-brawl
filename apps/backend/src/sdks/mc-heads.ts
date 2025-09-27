@@ -4,11 +4,13 @@ export async function getPlayerHeadSkinBase64(uuid: string) {
       res.arrayBuffer(),
     );
 
-    const base64 = Buffer.from(responsePng).toString("base64");
+    const uint8Array = new Uint8Array(responsePng);
+    const binaryString = String.fromCharCode.apply(null, Array.from(uint8Array));
+    const base64 = btoa(binaryString);
 
     return base64;
   } catch (error) {
-    console.error(error);
+    console.error("Failed to get player head:", error);
     return null;
   }
 }

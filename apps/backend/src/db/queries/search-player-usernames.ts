@@ -10,6 +10,5 @@ export function searchPlayerUsernames(query: string, paginationOptions: Paginati
       sql`to_tsvector('english', ${Table.players.username}) @@ to_tsquery('english', ${query})`,
     )
     .limit(paginationOptions.limit)
-    .offset((paginationOptions.page - 1) * paginationOptions.limit)
-    .$withCache();
+    .offset((paginationOptions.page - 1) * paginationOptions.limit);
 }

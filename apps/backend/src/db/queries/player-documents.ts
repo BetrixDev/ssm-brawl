@@ -23,7 +23,7 @@ export async function getPlayerDocument(uuid: string): Promise<PlayerDocument> {
     stats: queryResult.stats,
     banData: queryResult.bans.map((ban) => ({
       id: ban.id,
-      isBanned: false,
+      isBanned: ban.expiresAt ? ban.expiresAt.getTime() > Date.now() : true,
       reason: ban.reason,
       expiresAt: ban.expiresAt?.toISOString() ?? null,
       bannedAt: ban.bannedAt.toISOString(),

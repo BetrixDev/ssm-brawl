@@ -9,7 +9,7 @@ import { polarClient } from "./payments";
 
 export const auth = betterAuth<BetterAuthOptions>({
   database: drizzleAdapter(db, {
-    provider: "sqlite",
+    provider: "pg",
     usePlural: true,
     schema: schema,
   }),

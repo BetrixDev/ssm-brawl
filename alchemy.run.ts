@@ -19,20 +19,23 @@ const app = await alchemy("super-smash-mobs-brawl", {
     }),
 });
 
-await Exec("db-generate", {
-  cwd: "apps/backend",
-  command: "pnpm run db:generate",
-});
-
-const kv = await KVNamespace("kv", {
-  title: `${app.name}-${app.stage}-kv`,
-});
-
 const neonDb = await NeonProject("db", {
   name: `${app.name}-${app.stage}-db`,
   apiKey: alchemy.secret(process.env.NEON_API_KEY),
   region_id: "aws-us-east-1",
   pg_version: 18 as any,
+});
+
+await Exec("db-generate", {
+  cwd: "apps/backend",
+  command: "pnpm run db:generate",
+  env: {
+    DATABASE_URL: neonDb.connection_uris[0].connection_uri,
+  },
+});
+
+const kv = await KVNamespace("kv", {
+  title: `${app.name}-${app.stage}-kv`,
 });
 
 await Exec("db-generate", {
@@ -54,7 +57,7 @@ export const backend = await Worker("backend", {
   entrypoint: "src/index.ts",
   compatibility: "node",
   bindings: {
-    NODE_ENV: stage,
+    NODE_ENV: app.stage === "prod" ? "production" : "development",
     DATABASE_URL: neonDb.connection_uris[0].connection_uri,
     KV: kv,
     CORS_ORIGIN: process.env.CORS_ORIGIN || "http://localhost:3001",
@@ -148,8 +151,8 @@ console.log(`Wiki -> ${wiki.url}`);
 
 if (process.env.PULL_REQUEST) {
   await GitHubComment("preview-comment", {
-    owner: "your-username",
-    repository: "your-repo",
+    owner: "BetrixDev",
+    repository: "ssm-brawl",
     issueNumber: Number(process.env.PULL_REQUEST),
     body: `
      ## 🚀 Preview Deployed
