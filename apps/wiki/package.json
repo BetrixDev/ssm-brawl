@@ -1,5 +1,5 @@
 {
-  "name": "wiki",
+  "name": "@ssmbrawl/wiki",
   "type": "module",
   "version": "0.0.1",
   "scripts": {

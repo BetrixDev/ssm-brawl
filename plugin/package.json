@@ -1,5 +1,5 @@
 {
-  "name": "plugin",
+  "name": "@ssmbrawl/plugin",
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env -- nodemon --watch src --ext kt,yaml,yml --exec gradlew.bat runServer",

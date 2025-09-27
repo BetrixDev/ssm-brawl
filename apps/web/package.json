@@ -43,7 +43,6 @@
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^5.0.1",
     "jsdom": "^26.0.0",
-    "nitro-nightly": "^3.0.0-20250925-181710-5191890e",
     "typescript": "^5.7.2",
     "vite": "^7.0.2",
     "web-vitals": "^5.0.3"

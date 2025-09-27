@@ -23,5 +23,6 @@
   "trustedDependencies": [
     "@parcel/watcher",
     "@tailwindcss/oxide"
-  ]
+  ],
+  "packageManager": "bun@1.2.22"
 }
