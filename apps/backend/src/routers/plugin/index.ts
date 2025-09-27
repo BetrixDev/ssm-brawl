@@ -1,5 +1,6 @@
+import { o } from "@/lib/orpc";
 import { pluginPlayersRouter } from "./player";
 
 export const pluginRouter = {
-    players: pluginPlayersRouter,
+    players: o.prefix("/players").router(pluginPlayersRouter),
 }

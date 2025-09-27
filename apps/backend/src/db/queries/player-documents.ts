@@ -2,9 +2,10 @@ import type { PlayerDocument } from "@/schemas/player-document";
 import { getPlayerHeadSkinBase64 } from "@/sdks/mc-heads";
 import { randomUUID } from "crypto";
 import { eq } from "drizzle-orm";
-import { db, Table } from "..";
+import { Table } from "..";
+import type { Database } from "../index";
 
-export async function getPlayerDocument(uuid: string): Promise<PlayerDocument> {
+export async function getPlayerDocument(db: Database, uuid: string): Promise<PlayerDocument> {
   const queryResult = await db.query.players.findFirst({
     where: (players, { eq }) => eq(players.uuid, uuid),
     with: {
@@ -13,7 +14,7 @@ export async function getPlayerDocument(uuid: string): Promise<PlayerDocument> {
   });
 
   if (!queryResult) {
-    return createInitialPlayerDocument(uuid);
+    return createInitialPlayerDocument(db, uuid);
   }
 
   return {
@@ -32,7 +33,10 @@ export async function getPlayerDocument(uuid: string): Promise<PlayerDocument> {
   };
 }
 
-export async function createInitialPlayerDocument(uuid: string): Promise<PlayerDocument> {
+export async function createInitialPlayerDocument(
+  db: Database,
+  uuid: string,
+): Promise<PlayerDocument> {
   const [[insertResult], headSkinBase64] = await Promise.all([
     db
       .insert(Table.players)
@@ -56,7 +60,7 @@ export async function createInitialPlayerDocument(uuid: string): Promise<PlayerD
   };
 }
 
-export async function updatePlayerDocument(uuid: string, document: PlayerDocument) {
+export async function updatePlayerDocument(db: Database, uuid: string, document: PlayerDocument) {
   await db.transaction(async (tx) => {
     await tx
       .update(Table.players)

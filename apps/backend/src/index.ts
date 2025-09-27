@@ -7,7 +7,8 @@ import { env } from "cloudflare:workers";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import { auth } from "./lib/auth";
+import { getDb } from "./db";
+import { getAuth } from "./lib/auth";
 import { createContext } from "./lib/context";
 import { appRouter } from "./routers/index";
 
@@ -24,7 +25,11 @@ app.use(
   }),
 );
 
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
+app.on(["POST", "GET"], "/api/auth/*", async (c) => {
+  const auth = getAuth(await getDb());
+
+  auth.handler(c.req.raw);
+});
 
 export const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [

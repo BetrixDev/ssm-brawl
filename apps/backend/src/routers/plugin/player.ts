@@ -1,22 +1,23 @@
 import { getPlayerDocument, updatePlayerDocument } from "@/db/queries/player-documents";
-import { pluginProcedure } from "@/lib/orpc";
+import { dbProvider, pluginProcedure } from "@/lib/orpc";
 import { playerDocumentSchema } from "@/schemas/player-document";
 import * as z from "zod";
 
 export const pluginPlayersRouter = {
   getPlayerDocument: pluginProcedure
-    .route({ method: "GET", path: "/player/{uuid}/document" })
+    .route({ method: "GET", path: "/{uuid}/document" })
     .output(playerDocumentSchema)
     .input(
       z.object({
         uuid: z.string(),
       }),
     )
-    .handler(async ({ input }) => {
-      return await getPlayerDocument(input.uuid);
+    .use(dbProvider)
+    .handler(async ({context, input }) => {
+      return await getPlayerDocument(context.db, input.uuid);
     }),
   savePlayerDocument: pluginProcedure
-    .route({ method: "PUT", path: "/player/{uuid}/document" })
+    .route({ method: "PUT", path: "/{uuid}/document" })
     .output(
       z.object({
         message: z.string(),
@@ -28,8 +29,9 @@ export const pluginPlayersRouter = {
         document: playerDocumentSchema,
       }),
     )
-    .handler(async ({ input }) => {
-      await updatePlayerDocument(input.uuid, input.document);
+    .use(dbProvider)
+    .handler(async ({context, input }) => {
+      await updatePlayerDocument(context.db, input.uuid, input.document);
 
       return {
         message: "Player document saved",
