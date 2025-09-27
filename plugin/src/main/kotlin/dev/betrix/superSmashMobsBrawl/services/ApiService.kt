@@ -6,6 +6,7 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.put
@@ -17,23 +18,18 @@ import kotlinx.serialization.json.Json
 import org.bukkit.entity.Player
 
 object ApiService {
-    private val httpAuthToken = System.getenv("HTTP_AUTH_TOKEN")
-    private val httpBaseUrl = System.getenv("HTTP_BASE_URL")
-    private val convexBase =
-        (httpBaseUrl
-            ?: error(
-                "HTTP_BASE_URL is required (e.g., https://adjective-animal-number.convex.cloud)"
-            )) + "/convex"
+    private val apiSecretKey = System.getenv("API_SECRET_KEY")
+    private val baseApiUrl = System.getenv("BASE_API_URL")
 
     @PublishedApi
-    internal val convexClient =
+    internal val apiClient =
         HttpClient(CIO) {
             defaultRequest {
-                if (!httpAuthToken.isNullOrBlank()) {
-                    header("Authorization", "Bearer $httpAuthToken")
+                if (!apiSecretKey.isNullOrBlank()) {
+                    header("Authorization", "Bearer $apiSecretKey")
                 }
                 contentType(ContentType.Application.Json)
-                url(convexBase)
+                url(baseApiUrl)
             }
             install(ContentNegotiation) {
                 json(
@@ -51,20 +47,20 @@ object ApiService {
         isJoinEvent: Boolean = false,
     ): PlayerDocument {
         val response: PlayerDocument =
-            convexClient.get("players/${player.uniqueId}/document?joinEvent=${isJoinEvent}").body()
+            apiClient.get("players/${player.uniqueId}/document?joinEvent=${isJoinEvent}").body()
 
         return response
     }
 
     suspend fun playersSetDocumentAsync(player: Player, document: PlayerDocument) {
-        convexClient.put("players/${player.uniqueId}/document") {
+        apiClient.put("players/${player.uniqueId}/document") {
             contentType(ContentType.Application.Json)
             setBody(document)
         }
     }
 
     suspend inline fun <reified T> kvGetAsync(key: String): T? {
-        val response = convexClient.get("kv/$key")
+        val response = apiClient.get("kv/$key")
 
         if (response.status.value != 200) {
             return null
@@ -73,10 +69,14 @@ object ApiService {
         return response.body()
     }
 
-    suspend inline fun kvSetAsync(key: String, value: Any) {
-        convexClient.put("kv/$key") {
+    suspend fun kvSetAsync(key: String, value: Any) {
+        apiClient.put("kv/$key") {
             contentType(ContentType.Application.Json)
             setBody(value)
         }
+    }
+
+    suspend fun kvDeleteAsync(key: String) {
+        apiClient.delete("kv/$key")
     }
 }
