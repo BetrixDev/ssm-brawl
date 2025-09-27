@@ -3,11 +3,11 @@ import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { username } from "better-auth/plugins";
 import { env } from "cloudflare:workers";
-import type { getDb } from "../db";
+import type { Database } from "../db";
 import * as schema from "../db/schema/auth";
 import { polarClient } from "./payments";
 
-export function getAuth(db: Awaited<ReturnType<typeof getDb>>) {
+export function getAuth(db: Database) {
   return betterAuth<BetterAuthOptions>({
     database: drizzleAdapter(db, {
       provider: "pg",

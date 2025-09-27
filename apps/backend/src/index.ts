@@ -26,9 +26,9 @@ app.use(
 );
 
 app.on(["POST", "GET"], "/api/auth/*", async (c) => {
-  const auth = getAuth(await getDb());
+  const auth = getAuth(getDb());
 
-  auth.handler(c.req.raw);
+  return auth.handler(c.req.raw);
 });
 
 export const apiHandler = new OpenAPIHandler(appRouter, {

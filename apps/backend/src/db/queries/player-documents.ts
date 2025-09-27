@@ -84,7 +84,7 @@ export async function updatePlayerDocument(db: Database, uuid: string, document:
             .update(Table.playerBans)
             .set({
               reason: banData.reason,
-              expiresAt: banData.expiresAt ? new Date(banData.expiresAt) : undefined, // undefined for permanent bans
+              expiresAt: banData.expiresAt ? new Date(banData.expiresAt) : null, // null for permanent bans
               bannedBy: banData.bannedBy,
             })
             .where(eq(Table.playerBans.id, existingBan.id));
@@ -93,7 +93,7 @@ export async function updatePlayerDocument(db: Database, uuid: string, document:
             id: randomUUID(),
             playerUuid: uuid,
             reason: banData.reason,
-            expiresAt: banData.expiresAt ? new Date(banData.expiresAt) : undefined, // undefined for permanent bans
+            expiresAt: banData.expiresAt ? new Date(banData.expiresAt) : null, // null for permanent bans
             bannedAt: new Date(banData.bannedAt),
             bannedBy: banData.bannedBy,
           });

@@ -7,7 +7,7 @@ import type { Context } from "./context";
 export const o = os.$context<Context>();
 
 export const dbProvider = o.$context<{ db?: Database }>().middleware(async ({ context, next }) => {
-  context.db ??= await getDb();
+  context.db ??= getDb();
 
   return next({
     context: {
@@ -19,7 +19,7 @@ export const dbProvider = o.$context<{ db?: Database }>().middleware(async ({ co
 export const authProvider = o
   .$context<{ auth?: ReturnType<typeof getAuth>; db?: Database }>()
   .middleware(async ({ context, next }) => {
-    context.db ??= await getDb();
+    context.db ??= getDb();
     context.auth ??= getAuth(context.db);
 
     return next({
@@ -37,7 +37,7 @@ export const sessionProvider = o
     headers: Headers;
   }>()
   .middleware(async ({ context, next }) => {
-    context.db ??= await getDb();
+    context.db ??= getDb();
     context.auth ??= getAuth(context.db);
 
     context.session ??= await context.auth?.api.getSession({
