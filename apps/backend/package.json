@@ -13,29 +13,29 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "@libsql/client": "^0.15.9",
-    "@orpc/client": "^1.9.0",
-    "@orpc/openapi": "^1.9.0",
-    "@orpc/server": "^1.9.0",
-    "@orpc/zod": "^1.9.0",
-    "@polar-sh/better-auth": "^1.1.3",
-    "@polar-sh/sdk": "^0.34.16",
+    "@libsql/client": "^0.15.15",
+    "@orpc/client": "^1.9.1",
+    "@orpc/openapi": "^1.9.1",
+    "@orpc/server": "^1.9.1",
+    "@orpc/zod": "^1.9.1",
+    "@polar-sh/better-auth": "^1.1.4",
+    "@polar-sh/sdk": "^0.34.17",
     "better-auth": "^1.3.18",
-    "dotenv": "^17.2.1",
-    "drizzle-orm": "^0.44.2",
+    "dotenv": "^17.2.2",
+    "drizzle-orm": "^0.44.5",
     "drizzle-zod": "^0.8.3",
-    "hono": "^4.8.2",
+    "hono": "^4.9.9",
     "postgres": "^3.4.7",
     "redis": "^5.8.2",
-    "zod": "^4.0.2"
+    "zod": "^4.1.11"
   },
   "devDependencies": {
-    "@types/node": "^22.13.11",
+    "@types/node": "^22.18.6",
     "@types/pg": "^8.15.5",
-    "dotenv": "^17.2.1",
-    "drizzle-kit": "^0.31.2",
-    "tsdown": "^0.15.1",
-    "typescript": "^5.8.2",
-    "wrangler": "^4.23.0"
+    "dotenv": "^17.2.2",
+    "drizzle-kit": "^0.31.5",
+    "tsdown": "^0.15.5",
+    "typescript": "^5.9.2",
+    "wrangler": "^4.40.2"
   }
 }
