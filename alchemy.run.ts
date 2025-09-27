@@ -13,10 +13,7 @@ config({ path: "./apps/web/.env" });
 const stage = process.env.STAGE ?? "dev";
 
 const app = await alchemy("super-smash-mobs-brawl", {
-  stateStore: (scope) =>
-    new CloudflareStateStore(scope, {
-      scriptName: `ssmbrawl-state-${stage}`,
-    }),
+  stateStore: (scope) => new CloudflareStateStore(scope),
 });
 
 const neonDb = await NeonProject("db", {
