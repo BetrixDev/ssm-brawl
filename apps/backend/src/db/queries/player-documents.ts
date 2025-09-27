@@ -1,3 +1,4 @@
+import { incrementStat } from "@/helpers/stats-helpers";
 import type { PlayerDocument } from "@/schemas/player-document";
 import { getPlayerHeadSkinBase64 } from "@/sdks/mc-heads";
 import { randomUUID } from "crypto";
@@ -60,13 +61,39 @@ export async function createInitialPlayerDocument(
   };
 }
 
+export async function handlePlayerJoinEvent(db: Database, uuid: string) {
+  await db.transaction(async (tx) => {
+    await tx.insert(Table.playerJoinEvents).values({
+      id: randomUUID(),
+      playerUuid: uuid,
+      timestamp: new Date(),
+    });
+
+    const player = await tx.query.players.findFirst({
+      where: (players, { eq }) => eq(players.uuid, uuid),
+    });
+
+    await tx
+      .update(Table.players)
+      .set({
+        lastJoinedDate: new Date(),
+        stats: player?.stats
+          ? {
+              ...player.stats,
+              joinCount: incrementStat(player.stats, "joinCount", 0),
+            }
+          : undefined,
+      })
+      .where(eq(Table.players.uuid, uuid));
+  });
+}
+
 export async function updatePlayerDocument(db: Database, uuid: string, document: PlayerDocument) {
   await db.transaction(async (tx) => {
     await tx
       .update(Table.players)
       .set({
         lastJoinedDate: new Date(document.lastJoinDate),
-        firstJoinedDate: new Date(document.lastJoinDate),
         stats: document.stats,
       })
       .where(eq(Table.players.uuid, uuid));

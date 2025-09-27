@@ -1,12 +1,14 @@
 export async function getPlayerHeadSkinBase64(uuid: string) {
   try {
-    const responsePng = await fetch(`https://mc-heads.net/avatar/${uuid}`).then((res) =>
-      res.arrayBuffer(),
-    );
+    const response = await fetch(`https://mc-heads.net/avatar/${uuid}`);
 
-    const uint8Array = new Uint8Array(responsePng);
-    const binaryString = String.fromCharCode.apply(null, Array.from(uint8Array));
-    const base64 = btoa(binaryString);
+    if (!response.ok) {
+      console.warn("mc-heads returned non-OK response", response.status, response.statusText);
+      return null;
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString("base64");
 
     return base64;
   } catch (error) {

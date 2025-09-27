@@ -12,8 +12,9 @@
     },
     "outDir": "./dist",
     "types": ["node"],
-    "composite": true,
+    "composite": false,
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "declaration": false
   }
 }

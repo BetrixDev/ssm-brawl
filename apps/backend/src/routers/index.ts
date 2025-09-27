@@ -1,6 +1,6 @@
 import type { RouterClient } from "@orpc/server";
 import { dbProvider, kvProvider, o, publicProcedure } from "../lib/orpc";
-import { pluginRouter } from "./plugin";
+import { pluginRouter } from "./plugin/plugin-router";
 
 export const appRouter = {
   healthCheck: publicProcedure

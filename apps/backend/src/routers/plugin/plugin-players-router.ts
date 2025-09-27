@@ -1,20 +1,33 @@
-import { getPlayerDocument, updatePlayerDocument } from "@/db/queries/player-documents";
+import { getPlayerDocument, handlePlayerJoinEvent, updatePlayerDocument } from "@/db/queries/player-documents";
+import { incrementStat } from "@/helpers/stats-helpers";
 import { dbProvider, pluginProcedure } from "@/lib/orpc";
 import { playerDocumentSchema } from "@/schemas/player-document";
 import * as z from "zod";
 
 export const pluginPlayersRouter = {
   getPlayerDocument: pluginProcedure
-    .route({ method: "GET", path: "/{uuid}/document" })
+    .route({ method: "GET", path: "/{uuid}/document", inputStructure: "detailed" })
     .output(playerDocumentSchema)
     .input(
-      z.object({
-        uuid: z.string(),
-      }),
+     z.object({
+        params:  z.object({
+          uuid: z.string(),
+        }),
+        query: z.object({
+          joinEvent: z.stringbool().default(false),
+        }),
+     })
     )
     .use(dbProvider)
     .handler(async ({context, input }) => {
-      return await getPlayerDocument(context.db, input.uuid);
+      const document = await getPlayerDocument(context.db, input.params.uuid);
+
+
+      if (input.query.joinEvent) {
+        await handlePlayerJoinEvent(context.db, input.params.uuid);
+      } 
+
+      return document
     }),
   savePlayerDocument: pluginProcedure
     .route({ method: "PUT", path: "/{uuid}/document" })

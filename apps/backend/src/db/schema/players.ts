@@ -8,7 +8,7 @@ export const players = pgTable(
     username: text().notNull(),
     lastJoinedDate: timestamp().defaultNow().notNull(),
     firstJoinedDate: timestamp().defaultNow().notNull(),
-    stats: jsonb().$type<Record<string, string | number | boolean>>().notNull(),
+    stats: jsonb().$type<Record<string, string | number | boolean>>().default({}).notNull(),
     headSkinBase64: text(),
   },
   (table) => [
@@ -18,13 +18,16 @@ export const players = pgTable(
 
 export const playersRelations = relations(players, ({ many }) => ({
   bans: many(playerBans),
+  joinEvents: many(playerJoinEvents),
 }));
 
 export const playerBans = pgTable(
   "player_bans",
   {
     id: text().primaryKey(),
-    playerUuid: text().references(() => players.uuid),
+    playerUuid: text()
+      .references(() => players.uuid, { onDelete: "cascade" })
+      .notNull(),
     reason: text().notNull(),
     expiresAt: timestamp(),
     bannedAt: timestamp().defaultNow().notNull(),
@@ -36,6 +39,22 @@ export const playerBans = pgTable(
 export const playerBansRelations = relations(playerBans, ({ one }) => ({
   player: one(players, {
     fields: [playerBans.playerUuid],
+    references: [players.uuid],
+  }),
+}));
+
+export const playerJoinEvents = pgTable("player_join_events", {
+  id: text().primaryKey(),
+  playerUuid: text()
+    .references(() => players.uuid, { onDelete: "cascade" })
+    .notNull(),
+  timestamp: timestamp().defaultNow().notNull(),
+  ipAddress: text(),
+});
+
+export const playerJoinEventsRelations = relations(playerJoinEvents, ({ one }) => ({
+  player: one(players, {
+    fields: [playerJoinEvents.playerUuid],
     references: [players.uuid],
   }),
 }));
