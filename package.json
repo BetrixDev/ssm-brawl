@@ -22,7 +22,11 @@
   ],
   "trustedDependencies": [
     "@parcel/watcher",
-    "@tailwindcss/oxide"
+    "@tailwindcss/oxide",
+    "esbuild",
+    "sharp",
+    "wiki",
+    "workerd"
   ],
   "packageManager": "bun@1.2.22"
 }
