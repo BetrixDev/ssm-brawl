@@ -9,4 +9,3 @@ class DeathsGraspAbility(player: Player) : BrawlAbility("deaths_grasp", player) 
         player.sendDebugMessage("Death's Grasp pending implementation")
     }
 }
-

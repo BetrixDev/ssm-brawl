@@ -9,4 +9,3 @@ class BileBlasterAbility(player: Player) : BrawlAbility("bile_blaster", player) 
         player.sendDebugMessage("Bile Blaster pending implementation")
     }
 }
-

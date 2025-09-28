@@ -14,4 +14,3 @@ class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", pl
         super.teardown()
     }
 }
-
