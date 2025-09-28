@@ -20,4 +20,8 @@ class PotionProjectile(
             shooter = owner
             this.item = this@PotionProjectile.item.clone()
         }
+
+    fun customMethod() {
+
+    }
 }

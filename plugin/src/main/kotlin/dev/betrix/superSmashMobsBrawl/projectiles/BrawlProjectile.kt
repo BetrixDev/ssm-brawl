@@ -72,6 +72,7 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
     protected var projectileSize = 0.5
     protected open var velocityMultiplier = 1.0
     protected var velocityAddend: Vector? = null
+    protected var customSetInitialVelocity: ((projectile: Entity) -> Unit)? = null
 
     // Callback collections
     private val entityHitCallbacks = mutableListOf<EntityHitCallback>()
@@ -173,10 +174,28 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
             addEffect(StandardTrailEffect(particle, count, offset ?: Vector(0.1, 0.1, 0.1)))
         }
 
+    fun trailSoundEffect(sound: Sound, volume: Float = 1.0f, pitch: Float = 1.0f): BrawlProjectile =
+        apply {
+            addEffect(object : ProjectileEffect {
+                override fun onTick(projectile: BrawlProjectile) {
+                    val entity = projectile.projectileEntity ?: return
+                    entity.world.playSound(entity.location, sound, volume, pitch)
+                }
+
+                override fun onHit(projectile: BrawlProjectile, hitType: HitType) {
+                    // No special hit behavior for trail sound effects
+                }
+            })
+        }
+
     fun impactEffect(particle: Particle, sound: Sound? = null, count: Int = 1): BrawlProjectile =
         apply {
             addEffect(StandardImpactEffect(particle, sound, count))
         }
+
+    fun setInitialVelocity(velocityFunction: ((projectile: Entity) -> Unit)): BrawlProjectile = apply {
+        customSetInitialVelocity = velocityFunction
+    }
 
     fun launch(): BrawlProjectile {
         projectileEntity = createProjectileEntity()
@@ -272,6 +291,11 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
     abstract fun createProjectileEntity(): Entity
 
     open fun doVelocity() {
+        if (customSetInitialVelocity != null && projectileEntity != null) {
+            customSetInitialVelocity?.invoke(projectileEntity!!)
+            return
+        }
+
         val baseVelocity = owner.eyeLocation.direction
         val finalVelocity =
             if (velocityAddend != null) {

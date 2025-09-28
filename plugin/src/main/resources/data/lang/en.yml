@@ -36,6 +36,9 @@ kits:
   slime:
     name: "Slime"
     description: "Glass cannon jumper with unmatched regen and explosive bursts"
+  iron_golem:
+    name: "Iron Golem"
+    description: "Slow but tanky bruiser with devastating melee and knockback"
 abilities:
   sulphur_bomb:
     name: "Sulphur Bomb"
@@ -115,6 +118,9 @@ abilities:
   slime_slam:
     name: "Slime Slam"
     description: "Crash downward and rebound to safety"
+  iron_hook:
+    name: "Iron Hook"
+    description: "Hook enemies and yank them toward you"
 maps:
   blue_forest:
     name: "Blue Forest"
