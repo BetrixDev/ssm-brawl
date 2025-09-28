@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { index, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { index, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const players = pgTable(
   "players",
@@ -9,6 +9,7 @@ export const players = pgTable(
     lastJoinedDate: timestamp().defaultNow().notNull(),
     firstJoinedDate: timestamp().defaultNow().notNull(),
     stats: jsonb().$type<Record<string, string | number | boolean>>().default({}).notNull(),
+    dailyLoginStreak: integer().default(0).notNull(),
     headSkinBase64: text(),
   },
   (table) => [

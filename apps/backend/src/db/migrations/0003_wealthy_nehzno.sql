@@ -1,0 +1,1 @@
+ALTER TABLE "players" ADD COLUMN "daily_login_streak" integer;
