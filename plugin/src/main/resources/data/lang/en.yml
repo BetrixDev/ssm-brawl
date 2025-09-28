@@ -27,6 +27,9 @@ kits:
   squid:
     name: "Squid"
     description: "Squid is an all-around solid defensive kit"
+  guardian:
+    name: "Guardian"
+    description: "Control the tides with lasers, whirlpools, and resilient armor"
 abilities:
   sulphur_bomb:
     name: "Sulphur Bomb"
@@ -85,6 +88,15 @@ abilities:
   fish_flurry:
     name: "Fish Flurry"
     description: "Summon a whirl of fish that batters nearby enemies"
+  whirlpool_axe:
+    name: "Whirlpool Axe"
+    description: "Hurl a spinning axe that drags foes toward its vortex"
+  water_splash:
+    name: "Water Splash"
+    description: "Burst upward on a wave of water to recover and reposition"
+  target_laser:
+    name: "Target Laser"
+    description: "Charge a focused beam that scorches enemies in front of you"
 maps:
   blue_forest:
     name: "Blue Forest"
@@ -167,6 +179,9 @@ messages:
     nether_pig:
       name: "Nether Pig"
       description: "Gain fiery resilience when your health nears collapse"
+  thorns:
+    name: "Thorns"
+    description: "Reflect damage and shrug off hits after surviving near-death"
   projectiles:
     arrow: "Arrow"
     barrage_arrow: "Barrage Arrow"

@@ -227,3 +227,23 @@ kits:
       chestplate: chainmail_chestplate
       leggings: chainmail_leggings
       boots: chainmail_boots
+
+  # Guardian
+  - id: guardian
+    meleeDamage: 5.0
+    armor: 4.5
+    knockbackMultiplier: 1.25
+    disguiseId: "guardian"
+    selectionSound: "entity.guardian.ambient"
+    displayItem: "prismarine_shard"
+    passives:
+      - id: thorns
+    abilities:
+      - id: whirlpool_axe
+      - id: water_splash
+      - id: target_laser
+    armorItems:
+      helmet: chainmail_helmet
+      chestplate: chainmail_chestplate
+      leggings: chainmail_leggings
+      boots: chainmail_boots

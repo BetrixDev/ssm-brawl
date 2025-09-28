@@ -226,6 +226,33 @@ abilities:
       damagePerTick: 1.0
       tickIntervalTicks: 5
 
+  - id: whirlpool_axe
+    cooldown: 5.0
+    type: projectile
+    itemSlot: 0
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: prismarine_shard
+    metadata: {}
+
+  - id: water_splash
+    cooldown: 12.0
+    type: recovery
+    itemSlot: 1
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: water_bucket
+    metadata: {}
+
+  - id: target_laser
+    cooldown: 15.0
+    type: aoe
+    itemSlot: 2
+    usage: right_click
+    hotbarItem: iron_sword
+    displayItem: prismarine_crystals
+    metadata: {}
+
   - id: bouncy_bacon
     cooldown: 5.0
     itemSlot: 0
