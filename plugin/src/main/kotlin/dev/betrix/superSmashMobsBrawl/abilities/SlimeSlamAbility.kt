@@ -9,4 +9,3 @@ class SlimeSlamAbility(player: Player) : BrawlAbility("slime_slam", player) {
         player.sendDebugMessage("Slime Slam ability pending implementation")
     }
 }
-

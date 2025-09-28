@@ -14,4 +14,3 @@ class GigaSlimePassive(player: Player) : BrawlPassive("giga_slime", player) {
         super.teardown()
     }
 }
-
