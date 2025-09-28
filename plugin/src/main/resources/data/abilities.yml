@@ -276,3 +276,19 @@ abilities:
       explosionRadius: 4.0
       launchVerticalBoost: 0.8
       damage: 4.0
+
+  - id: bile_blaster
+    cooldown: 8.0
+    type: projectile
+    itemSlot: 0
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: slime_ball
+
+  - id: deaths_grasp
+    cooldown: 10.0
+    type: recovery
+    itemSlot: 1
+    usage: left_click
+    hotbarItem: bow
+    displayItem: bow

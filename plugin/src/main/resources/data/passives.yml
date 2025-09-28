@@ -81,3 +81,9 @@ passives:
       lowHealthThreshold: 6.0
       projectileReduction: 0.2
       knockbackReduction: 0.15
+
+  - id: corrupted_arrow
+    displayItem: arrow
+    userFacing: true
+    metadata:
+      double_damage_condition: deaths_grasp_used

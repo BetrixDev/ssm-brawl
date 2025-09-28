@@ -8,6 +8,9 @@ kits:
   skeleton:
     name: "Skeleton"
     description: "He got bones"
+  zombie:
+    name: "Zombie"
+    description: "Versatile brawler with corrosive bile and relentless grapples"
   cow:
     name: "Cow"
   pig:
@@ -43,6 +46,12 @@ abilities:
   roped_arrow:
     name: "Roped Arrow"
     description: ""
+  bile_blaster:
+    name: "Bile Blaster"
+    description: "Launch a caustic bile shot that primes enemies for follow-up strikes"
+  deaths_grasp:
+    name: "Death's Grasp"
+    description: "Lunge forward with a tethering grip to yank yourself toward safety"
   blink:
     name: "Blink"
     description: ""
@@ -170,6 +179,9 @@ messages:
       name: "Hunger"
       description: "Restore hunger by striking opponents"
       attackToRestore: "<warning>Attack other players to restore hunger!</warning>"
+    corrupted_arrow:
+      name: "Corrupted Arrow"
+      description: "Empower bow shots after using Death's Grasp to deal brutal damage"
     wall_climb:
       name: "Wall Climb"
       description: "Hold sneak on a wall to climb and regain a midair reset"

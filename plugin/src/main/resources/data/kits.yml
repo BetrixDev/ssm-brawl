@@ -68,6 +68,29 @@ kits:
       leggings: iron_leggings
       boots: iron_boots
 
+  # Zombie
+  - id: zombie
+    meleeDamage: 6.0
+    armor: 5.0
+    knockbackMultiplier: 1.25
+    disguiseId: "zombie"
+    selectionSound: "entity.zombie.ambient"
+    displayItem: "rotten_flesh"
+    passives:
+      - id: regeneration
+        overrides:
+          metadata:
+            healAmount: 0.25
+      - id: corrupted_arrow
+    abilities:
+      - id: bile_blaster
+      - id: deaths_grasp
+    armorItems:
+      helmet: null
+      chestplate: chainmail_chestplate
+      leggings: chainmail_leggings
+      boots: chainmail_boots
+
   # Cow
   - id: cow
     meleeDamage: 6.0
