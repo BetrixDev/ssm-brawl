@@ -9,4 +9,3 @@ class WhirlpoolAxeAbility(player: Player) : BrawlAbility("whirlpool_axe", player
         player.sendDebugMessage("Whirlpool Axe ability pending implementation")
     }
 }
-

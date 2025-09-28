@@ -9,4 +9,3 @@ class WaterSplashAbility(player: Player) : BrawlAbility("water_splash", player) 
         player.sendDebugMessage("Water Splash ability pending implementation")
     }
 }
-

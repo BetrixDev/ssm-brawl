@@ -14,5 +14,3 @@ class ThornsPassive(player: Player) : BrawlPassive("thorns", player) {
         super.teardown()
     }
 }
-
-

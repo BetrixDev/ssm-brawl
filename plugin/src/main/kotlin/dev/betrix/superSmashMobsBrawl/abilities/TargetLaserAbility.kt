@@ -9,4 +9,3 @@ class TargetLaserAbility(player: Player) : BrawlAbility("target_laser", player) 
         player.sendDebugMessage("Target Laser ability pending implementation")
     }
 }
-
