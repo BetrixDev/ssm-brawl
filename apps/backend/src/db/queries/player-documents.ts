@@ -1,3 +1,4 @@
+import { calculateDailyLoginStreak } from "@/helpers/daily-login-streak";
 import { incrementStat } from "@/helpers/stats-helpers";
 import type { PlayerDocument } from "@/schemas/player-document";
 import { getPlayerHeadSkinBase64 } from "@/sdks/mc-heads";
@@ -22,6 +23,7 @@ export async function getPlayerDocument(db: Database, uuid: string): Promise<Pla
     isFirstTimeOnServer: false,
     lastJoinDate: queryResult.lastJoinedDate.toISOString(),
     headSkinBase64: queryResult.headSkinBase64,
+    dailyLoginStreak: queryResult.dailyLoginStreak ?? null,
     stats: queryResult.stats,
     banData: queryResult.bans.map((ban) => ({
       id: ban.id,
@@ -56,6 +58,7 @@ export async function createInitialPlayerDocument(
     isFirstTimeOnServer: true,
     lastJoinDate: insertResult.lastJoinedDate.toISOString(),
     headSkinBase64,
+    dailyLoginStreak: insertResult.dailyLoginStreak ?? null,
     stats: insertResult.stats,
     banData: null,
   };
@@ -77,6 +80,10 @@ export async function handlePlayerJoinEvent(db: Database, uuid: string) {
       .update(Table.players)
       .set({
         lastJoinedDate: new Date(),
+        dailyLoginStreak: calculateDailyLoginStreak(
+          player?.dailyLoginStreak,
+          player?.lastJoinedDate ?? null,
+        ),
         stats: player?.stats
           ? {
               ...player.stats,
@@ -94,6 +101,7 @@ export async function updatePlayerDocument(db: Database, uuid: string, document:
       .update(Table.players)
       .set({
         lastJoinedDate: new Date(document.lastJoinDate),
+        dailyLoginStreak: document.dailyLoginStreak ?? undefined,
         stats: document.stats,
       })
       .where(eq(Table.players.uuid, uuid));

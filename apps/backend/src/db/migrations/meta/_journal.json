@@ -15,6 +15,20 @@
       "when": 1758922565836,
       "tag": "0001_sweet_wendell_vaughn",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1759024403466,
+      "tag": "0002_flippant_penance",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1759024479843,
+      "tag": "0003_wealthy_nehzno",
+      "breakpoints": true
     }
   ]
 }
