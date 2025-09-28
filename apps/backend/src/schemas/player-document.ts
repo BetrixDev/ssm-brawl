@@ -4,7 +4,7 @@ export const playerDocumentSchema = z.object({
   isFirstTimeOnServer: z.boolean(),
   lastJoinDate: z.string(),
   headSkinBase64: z.string().nullable(),
-  dailyLoginStreak: z.number().int().positive().nullable(),
+  dailyLoginStreak: z.number().int().nonnegative().nullable(),
   stats: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])),
   banData: z
     .array(
