@@ -82,6 +82,11 @@ passives:
       projectileReduction: 0.2
       knockbackReduction: 0.15
 
+  - id: giga_slime
+    displayItem: slime_ball
+    userFacing: true
+    metadata: {}
+
   - id: corrupted_arrow
     displayItem: arrow
     userFacing: true

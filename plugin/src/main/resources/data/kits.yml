@@ -270,3 +270,26 @@ kits:
       chestplate: chainmail_chestplate
       leggings: chainmail_leggings
       boots: chainmail_boots
+
+  # Slime
+  - id: slime
+    meleeDamage: 6.0
+    armor: 4.0
+    knockbackMultiplier: 1.75
+    disguiseId: "slime"
+    selectionSound: "entity.slime.squish"
+    displayItem: "slime_ball"
+    passives:
+      - id: regeneration
+        overrides:
+          metadata:
+            healAmount: 0.35
+      - id: giga_slime
+    abilities:
+      - id: slime_rocket
+      - id: slime_slam
+    armorItems:
+      helmet: chainmail_helmet
+      chestplate: chainmail_chestplate
+      leggings: null
+      boots: chainmail_boots

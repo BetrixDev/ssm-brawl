@@ -33,6 +33,9 @@ kits:
   guardian:
     name: "Guardian"
     description: "Control the tides with lasers, whirlpools, and resilient armor"
+  slime:
+    name: "Slime"
+    description: "Glass cannon jumper with unmatched regen and explosive bursts"
 abilities:
   sulphur_bomb:
     name: "Sulphur Bomb"
@@ -106,6 +109,12 @@ abilities:
   target_laser:
     name: "Target Laser"
     description: "Charge a focused beam that scorches enemies in front of you"
+  slime_rocket:
+    name: "Slime Rocket"
+    description: "Launch a sticky slime shot that detonates on contact"
+  slime_slam:
+    name: "Slime Slam"
+    description: "Crash downward and rebound to safety"
 maps:
   blue_forest:
     name: "Blue Forest"
@@ -194,6 +203,9 @@ messages:
   thorns:
     name: "Thorns"
     description: "Reflect damage and shrug off hits after surviving near-death"
+  giga_slime:
+    name: "Giga Slime"
+    description: "Grow larger, leap farther, and accelerate regen as momentum builds"
   projectiles:
     arrow: "Arrow"
     barrage_arrow: "Barrage Arrow"

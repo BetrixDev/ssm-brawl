@@ -253,6 +253,24 @@ abilities:
     displayItem: prismarine_crystals
     metadata: {}
 
+  - id: slime_rocket
+    cooldown: 8.0
+    type: projectile
+    itemSlot: 0
+    usage: right_click
+    hotbarItem: iron_sword
+    displayItem: slime_ball
+    metadata: {}
+
+  - id: slime_slam
+    cooldown: 10.0
+    type: recovery
+    itemSlot: 1
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: slime_block
+    metadata: {}
+
   - id: bouncy_bacon
     cooldown: 5.0
     itemSlot: 0
