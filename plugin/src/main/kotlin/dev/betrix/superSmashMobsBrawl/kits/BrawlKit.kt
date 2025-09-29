@@ -80,6 +80,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "deaths_grasp" -> DeathsGraspAbility(player)
                     "slime_rocket" -> SlimeRocketAbility(player)
                     "slime_slam" -> SlimeSlamAbility(player)
+                    "iron_hook" -> IronHookAbility(player)
                     else -> {
                         logger.severe(
                             "No ability found with id ${it.id} reference on kit ${kitData.id}"

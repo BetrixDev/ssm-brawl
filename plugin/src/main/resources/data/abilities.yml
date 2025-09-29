@@ -310,3 +310,11 @@ abilities:
     usage: left_click
     hotbarItem: bow
     displayItem: bow
+
+  - id: iron_hook
+    cooldown: 8.0
+    itemSlot: 1
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_pickaxe
+    displayItem: tripwire_hook

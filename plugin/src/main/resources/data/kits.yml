@@ -293,3 +293,24 @@ kits:
       chestplate: chainmail_chestplate
       leggings: null
       boots: chainmail_boots
+
+  # Iron Golem
+  - id: iron_golem
+    meleeDamage: 7.0
+    armor: 8.0
+    knockbackMultiplier: 1.0
+    disguiseId: iron_golem
+    passives:
+      - id: double_jump
+      - id: regeneration
+        overrides:
+          metadata:
+            regenRate: 0.2
+      - id: hunger
+    abilities:
+      - id: iron_hook
+    armorItems:
+      helmet: iron_helmet
+      chestplate: iron_chestplate
+      leggings: iron_leggings
+      boots: diamond_boots
