@@ -31,22 +31,15 @@ services:
     command: ["bun", "run", "db:migrate"]
     restart: "no"
   redis:
-    image: redis:latest
+    image: docker.dragonflydb.io/dragonflydb/dragonfly
     container_name: ssmb-redis
     restart: unless-stopped
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      REDIS_USER: ${REDIS_USER:-default}
-      REDIS_DB: ${REDIS_DB:-0}
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+    ulimits:
+      memlock: -1
   api:
     depends_on:
       redis:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
       migrate:
