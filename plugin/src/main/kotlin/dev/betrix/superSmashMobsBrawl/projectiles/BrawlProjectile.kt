@@ -176,16 +176,18 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
 
     fun trailSoundEffect(sound: Sound, volume: Float = 1.0f, pitch: Float = 1.0f): BrawlProjectile =
         apply {
-            addEffect(object : ProjectileEffect {
-                override fun onTick(projectile: BrawlProjectile) {
-                    val entity = projectile.projectileEntity ?: return
-                    entity.world.playSound(entity.location, sound, volume, pitch)
-                }
+            addEffect(
+                object : ProjectileEffect {
+                    override fun onTick(projectile: BrawlProjectile) {
+                        val entity = projectile.projectileEntity ?: return
+                        entity.world.playSound(entity.location, sound, volume, pitch)
+                    }
 
-                override fun onHit(projectile: BrawlProjectile, hitType: HitType) {
-                    // No special hit behavior for trail sound effects
+                    override fun onHit(projectile: BrawlProjectile, hitType: HitType) {
+                        // No special hit behavior for trail sound effects
+                    }
                 }
-            })
+            )
         }
 
     fun impactEffect(particle: Particle, sound: Sound? = null, count: Int = 1): BrawlProjectile =
@@ -193,9 +195,10 @@ abstract class BrawlProjectile(open val owner: Player, open val name: String) :
             addEffect(StandardImpactEffect(particle, sound, count))
         }
 
-    fun setInitialVelocity(velocityFunction: ((projectile: Entity) -> Unit)): BrawlProjectile = apply {
-        customSetInitialVelocity = velocityFunction
-    }
+    fun setInitialVelocity(velocityFunction: ((projectile: Entity) -> Unit)): BrawlProjectile =
+        apply {
+            customSetInitialVelocity = velocityFunction
+        }
 
     fun launch(): BrawlProjectile {
         projectileEntity = createProjectileEntity()

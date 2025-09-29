@@ -3,7 +3,6 @@ package dev.betrix.superSmashMobsBrawl.abilities
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import dev.betrix.superSmashMobsBrawl.events.Damager
-import dev.betrix.superSmashMobsBrawl.extensions.doKnockback
 import dev.betrix.superSmashMobsBrawl.extensions.playSound
 import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
@@ -20,10 +19,9 @@ import org.bukkit.inventory.ItemStack
 
 class IronHookAbility(player: Player) : BrawlAbility("iron_hook", player) {
     private val activeProjectiles = mutableListOf<BrawlProjectile>()
-    
+
     private val projectileDamage = metadata.double("projectileDamage") ?: 4.0
     private val projectileSize = (metadata.double("projectileSize") ?: 0.6).coerceAtLeast(0.1)
-
 
     override fun activate() {
         super.activate()
@@ -43,12 +41,20 @@ class IronHookAbility(player: Player) : BrawlAbility("iron_hook", player) {
 
         val ironHookProjectile =
             BrawlProjectile.potion(
-                player,
-                ItemStack.of(Material.TRIPWIRE_HOOK),
-                "abilities.iron_hook.name",
-            )
+                    player,
+                    ItemStack.of(Material.TRIPWIRE_HOOK),
+                    "abilities.iron_hook.name",
+                )
                 .setInitialVelocity { projectile ->
-                    projectile.setVelocity(player.eyeLocation.direction, 1.8, false, 0.0, 0.2, 10.0, false)
+                    projectile.setVelocity(
+                        player.eyeLocation.direction,
+                        1.8,
+                        false,
+                        0.0,
+                        0.2,
+                        10.0,
+                        false,
+                    )
                 }
                 .projectileSize(projectileSize)
                 .trailEffect(Particle.CRIT)
