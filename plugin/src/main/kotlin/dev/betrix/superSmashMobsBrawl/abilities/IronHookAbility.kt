@@ -20,8 +20,7 @@ import org.bukkit.inventory.ItemStack
 
 class IronHookAbility(player: Player) : BrawlAbility("iron_hook", player) {
     private val activeProjectiles = mutableListOf<BrawlProjectile>()
-
-    private val projectileKnockbackModifier = metadata.double("projectileKnockbackModifier") ?: 0.0
+    
     private val projectileDamage = metadata.double("projectileDamage") ?: 4.0
     private val projectileSize = (metadata.double("projectileSize") ?: 0.6).coerceAtLeast(0.1)
 
@@ -32,8 +31,10 @@ class IronHookAbility(player: Player) : BrawlAbility("iron_hook", player) {
     }
 
     override fun teardown() {
-        activeProjectiles.forEach { it.teardown() }
-        activeProjectiles.clear()
+        while (activeProjectiles.isNotEmpty()) {
+            val projectile = activeProjectiles.removeAt(activeProjectiles.lastIndex)
+            projectile.teardown()
+        }
         super.teardown()
     }
 
