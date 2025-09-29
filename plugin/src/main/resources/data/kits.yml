@@ -271,6 +271,30 @@ kits:
       leggings: chainmail_leggings
       boots: chainmail_boots
 
+  # Snowman
+  - id: snowman
+    meleeDamage: 6.0
+    armor: 6.0
+    knockbackMultiplier: 1.4
+    disguiseId: "snowman"
+    selectionSound: "entity.snow_golem.ambient"
+    displayItem: "snow_block"
+    passives:
+      - id: arctic_aura
+      - id: regeneration
+        overrides:
+          metadata:
+            healAmount: 0.3
+    abilities:
+      - id: blizzard
+      - id: ice_path
+      - id: snow_turret
+    armorItems:
+      helmet: chainmail_helmet
+      chestplate: chainmail_chestplate
+      leggings: chainmail_leggings
+      boots: chainmail_boots
+
   # Slime
   - id: slime
     meleeDamage: 6.0

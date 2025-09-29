@@ -81,6 +81,9 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "slime_rocket" -> SlimeRocketAbility(player)
                     "slime_slam" -> SlimeSlamAbility(player)
                     "iron_hook" -> IronHookAbility(player)
+                    "blizzard" -> BlizzardAbility(player)
+                    "ice_path" -> IcePathAbility(player)
+                    "snow_turret" -> SnowTurretAbility(player)
                     else -> {
                         logger.severe(
                             "No ability found with id ${it.id} reference on kit ${kitData.id}"
@@ -112,6 +115,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "thorns" -> ThornsPassive(player)
                     "corrupted_arrow" -> CorruptedArrowPassive(player)
                     "giga_slime" -> GigaSlimePassive(player)
+                    "arctic_aura" -> ArcticAuraPassive(player)
                     else -> {
                         logger.severe(
                             "No passive found with id ${it.id} reference on kit ${kitData.id}"

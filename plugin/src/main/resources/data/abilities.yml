@@ -253,6 +253,39 @@ abilities:
     displayItem: prismarine_crystals
     metadata: {}
 
+  - id: blizzard
+    cooldown: 0.0
+    type: aoe
+    itemSlot: 0
+    usage: right_click
+    hotbarItem: iron_sword
+    displayItem: snow_block
+    metadata:
+      uses_experience: true
+
+  - id: ice_path
+    cooldown: 12.0
+    type: recovery
+    itemSlot: 1
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: ice
+    metadata:
+      path_duration: 4
+      bounce_height: 1
+
+  - id: snow_turret
+    cooldown: 0.0
+    type: aoe
+    itemSlot: 3
+    usage: right_click
+    hotbarItem: pumpkin
+    displayItem: carved_pumpkin
+    metadata:
+      duration: 20
+      max_summons: 3
+      is_smash_ability: true
+
   - id: slime_rocket
     cooldown: 8.0
     type: projectile

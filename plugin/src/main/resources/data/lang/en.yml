@@ -39,6 +39,9 @@ kits:
   iron_golem:
     name: "Iron Golem"
     description: "Slow but tanky bruiser with devastating melee and knockback"
+  snowman:
+    name: "Snowman"
+    description: "Close-range brawler that freezes foes and excels at ledge pressure"
 abilities:
   sulphur_bomb:
     name: "Sulphur Bomb"
@@ -121,6 +124,15 @@ abilities:
   iron_hook:
     name: "Iron Hook"
     description: "Hook enemies and yank them toward you"
+  blizzard:
+    name: "Blizzard"
+    description: "Unleash a flurry of snow that blankets enemies in frost"
+  ice_path:
+    name: "Ice Path"
+    description: "Ride a slippery trail of ice to recover or chase foes"
+  snow_turret:
+    name: "Snow Turret"
+    description: "Summon a frosty sentry that peppers enemies with snowballs"
 maps:
   blue_forest:
     name: "Blue Forest"
@@ -212,6 +224,9 @@ messages:
   giga_slime:
     name: "Giga Slime"
     description: "Grow larger, leap farther, and accelerate regen as momentum builds"
+  arctic_aura:
+    name: "Arctic Aura"
+    description: "Radiate chilling snow that slows enemies and empowers your strikes"
   projectiles:
     arrow: "Arrow"
     barrage_arrow: "Barrage Arrow"

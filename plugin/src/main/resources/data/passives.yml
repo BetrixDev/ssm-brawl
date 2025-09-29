@@ -87,6 +87,15 @@ passives:
     userFacing: true
     metadata: {}
 
+  - id: arctic_aura
+    displayItem: snow_block
+    userFacing: true
+    metadata:
+      damage_bonus: 1
+      slow_effect: true
+      knockback_reduction: true
+      uses_experience: true
+
   - id: corrupted_arrow
     displayItem: arrow
     userFacing: true
