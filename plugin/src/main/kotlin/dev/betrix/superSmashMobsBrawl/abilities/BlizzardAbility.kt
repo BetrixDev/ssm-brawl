@@ -7,7 +7,6 @@ class BlizzardAbility(player: Player) : BrawlAbility("blizzard", player) {
     override fun activate() {
         super.activate()
         player.sendDebugMessage("Blizzard ability implementation pending")
-        // TODO("")
     }
 }
 

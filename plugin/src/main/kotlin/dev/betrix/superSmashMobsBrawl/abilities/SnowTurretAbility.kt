@@ -7,7 +7,6 @@ class SnowTurretAbility(player: Player) : BrawlAbility("snow_turret", player) {
     override fun activate() {
         super.activate()
         player.sendDebugMessage("Snow Turret ability implementation pending")
-        // TODO("")
     }
 }
 

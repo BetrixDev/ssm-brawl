@@ -7,7 +7,6 @@ class IcePathAbility(player: Player) : BrawlAbility("ice_path", player) {
     override fun activate() {
         super.activate()
         player.sendDebugMessage("Ice Path ability implementation pending")
-        // TODO("")
     }
 }
 
