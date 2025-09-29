@@ -312,7 +312,7 @@ abilities:
     displayItem: bow
 
   - id: iron_hook
-    cooldown: 8
+    cooldown: 8.0
     itemSlot: 1
     type: projectile
     usage: right_click
