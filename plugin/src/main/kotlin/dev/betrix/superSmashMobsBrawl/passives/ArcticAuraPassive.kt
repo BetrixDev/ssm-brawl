@@ -14,4 +14,3 @@ class ArcticAuraPassive(player: Player) : BrawlPassive("arctic_aura", player) {
         super.teardown()
     }
 }
-

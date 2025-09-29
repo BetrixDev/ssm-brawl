@@ -9,4 +9,3 @@ class BlizzardAbility(player: Player) : BrawlAbility("blizzard", player) {
         player.sendDebugMessage("Blizzard ability implementation pending")
     }
 }
-

@@ -9,4 +9,3 @@ class IcePathAbility(player: Player) : BrawlAbility("ice_path", player) {
         player.sendDebugMessage("Ice Path ability implementation pending")
     }
 }
-

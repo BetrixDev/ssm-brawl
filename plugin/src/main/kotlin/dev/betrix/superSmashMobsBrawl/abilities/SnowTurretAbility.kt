@@ -9,4 +9,3 @@ class SnowTurretAbility(player: Player) : BrawlAbility("snow_turret", player) {
         player.sendDebugMessage("Snow Turret ability implementation pending")
     }
 }
-
