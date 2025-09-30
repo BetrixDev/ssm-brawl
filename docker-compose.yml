@@ -1,25 +1,36 @@
 name: super-smash-mobs-brawl
 
 services:
-  postgres:
-    image: postgres:18
-    container_name: ssmb-postgres
-    restart: unless-stopped
-    ports:
-      - "5432:5432"
+  api:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    container_name: ssmb-api
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-brawl}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-brawl}
-      POSTGRES_DB: ${POSTGRES_DB:-brawl}
-      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
-      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-changeme}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+      POLAR_ACCESS_TOKEN: ${POLAR_ACCESS_TOKEN:-}
+      POLAR_SUCCESS_URL: ${POLAR_SUCCESS_URL:-http://localhost:3000/checkout/success}
+      POLAR_SERVER: ${POLAR_SERVER:-sandbox}
+      PLUGIN_SECRET_KEY: ${PLUGIN_SECRET_KEY:-changeme}
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: "postgres://postgres:${POSTGRES_PASSWORD:-brawl}@postgres:5432/postgres"
+    ports:
+      - "0.0.0.0:3000:3000"
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-brawl}"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health-check"]
       interval: 5s
       timeout: 5s
       retries: 5
-    volumes:
-      - db_data:/var/lib/postgresql/data
   migrate:
     build:
       context: ./apps/backend
@@ -29,62 +40,17 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: "postgres://${POSTGRES_USER:-brawl}:${POSTGRES_PASSWORD:-brawl}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-brawl}"
+      DATABASE_URL: "postgres://postgres:${POSTGRES_PASSWORD:-brawl}@postgres:5432/postgres"
     command: ["bun", "run", "db:migrate"]
     restart: "no"
-  redis:
-    image: redis:latest
-    container_name: ssmb-redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      REDIS_USER: ${REDIS_USER:-default}
-      REDIS_DB: ${REDIS_DB:-0}
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-  api:
-    depends_on:
-      redis:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
-    build:
-      context: ./apps/backend
-      dockerfile: Dockerfile
-    container_name: ssmb-api
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
-      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-changeme}
-      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
-      POLAR_ACCESS_TOKEN: ${POLAR_ACCESS_TOKEN:-}
-      POLAR_SUCCESS_URL: ${POLAR_SUCCESS_URL:-http://localhost:3000/checkout/success}
-      POLAR_SERVER: ${POLAR_SERVER:-sandbox}
-      PLUGIN_SECRET_KEY: ${PLUGIN_SECRET_KEY:-changeme}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
-      DATABASE_URL: "postgres://${POSTGRES_USER:-brawl}:${POSTGRES_PASSWORD:-brawl}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-brawl}"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health-check"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
   minecraft:
     build:
       context: ./plugin
       dockerfile: Dockerfile
     container_name: ssmb-minecraft
-    restart: unless-stopped
-    ports:
-      - "${MINECRAFT_PORT:-25565}"
+    depends_on:
+      api:
+        condition: service_healthy
     environment:
       MEMORY_SIZE: ${MINECRAFT_MEMORY:-2G}
       ONLINE_MODE: ${ONLINE_MODE:-false}
@@ -93,8 +59,33 @@ services:
       AXIOM_DATASET_NAME: ${AXIOM_DATASET_NAME:-super-smash-mobs-brawl}
       BASE_API_URL: ${BASE_API_URL:-http://api:3000/api}
       API_SECRET_KEY: ${API_SECRET_KEY:-changeme}
+    ports:
+      - "0.0.0.0:${MINECRAFT_PORT:-25565}:${MINECRAFT_PORT:-25565}"
+    restart: unless-stopped
     stdin_open: true
     tty: true
+  postgres:
+    image: postgres:18
+    container_name: ssmb-postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-brawl}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: redis:8.2.1
+    container_name: ssmb-redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   db_data:

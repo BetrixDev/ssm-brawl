@@ -1,4 +1,4 @@
-import type { RouterClient } from "@orpc/server";
+import { ORPCError, type RouterClient } from "@orpc/server";
 import { dbProvider, kvProvider, o, publicProcedure } from "../lib/orpc";
 import { pluginRouter } from "./plugin/plugin-router";
 
@@ -14,10 +14,12 @@ export const appRouter = {
         await context.db.execute("select 1");
       } catch (error) {
         console.error(error);
-        return {
-          status: "ERROR",
+
+        throw new ORPCError("INTERNAL_SERVER_ERROR", {
+          status: 500,
           message: "Database connection failed",
-        };
+          cause: error,
+        });
       }
 
       const dbCheckDuration = performance.now() - dbCheckStart;
@@ -29,10 +31,12 @@ export const appRouter = {
         await context.kv.get("test");
       } catch (error) {
         console.error(error);
-        return {
-          status: "ERROR",
+
+        throw new ORPCError("INTERNAL_SERVER_ERROR", {
+          status: 500,
           message: "KV connection failed",
-        };
+          cause: error,
+        });
       }
 
       const kvCheckDuration = performance.now() - kvCheckStart;

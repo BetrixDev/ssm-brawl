@@ -1,5 +1,5 @@
 import { env } from "@/lib/env";
-import { drizzle } from "drizzle-orm/postgres-js";
+import { drizzle } from "drizzle-orm/bun-sql";
 import * as schema from "./schema";
 
 export function getDb() {
