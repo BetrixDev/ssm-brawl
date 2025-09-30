@@ -21,8 +21,8 @@ services:
       POLAR_SUCCESS_URL: ${POLAR_SUCCESS_URL:-http://localhost:3000/checkout/success}
       POLAR_SERVER: ${POLAR_SERVER:-sandbox}
       PLUGIN_SECRET_KEY: ${PLUGIN_SECRET_KEY:-changeme}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
-      DATABASE_URL: "postgres://${POSTGRES_USER:-brawl}:${POSTGRES_PASSWORD:-brawl}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-brawl}"
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: "postgres://postgres:${POSTGRES_PASSWORD:-brawl}@postgres:5432/postgres"
     ports:
       - "0.0.0.0:3000:3000"
     restart: unless-stopped
@@ -40,10 +40,9 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: "postgres://${POSTGRES_USER:-brawl}:${POSTGRES_PASSWORD:-brawl}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-brawl}"
+      DATABASE_URL: "postgres://postgres:${POSTGRES_PASSWORD:-brawl}@postgres:5432/postgres"
     command: ["bun", "run", "db:migrate"]
     restart: "no"
-    exclude_from_hc: true
   minecraft:
     build:
       context: ./plugin
@@ -65,18 +64,13 @@ services:
     restart: unless-stopped
     stdin_open: true
     tty: true
-    exclude_from_hc: true
   postgres:
     image: postgres:18
     container_name: ssmb-postgres
     volumes:
       - db_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-brawl}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-brawl}
-      POSTGRES_DB: ${POSTGRES_DB:-brawl}
-      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
-      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-brawl}"]
@@ -86,10 +80,6 @@ services:
   redis:
     image: redis:8.2.1
     container_name: ssmb-redis
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      REDIS_USER: ${REDIS_USER:-default}
-      REDIS_DB: ${REDIS_DB:-0}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
