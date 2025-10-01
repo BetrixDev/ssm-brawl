@@ -1,0 +1,14 @@
+{
+  "name": "SSMB Dev",
+  "image": "ghcr.io/nhaef/devcontainer-bun:latest",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "docker-compose.devcontainer.yml"
+  ],
+  "service": "dev",
+  "runServices": ["postgres", "redis"],
+  "shutdownAction": "stopContainer",
+  "postStartCommand": "bun install"
+}
