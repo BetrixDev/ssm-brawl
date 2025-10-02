@@ -124,6 +124,9 @@ abilities:
   iron_hook:
     name: "Iron Hook"
     description: "Hook enemies and yank them toward you"
+  seismic_slam:
+    name: "Seismic Slam"
+    description: "Leap high then slam to rattle every grounded foe"
   blizzard:
     name: "Blizzard"
     description: "Unleash a flurry of snow that blankets enemies in frost"

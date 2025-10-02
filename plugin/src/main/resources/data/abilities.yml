@@ -351,3 +351,23 @@ abilities:
     usage: right_click
     hotbarItem: iron_pickaxe
     displayItem: tripwire_hook
+
+  - id: seismic_slam
+    cooldown: 10.0
+    itemSlot: 0
+    type: aoe
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: iron_shovel
+    metadata:
+      launchStrength: 1.0
+      launchYAdd: 1.0
+      launchYMax: 1.0
+      launchGroundBoost: true
+      landingCheckDelayTicks: 20
+      landingCheckIntervalTicks: 1
+      baseDamage: 10.0
+      damageRange: 8.0
+      knockbackMultiplier: 2.4
+      blockEffectRadius: 4
+      blockEffectChance: 0.1

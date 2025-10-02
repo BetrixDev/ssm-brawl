@@ -81,6 +81,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "slime_rocket" -> SlimeRocketAbility(player)
                     "slime_slam" -> SlimeSlamAbility(player)
                     "iron_hook" -> IronHookAbility(player)
+                    "seismic_slam" -> SeismicSlamAbility(player)
                     "blizzard" -> BlizzardAbility(player)
                     "ice_path" -> IcePathAbility(player)
                     "snow_turret" -> SnowTurretAbility(player)
@@ -133,6 +134,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
         player.gameMode = GameMode.SURVIVAL
         player.heal()
         player.feed()
+        player.clearActivePotionEffects()
 
         // Equip armor if specified
         kitData.armorItems?.let { armor ->
@@ -178,6 +180,8 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
             player.inventory.leggings = null
             player.inventory.boots = null
         }
+
+        player.clearActivePotionEffects()
 
         player.sendDebugMessage("The $id kit has been removed")
     }
