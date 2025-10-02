@@ -1,6 +1,6 @@
 name: super-smash-mobs-brawl
-version: '0.1.0'
+version: "0.1.0"
 main: dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
-api-version: '1.21'
-authors: [ BetrixDev ]
-depend: [ LibsDisguises ]
+api-version: "1.21"
+authors: [BetrixDev]
+depend: [LibsDisguises]

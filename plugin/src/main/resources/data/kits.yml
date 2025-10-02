@@ -161,7 +161,7 @@ kits:
 
   # Chicken
   - id: chicken
-    meleeDamage: 9.0    # 4.5 hearts
+    meleeDamage: 9.0 # 4.5 hearts
     armor: 2.5
     knockbackMultiplier: 2.0
     disguiseId: "chicken"

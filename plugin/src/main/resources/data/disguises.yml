@@ -1,26 +1,26 @@
 disguises:
-    - id: creeper
+  - id: creeper
 
-    - id: skeleton
+  - id: skeleton
 
-    - id: cow
+  - id: cow
 
-    - id: chicken
+  - id: chicken
 
-    - id: enderman
+  - id: enderman
 
-    - id: spider
+  - id: spider
 
-    - id: witch
+  - id: witch
 
-    - id: squid
+  - id: squid
 
-    - id: pig
+  - id: pig
 
-    - id: guardian
+  - id: guardian
 
-    - id: zombie
+  - id: zombie
 
-    - id: slime
+  - id: slime
 
-    - id: snowman
+  - id: snowman

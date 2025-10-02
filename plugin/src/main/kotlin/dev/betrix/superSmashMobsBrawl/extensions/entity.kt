@@ -13,12 +13,12 @@ import org.bukkit.util.Vector
 /**
  * Calculates the entity's current speed in blocks per second.
  *
- * This extension property provides a convenient way to measure how fast an entity
- * is currently moving in the game world. It converts the internal velocity units
- * (which are in blocks per tick) to a more human-readable blocks per second value.
+ * This extension property provides a convenient way to measure how fast an entity is currently
+ * moving in the game world. It converts the internal velocity units (which are in blocks per tick)
+ * to a more human-readable blocks per second value.
  *
- * The calculation is based on the assumption that Minecraft runs at 20 ticks per second,
- * so the velocity vector's magnitude is multiplied by 20 to get the speed in blocks per second.
+ * The calculation is based on the assumption that Minecraft runs at 20 ticks per second, so the
+ * velocity vector's magnitude is multiplied by 20 to get the speed in blocks per second.
  *
  * **Important Notes:**
  * - Returns 0.0 if the entity is stationary
@@ -51,9 +51,9 @@ val Entity.blocksPerSecond: Double
 /**
  * Teleports this entity to a specific spawn point location.
  *
- * This extension function provides a convenient way to teleport entities to predefined
- * spawn points as defined in the `maps.yml` configuration file. It automatically
- * handles the conversion from [SpawnPoint] data objects to Bukkit [Location] objects.
+ * This extension function provides a convenient way to teleport entities to predefined spawn points
+ * as defined in the `maps.yml` configuration file. It automatically handles the conversion from
+ * [SpawnPoint] data objects to Bukkit [Location] objects.
  *
  * **Use Cases:**
  * - Teleporting players to minigame spawn points at match start
@@ -67,19 +67,18 @@ val Entity.blocksPerSecond: Double
  * - Works for all entity types, not just players
  * - Does not trigger teleport events or play teleport effects
  *
- * **Configuration Integration:**
- * This function is designed to work seamlessly with spawn points defined in
- * `maps.yml` under both `gameMaps.spawnPoints` and `hubMaps.spawnPoints` sections.
+ * **Configuration Integration:** This function is designed to work seamlessly with spawn points
+ * defined in `maps.yml` under both `gameMaps.spawnPoints` and `hubMaps.spawnPoints` sections.
  *
  * Example usage:
  * ```kotlin
  * // Get spawn point from maps.yml configuration
  * val spawnPoints = gameMap.spawnPoints
  * val randomSpawn = spawnPoints.random()
- * 
+ *
  * // Teleport player to the spawn point
  * player.teleport(randomSpawn)
- * 
+ *
  * // Or use for spectator spawn
  * val spectatorSpawn = gameMap.spectatorSpawnPoint
  * deadPlayer.teleport(spectatorSpawn)
@@ -97,22 +96,20 @@ fun Entity.teleport(spawnPoint: SpawnPoint) {
 /**
  * Sets the velocity of this entity using directional vector calculation.
  *
- * This is a convenience method that calculates the velocity based on the entity's
- * current facing direction. It delegates to the more comprehensive [setVelocity]
- * method with sensible defaults for most parameters.
+ * This is a convenience method that calculates the velocity based on the entity's current facing
+ * direction. It delegates to the more comprehensive [setVelocity] method with sensible defaults for
+ * most parameters.
  *
- * @param strength The multiplier applied to the directional vector. Higher values
- *                 result in faster movement. Typical values range from 0.5 to 3.0.
- * @param yAdd Additional vertical velocity added after directional calculation.
- *             Positive values launch the entity upward, negative values push downward.
- *             Common values: 0.3-0.8 for upward jumps, -0.2 for downward force.
- * @param yMax Maximum allowed vertical velocity component. Prevents excessive
- *             upward motion that could launch entities too high. Usually set to
- *             1.0-2.0 for normal gameplay mechanics.
- * @param groundBoost Whether to add extra vertical velocity when the entity is on ground.
- *                   This simulates jumping mechanics where grounded entities get
- *                   a small boost. Adds 0.2 to vertical velocity when true and on ground.
- *
+ * @param strength The multiplier applied to the directional vector. Higher values result in faster
+ *   movement. Typical values range from 0.5 to 3.0.
+ * @param yAdd Additional vertical velocity added after directional calculation. Positive values
+ *   launch the entity upward, negative values push downward. Common values: 0.3-0.8 for upward
+ *   jumps, -0.2 for downward force.
+ * @param yMax Maximum allowed vertical velocity component. Prevents excessive upward motion that
+ *   could launch entities too high. Usually set to 1.0-2.0 for normal gameplay mechanics.
+ * @param groundBoost Whether to add extra vertical velocity when the entity is on ground. This
+ *   simulates jumping mechanics where grounded entities get a small boost. Adds 0.2 to vertical
+ *   velocity when true and on ground.
  * @see setVelocity For the full velocity calculation method with all parameters.
  *
  * Example usage:
@@ -129,9 +126,9 @@ fun Entity.setVelocity(strength: Double, yAdd: Double, yMax: Double, groundBoost
  * Sets the velocity of this entity with comprehensive control over all velocity components.
  *
  * This method provides fine-grained control over entity movement and is the primary
- * velocity-setting mechanism used throughout the plugin. It handles edge cases like
- * NaN values and zero vectors, applies various velocity modifications, and ensures
- * consistent behavior across different entity types.
+ * velocity-setting mechanism used throughout the plugin. It handles edge cases like NaN values and
+ * zero vectors, applies various velocity modifications, and ensures consistent behavior across
+ * different entity types.
  *
  * The velocity calculation follows this process:
  * 1. Validate input vector (skip if NaN or zero length)
@@ -143,27 +140,24 @@ fun Entity.setVelocity(strength: Double, yAdd: Double, yMax: Double, groundBoost
  * 7. Reset fall distance to prevent fall damage
  * 8. Apply final velocity to entity
  *
- * @param velocity The base direction vector for movement. Will be normalized
- *                 before application. Must not contain NaN values or be zero length.
- * @param strength Multiplier applied to the normalized velocity vector. Controls
- *                 the overall speed of movement. Typical values: 0.5-4.0 for normal
- *                 gameplay, higher for special abilities or knockback.
- * @param ySet Whether to override the Y component of the velocity vector with [yBase].
- *            Useful when you want complete control over vertical motion regardless
- *            of the input vector's Y component.
+ * @param velocity The base direction vector for movement. Will be normalized before application.
+ *   Must not contain NaN values or be zero length.
+ * @param strength Multiplier applied to the normalized velocity vector. Controls the overall speed
+ *   of movement. Typical values: 0.5-4.0 for normal gameplay, higher for special abilities or
+ *   knockback.
+ * @param ySet Whether to override the Y component of the velocity vector with [yBase]. Useful when
+ *   you want complete control over vertical motion regardless of the input vector's Y component.
  * @param yBase The Y velocity value to use when [ySet] is true. Ignored when [ySet] is false.
- *              Positive values launch upward, negative values push downward.
- * @param yAdd Additional Y velocity added after all other calculations. This is
- *             applied after normalization and scaling, allowing for fine-tuning
- *             of vertical motion. Common for jump boosts or gravity effects.
- * @param yMax Maximum allowed Y velocity component. Acts as a ceiling to prevent
- *             excessive upward motion. Set to Double.MAX_VALUE to disable clamping.
- * @param groundBoost Whether to add extra upward velocity when the entity is on ground.
- *                   Adds 0.2 to Y velocity when true and entity.isOnGround is true.
- *                   Simulates jumping mechanics and ground-based launch effects.
- *
+ *   Positive values launch upward, negative values push downward.
+ * @param yAdd Additional Y velocity added after all other calculations. This is applied after
+ *   normalization and scaling, allowing for fine-tuning of vertical motion. Common for jump boosts
+ *   or gravity effects.
+ * @param yMax Maximum allowed Y velocity component. Acts as a ceiling to prevent excessive upward
+ *   motion. Set to Double.MAX_VALUE to disable clamping.
+ * @param groundBoost Whether to add extra upward velocity when the entity is on ground. Adds 0.2 to
+ *   Y velocity when true and entity.isOnGround is true. Simulates jumping mechanics and
+ *   ground-based launch effects.
  * @throws IllegalStateException If the entity is removed or invalid when setting velocity.
- *
  * @see Entity.setVelocity Simplified version with fewer parameters.
  * @see Entity.velocity Direct property access for simple velocity setting.
  *
@@ -293,13 +287,12 @@ fun Entity.doKnockback(
 /**
  * Determines whether this entity is currently standing on a solid block surface.
  *
- * This function performs comprehensive ground detection to determine if an entity
- * is in contact with a solid surface that would allow ground-based actions like
- * jumping, ability activation, or prevent falling. It accounts for various edge
- * cases and special block types that players commonly interact with.
+ * This function performs comprehensive ground detection to determine if an entity is in contact
+ * with a solid surface that would allow ground-based actions like jumping, ability activation, or
+ * prevent falling. It accounts for various edge cases and special block types that players commonly
+ * interact with.
  *
- * **Detection Logic:**
- * The function checks multiple potential contact points around the entity's
+ * **Detection Logic:** The function checks multiple potential contact points around the entity's
  * position using a grid-based approach. It examines:
  * - Direct block contact beneath the entity
  * - Lily pad surfaces (special case for water traversal)
@@ -318,9 +311,8 @@ fun Entity.doKnockback(
  * - Lily pads (counts as solid ground for water traversal)
  * - Half-block positions (slabs, stairs, etc.)
  *
- * **Performance Note:**
- * This function performs multiple block lookups in a small radius around the entity.
- * While optimized for performance, avoid calling it every tick for many entities.
+ * **Performance Note:** This function performs multiple block lookups in a small radius around the
+ * entity. While optimized for performance, avoid calling it every tick for many entities.
  *
  * Example usage:
  * ```kotlin
