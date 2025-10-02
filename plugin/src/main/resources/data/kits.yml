@@ -321,7 +321,7 @@ kits:
   # Iron Golem
   - id: iron_golem
     meleeDamage: 7.0
-    armor: 8.0
+    armor: 7.5
     knockbackMultiplier: 1.0
     disguiseId: iron_golem
     passives:
