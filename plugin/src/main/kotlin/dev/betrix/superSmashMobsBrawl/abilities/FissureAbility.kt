@@ -34,13 +34,14 @@ class FissureAbility(player: Player) : BrawlAbility("fissure", player) {
         val startLocation = player.location.clone()
         val data = FissureData(startLocation)
         fissureTask?.cancel()
-        fissureTask = repeatingTask(0, 1) {
-            if (data.update()) {
-                data.clear()
-                cancel()
-                fissureTask = null
+        fissureTask =
+            repeatingTask(0, 1) {
+                if (data.update()) {
+                    data.clear()
+                    cancel()
+                    fissureTask = null
+                }
             }
-        }
         fissureTask?.let { runnables.add(it) }
     }
 
@@ -53,16 +54,18 @@ class FissureAbility(player: Player) : BrawlAbility("fissure", player) {
     private inner class FissureData(startLocation: Location) {
         private val owner: Player = player
         private val world = startLocation.world
-        private val direction: Vector = owner.location.direction.clone().apply {
-            y = 0.0
-            if (length() == 0.0) {
-                x = 0.0
-                z = 1.0
+        private val direction: Vector =
+            owner.location.direction.clone().apply {
+                y = 0.0
+                if (length() == 0.0) {
+                    x = 0.0
+                    z = 1.0
+                }
+                normalize()
+                multiply(0.1)
             }
-            normalize()
-            multiply(0.1)
-        }
-        private val currentLocation: Location = startLocation.clone().add(direction).add(0.0, -0.4, 0.0)
+        private val currentLocation: Location =
+            startLocation.clone().add(direction).add(0.0, -0.4, 0.0)
         private val path = mutableListOf<Block>()
         private val hitPlayers = mutableSetOf<Player>()
         private val trackedBlockStates = mutableMapOf<Block, BlockData>()
@@ -157,10 +160,18 @@ class FissureAbility(player: Player) : BrawlAbility("fissure", player) {
 
         private fun applyBaseTransform(block: Block) {
             when (block.type) {
-                Material.STONE -> scheduleBlockChange(block, Material.COBBLESTONE.createBlockData(), 14000L)
-                Material.GRASS_BLOCK -> scheduleBlockChange(block, Material.DIRT.createBlockData(), 14000L)
-                Material.STONE_BRICKS -> scheduleBlockChange(block, Material.CRACKED_STONE_BRICKS.createBlockData(), 14000L)
-                Material.SNOW -> scheduleBlockChange(block, Material.SNOW_BLOCK.createBlockData(), 10000L)
+                Material.STONE ->
+                    scheduleBlockChange(block, Material.COBBLESTONE.createBlockData(), 14000L)
+                Material.GRASS_BLOCK ->
+                    scheduleBlockChange(block, Material.DIRT.createBlockData(), 14000L)
+                Material.STONE_BRICKS ->
+                    scheduleBlockChange(
+                        block,
+                        Material.CRACKED_STONE_BRICKS.createBlockData(),
+                        14000L,
+                    )
+                Material.SNOW ->
+                    scheduleBlockChange(block, Material.SNOW_BLOCK.createBlockData(), 10000L)
                 else -> {}
             }
         }
@@ -210,12 +221,10 @@ class FissureAbility(player: Player) : BrawlAbility("fissure", player) {
                         lang.t("messages.abilities.hitByAbility") {
                             "abilityId" to id
                             "attacker" to owner.name
-                        },
+                        }
                     )
                     val handledSnapshot = handled
-                    delay(4) {
-                        launchTarget(target, upCenter, handledSnapshot)
-                    }
+                    delay(4) { launchTarget(target, upCenter, handledSnapshot) }
                 }
             }
         }
@@ -276,4 +285,3 @@ class FissureAbility(player: Player) : BrawlAbility("fissure", player) {
         }
     }
 }
-
