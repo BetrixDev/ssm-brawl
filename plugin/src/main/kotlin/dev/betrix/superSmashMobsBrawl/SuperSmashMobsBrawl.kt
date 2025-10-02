@@ -110,10 +110,14 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
     }
 
     override suspend fun onDisableAsync() {
+        logger.info("SSMB shutting down")
+
         HubService.teardown()
         WorldService.teardown()
         DebugService.teardown()
+        KitService.teardown()
+        PlayerDocumentService.teardown()
+
         stopKoin()
-        logger.info("SSMB shutting down")
     }
 }

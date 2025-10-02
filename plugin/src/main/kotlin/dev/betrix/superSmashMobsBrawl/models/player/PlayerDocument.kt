@@ -23,7 +23,8 @@ constructor(
     @Serializable(with = InstantIsoSerializer::class) val lastJoinDate: Instant,
     val headSkinBase64: String?,
     val stats: MutableMap<String, JsonElement>,
-    val banData: PlayerBanData?,
+    var banData: List<PlayerBanData>?,
+    var selectedKitId: String,
 ) {
     /**
      * Type-safe getter for stats values

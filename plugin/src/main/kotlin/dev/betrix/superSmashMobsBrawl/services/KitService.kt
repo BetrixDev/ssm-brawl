@@ -3,6 +3,8 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import dev.betrix.superSmashMobsBrawl.Manageable
+import dev.betrix.superSmashMobsBrawl.events.PlayerDocumentLoaded
 import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
 import dev.betrix.superSmashMobsBrawl.gui.BrawlGui.Companion.openInventory
 import dev.betrix.superSmashMobsBrawl.gui.brawlGui
@@ -31,7 +33,7 @@ enum class AssignKitError {
     SETUP_FAILED,
 }
 
-object KitService : KoinComponent {
+object KitService : KoinComponent, Manageable() {
     private val lang: LangService by inject()
     private val plugin: JavaPlugin by inject()
     private val dataService: DataService by inject()
@@ -41,10 +43,14 @@ object KitService : KoinComponent {
     private val assignedBrawlKits = ConcurrentHashMap<UUID, BrawlKit>()
 
     init {
-        event<PlayerQuitEvent> {
+        listeners.add(event<PlayerQuitEvent> {
             unassignKit(player)
             playerSelectedKits.remove(player.uniqueId)
-        }
+        })
+
+        listeners.add(event<PlayerDocumentLoaded> {
+            playerSelectedKits[player.uniqueId] = document.selectedKitId
+        })
     }
 
     fun playerSelectKit(player: Player, kit: KitDef) {

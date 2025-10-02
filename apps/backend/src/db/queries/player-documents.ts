@@ -24,6 +24,7 @@ export async function getPlayerDocument(uuid: string): Promise<PlayerDocument> {
     headSkinBase64: queryResult.headSkinBase64,
     dailyLoginStreak: queryResult.dailyLoginStreak ?? null,
     stats: queryResult.stats,
+    selectedKitId: queryResult.selectedKitId,
     banData: queryResult.bans.map((ban) => ({
       id: ban.id,
       isBanned: ban.expiresAt ? ban.expiresAt.getTime() > Date.now() : true,
@@ -56,6 +57,7 @@ export async function createInitialPlayerDocument(uuid: string): Promise<PlayerD
     headSkinBase64,
     dailyLoginStreak: insertResult.dailyLoginStreak ?? null,
     stats: insertResult.stats,
+    selectedKitId: insertResult.selectedKitId,
     banData: null,
   };
 }

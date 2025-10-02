@@ -3,6 +3,8 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
+import dev.betrix.superSmashMobsBrawl.events.PlayerDocumentLoaded
+import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
 import dev.betrix.superSmashMobsBrawl.extensions.ticks
 import dev.betrix.superSmashMobsBrawl.extensions.warn
 import dev.betrix.superSmashMobsBrawl.models.player.PlayerDocument
@@ -33,8 +35,15 @@ object PlayerDocumentService : KoinComponent, Manageable() {
                     withContext(Dispatchers.IO) { api.playersGetDocumentAsync(player, true) }
 
                 documents[player.uniqueId] = document
+
+                PlayerDocumentLoaded(player, document).callEvent()
             }
         }
+
+        listeners.add(event<PlayerSelectKitEvent> {
+            val document = documents[player.uniqueId] ?: return@event
+            document.selectedKitId = kit.id
+        })
 
         runnables.add(
             repeatingTask(5.minutes.ticks) {
@@ -77,6 +86,8 @@ object PlayerDocumentService : KoinComponent, Manageable() {
                             }
 
                         documents[player.uniqueId] = document
+
+                        PlayerDocumentLoaded(player, document).callEvent()
                     }
                 }
             }

@@ -18,6 +18,7 @@ export const players = sqliteTable(
       .notNull(),
     dailyLoginStreak: integer().default(0).notNull(),
     headSkinBase64: text(),
+    selectedKitId: text().notNull().default("skeleton"),
   },
   (table) => [index("username_idx").on(table.username)],
 );
