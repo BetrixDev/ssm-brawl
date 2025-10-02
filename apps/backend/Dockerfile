@@ -1,4 +1,4 @@
-FROM oven/bun:latest AS builder
+FROM oven/bun:latest AS build
 
 WORKDIR /app
 
@@ -7,18 +7,19 @@ RUN bun install
 
 COPY . ./
 
+ENV NODE_ENV=production
+
 RUN bun run build
 
-FROM debian:bookworm-slim
+FROM gcr.io/distroless/base
 
 WORKDIR /app
 
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y curl \
-    && rm -rf /var/lib/apt/lists/*
+COPY --from=build /app/server server
+COPY --from=build /app/src/db/migrations ./src/db/migrations
 
-COPY --from=builder /app/server ./server
-
-EXPOSE 3000/tcp
+ENV NODE_ENV=production
 
 CMD ["./server"]
+
+EXPOSE 3000

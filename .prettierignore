@@ -1,4 +1,4 @@
-plugin
+./plugin
 !plugin/src
 **/*.gen.ts
 pnpm*.yaml

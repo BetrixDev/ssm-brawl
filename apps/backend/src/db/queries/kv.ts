@@ -6,7 +6,14 @@ export async function getKv<T>(key: string): Promise<T | null>;
 export async function getKv<T>(key: string, defaultValue: T | null = null): Promise<T | null> {
   const result = await db.select().from(Table.kv).where(eq(Table.kv.key, key)).limit(1);
 
-  return result[0].value ? JSON.parse(result[0].value) : defaultValue;
+  const resultValue = result[0]?.value;
+
+  if (resultValue === undefined || resultValue === null) {
+    setKv(key, defaultValue);
+    return defaultValue;
+  }
+
+  return JSON.parse(resultValue);
 }
 
 export async function setKv<T>(key: string, value: T): Promise<void> {

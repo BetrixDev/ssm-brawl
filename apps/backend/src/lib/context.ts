@@ -1,12 +1,10 @@
-import type { Context as HonoContext } from "hono";
-
 export type CreateContextOptions = {
-  context: HonoContext;
+  request: Request;
 };
 
-export async function createContext({ context }: CreateContextOptions) {
+export async function createContext({ request }: CreateContextOptions) {
   return {
-    headers: context.req.raw.headers,
+    headers: request.headers,
   };
 }
 

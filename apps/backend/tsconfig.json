@@ -14,7 +14,6 @@
     "types": ["node", "bun"],
     "composite": false,
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
     "declaration": false
   }
 }

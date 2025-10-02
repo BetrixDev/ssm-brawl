@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "check-types": "tsc -b",
-    "build": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
+    "build": "bun build --compile --minify-whitespace --minify-syntax --target bun --outfile server ./src/index.ts ",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -13,6 +13,7 @@
     "dev": "bun run --env-file=../../.env.development --watch src/index.ts"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.4.0",
     "@libsql/client": "^0.15.15",
     "@orpc/client": "^1.9.1",
     "@orpc/openapi": "^1.9.1",
@@ -24,7 +25,7 @@
     "dotenv": "^17.2.2",
     "drizzle-orm": "^0.44.5",
     "drizzle-zod": "^0.8.3",
-    "hono": "^4.9.9",
+    "elysia": "^1.4.9",
     "zod": "^4.1.11"
   },
   "devDependencies": {

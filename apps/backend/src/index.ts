@@ -1,11 +1,10 @@
+import { cors } from "@elysiajs/cors";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-import { Hono } from "hono";
-import { cors } from "hono/cors";
-import { logger } from "hono/logger";
+import { Elysia } from "elysia";
 import { initDb } from "./db";
 import { auth } from "./lib/auth";
 import { createContext } from "./lib/context";
@@ -14,26 +13,55 @@ import { appRouter } from "./routers/index";
 
 await initDb();
 
-const app = new Hono();
+new Elysia()
+  .use(
+    cors(
+      env.CORS_ORIGIN
+        ? {
+            origin: env.CORS_ORIGIN,
+            methods: ["GET", "POST", "OPTIONS"],
+            allowedHeaders: ["Content-Type", "Authorization"],
+            credentials: true,
+          }
+        : undefined,
+    ),
+  )
+  .mount("/auth", auth.handler)
+  .all(
+    "/*",
+    async ({ request }) => {
+      const context = await createContext({ request });
 
-app.use(logger());
-app.use(
-  "/*",
-  cors(
-    env.CORS_ORIGIN
-      ? {
-          origin: env.CORS_ORIGIN,
-          allowMethods: ["GET", "POST", "OPTIONS"],
-          allowHeaders: ["Content-Type", "Authorization"],
-          credentials: true,
-        }
-      : undefined,
-  ),
-);
+      const rpcResult = await rpcHandler.handle(request, {
+        prefix: "/rpc",
+        context: context,
+      });
 
-app.on(["POST", "GET"], "/api/auth/*", async (c) => {
-  return auth.handler(c.req.raw);
-});
+      if (rpcResult.matched) {
+        return rpcResult.response;
+      }
+
+      const apiResult = await apiHandler.handle(request, {
+        prefix: "/",
+        context: context,
+      });
+
+      if (apiResult.matched) {
+        return apiResult.response;
+      }
+
+      return new Response("Not Found", { status: 404 });
+    },
+    {
+      parse: "none",
+    },
+  )
+  .get("/", () => {
+    return "OK";
+  })
+  .listen(3000);
+
+console.log("Backned is running at http://localhost:3000");
 
 export const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [
@@ -55,33 +83,3 @@ export const rpcHandler = new RPCHandler(appRouter, {
     }),
   ],
 });
-
-app.use("/*", async (c, next) => {
-  const context = await createContext({ context: c });
-
-  const rpcResult = await rpcHandler.handle(c.req.raw, {
-    prefix: "/rpc",
-    context: context,
-  });
-
-  if (rpcResult.matched) {
-    return c.newResponse(rpcResult.response.body, rpcResult.response);
-  }
-
-  const apiResult = await apiHandler.handle(c.req.raw, {
-    prefix: "/api",
-    context: context,
-  });
-
-  if (apiResult.matched) {
-    return c.newResponse(apiResult.response.body, apiResult.response);
-  }
-
-  await next();
-});
-
-app.get("/", (c) => {
-  return c.text("OK");
-});
-
-export default app;

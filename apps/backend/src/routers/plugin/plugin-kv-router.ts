@@ -7,7 +7,7 @@ export const pluginKvRouter = {
     .route({ method: "GET", path: "/{key}" })
     .output(z.any().nullable())
     .input(z.object({ key: z.string() }))
-    .handler(async ({ context, input }) => {
+    .handler(async ({ input }) => {
       return await getKv(input.key);
     }),
   set: pluginProcedure

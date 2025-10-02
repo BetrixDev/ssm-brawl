@@ -5,7 +5,7 @@ import { o, publicProcedure } from "../lib/orpc";
 import { pluginRouter } from "./plugin/plugin-router";
 
 export const appRouter = {
-  healthCheck: publicProcedure.route({ method: "GET", path: "/health-check" }).handler(async () => {
+  healthCheck: publicProcedure.route({ method: "GET", path: "/hc" }).handler(async () => {
     const dbCheckStart = performance.now();
 
     try {
