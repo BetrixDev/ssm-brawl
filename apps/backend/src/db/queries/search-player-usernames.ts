@@ -7,7 +7,7 @@ export function searchPlayerUsernames(query: string, paginationOptions: Paginati
     .select()
     .from(Table.players)
     .where(
-      sql`to_tsvector('english', ${Table.players.username}) @@ to_tsquery('english', ${query})`,
+      sql`lower(${Table.players.username}) LIKE lower(${'%' + query + '%'})`,
     )
     .limit(paginationOptions.limit)
     .offset((paginationOptions.page - 1) * paginationOptions.limit);
