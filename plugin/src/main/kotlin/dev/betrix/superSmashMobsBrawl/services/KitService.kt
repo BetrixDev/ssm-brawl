@@ -43,14 +43,18 @@ object KitService : KoinComponent, Manageable() {
     private val assignedBrawlKits = ConcurrentHashMap<UUID, BrawlKit>()
 
     init {
-        listeners.add(event<PlayerQuitEvent> {
-            unassignKit(player)
-            playerSelectedKits.remove(player.uniqueId)
-        })
+        listeners.add(
+            event<PlayerQuitEvent> {
+                unassignKit(player)
+                playerSelectedKits.remove(player.uniqueId)
+            }
+        )
 
-        listeners.add(event<PlayerDocumentLoaded> {
-            playerSelectedKits[player.uniqueId] = document.selectedKitId
-        })
+        listeners.add(
+            event<PlayerDocumentLoaded> {
+                playerSelectedKits[player.uniqueId] = document.selectedKitId
+            }
+        )
     }
 
     fun playerSelectKit(player: Player, kit: KitDef) {

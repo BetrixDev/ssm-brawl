@@ -40,10 +40,12 @@ object PlayerDocumentService : KoinComponent, Manageable() {
             }
         }
 
-        listeners.add(event<PlayerSelectKitEvent> {
-            val document = documents[player.uniqueId] ?: return@event
-            document.selectedKitId = kit.id
-        })
+        listeners.add(
+            event<PlayerSelectKitEvent> {
+                val document = documents[player.uniqueId] ?: return@event
+                document.selectedKitId = kit.id
+            }
+        )
 
         runnables.add(
             repeatingTask(5.minutes.ticks) {
