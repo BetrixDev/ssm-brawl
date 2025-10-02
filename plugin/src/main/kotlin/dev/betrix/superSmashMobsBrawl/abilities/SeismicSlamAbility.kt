@@ -79,7 +79,7 @@ class SeismicSlamAbility(player: Player) : BrawlAbility("seismic_slam", player) 
         val ownerLocation = player.location
 
         ownerLocation
-            .getNearbyEntities(damageRange,damageRange,damageRange)
+            .getNearbyEntities(damageRange, damageRange, damageRange)
             .mapNotNull { it as? LivingEntity }
             .filter { it != player }
             .forEach { target ->
@@ -134,4 +134,3 @@ class SeismicSlamAbility(player: Player) : BrawlAbility("seismic_slam", player) 
         }
     }
 }
-
