@@ -3,22 +3,20 @@ import { sql } from "drizzle-orm";
 import { db, Table } from "..";
 
 export function searchPlayerUsernames(query: string, paginationOptions: PaginationOptions) {
+  const sanitized = query.replace(/\s+/g, ' ').trim();
+  const matchQuery = sanitized.length ? sanitized + '*' : '';
+
   return db
     .select()
     .from(Table.players)
     .where(
-      sql`lower(${Table.players.username}) LIKE lower(${'%' + query + '%'})`,
+      sql`${sql.raw('rowid')} IN (SELECT rowid FROM players_fts WHERE players_fts MATCH ${matchQuery})`,
     )
     .orderBy(
-      sql`CASE
-        WHEN lower(${Table.players.username}) = lower(${query}) THEN 0
-        WHEN lower(${Table.players.username}) LIKE lower(${query + '%'}) THEN 1
-        WHEN instr(lower(${Table.players.username}), lower(${query})) > 0 THEN 2
-        ELSE 3
-      END ASC,
-      instr(lower(${Table.players.username}), lower(${query})) ASC,
-      length(${Table.players.username}) ASC,
-      ${Table.players.username} ASC`,
+      sql`(SELECT bm25(players_fts)
+           FROM players_fts
+           WHERE players_fts.rowid = ${sql.raw('rowid')} AND players_fts MATCH ${matchQuery}
+          ) ASC`,
     )
     .limit(paginationOptions.limit)
     .offset((paginationOptions.page - 1) * paginationOptions.limit);
