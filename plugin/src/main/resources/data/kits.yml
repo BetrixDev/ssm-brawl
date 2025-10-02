@@ -333,6 +333,7 @@ kits:
       - id: hunger
     abilities:
       - id: iron_hook
+      - id: fissure
       - id: seismic_slam
     armorItems:
       helmet: iron_helmet

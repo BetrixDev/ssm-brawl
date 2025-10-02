@@ -371,3 +371,12 @@ abilities:
       knockbackMultiplier: 2.4
       blockEffectRadius: 4
       blockEffectChance: 0.1
+
+  - id: fissure
+    cooldown: 8.0
+    itemSlot: 0
+    type: aoe
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: iron_pickaxe
+    metadata: {}

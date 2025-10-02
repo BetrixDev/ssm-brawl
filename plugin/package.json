@@ -2,7 +2,7 @@
   "name": "@ssmbrawl/plugin",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e .env -- nodemon --watch src --ext kt,yaml,yml --exec \"node ./scripts/run-gradle.mjs\" runServer",
+    "dev": "dotenv -e .env -- nodemon --watch src --ext kt,yaml,yml --exec \"bun run --env-file=../.env.development ./scripts/run-gradle.mjs\" runServer",
     "build": "node ./scripts/run-gradle.mjs build",
     "test": "node ./scripts/run-gradle.mjs test"
   },

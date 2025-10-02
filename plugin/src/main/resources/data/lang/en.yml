@@ -127,6 +127,9 @@ abilities:
   seismic_slam:
     name: "Seismic Slam"
     description: "Leap high then slam to rattle every grounded foe"
+  fissure:
+    name: "Fissure"
+    description: "Smash the ground to raise a damaging fissure that launches enemies"
   blizzard:
     name: "Blizzard"
     description: "Unleash a flurry of snow that blankets enemies in frost"
