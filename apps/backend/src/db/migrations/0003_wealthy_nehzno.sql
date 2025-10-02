@@ -1,1 +1,0 @@
-ALTER TABLE "players" ADD COLUMN "daily_login_streak" integer DEFAULT 0 NOT NULL;

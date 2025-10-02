@@ -6,11 +6,13 @@ import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import { getDb } from "./db";
-import { getAuth } from "./lib/auth";
+import { initDb } from "./db";
+import { auth } from "./lib/auth";
 import { createContext } from "./lib/context";
 import { env } from "./lib/env";
 import { appRouter } from "./routers/index";
+
+await initDb();
 
 const app = new Hono();
 
@@ -30,8 +32,6 @@ app.use(
 );
 
 app.on(["POST", "GET"], "/api/auth/*", async (c) => {
-  const auth = getAuth(getDb());
-
   return auth.handler(c.req.raw);
 });
 

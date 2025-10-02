@@ -1,16 +1,25 @@
-import { env } from "@/lib/env";
-import { drizzle } from "drizzle-orm/bun-sql";
+import { Database } from "bun:sqlite";
+import { drizzle } from "drizzle-orm/bun-sqlite";
+import { migrate } from "drizzle-orm/bun-sqlite/migrator";
+import { mkdirSync } from "node:fs";
+import path from "node:path";
 import * as schema from "./schema";
 
-export function getDb() {
-  const db = drizzle(env.DATABASE_URL, {
-    schema,
-    casing: "snake_case",
+mkdirSync("./data", { recursive: true });
+
+const sqlite = new Database("./data/database.sqlite", { create: true });
+
+export const db = drizzle(sqlite, {
+  schema,
+  casing: "snake_case",
+});
+
+export async function initDb() {
+  sqlite.exec("PRAGMA journal_mode = WAL;");
+
+  migrate(db, {
+    migrationsFolder: path.join(__dirname, "migrations"),
   });
-
-  return db;
 }
-
-export type Database = ReturnType<typeof getDb>;
 
 export const Table = schema;

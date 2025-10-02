@@ -1,33 +1,31 @@
-import { kvProvider, pluginProcedure } from "@/lib/orpc";
+import { deleteKv, getKv, setKv } from "@/db/queries/kv";
+import { pluginProcedure } from "@/lib/orpc";
 import z from "zod";
 
 export const pluginKvRouter = {
-    get: pluginProcedure
+  get: pluginProcedure
     .route({ method: "GET", path: "/{key}" })
     .output(z.any().nullable())
     .input(z.object({ key: z.string() }))
-    .use(kvProvider)
-    .handler(async ({context, input}) => {
-        return await context.kv.get(input.key);
+    .handler(async ({ context, input }) => {
+      return await getKv(input.key);
     }),
-    set: pluginProcedure
+  set: pluginProcedure
     .route({ method: "POST", path: "/{key}" })
     .output(z.object({ message: z.string() }))
-    .input(z.object({ key: z.string(), value: z.any() }))
-    .use(kvProvider)
-    .handler(async ({context, input}) => {
-        await context.kv.set(input.key, input.value);
+    .input(z.object({ key: z.string(), value: z.unknown() }))
+    .handler(async ({ input }) => {
+      await setKv(input.key, input.value);
 
-        return { message: "KV set" };
+      return { message: "KV set" };
     }),
-    delete: pluginProcedure
+  delete: pluginProcedure
     .route({ method: "DELETE", path: "/{key}" })
     .output(z.object({ message: z.string() }))
     .input(z.object({ key: z.string() }))
-    .use(kvProvider)
-    .handler(async ({context, input}) => {
-        await context.kv.delete(input.key);
-        
-        return { message: "KV deleted" };
+    .handler(async ({ input }) => {
+      await deleteKv(input.key);
+
+      return { message: "KV deleted" };
     }),
-}
+};

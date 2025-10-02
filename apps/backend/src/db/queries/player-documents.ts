@@ -4,10 +4,9 @@ import type { PlayerDocument } from "@/schemas/player-document";
 import { getPlayerHeadSkinBase64 } from "@/sdks/mc-heads";
 import { randomUUID } from "crypto";
 import { eq } from "drizzle-orm";
-import { Table } from "..";
-import type { Database } from "../index";
+import { db, Table } from "..";
 
-export async function getPlayerDocument(db: Database, uuid: string): Promise<PlayerDocument> {
+export async function getPlayerDocument(uuid: string): Promise<PlayerDocument> {
   const queryResult = await db.query.players.findFirst({
     where: (players, { eq }) => eq(players.uuid, uuid),
     with: {
@@ -16,7 +15,7 @@ export async function getPlayerDocument(db: Database, uuid: string): Promise<Pla
   });
 
   if (!queryResult) {
-    return createInitialPlayerDocument(db, uuid);
+    return createInitialPlayerDocument(uuid);
   }
 
   return {
@@ -36,10 +35,7 @@ export async function getPlayerDocument(db: Database, uuid: string): Promise<Pla
   };
 }
 
-export async function createInitialPlayerDocument(
-  db: Database,
-  uuid: string,
-): Promise<PlayerDocument> {
+export async function createInitialPlayerDocument(uuid: string): Promise<PlayerDocument> {
   const headSkinBase64 = await getPlayerHeadSkinBase64(uuid);
 
   const [insertResult] = await db
@@ -64,7 +60,7 @@ export async function createInitialPlayerDocument(
   };
 }
 
-export async function handlePlayerJoinEvent(db: Database, uuid: string) {
+export async function handlePlayerJoinEvent(uuid: string) {
   await db.transaction(async (tx) => {
     await tx.insert(Table.playerJoinEvents).values({
       id: randomUUID(),
@@ -95,7 +91,7 @@ export async function handlePlayerJoinEvent(db: Database, uuid: string) {
   });
 }
 
-export async function updatePlayerDocument(db: Database, uuid: string, document: PlayerDocument) {
+export async function updatePlayerDocument(uuid: string, document: PlayerDocument) {
   await db.transaction(async (tx) => {
     await tx
       .update(Table.players)

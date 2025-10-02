@@ -4,8 +4,5 @@ export default defineConfig({
   schema: "./src/db/schema",
   out: "./src/db/migrations",
   casing: "snake_case",
-  dialect: "postgresql",
-  dbCredentials: {
-    url: process.env.DATABASE_URL!,
-  },
+  dialect: "sqlite",
 });

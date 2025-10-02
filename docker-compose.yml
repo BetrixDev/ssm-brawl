@@ -9,10 +9,6 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     environment:
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-changeme}
@@ -21,28 +17,16 @@ services:
       POLAR_SUCCESS_URL: ${POLAR_SUCCESS_URL:-http://localhost:3000/checkout/success}
       POLAR_SERVER: ${POLAR_SERVER:-sandbox}
       PLUGIN_SECRET_KEY: ${PLUGIN_SECRET_KEY:-changeme}
-      REDIS_URL: redis://redis:6379/0
-      DATABASE_URL: "postgres://postgres:${POSTGRES_PASSWORD:-brawl}@postgres:5432/postgres"
     ports:
       - "0.0.0.0:3000:3000"
+    volumes:
+      - backend_data:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health-check"]
       interval: 5s
       timeout: 5s
       retries: 5
-  migrate:
-    build:
-      context: ./apps/backend
-      dockerfile: Dockerfile.migrate
-    container_name: ssmb-migrate
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: "postgres://postgres:${POSTGRES_PASSWORD:-brawl}@postgres:5432/postgres"
-    command: ["bun", "run", "db:migrate"]
-    restart: "no"
   minecraft:
     build:
       context: ./plugin
@@ -64,28 +48,6 @@ services:
     restart: unless-stopped
     stdin_open: true
     tty: true
-  postgres:
-    image: postgres:18
-    container_name: ssmb-postgres
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-brawl}
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-  redis:
-    image: redis:8.2.1
-    container_name: ssmb-redis
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
 volumes:
-  db_data:
+  backend_data:

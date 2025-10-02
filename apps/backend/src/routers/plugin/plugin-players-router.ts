@@ -1,6 +1,5 @@
 import { getPlayerDocument, handlePlayerJoinEvent, updatePlayerDocument } from "@/db/queries/player-documents";
-import { incrementStat } from "@/helpers/stats-helpers";
-import { dbProvider, pluginProcedure } from "@/lib/orpc";
+import {  pluginProcedure } from "@/lib/orpc";
 import { playerDocumentSchema } from "@/schemas/player-document";
 import * as z from "zod";
 
@@ -18,13 +17,12 @@ export const pluginPlayersRouter = {
         }),
      })
     )
-    .use(dbProvider)
-    .handler(async ({context, input }) => {
-      const document = await getPlayerDocument(context.db, input.params.uuid);
+    .handler(async ({ input }) => {
+      const document = await getPlayerDocument( input.params.uuid);
 
 
       if (input.query.joinEvent) {
-        await handlePlayerJoinEvent(context.db, input.params.uuid);
+        await handlePlayerJoinEvent( input.params.uuid);
       } 
 
       return document
@@ -42,9 +40,8 @@ export const pluginPlayersRouter = {
         document: playerDocumentSchema,
       }),
     )
-    .use(dbProvider)
-    .handler(async ({context, input }) => {
-      await updatePlayerDocument(context.db, input.uuid, input.document);
+    .handler(async ({ input }) => {
+      await updatePlayerDocument( input.uuid, input.document);
 
       return {
         message: "Player document saved",

@@ -11,8 +11,6 @@ const envSchema = z.object({
   POLAR_SUCCESS_URL: z.url(),
   POLAR_SERVER: z.enum(["production", "sandbox"]).default("sandbox"),
   PLUGIN_SECRET_KEY: z.string(),
-  REDIS_URL: z.string(),
-  DATABASE_URL: z.string(),
 });
 
 export const env = envSchema.parse(process.env);

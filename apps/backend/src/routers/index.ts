@@ -1,53 +1,51 @@
+import { db } from "@/db";
+import { getKv, setKv } from "@/db/queries/kv";
 import { ORPCError, type RouterClient } from "@orpc/server";
-import { dbProvider, kvProvider, o, publicProcedure } from "../lib/orpc";
+import { o, publicProcedure } from "../lib/orpc";
 import { pluginRouter } from "./plugin/plugin-router";
 
 export const appRouter = {
-  healthCheck: publicProcedure
-    .use(dbProvider)
-    .use(kvProvider)
-    .route({ method: "GET", path: "/health-check" })
-    .handler(async ({ context }) => {
-      const dbCheckStart = performance.now();
+  healthCheck: publicProcedure.route({ method: "GET", path: "/health-check" }).handler(async () => {
+    const dbCheckStart = performance.now();
 
-      try {
-        await context.db.execute("select 1");
-      } catch (error) {
-        console.error(error);
+    try {
+      db.$client.run("select 1");
+    } catch (error) {
+      console.error(error);
 
-        throw new ORPCError("INTERNAL_SERVER_ERROR", {
-          status: 500,
-          message: "Database connection failed",
-          cause: error,
-        });
-      }
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+        status: 500,
+        message: "Database connection failed",
+        cause: error,
+      });
+    }
 
-      const dbCheckDuration = performance.now() - dbCheckStart;
+    const dbCheckDuration = performance.now() - dbCheckStart;
 
-      const kvCheckStart = performance.now();
+    const kvCheckStart = performance.now();
 
-      try {
-        await context.kv.set("test", "test");
-        await context.kv.get("test");
-      } catch (error) {
-        console.error(error);
+    try {
+      await setKv("test", "test");
+      await getKv("test");
+    } catch (error) {
+      console.error(error);
 
-        throw new ORPCError("INTERNAL_SERVER_ERROR", {
-          status: 500,
-          message: "KV connection failed",
-          cause: error,
-        });
-      }
+      throw new ORPCError("INTERNAL_SERVER_ERROR", {
+        status: 500,
+        message: "KV database failed",
+        cause: error,
+      });
+    }
 
-      const kvCheckDuration = performance.now() - kvCheckStart;
+    const kvCheckDuration = performance.now() - kvCheckStart;
 
-      return {
-        status: "OK",
-        dbCheckDurationMs: dbCheckDuration,
-        kvCheckDurationMs: kvCheckDuration,
-        timestamp: new Date().toISOString(),
-      };
-    }),
+    return {
+      status: "OK",
+      dbCheckDurationMs: dbCheckDuration,
+      kvCheckDurationMs: kvCheckDuration,
+      timestamp: new Date().toISOString(),
+    };
+  }),
   plugin: o.prefix("/plugin").router(pluginRouter),
 };
 
