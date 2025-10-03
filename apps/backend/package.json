@@ -10,7 +10,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "auth:generate": "npx @better-auth/cli@latest generate",
-    "dev": "bun run --env-file=../../.env.development --watch src/index.ts"
+    "dev": "bun run --env-file=../../.env.development --watch src/index.ts",
+    "test": "bun test"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.0",

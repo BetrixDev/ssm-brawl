@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { getKv, setKv } from "@/db/queries/kv";
 import { ORPCError, type RouterClient } from "@orpc/server";
 import { o, publicProcedure } from "../lib/orpc";
+import { playersRouter } from "./players/players-router";
 import { pluginRouter } from "./plugin/plugin-router";
 
 export const appRouter = {
@@ -47,6 +48,7 @@ export const appRouter = {
     };
   }),
   plugin: o.prefix("/plugin").router(pluginRouter),
+  players: o.prefix("/players").router(playersRouter),
 };
 
 export type AppRouter = typeof appRouter;
