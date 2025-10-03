@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "format": "prettier --write . && bunx ktfmt@latest --kotlinlang-style plugin/src",
+    "format": "prettier --write . && pnpm dlx ktfmt@latest --kotlinlang-style plugin/src",
     "dev": "turbo run dev",
     "dev:plugin": "turbo run dev -F plugin",
     "dev:ts": "turbo run dev -F !plugin",
@@ -14,19 +14,7 @@
   "devDependencies": {
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.3.0",
-    "turbo": "^2.5.8"
+    "turbo": "2.5.9-canary.3"
   },
-  "workspaces": [
-    "apps/*",
-    "plugin"
-  ],
-  "trustedDependencies": [
-    "@parcel/watcher",
-    "@tailwindcss/oxide",
-    "esbuild",
-    "sharp",
-    "wiki",
-    "workerd"
-  ],
-  "packageManager": "bun@1.2.22"
+  "packageManager": "pnpm@9.1.0"
 }
