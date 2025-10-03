@@ -19,6 +19,10 @@ export default defineConfig({
       ],
       sidebar: [
         {
+          label: "Getting Started",
+          slug: "getting-started",
+        },
+        {
           label: "Kits",
           autogenerate: { directory: "kits" },
         },
