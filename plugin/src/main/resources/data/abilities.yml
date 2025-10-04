@@ -136,15 +136,16 @@ abilities:
       blockRotationStepSpeedTicks: 4
 
   - id: egg_blaster
-    cooldown: 2.0
+    cooldown: 2.5
     itemSlot: 0
     type: projectile
     usage: right_click
     hotbarItem: iron_sword
     displayItem: egg
     metadata:
-      eggPairs: 8
+      durationMs: 750
       eggDamage: 1.0
+      eggPairs: 8
       slownessLevel: 1
       slownessDuration: 40
       cooldownTicks: 40
