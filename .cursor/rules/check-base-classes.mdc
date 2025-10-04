@@ -1,0 +1,5 @@
+---
+globs: *.kt
+---
+
+When injecting something into a class with Koin, if the class is a subclass, check that the base class (and its base classes) don't already have the dependency injected. If they do, let that dependency be available in the subclass by making is protected if it isn't already.
