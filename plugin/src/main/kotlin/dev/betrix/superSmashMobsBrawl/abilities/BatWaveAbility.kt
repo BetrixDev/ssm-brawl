@@ -21,7 +21,8 @@ class BatWaveAbility(player: Player) : BrawlAbility("bat_wave", player) {
 
     private val batCount = metadata.int("batCount") ?: 32
     private val batDurationMs = metadata.long("batDurationMs") ?: 2500
-    private val batSpeed = metadata.double("batSpeed") ?: 0.75
+    private val batSpeed = metadata.double("batSpeed") ?: 0.5
+    private val leashedBatSpeedMultiplier = metadata.double("leashedBatSpeedMultiplier") ?: 1.8
     private val batDamage = metadata.double("batDamage") ?: 3.0
     private val hitboxRadius = metadata.double("hitboxRadius") ?: 2.0
     private val knockbackMultiplier = metadata.double("knockbackMultiplier") ?: 1.75
@@ -129,8 +130,9 @@ class BatWaveAbility(player: Player) : BrawlAbility("bat_wave", player) {
                             (Math.random() - 0.5) / 2,
                         )
 
+                    val currentBatSpeed = if (bat.isLeashed) batSpeed * leashedBatSpeedMultiplier else batSpeed
                     val batVelocity =
-                        startLocation!!.direction.clone().multiply(batSpeed).add(random)
+                        startLocation!!.direction.clone().multiply(currentBatSpeed).add(random)
                     bat.velocity = batVelocity
 
                     for (otherPlayer in bat.world.players) {
