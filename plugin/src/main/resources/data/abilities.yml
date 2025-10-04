@@ -151,19 +151,22 @@ abilities:
       cooldownTicks: 40
 
   - id: chicken_missile
-    cooldown: 8.0
+    cooldown: 7.0
     itemSlot: 1
     type: projectile
     usage: right_click
     hotbarItem: iron_axe
     displayItem: chicken_spawn_egg
     metadata:
-      missileDamage: 3.0
-      missileKnockback: 1.5
-      aoeRadius: 2.5
-      cooldownTicks: 160
-      earlyDeathTimeMin: 20
-      earlyDeathTimeMax: 60
+      damage: 8.0
+      explosionRadius: 3.0
+      directHitboxRadius: 2.0
+      minimumHitTimeMs: 200
+      durationMs: 4000
+      velocityStrength: 0.6
+      knockbackStrength: 1.6
+      knockbackYAdd: 0.8
+      knockbackYMax: 10.0
 
   - id: daze_potion
     cooldown: 2.0
