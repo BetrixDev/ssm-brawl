@@ -106,6 +106,7 @@ class DefaultRespawnManager(private val minigame: BrawlMinigame) :
             player.allowFlight = true
             player.isFlying = true
             player.fallDistance = 0f
+            player.inventory.clear()
 
             // Mark player as respawning
             markRespawning(player)
@@ -181,6 +182,7 @@ class DefaultRespawnManager(private val minigame: BrawlMinigame) :
         player.feed()
         player.heal()
         player.gameMode = GameMode.SURVIVAL
+        player.inventory.clear()
 
         // Handle kit assignment
         (minigame.kitHandler as? IKitHandler)?.assignKitToPlayer(player)
