@@ -83,4 +83,12 @@ fun Material.isHubInteractable(): Boolean {
 }
 
 val Material.isSword: Boolean
-    get() = this.name.lowercase().endsWith("_sword")
+    get() = when (this) {
+        Material.WOODEN_SWORD,
+        Material.STONE_SWORD,
+        Material.IRON_SWORD,
+        Material.GOLDEN_SWORD,
+        Material.DIAMOND_SWORD,
+        Material.NETHERITE_SWORD -> true
+        else -> false
+    }
