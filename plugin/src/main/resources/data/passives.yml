@@ -24,9 +24,12 @@ passives:
     metadata:
       maxFlaps: 8
       energyPerFlap: 12.5
+      minEnergyToFlap: 12.5
       maxEnergy: 100.0
-      energyRegenRate: 4.0
+      energyRegenRate: 8.0
       flapStrengthMultiplier: 0.95
+      flapVerticalBoost: 0.15
+      flapHeightMax: 0.9
 
   - id: arrow_recharge
     displayItem: bundle

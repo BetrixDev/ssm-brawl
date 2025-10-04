@@ -9,16 +9,33 @@ import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerToggleFlightEvent
 
-class DoubleJumpPassive(player: Player) : BrawlPassive("double_jump", player) {
+open class DoubleJumpPassive(
+    id: String = "double_jump",
+    player: Player,
+) : BrawlPassive(id, player) {
 
-    private var canDoubleJump = true
+    protected open val power: Double = 0.9
+    protected open val height: Double = 0.9
+    protected open val doubleJumpSound: Sound = Sound.ENTITY_BLAZE_SHOOT
+    protected open val rechargeDelayMs: Long = 0L
+    
+    protected var lastJumpTimeMs: Long = 0L
+    protected var canDoubleJump: Boolean = true
 
     override fun setup() {
         player.allowFlight = true
+        setupRechargeTask()
+        setupFlightToggleListener()
+        setupDeathListener()
+        setupFallDamageListener()
+        super.setup()
+    }
 
+    protected open fun setupRechargeTask() {
         runnables.add(
             repeatingTask(20) {
                 if (!player.allowFlight && canDoubleJump && isOnGround(player)) {
@@ -29,15 +46,21 @@ class DoubleJumpPassive(player: Player) : BrawlPassive("double_jump", player) {
 
         runnables.add(
             repeatingTask(1) {
+                if (System.currentTimeMillis() - lastJumpTimeMs < rechargeDelayMs) {
+                    return@repeatingTask
+                }
+                
                 if (
-                    (player.isOnBlock() || canDoubleJump) && (!canDoubleJump || !player.allowFlight)
+                    (groundCheck() || canDoubleJump) && (!canDoubleJump || !player.allowFlight)
                 ) {
                     canDoubleJump = true
                     player.allowFlight = true
                 }
             }
         )
+    }
 
+    protected open fun setupFlightToggleListener() {
         listeners.add(
             event<PlayerToggleFlightEvent> ToggleFlightEvent@{
                 if (
@@ -61,13 +84,16 @@ class DoubleJumpPassive(player: Player) : BrawlPassive("double_jump", player) {
                 player.allowFlight = false
                 player.fallDistance = 0f
 
-                player.playSound(player.location, Sound.ENTITY_BLAZE_SHOOT, 1F, 1F)
-                player.setVelocity(player.location.direction, 0.9, true, 0.9, 0.0, 0.9, true)
+                playDoubleJumpSound()
+                activate()
 
                 canDoubleJump = false
+                lastJumpTimeMs = System.currentTimeMillis()
             }
         )
+    }
 
+    protected open fun setupDeathListener() {
         listeners.add(
             event<PlayerDeathEvent> DeathEvent@{
                 if (this@DoubleJumpPassive.player != player) {
@@ -78,8 +104,37 @@ class DoubleJumpPassive(player: Player) : BrawlPassive("double_jump", player) {
                 canDoubleJump = true
             }
         )
+    }
 
-        super.setup()
+    protected open fun setupFallDamageListener() {
+        listeners.add(
+            event<EntityDamageEvent> DamageEvent@{
+                if (entity != this@DoubleJumpPassive.player) {
+                    return@DamageEvent
+                }
+                
+                if (cause == EntityDamageEvent.DamageCause.FALL) {
+                    isCancelled = true
+                    player.sendDebugMessage("[DJ] Fall damage cancelled")
+                }
+            }
+        )
+    }
+
+    protected open fun activate() {
+        player.setVelocity(player.location.direction, power, true, power, 0.0, height, true)
+    }
+
+    protected open fun groundCheck(): Boolean {
+        return player.isOnBlock()
+    }
+
+    protected open fun canUseJump(): Boolean {
+        return canDoubleJump
+    }
+
+    protected open fun playDoubleJumpSound() {
+        player.world.playSound(player.location, doubleJumpSound, 1f, 1f)
     }
 
     override fun teardown() {

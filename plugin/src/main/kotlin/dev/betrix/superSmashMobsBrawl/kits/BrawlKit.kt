@@ -103,7 +103,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
 
             passives.add(
                 when (it.id) {
-                    "double_jump" -> DoubleJumpPassive(player)
+                    "double_jump" -> DoubleJumpPassive(player = player)
                     "regeneration" -> RegenerationPassive(player)
                     "hunger" -> HungerPassive(player)
                     "arrow_recharge" -> ArrowRechargePassive(player)
@@ -136,6 +136,9 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
         player.heal()
         player.feed()
         player.clearActivePotionEffects()
+        player.exp = 0f
+        player.level = 0
+        player.totalExperience = 0
 
         // Equip armor if specified
         kitData.armorItems?.let { armor ->
