@@ -1,31 +1,27 @@
-import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-export const users = sqliteTable("users", {
+export const users = pgTable("users", {
   id: text().primaryKey(),
   name: text().notNull(),
   email: text().notNull().unique(),
-  emailVerified: integer({ mode: "boolean" }).default(false).notNull(),
+  emailVerified: boolean().default(false).notNull(),
   image: text(),
-  createdAt: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`)
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp()
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   username: text().unique(),
   displayUsername: text(),
 });
 
-export const sessions = sqliteTable("sessions", {
+export const sessions = pgTable("sessions", {
   id: text().primaryKey(),
-  expiresAt: integer({ mode: "timestamp" }).notNull(),
+  expiresAt: timestamp().notNull(),
   token: text().notNull().unique(),
-  createdAt: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`)
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   ipAddress: text(),
   userAgent: text(),
@@ -34,7 +30,7 @@ export const sessions = sqliteTable("sessions", {
     .references(() => users.id, { onDelete: "cascade" }),
 });
 
-export const accounts = sqliteTable("accounts", {
+export const accounts = pgTable("accounts", {
   id: text().primaryKey(),
   accountId: text().notNull(),
   providerId: text().notNull(),
@@ -44,27 +40,24 @@ export const accounts = sqliteTable("accounts", {
   accessToken: text(),
   refreshToken: text(),
   idToken: text(),
-  accessTokenExpiresAt: integer({ mode: "timestamp" }),
-  refreshTokenExpiresAt: integer({ mode: "timestamp" }),
+  accessTokenExpiresAt: timestamp(),
+  refreshTokenExpiresAt: timestamp(),
   scope: text(),
   password: text(),
-  createdAt: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`)
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
 
-export const verifications = sqliteTable("verifications", {
+export const verifications = pgTable("verifications", {
   id: text().primaryKey(),
   identifier: text().notNull(),
   value: text().notNull(),
-  expiresAt: integer({ mode: "timestamp" }).notNull(),
-  createdAt: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`)
+  expiresAt: timestamp().notNull(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp()
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });

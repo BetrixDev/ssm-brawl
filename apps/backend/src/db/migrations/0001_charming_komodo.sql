@@ -1,1 +1,0 @@
-ALTER TABLE `players` ADD `selected_kit_id` text DEFAULT 'skeleton' NOT NULL;

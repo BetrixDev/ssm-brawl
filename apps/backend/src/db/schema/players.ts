@@ -1,26 +1,21 @@
 import { relations, sql } from "drizzle-orm";
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-export const players = sqliteTable(
+export const players = pgTable(
   "players",
   {
     uuid: text().primaryKey(),
     username: text().notNull(),
-    lastJoinedDate: integer({ mode: "timestamp" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    firstJoinedDate: integer({ mode: "timestamp" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    stats: text({ mode: "json" })
-      .$type<Record<string, string | number | boolean>>()
-      .default({})
-      .notNull(),
+    lastJoinedDate: timestamp().defaultNow().notNull(),
+    firstJoinedDate: timestamp().defaultNow().notNull(),
+    stats: jsonb().$type<Record<string, string | number | boolean>>().default({}).notNull(),
     dailyLoginStreak: integer().default(0).notNull(),
     headSkinBase64: text(),
     selectedKitId: text().notNull().default("skeleton"),
   },
-  (table) => [index("username_idx").on(table.username)],
+  (table) => [
+    index("username_search_idx").using("gin", sql`to_tsvector('english', ${table.username})`),
+  ],
 );
 
 export const playersRelations = relations(players, ({ many }) => ({
@@ -28,7 +23,7 @@ export const playersRelations = relations(players, ({ many }) => ({
   joinEvents: many(playerJoinEvents),
 }));
 
-export const playerBans = sqliteTable(
+export const playerBans = pgTable(
   "player_bans",
   {
     id: text().primaryKey(),
@@ -36,13 +31,11 @@ export const playerBans = sqliteTable(
       .references(() => players.uuid, { onDelete: "cascade" })
       .notNull(),
     reason: text().notNull(),
-    expiresAt: integer({ mode: "timestamp" }),
-    bannedAt: integer({ mode: "timestamp" })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
+    expiresAt: timestamp(),
+    bannedAt: timestamp().defaultNow().notNull(),
     bannedBy: text().notNull(),
   },
-  (table) => [index("player_bans_player_uuid_idx").on(table.playerUuid)],
+  (table) => [index("player_bans_player_uuid_idx").using("btree", table.playerUuid)],
 );
 
 export const playerBansRelations = relations(playerBans, ({ one }) => ({
@@ -52,14 +45,12 @@ export const playerBansRelations = relations(playerBans, ({ one }) => ({
   }),
 }));
 
-export const playerJoinEvents = sqliteTable("player_join_events", {
+export const playerJoinEvents = pgTable("player_join_events", {
   id: text().primaryKey(),
   playerUuid: text()
     .references(() => players.uuid, { onDelete: "cascade" })
     .notNull(),
-  timestamp: integer({ mode: "timestamp" })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
+  timestamp: timestamp().defaultNow().notNull(),
   ipAddress: text(),
 });
 

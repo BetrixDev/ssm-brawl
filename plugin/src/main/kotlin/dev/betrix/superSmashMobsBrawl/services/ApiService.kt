@@ -58,25 +58,4 @@ object ApiService {
             setBody(document)
         }
     }
-
-    suspend inline fun <reified T> kvGetAsync(key: String): T? {
-        val response = apiClient.get("kv/$key")
-
-        if (response.status.value != 200) {
-            return null
-        }
-
-        return response.body()
-    }
-
-    suspend fun kvSetAsync(key: String, value: Any) {
-        apiClient.put("kv/$key") {
-            contentType(ContentType.Application.Json)
-            setBody(value)
-        }
-    }
-
-    suspend fun kvDeleteAsync(key: String) {
-        apiClient.delete("kv/$key")
-    }
 }

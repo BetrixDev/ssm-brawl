@@ -1,5 +1,4 @@
 import { db } from "@/db/db";
-import { getKv, setKv } from "@/db/queries/kv";
 import { ORPCError, type RouterClient } from "@orpc/server";
 import { o, publicProcedure } from "../lib/orpc";
 import { playersRouter } from "./players/players-router";
@@ -10,7 +9,7 @@ export const appRouter = {
     const dbCheckStart = performance.now();
 
     try {
-      db.$client.run("select 1");
+      db.execute("select 1");
     } catch (error) {
       console.error(error);
 
@@ -23,27 +22,9 @@ export const appRouter = {
 
     const dbCheckDuration = performance.now() - dbCheckStart;
 
-    const kvCheckStart = performance.now();
-
-    try {
-      await setKv("test", "test");
-      await getKv("test");
-    } catch (error) {
-      console.error(error);
-
-      throw new ORPCError("INTERNAL_SERVER_ERROR", {
-        status: 500,
-        message: "KV database failed",
-        cause: error,
-      });
-    }
-
-    const kvCheckDuration = performance.now() - kvCheckStart;
-
     return {
       status: "OK",
       dbCheckDurationMs: dbCheckDuration,
-      kvCheckDurationMs: kvCheckDuration,
       timestamp: new Date().toISOString(),
     };
   }),
