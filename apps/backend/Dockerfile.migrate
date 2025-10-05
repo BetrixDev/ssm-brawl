@@ -8,6 +8,8 @@ COPY package.json ./
 
 RUN bun install
 
+RUN bun install postgres
+
 FROM deps AS migrate
 
 COPY . .

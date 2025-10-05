@@ -10,7 +10,7 @@ const baseEnvSchema = z.object({
 });
 
 const devSchema = baseEnvSchema.extend({
-  DATABASE_URL: z.string().default("postgres://postgres:brawl@database:5432/postgres"),
+  DATABASE_URL: z.string().default("postgres://postgres:brawl@localhost:5432/postgres"),
   CORS_ORIGIN: z.string().optional().default("http://localhost:3001"),
   BETTER_AUTH_SECRET: z.string().default("changeme"),
   BETTER_AUTH_URL: z.url().default("http://localhost:3000"),

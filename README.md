@@ -90,12 +90,15 @@ sudo apt install openjdk-25-jdk
 
 Once running, the following services will be available:
 
-| Service   | URL                   | Description                                |
-| --------- | --------------------- | ------------------------------------------ |
-| Website   | http://localhost:3001 | Web dashboard and player portal            |
-| API       | http://localhost:3000 | Backend API endpoints                      |
-| Wiki      | http://localhost:1337 | Game documentation                         |
-| Minecraft | `localhost:25565`     | Game server (connect via Minecraft client) |
+| Service        | URL                   | Description                                |
+| -------------- | --------------------- | ------------------------------------------ |
+| Website        | http://localhost:3001 | Web dashboard and player portal            |
+| API            | http://localhost:3000 | Backend API endpoints                      |
+| Wiki           | http://localhost:1337 | Game documentation                         |
+| Minecraft      | `localhost:25565`     | Game server (connect via Minecraft client) |
+| Drizzle Studio | http://localhost:4984 | Drizzle Studio for database management     |
+
+> Drizzle Studio passcode is `changeme` for local development
 
 ## 📦 Project Structure
 

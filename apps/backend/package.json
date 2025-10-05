@@ -9,6 +9,7 @@
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
     "auth:generate": "npx @better-auth/cli@latest generate",
     "dev": "bun run --env-file=../../.env.development --watch src/index.ts"
   },
@@ -26,7 +27,6 @@
     "drizzle-orm": "^0.44.5",
     "drizzle-zod": "^0.8.3",
     "elysia": "^1.4.9",
-    "pg": "^8.16.3",
     "zod": "^4.1.11"
   },
   "devDependencies": {

@@ -12,7 +12,7 @@ function getDockerComposeCommand() {
 
 function runDockerCompose() {
   const [command, ...baseArgs] = getDockerComposeCommand();
-  const args = [...baseArgs, "up", "-d"];
+  const args = [...baseArgs, "up", "-d", "database", "migrate", "drizzle_gate"];
 
   const dockerCompose = spawn(command, args, {
     cwd: path.resolve(process.cwd(), "..", ".."),

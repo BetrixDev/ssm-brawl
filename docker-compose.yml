@@ -33,6 +33,11 @@ services:
       context: ./apps/backend
       dockerfile: Dockerfile
     container_name: ssmb-api
+    depends_on:
+      database:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3001}
@@ -50,6 +55,16 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  drizzle_gate:
+    image: ghcr.io/drizzle-team/gateway:latest
+    restart: always
+    ports:
+      - "0.0.0.0:4983:4983"
+    environment:
+      MASTERPASS: ${MASTERPASS:-changeme}
+    volumes:
+      - drizzle_gate:/app
+
   minecraft:
     build:
       context: ./plugin
@@ -74,3 +89,4 @@ services:
 
 volumes:
   db_data:
+  drizzle_gate:
