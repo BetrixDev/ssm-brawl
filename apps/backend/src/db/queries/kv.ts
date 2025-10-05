@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db, Table } from "..";
+import { db, Table } from "../db";
 
 export async function getKv<T>(key: string, defaultValue: T): Promise<T>;
 export async function getKv<T>(key: string): Promise<T | null>;

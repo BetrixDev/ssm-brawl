@@ -5,7 +5,7 @@ import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { Elysia } from "elysia";
-import { initDb } from "./db";
+import { initDb } from "./db/db";
 import { auth } from "./lib/auth";
 import { createContext } from "./lib/context";
 import { env } from "./lib/env";

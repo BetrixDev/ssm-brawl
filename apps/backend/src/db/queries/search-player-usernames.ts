@@ -1,6 +1,6 @@
 import type { PaginationOptions } from "@/schemas/pagination-options";
 import { like, sql } from "drizzle-orm";
-import { db, Table } from "..";
+import { db, Table } from "../db";
 
 export async function searchPlayerUsernames(query: string, paginationOptions?: PaginationOptions) {
   return await db

@@ -1,4 +1,4 @@
-import { db, initDb, Table } from "@/db";
+import { db, initDb, Table } from "@/db/db";
 import { appRouter } from "@/routers";
 import { call } from "@orpc/server";
 import { beforeAll, describe, expect, it } from "bun:test";

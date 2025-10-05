@@ -4,7 +4,7 @@ import type { PlayerDocument } from "@/schemas/player-document";
 import { getPlayerHeadSkinBase64 } from "@/sdks/mc-heads";
 import { randomUUID } from "crypto";
 import { eq } from "drizzle-orm";
-import { db, Table } from "..";
+import { db, Table } from "../db";
 
 export async function getPlayerDocument(uuid: string): Promise<PlayerDocument> {
   const queryResult = await db.query.players.findFirst({

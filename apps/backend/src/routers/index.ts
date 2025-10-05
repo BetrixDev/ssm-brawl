@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import { db } from "@/db/db";
 import { getKv, setKv } from "@/db/queries/kv";
 import { ORPCError, type RouterClient } from "@orpc/server";
 import { o, publicProcedure } from "../lib/orpc";
