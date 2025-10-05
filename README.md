@@ -104,12 +104,12 @@ super-smash-mobs-brawl/
 ├── tooling/
 │   └── database-dev/        # Tooling for local database development
 ├── apps/
-│   ├── web/                 # Frontend application with [Tanstack Start](https://tanstack.com/start/latest/docs/framework/react/overview)
-│   ├── backend/             # Backend service with [Elysia](https://elysiajs.com) and [ORPC](https://orpc.unnoq.com)
-│   └── wiki/                # Documentation site with [Astro Starlight](https://starlight.astro.build) __(subject to change)__
-│       └── src/content/docs # Wiki content [Authoring Content Guide](https://starlight.astro.build/guides/authoring-content)
+│   ├── web/                 # Frontend application with Tanstack Start
+│   ├── backend/             # Backend service with Elysia and ORPC
+│   └── wiki/                # Documentation site with Astro Starlight __(subject to change)__
+│       └── src/content/docs # Wiki content Authoring Content Guide
 ├── plugin/                  # Minecraft server plugin
-├── docker-compose.yml       # [Service orchestration](https://docs.docker.com/compose)
+├── docker-compose.yml       # Service orchestration
 └── package.json             # Workspace configuration
 ```
 
