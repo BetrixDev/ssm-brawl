@@ -5,6 +5,7 @@ import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.events.DeathReason
 import dev.betrix.superSmashMobsBrawl.events.HazardType
+import dev.betrix.superSmashMobsBrawl.extensions.isCreativeMode
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import gg.flyte.twilight.scheduler.delay
 import gg.flyte.twilight.scheduler.repeatingTask
@@ -43,6 +44,10 @@ class DefaultHazardManager(private val minigame: BrawlMinigame) : Manageable(), 
             repeatingTask(2) {
                 minigame.allPlayers().forEach { player ->
                     if (player.isOnline && player.location?.block?.isLiquid == true) {
+                        if (player is Player && player.isCreativeMode()) {
+                            return@forEach
+                        }
+
                         handleHazardDeath(player as Player, HazardType.LIQUID)
                     }
                 }

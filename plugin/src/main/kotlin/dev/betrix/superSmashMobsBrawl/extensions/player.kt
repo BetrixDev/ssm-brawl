@@ -3,6 +3,7 @@ package dev.betrix.superSmashMobsBrawl.extensions
 import dev.betrix.superSmashMobsBrawl.services.DebugService
 import dev.betrix.superSmashMobsBrawl.services.KitService
 import dev.betrix.superSmashMobsBrawl.services.LangService
+import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -67,4 +68,8 @@ fun Player.getLocationInFrontOfEyes(distance: Double): Location {
 
 fun Player.playSound(sound: Sound, pitch: Float = 1f, volume: Float = 1f) {
     playSound(eyeLocation, sound, pitch, volume)
+}
+
+fun Player.isCreativeMode(): Boolean {
+    return gameMode == GameMode.CREATIVE
 }

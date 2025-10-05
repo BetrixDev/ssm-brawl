@@ -4,6 +4,7 @@ import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.extensions.isBrawlInventory
+import dev.betrix.superSmashMobsBrawl.extensions.isCreativeMode
 import dev.betrix.superSmashMobsBrawl.minigames.BrawlMinigame
 import gg.flyte.twilight.event.event
 import org.bukkit.entity.Player
@@ -39,7 +40,7 @@ class DefaultEnvironmentProtectionManager(private val minigame: BrawlMinigame) :
         // Prevent block breaking
         listeners.add(
             event<BlockBreakEvent> {
-                if (isPlayerInMinigame(player)) {
+                if (isPlayerInMinigame(player) && !player.isCreativeMode()) {
                     isCancelled = true
                 }
             }
@@ -48,7 +49,7 @@ class DefaultEnvironmentProtectionManager(private val minigame: BrawlMinigame) :
         // Prevent block placing
         listeners.add(
             event<BlockPlaceEvent> {
-                if (isPlayerInMinigame(player)) {
+                if (isPlayerInMinigame(player) && !player.isCreativeMode()) {
                     isCancelled = true
                 }
             }
@@ -102,7 +103,7 @@ class DefaultEnvironmentProtectionManager(private val minigame: BrawlMinigame) :
         // Prevent interaction with blocks that have GUIs or functionality
         listeners.add(
             event<PlayerInteractEvent> {
-                if (!isPlayerInMinigame(player)) return@event
+                if (!isPlayerInMinigame(player) || !player.isCreativeMode()) return@event
 
                 // Allow interaction with air (for abilities/combat)
                 if (clickedBlock == null) return@event
