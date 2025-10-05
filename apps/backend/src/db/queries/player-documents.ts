@@ -1,5 +1,4 @@
 import { calculateDailyLoginStreak } from "@/helpers/daily-login-streak";
-import { incrementStat } from "@/helpers/stats-helpers";
 import type { PlayerDocument } from "@/schemas/player-document";
 import { getPlayerHeadSkinBase64 } from "@/sdks/mc-heads";
 import { randomUUID } from "crypto";
@@ -23,7 +22,6 @@ export async function getPlayerDocument(uuid: string): Promise<PlayerDocument> {
     lastJoinDate: queryResult.lastJoinedDate.toISOString(),
     headSkinBase64: queryResult.headSkinBase64,
     dailyLoginStreak: queryResult.dailyLoginStreak ?? null,
-    stats: queryResult.stats,
     selectedKitId: queryResult.selectedKitId,
     banData: queryResult.bans.map((ban) => ({
       id: ban.id,
@@ -46,7 +44,6 @@ export async function createInitialPlayerDocument(uuid: string): Promise<PlayerD
       username: uuid,
       lastJoinedDate: new Date(),
       firstJoinedDate: new Date(),
-      stats: {},
       headSkinBase64,
     })
     .returning();
@@ -56,7 +53,7 @@ export async function createInitialPlayerDocument(uuid: string): Promise<PlayerD
     lastJoinDate: insertResult.lastJoinedDate.toISOString(),
     headSkinBase64,
     dailyLoginStreak: insertResult.dailyLoginStreak ?? null,
-    stats: insertResult.stats,
+
     selectedKitId: insertResult.selectedKitId,
     banData: null,
   };
@@ -82,12 +79,6 @@ export async function handlePlayerJoinEvent(uuid: string) {
           player?.dailyLoginStreak,
           player?.lastJoinedDate ?? null,
         ),
-        stats: player?.stats
-          ? {
-              ...player.stats,
-              joinCount: incrementStat(player.stats, "joinCount", 0),
-            }
-          : undefined,
       })
       .where(eq(Table.players.uuid, uuid));
   });
@@ -100,7 +91,6 @@ export async function updatePlayerDocument(uuid: string, document: PlayerDocumen
       .set({
         lastJoinedDate: new Date(document.lastJoinDate),
         dailyLoginStreak: document.dailyLoginStreak ?? undefined,
-        stats: document.stats,
       })
       .where(eq(Table.players.uuid, uuid));
 

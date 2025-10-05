@@ -1,5 +1,19 @@
 import { relations, sql } from "drizzle-orm";
-import { index, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { index, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  playerAbilityStats,
+  playerAbilityStatsHistory,
+  playerGeneralStats,
+  playerGeneralStatsHistory,
+  playerKitStats,
+  playerKitStatsHistory,
+  playerMinigameStats,
+  playerMinigameStatsHistory,
+  playerParkourStats,
+  playerParkourStatsHistory,
+  playerPassiveStats,
+  playerPassiveStatsHistory,
+} from "./player-stats";
 
 export const players = pgTable(
   "players",
@@ -8,7 +22,6 @@ export const players = pgTable(
     username: text().notNull(),
     lastJoinedDate: timestamp().defaultNow().notNull(),
     firstJoinedDate: timestamp().defaultNow().notNull(),
-    stats: jsonb().$type<Record<string, string | number | boolean>>().default({}).notNull(),
     dailyLoginStreak: integer().default(0).notNull(),
     headSkinBase64: text(),
     selectedKitId: text().notNull().default("skeleton"),
@@ -21,6 +34,18 @@ export const players = pgTable(
 export const playersRelations = relations(players, ({ many }) => ({
   bans: many(playerBans),
   joinEvents: many(playerJoinEvents),
+  generalStats: many(playerGeneralStats),
+  kitStats: many(playerKitStats),
+  minigameStats: many(playerMinigameStats),
+  parkourStats: many(playerParkourStats),
+  passiveStats: many(playerPassiveStats),
+  abilityStats: many(playerAbilityStats),
+  generalStatsHistory: many(playerGeneralStatsHistory),
+  kitStatsHistory: many(playerKitStatsHistory),
+  minigameStatsHistory: many(playerMinigameStatsHistory),
+  parkourStatsHistory: many(playerParkourStatsHistory),
+  passiveStatsHistory: many(playerPassiveStatsHistory),
+  abilityStatsHistory: many(playerAbilityStatsHistory),
 }));
 
 export const playerBans = pgTable(

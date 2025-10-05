@@ -5,7 +5,6 @@ export const playerDocumentSchema = z.object({
   lastJoinDate: z.string(),
   headSkinBase64: z.string().nullable(),
   dailyLoginStreak: z.number().int().nonnegative().default(0),
-  stats: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])),
   selectedKitId: z.string(),
   banData: z
     .array(
