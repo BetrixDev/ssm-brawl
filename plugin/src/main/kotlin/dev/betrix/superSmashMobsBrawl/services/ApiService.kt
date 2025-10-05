@@ -14,6 +14,7 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
@@ -55,6 +56,10 @@ object ApiService : IManageable {
                         ignoreUnknownKeys = true
                     }
                 )
+            }
+            install(Logging) {
+                level = LogLevel.ALL
+                sanitizeHeader { it == "Authorization" }
             }
         }
 
