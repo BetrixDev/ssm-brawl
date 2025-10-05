@@ -112,7 +112,9 @@ export const playerGeneralStatsHistory = pgTable(
   "player_general_stats_history",
   {
     id: serial().primaryKey(),
-    playerUuid: text().notNull(),
+    playerUuid: text()
+      .notNull()
+      .references(() => players.uuid, { onDelete: "cascade" }),
     statId: text().notNull(),
     value: jsonb().$type<unknown>().notNull(),
     timestamp: timestamp().defaultNow().notNull(),
@@ -127,7 +129,9 @@ export const playerKitStatsHistory = pgTable(
   "player_kit_stats_history",
   {
     id: serial().primaryKey(),
-    playerUuid: text().notNull(),
+    playerUuid: text()
+      .notNull()
+      .references(() => players.uuid, { onDelete: "cascade" }),
     kitId: text().notNull(),
     statId: text().notNull(),
     value: jsonb().$type<unknown>().notNull(),
@@ -143,7 +147,9 @@ export const playerMinigameStatsHistory = pgTable(
   "player_minigame_stats_history",
   {
     id: serial().primaryKey(),
-    playerUuid: text().notNull(),
+    playerUuid: text()
+      .notNull()
+      .references(() => players.uuid, { onDelete: "cascade" }),
     minigameId: text().notNull(),
     statId: text().notNull(),
     value: jsonb().$type<unknown>().notNull(),
@@ -159,7 +165,9 @@ export const playerParkourStatsHistory = pgTable(
   "player_parkour_stats_history",
   {
     id: serial().primaryKey(),
-    playerUuid: text().notNull(),
+    playerUuid: text()
+      .notNull()
+      .references(() => players.uuid, { onDelete: "cascade" }),
     mapId: text().notNull(),
     statId: text().notNull(),
     value: jsonb().$type<unknown>().notNull(),
@@ -175,7 +183,9 @@ export const playerPassiveStatsHistory = pgTable(
   "player_passive_stats_history",
   {
     id: serial().primaryKey(),
-    playerUuid: text().notNull(),
+    playerUuid: text()
+      .notNull()
+      .references(() => players.uuid, { onDelete: "cascade" }),
     passiveId: text().notNull(),
     statId: text().notNull(),
     value: jsonb().$type<unknown>().notNull(),
@@ -191,7 +201,9 @@ export const playerAbilityStatsHistory = pgTable(
   "player_ability_stats_history",
   {
     id: serial().primaryKey(),
-    playerUuid: text().notNull(),
+    playerUuid: text()
+      .notNull()
+      .references(() => players.uuid, { onDelete: "cascade" }),
     abilityId: text().notNull(),
     statId: text().notNull(),
     value: jsonb().$type<unknown>().notNull(),
