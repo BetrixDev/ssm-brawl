@@ -39,31 +39,7 @@ Ensure you have the following tools installed:
 | [Bun](https://bun.sh/)                    | Fast JavaScript runtime | Latest version   |
 | [PNPM](https://pnpm.io/installation)      | Package manager         | v9.1.0           |
 | [Docker](https://www.docker.com/)         | Containerization        | Latest version   |
-| Latest JDK Version                        | Building plugin         | Latest version   |
-
-<details>
-<summary>Downloading Latest JDK Version</summary>
-
-macOS:
-
-```bash
-brew install openjdk
-```
-
-Windows:
-
-```bash
-winget install Microsoft.OpenJDK.25
-```
-
-Linux:
-
-```bash
-sudo apt update
-sudo apt install openjdk-25-jdk
-```
-
-</details>
+| JDK Version 21-23                         | Building plugin         | Latest version   |
 
 ### Installation
 
