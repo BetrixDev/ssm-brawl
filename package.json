@@ -7,7 +7,7 @@
     "dev": "turbo run dev",
     "dev:plugin": "turbo run dev -F plugin",
     "dev:ts": "turbo run dev -F !plugin",
-    "dev:db": "docker compose up -d database migrate",
+    "dev:db": "turbo run dev -F @ssmbrawl/database-dev",
     "build": "turbo run build",
     "test": "turbo run test",
     "check-types": "turbo check-types"
