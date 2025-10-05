@@ -20,7 +20,7 @@ export function getRouter() {
   });
 
   const link = new RPCLink({
-    url: `${import.meta.env.VITE_SERVER_URL}/rpc`,
+    url: import.meta.env.DEV ? "http://localhost:3000/rpc" : "https://api.ssmbrawl.com/rpc",
     fetch(url, options) {
       return fetch(url, {
         ...options,

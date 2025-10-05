@@ -5,12 +5,22 @@ import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { Elysia } from "elysia";
+import logixlysia from "logixlysia";
 import { auth } from "./lib/auth";
 import { createContext } from "./lib/context";
 import { env } from "./lib/env";
 import { appRouter } from "./routers/index";
 
-new Elysia()
+new Elysia({ name: "Super Smash Mobs Brawl Api" })
+  .use(
+    logixlysia({
+      config: {
+        ip: true,
+        startupMessageFormat: "simple",
+        showStartupMessage: true,
+      },
+    }),
+  )
   .use(
     cors(
       env.CORS_ORIGIN
@@ -57,8 +67,6 @@ new Elysia()
     return "OK";
   })
   .listen(3000);
-
-console.log("Backned is running at http://localhost:3000");
 
 export const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [

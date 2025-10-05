@@ -27,6 +27,7 @@
     "drizzle-orm": "^0.44.5",
     "drizzle-zod": "^0.8.3",
     "elysia": "^1.4.9",
+    "logixlysia": "^5.2.0",
     "zod": "^4.1.11"
   },
   "devDependencies": {

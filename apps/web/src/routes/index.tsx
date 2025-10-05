@@ -9,7 +9,11 @@ export const Route = createFileRoute("/")({
 function HomeComponent() {
   const rpc = useRpc();
 
+  console.log(rpc);
+
   const healthCheck = useQuery(rpc.healthCheck.queryOptions());
+
+  console.log(healthCheck);
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-2">
@@ -31,9 +35,6 @@ function HomeComponent() {
           </div>
           <div className="text-muted-foreground text-sm">
             DB Check Duration: {healthCheck.data?.dbCheckDurationMs}ms
-          </div>
-          <div className="text-muted-foreground text-sm">
-            KV set & get Duration: {healthCheck.data?.kvCheckDurationMs}ms
           </div>
         </section>
       </div>

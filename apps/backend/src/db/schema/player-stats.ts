@@ -1,6 +1,17 @@
 import { relations } from "drizzle-orm";
-import { index, jsonb, pgTable, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  index,
+  jsonb,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  serial,
+  text,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { players } from "./players";
+
+export const generalStatsEnum = pgEnum("general_stats_enum", ["joinCount"]);
 
 export const playerGeneralStats = pgTable(
   "player_general_stats",
@@ -8,7 +19,7 @@ export const playerGeneralStats = pgTable(
     playerUuid: text()
       .references(() => players.uuid, { onDelete: "cascade" })
       .notNull(),
-    statId: text().notNull(),
+    statId: generalStatsEnum().notNull(),
     value: jsonb().$type<unknown>().notNull(),
   },
   (table) => [

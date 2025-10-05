@@ -1,4 +1,3 @@
-import { calculateDailyLoginStreak } from "@/helpers/daily-login-streak";
 import type { PlayerDocument } from "@/schemas/player-document";
 import { getPlayerHeadSkinBase64 } from "@/sdks/mc-heads";
 import { randomUUID } from "crypto";
@@ -57,31 +56,6 @@ export async function createInitialPlayerDocument(uuid: string): Promise<PlayerD
     selectedKitId: insertResult.selectedKitId,
     banData: null,
   };
-}
-
-export async function handlePlayerJoinEvent(uuid: string) {
-  await db.transaction(async (tx) => {
-    await tx.insert(Table.playerJoinEvents).values({
-      id: randomUUID(),
-      playerUuid: uuid,
-      timestamp: new Date(),
-    });
-
-    const player = await tx.query.players.findFirst({
-      where: (players, { eq }) => eq(players.uuid, uuid),
-    });
-
-    await tx
-      .update(Table.players)
-      .set({
-        lastJoinedDate: new Date(),
-        dailyLoginStreak: calculateDailyLoginStreak(
-          player?.dailyLoginStreak,
-          player?.lastJoinedDate ?? null,
-        ),
-      })
-      .where(eq(Table.players.uuid, uuid));
-  });
 }
 
 export async function updatePlayerDocument(uuid: string, document: PlayerDocument) {

@@ -13,6 +13,8 @@ import gg.flyte.twilight.scheduler.repeatingTask
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.bukkit.entity.Player
@@ -32,7 +34,11 @@ object PlayerDocumentService : KoinComponent, Manageable() {
         plugin.server.onlinePlayers.forEach { player ->
             plugin.launch {
                 val document =
-                    withContext(Dispatchers.IO) { api.playersGetDocumentAsync(player, true) }
+                    withContext(Dispatchers.IO) { api.playersGetDocumentAsync(player) }
+
+                withContext(Dispatchers.IO) {
+                    api.sendPlayerJoinEvent(player)
+                }
 
                 documents[player.uniqueId] = document
 
@@ -82,14 +88,22 @@ object PlayerDocumentService : KoinComponent, Manageable() {
             event<PlayerJoinEvent>(priority = EventPriority.LOWEST) {
                 runBlocking {
                     plugin.launch {
-                        val document =
-                            withContext(Dispatchers.IO) {
-                                api.playersGetDocumentAsync(player, true)
+                        coroutineScope {
+                            val documentDeferred =
+                                async(Dispatchers.IO) {
+                                    api.playersGetDocumentAsync(player)
+                                }
+
+                            async(Dispatchers.IO) {
+                                api.sendPlayerJoinEvent(player)
                             }
 
-                        documents[player.uniqueId] = document
+                            val document = documentDeferred.await()
 
-                        PlayerDocumentLoaded(player, document).callEvent()
+                            documents[player.uniqueId] = document
+
+                            PlayerDocumentLoaded(player, document).callEvent()
+                        }
                     }
                 }
             }
@@ -99,7 +113,10 @@ object PlayerDocumentService : KoinComponent, Manageable() {
             event<PlayerQuitEvent>(priority = EventPriority.LOWEST) {
                 documents.remove(player.uniqueId)?.let {
                     plugin.launch {
-                        withContext(Dispatchers.IO) { api.playersSetDocumentAsync(player, it) }
+                        coroutineScope {
+                            async(Dispatchers.IO) { api.playersSetDocumentAsync(player, it) }
+                            async(Dispatchers.IO) { api.sendPlayerQuitEvent(player) }
+                        }
                     }
                 }
             }
@@ -144,7 +161,7 @@ object PlayerDocumentService : KoinComponent, Manageable() {
     suspend fun getPlayerDocumentOrFetch(player: Player): PlayerDocument {
         return documents[player.uniqueId]
             ?: withContext(Dispatchers.IO) {
-                val document = api.playersGetDocumentAsync(player, true)
+                val document = api.playersGetDocumentAsync(player)
                 documents[player.uniqueId] = document
                 document
             }

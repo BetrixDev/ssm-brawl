@@ -6,10 +6,12 @@ import dev.betrix.superSmashMobsBrawl.utils.DockerDetector
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -32,9 +34,9 @@ object ApiService : IManageable {
 
     private val baseApiUrl = run {
         if (isDocker) {
-            "http://api:3000"
+            "http://api:3000/plugin"
         } else {
-            "http://localhost:3000"
+            "http://localhost:3000/plugin"
         }
     }
 
@@ -55,6 +57,9 @@ object ApiService : IManageable {
                         ignoreUnknownKeys = true
                     }
                 )
+            }
+            install(HttpRequestRetry) {
+                retryOnServerErrors(2)
             }
         }
 
@@ -82,12 +87,23 @@ object ApiService : IManageable {
 
     suspend fun playersGetDocumentAsync(
         player: Player,
-        isJoinEvent: Boolean = false,
     ): PlayerDocument {
         val response: PlayerDocument =
-            apiClient.get("players/${player.uniqueId}/document?joinEvent=${isJoinEvent}").body()
+            apiClient.get("players/${player.uniqueId}/document").body()
 
         return response
+    }
+
+    suspend fun sendPlayerJoinEvent(
+        player: Player,
+    ) {
+        apiClient.post("players/${player.uniqueId}/join")
+    }
+
+    suspend fun sendPlayerQuitEvent(
+        player: Player,
+    ) {
+        apiClient.post("players/${player.uniqueId}/quit")
     }
 
     suspend fun playersSetDocumentAsync(player: Player, document: PlayerDocument) {
