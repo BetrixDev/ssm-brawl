@@ -5,8 +5,8 @@
   "scripts": {
     "format": "prettier --write . && pnpm dlx ktfmt@latest --kotlinlang-style plugin/src",
     "dev": "turbo run dev",
-    "dev:plugin": "turbo run dev -F plugin",
-    "dev:ts": "turbo run dev -F !plugin",
+    "dev:plugin": "turbo run dev -F @ssmbrawl/plugin",
+    "dev:ts": "turbo run dev -F !@ssmbrawl/plugin",
     "dev:db": "turbo run dev -F @ssmbrawl/database-dev",
     "build": "turbo run build",
     "test": "turbo run test",
