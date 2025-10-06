@@ -34,11 +34,13 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
     private val lang: LangService by inject()
     lateinit var liteCommands: LiteCommands<CommandSender>
     lateinit var twilight: Twilight
+    lateinit var axiomLoggerHandler: AxiomLoggerHandler
 
     override suspend fun onEnableAsync() {
         twilight = twilight(this)
 
-        Logger.getLogger("").addHandler(AxiomLoggerHandler(this))
+        axiomLoggerHandler = AxiomLoggerHandler(this)
+        Logger.getLogger("").addHandler(axiomLoggerHandler)
 
         startKoin {
             modules(
@@ -46,6 +48,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                     single { this@SuperSmashMobsBrawl }
                     single<JavaPlugin> { this@SuperSmashMobsBrawl }
                     single { this@SuperSmashMobsBrawl.logger }
+                    single { this@SuperSmashMobsBrawl.axiomLoggerHandler }
                     single { ApiService }
                     single { PlayerDocumentService }
                     single(createdAtStart = true) { DataService() }

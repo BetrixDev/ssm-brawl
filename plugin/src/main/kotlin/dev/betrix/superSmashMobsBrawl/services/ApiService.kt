@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.services
 
+import dev.betrix.superSmashMobsBrawl.AxiomLoggerHandler
 import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.models.player.PlayerDocument
 import dev.betrix.superSmashMobsBrawl.utils.DockerDetector
@@ -14,13 +15,15 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-object ApiService : IManageable {
+object ApiService : IManageable, KoinComponent {
+    private val axiomLoggerHandler: AxiomLoggerHandler by inject()
     private val isDocker = DockerDetector.isRunningInDocker()
 
     private val apiSecretKey = run {
@@ -57,9 +60,9 @@ object ApiService : IManageable {
                     }
                 )
             }
-            install(Logging) {
-                level = LogLevel.ALL
-                sanitizeHeader { it == "Authorization" }
+            install(KtorApiLogger) {
+                axiomHandler = axiomLoggerHandler
+                sanitizedHeaders = setOf("Authorization", "Bearer", "X-API-Key")
             }
         }
 
