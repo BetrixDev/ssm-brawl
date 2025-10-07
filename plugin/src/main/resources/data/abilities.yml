@@ -339,6 +339,16 @@ abilities:
     usage: right_click
     hotbarItem: iron_axe
     displayItem: slime_ball
+    metadata:
+      projectilesPerTick: 1
+      spewDurationMs: 2000
+      projectileKnockbackModifier: 1.0
+      projectileDamage: 1.0
+      projectileSize: 0.25
+      projectileSpread: 0.525
+      projectileBaseVelocity: 0.8
+      projectileVelocityRandomness: 0.2
+      burpSoundChance: 0.15
 
   - id: deaths_grasp
     cooldown: 10.0
