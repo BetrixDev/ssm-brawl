@@ -88,3 +88,5 @@ temp/
 !gradle/wrapper/gradle-wrapper.jar
 run
 .kotlin
+src/generated
+spec.yaml
