@@ -1,6 +1,5 @@
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "~/components/ui/sonner";
 
-import Loader from "@/components/loader";
 import type { ConvexQueryClient } from "@convex-dev/react-query";
 import type { QueryClient } from "@tanstack/react-query";
 import {
@@ -9,19 +8,18 @@ import {
   Scripts,
   createRootRouteWithContext,
   useRouteContext,
-  useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type { ConvexReactClient } from "convex/react";
 import Header from "../components/header";
 import appCss from "../index.css?url";
 
-import { authClient } from "@/lib/auth-client";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { fetchSession, getCookieName } from "@convex-dev/better-auth/react-start";
 import { createAuth } from "@ssm-brawl/backend/convex/auth";
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie, getRequest } from "@tanstack/react-start/server";
+import { authClient } from "~/lib/auth-client";
 
 const fetchAuth = createServerFn({ method: "GET" }).handler(async () => {
   const { session } = await fetchSession(getRequest());
@@ -50,7 +48,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "My App",
+        title: "Super Smash Mobs Brawl",
       },
     ],
     links: [
@@ -72,8 +70,8 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 });
 
 function RootDocument() {
-  const isFetching = useRouterState({ select: (s) => s.isLoading });
   const context = useRouteContext({ from: Route.id });
+
   return (
     <ConvexBetterAuthProvider client={context.convexClient} authClient={authClient}>
       <html lang="en" className="dark">
@@ -83,7 +81,7 @@ function RootDocument() {
         <body>
           <div className="grid h-svh grid-rows-[auto_1fr]">
             <Header />
-            {isFetching ? <Loader /> : <Outlet />}
+            <Outlet />
           </div>
           <Toaster richColors />
           <TanStackRouterDevtools position="bottom-left" />
