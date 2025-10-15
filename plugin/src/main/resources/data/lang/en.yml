@@ -114,7 +114,7 @@ abilities:
     description: "Burst upward on a wave of water to recover and reposition"
   target_laser:
     name: "Target Laser"
-    description: "Charge a focused beam that scorches enemies in front of you"
+    description: "Lock onto a foe with your laser to amplify damage and knockback"
   slime_rocket:
     name: "Slime Rocket"
     description: "Launch a sticky slime shot that detonates on contact"
@@ -183,6 +183,13 @@ messages:
       cooldown: "{lang:prefix} <warning>{lang:abilities.{abilityId}.name}</warning> <text>is on cooldown for</text> <yellow>{seconds}s</yellow>!"
     explode:
       alreadyCharging: "{lang:prefix} <warning>Already charging explosion!</warning>"
+    targetLaser:
+      alreadyTargeting: "{lang:prefix} <warning>Already targeting a player!</warning>"
+      mustBeOnGround: "{lang:prefix} <warning>You must be on the ground to use {lang:abilities.{abilityId}.name}!</warning>"
+      noTargetsInRange: "{lang:prefix} <warning>No targets within range!</warning>"
+      targeted: "{lang:prefix} <text>You targeted <primary>{target}</primary> <text>with <primary>{lang:abilities.{abilityId}.name}"
+      targetedBy: "{lang:prefix} <warning>{attacker}</warning> <text>targeted you with their <warning>{lang:abilities.{abilityId}.name}"
+      laserBroke: "{lang:prefix} <text>Your laser broke, dealing damage to <primary>{target}"
   kits:
     select:
       success: "{lang:prefix} <text>You have selected kit <primary>{lang:kits.{kitId}.name}"

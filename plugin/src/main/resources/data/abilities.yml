@@ -272,7 +272,12 @@ abilities:
     usage: right_click
     hotbarItem: iron_sword
     displayItem: prismarine_crystals
-    metadata: {}
+    metadata:
+      maxRange: 11.0
+      damageIncrease: 2.0
+      knockbackIncreaseMultiplier: 1.25
+      maxTimeMs: 8000
+      breakDamagePerSecond: 0.5
 
   - id: blizzard
     cooldown: 0.0
