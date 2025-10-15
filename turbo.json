@@ -5,11 +5,6 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".output/**", "build/**", ".next/**", "server*"]
-    },
-    "build:compile": {
-      "dependsOn": ["^build:compile"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**"]
     },
     "lint": {
@@ -18,10 +13,11 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
-    "test": {
-      "dependsOn": ["^test"]
-    },
     "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev:setup": {
       "cache": false,
       "persistent": true
     }
