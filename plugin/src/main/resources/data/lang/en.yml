@@ -93,7 +93,7 @@ abilities:
     description: "Launch forward while leaving a slowing web trail"
   daze_potion:
     name: "Daze Potion"
-    description: "Toss a potion that weakens and disorients nearby foes"
+    description: "Throw a bouncing potion that damages and slows anything it splashes onto"
   bat_wave:
     name: "Bat Wave"
     description: "Burst forward on a surge of bats to swat enemies aside"

@@ -176,6 +176,11 @@ abilities:
     hotbarItem: iron_axe
     displayItem: potion
     metadata:
+      projectileDamage: 7.0
+      projectileKnockbackModifier: 2.0
+      projectileVelocityMultiplier: 1.0
+      expirationTicks: 200
+      maxBounces: 3
       effectRadius: 3.0
       potionDurationTicks: 40
       potionAmplifier: 1
