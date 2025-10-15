@@ -237,7 +237,13 @@ abilities:
     usage: right_click
     hotbarItem: iron_axe
     displayItem: prismarine_shard
-    metadata: {}
+    metadata:
+      damage: 4.0
+      hitboxSize: 0.5
+      knockbackMultiplier: 0.0
+      expirationTicks: 60
+      velocityMultiplier: 1.6
+      pullYStrength: 0.5
 
   - id: water_splash
     cooldown: 12.0
