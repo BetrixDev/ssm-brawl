@@ -114,7 +114,6 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "wall_climb" -> WallClimbPassive(player)
                     "spider_leap" -> SpiderLeapPassive(player)
                     "nether_pig" -> NetherPigPassive(player)
-                    "thorns" -> ThornsPassive(player)
                     "corrupted_arrow" -> CorruptedArrowPassive(player)
                     "giga_slime" -> GigaSlimePassive(player)
                     "arctic_aura" -> ArcticAuraPassive(player)

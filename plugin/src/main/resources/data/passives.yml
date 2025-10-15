@@ -76,15 +76,7 @@ passives:
     userFacing: true
     metadata:
       lowHealthThreshold: 4.0
-
-  - id: thorns
-    displayItem: prismarine_shard
-    userFacing: true
-    metadata:
-      lowHealthThreshold: 6.0
-      projectileReduction: 0.2
-      knockbackReduction: 0.15
-
+      
   - id: giga_slime
     displayItem: slime_ball
     userFacing: true

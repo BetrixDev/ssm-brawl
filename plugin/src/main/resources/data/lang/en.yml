@@ -224,9 +224,6 @@ messages:
     nether_pig:
       name: "Nether Pig"
       description: "Gain fiery resilience when your health nears collapse"
-  thorns:
-    name: "Thorns"
-    description: "Reflect damage and shrug off hits after surviving near-death"
   giga_slime:
     name: "Giga Slime"
     description: "Grow larger, leap farther, and accelerate regen as momentum builds"

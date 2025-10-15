@@ -260,7 +260,9 @@ kits:
     selectionSound: "entity.guardian.ambient"
     displayItem: "prismarine_shard"
     passives:
-      - id: thorns
+      - id: double_jump
+      - id: regeneration
+      - id: hunger
     abilities:
       - id: whirlpool_axe
       - id: water_splash
