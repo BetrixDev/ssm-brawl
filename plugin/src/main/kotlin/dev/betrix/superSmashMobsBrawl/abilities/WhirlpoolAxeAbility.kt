@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack
 
 class WhirlpoolAxeAbility(player: Player) : BrawlAbility("whirlpool_axe", player) {
 
-    private val damage = metadata.double("damage") ?: 4.0
+    private val damage = metadata.double("damage") ?: 3.0
     private val hitboxSize = metadata.double("hitboxSize") ?: 0.5
     private val knockbackMultiplier = metadata.double("knockbackMultiplier") ?: 0.0
     private val expirationTicks = metadata.long("expirationTicks") ?: 60L

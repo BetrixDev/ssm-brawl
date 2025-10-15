@@ -238,7 +238,7 @@ abilities:
     hotbarItem: iron_axe
     displayItem: prismarine_shard
     metadata:
-      damage: 4.0
+      damage: 3.0
       hitboxSize: 0.5
       knockbackMultiplier: 0.0
       expirationTicks: 60
@@ -252,7 +252,18 @@ abilities:
     usage: right_click
     hotbarItem: iron_shovel
     displayItem: water_bucket
-    metadata: {}
+    metadata:
+      minimumAirTimeMs: 750
+      secondBoostTimeMs: 800
+      firstVelocity: 1.0
+      secondVelocity: 1.5
+      pullInRadius: 5.0
+      damageRadius: 5.0
+      damage: 12.0
+      pullYStrength: 0.5
+      knockbackMultiplier: 1.0
+      blockEffectRadius: 5
+      blockEffectChance: 0.1
 
   - id: target_laser
     cooldown: 15.0

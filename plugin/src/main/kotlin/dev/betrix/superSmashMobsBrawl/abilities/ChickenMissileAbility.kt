@@ -4,15 +4,12 @@ import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
-import dev.betrix.superSmashMobsBrawl.services.MinigameService
 import gg.flyte.twilight.extension.getNearbyEntities
 import gg.flyte.twilight.scheduler.repeatingTask
 import org.bukkit.*
 import org.bukkit.entity.Chicken
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.util.Vector
-import org.koin.core.component.inject
 
 class ChickenMissileAbility(player: Player) : BrawlAbility("chicken_missile", player) {
     private val damage = metadata.double("damage") ?: 8.0
@@ -164,7 +161,4 @@ class ChickenMissileAbility(player: Player) : BrawlAbility("chicken_missile", pl
         val minigame = minigameService.getMinigameForPlayer(player) ?: return false
         return !minigame.arePlayersOnSameTeam(player, entity)
     }
-
-    private val lastUsed: Long
-        get() = System.currentTimeMillis() - elapsedSinceLastActivation
 }

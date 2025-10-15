@@ -46,7 +46,7 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
 
     private val abilityKey = NamespacedKey(plugin, "abilityId")
 
-    private var lastUsed: Long = 0
+    protected var lastUsed: Long = 0
 
     private var lastCheckForCanActivate = true
 

@@ -253,7 +253,7 @@ kits:
 
   # Guardian
   - id: guardian
-    meleeDamage: 5.0
+    meleeDamage: 4.5
     armor: 4.5
     knockbackMultiplier: 1.25
     disguiseId: "guardian"
