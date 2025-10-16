@@ -117,7 +117,8 @@ abilities:
     description: "Lock onto a foe with your laser to amplify damage and knockback"
   slime_rocket:
     name: "Slime Rocket"
-    description: "Launch a sticky slime shot that detonates on contact"
+    description: "Charge up and launch a slime that grows stronger the longer you hold"
+    released: "{lang:prefix} <text>You released <primary>Slime Rocket"
   slime_slam:
     name: "Slime Slam"
     description: "Crash downward and rebound to safety"

@@ -325,7 +325,11 @@ abilities:
     usage: right_click
     hotbarItem: iron_sword
     displayItem: slime_ball
-    metadata: {}
+    metadata:
+      maxChargeTimeMs: 3000
+      maxChargeDurationMs: 5000
+      expDrainPerTick: 0.00916
+      minExpToCharge: 0.1
 
   - id: slime_slam
     cooldown: 10.0
