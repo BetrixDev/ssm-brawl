@@ -28,7 +28,8 @@ class InkShotgunAbility(player: Player) : BrawlAbility("ink_shotgun", player) {
     private val projectileSize = (metadata.double("projectileSize") ?: 0.5).coerceAtLeast(0.1)
     private val projectileSpread = metadata.double("projectileSpread") ?: 1.0
     private val projectileBaseVelocity = metadata.double("projectileBaseVelocity") ?: 1.0
-    private val projectileVelocityRandomness = metadata.double("projectileVelocityRandomness") ?: 0.4
+    private val projectileVelocityRandomness =
+        metadata.double("projectileVelocityRandomness") ?: 0.4
 
     private val activeProjectiles = mutableListOf<BrawlProjectile>()
 
@@ -64,10 +65,10 @@ class InkShotgunAbility(player: Player) : BrawlAbility("ink_shotgun", player) {
                     val random =
                         if (spread > 0) {
                             Vector(
-                                (Math.random() - 0.5),
-                                (Math.random() - 0.5),
-                                (Math.random() - 0.5),
-                            )
+                                    (Math.random() - 0.5),
+                                    (Math.random() - 0.5),
+                                    (Math.random() - 0.5),
+                                )
                                 .multiply(spread)
                                 .normalize()
                                 .multiply(0.15)
@@ -76,8 +77,9 @@ class InkShotgunAbility(player: Player) : BrawlAbility("ink_shotgun", player) {
                         }
 
                     val baseDirection = player.location.direction.add(random)
-                    val velocity = projectileBaseVelocity + (projectileVelocityRandomness * Math.random())
-                    
+                    val velocity =
+                        projectileBaseVelocity + (projectileVelocityRandomness * Math.random())
+
                     projectile.velocity = baseDirection.normalize().multiply(velocity)
                 }
                 .projectileSize(projectileSize)
@@ -95,10 +97,7 @@ class InkShotgunAbility(player: Player) : BrawlAbility("ink_shotgun", player) {
                                 .spawn()
                         }
 
-                        override fun onHit(
-                            projectile: BrawlProjectile,
-                            hitType: HitType
-                        ) {}
+                        override fun onHit(projectile: BrawlProjectile, hitType: HitType) {}
                     }
                 )
                 .onHitEntity { entity, projectile ->
@@ -142,7 +141,7 @@ class InkShotgunAbility(player: Player) : BrawlAbility("ink_shotgun", player) {
                     BrawlDamageType.Projectile,
                 )
 
-//            damageEvent.ignoreDamageDelay = true
+            //            damageEvent.ignoreDamageDelay = true
             damageEvent.callEvent()
 
             entity.doKnockback(

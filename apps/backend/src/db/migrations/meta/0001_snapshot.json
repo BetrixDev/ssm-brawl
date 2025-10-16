@@ -94,12 +94,8 @@
           "name": "accounts_user_id_users_id_fk",
           "tableFrom": "accounts",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -170,12 +166,8 @@
           "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -185,9 +177,7 @@
         "sessions_token_unique": {
           "name": "sessions_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -263,16 +253,12 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         },
         "users_username_unique": {
           "name": "users_username_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "username"
-          ]
+          "columns": ["username"]
         }
       },
       "policies": {},
@@ -365,12 +351,8 @@
           "name": "player_ability_stats_player_uuid_players_uuid_fk",
           "tableFrom": "player_ability_stats",
           "tableTo": "players",
-          "columnsFrom": [
-            "player_uuid"
-          ],
-          "columnsTo": [
-            "uuid"
-          ],
+          "columnsFrom": ["player_uuid"],
+          "columnsTo": ["uuid"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -378,11 +360,7 @@
       "compositePrimaryKeys": {
         "player_ability_stats_pk": {
           "name": "player_ability_stats_pk",
-          "columns": [
-            "player_uuid",
-            "ability_id",
-            "stat_id"
-          ]
+          "columns": ["player_uuid", "ability_id", "stat_id"]
         }
       },
       "uniqueConstraints": {},
@@ -500,12 +478,8 @@
           "name": "player_general_stats_player_uuid_players_uuid_fk",
           "tableFrom": "player_general_stats",
           "tableTo": "players",
-          "columnsFrom": [
-            "player_uuid"
-          ],
-          "columnsTo": [
-            "uuid"
-          ],
+          "columnsFrom": ["player_uuid"],
+          "columnsTo": ["uuid"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -513,10 +487,7 @@
       "compositePrimaryKeys": {
         "player_general_stats_pk": {
           "name": "player_general_stats_pk",
-          "columns": [
-            "player_uuid",
-            "stat_id"
-          ]
+          "columns": ["player_uuid", "stat_id"]
         }
       },
       "uniqueConstraints": {},
@@ -634,12 +605,8 @@
           "name": "player_kit_stats_player_uuid_players_uuid_fk",
           "tableFrom": "player_kit_stats",
           "tableTo": "players",
-          "columnsFrom": [
-            "player_uuid"
-          ],
-          "columnsTo": [
-            "uuid"
-          ],
+          "columnsFrom": ["player_uuid"],
+          "columnsTo": ["uuid"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -647,11 +614,7 @@
       "compositePrimaryKeys": {
         "player_kit_stats_pk": {
           "name": "player_kit_stats_pk",
-          "columns": [
-            "player_uuid",
-            "kit_id",
-            "stat_id"
-          ]
+          "columns": ["player_uuid", "kit_id", "stat_id"]
         }
       },
       "uniqueConstraints": {},
@@ -775,12 +738,8 @@
           "name": "player_minigame_stats_player_uuid_players_uuid_fk",
           "tableFrom": "player_minigame_stats",
           "tableTo": "players",
-          "columnsFrom": [
-            "player_uuid"
-          ],
-          "columnsTo": [
-            "uuid"
-          ],
+          "columnsFrom": ["player_uuid"],
+          "columnsTo": ["uuid"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -788,11 +747,7 @@
       "compositePrimaryKeys": {
         "player_minigame_stats_pk": {
           "name": "player_minigame_stats_pk",
-          "columns": [
-            "player_uuid",
-            "minigame_id",
-            "stat_id"
-          ]
+          "columns": ["player_uuid", "minigame_id", "stat_id"]
         }
       },
       "uniqueConstraints": {},
@@ -916,12 +871,8 @@
           "name": "player_parkour_stats_player_uuid_players_uuid_fk",
           "tableFrom": "player_parkour_stats",
           "tableTo": "players",
-          "columnsFrom": [
-            "player_uuid"
-          ],
-          "columnsTo": [
-            "uuid"
-          ],
+          "columnsFrom": ["player_uuid"],
+          "columnsTo": ["uuid"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -929,11 +880,7 @@
       "compositePrimaryKeys": {
         "player_parkour_stats_pk": {
           "name": "player_parkour_stats_pk",
-          "columns": [
-            "player_uuid",
-            "map_id",
-            "stat_id"
-          ]
+          "columns": ["player_uuid", "map_id", "stat_id"]
         }
       },
       "uniqueConstraints": {},
@@ -1057,12 +1004,8 @@
           "name": "player_passive_stats_player_uuid_players_uuid_fk",
           "tableFrom": "player_passive_stats",
           "tableTo": "players",
-          "columnsFrom": [
-            "player_uuid"
-          ],
-          "columnsTo": [
-            "uuid"
-          ],
+          "columnsFrom": ["player_uuid"],
+          "columnsTo": ["uuid"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1070,11 +1013,7 @@
       "compositePrimaryKeys": {
         "player_passive_stats_pk": {
           "name": "player_passive_stats_pk",
-          "columns": [
-            "player_uuid",
-            "passive_id",
-            "stat_id"
-          ]
+          "columns": ["player_uuid", "passive_id", "stat_id"]
         }
       },
       "uniqueConstraints": {},
@@ -1227,12 +1166,8 @@
           "name": "player_bans_player_uuid_players_uuid_fk",
           "tableFrom": "player_bans",
           "tableTo": "players",
-          "columnsFrom": [
-            "player_uuid"
-          ],
-          "columnsTo": [
-            "uuid"
-          ],
+          "columnsFrom": ["player_uuid"],
+          "columnsTo": ["uuid"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1279,12 +1214,8 @@
           "name": "player_join_events_player_uuid_players_uuid_fk",
           "tableFrom": "player_join_events",
           "tableTo": "players",
-          "columnsFrom": [
-            "player_uuid"
-          ],
-          "columnsTo": [
-            "uuid"
-          ],
+          "columnsFrom": ["player_uuid"],
+          "columnsTo": ["uuid"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }

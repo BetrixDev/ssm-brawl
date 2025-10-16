@@ -9,7 +9,6 @@ import dev.betrix.superSmashMobsBrawl.projectiles.ProjectileAction
 import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.Sound
-import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -46,8 +45,7 @@ class WhirlpoolAxeAbility(player: Player) : BrawlAbility("whirlpool_axe", player
             .onTick {
                 val entity = it.projectileEntity
                 if (entity != null && entity.isValid) {
-                    Particle.DRIPPING_WATER
-                        .builder()
+                    Particle.DRIPPING_WATER.builder()
                         .location(entity.location)
                         .offset(0.0, 0.0, 0.0)
                         .count(1)

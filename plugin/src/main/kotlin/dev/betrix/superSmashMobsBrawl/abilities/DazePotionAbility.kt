@@ -21,7 +21,8 @@ class DazePotionAbility(player: Player) : BrawlAbility("daze_potion", player) {
 
     private val projectileDamage = metadata.double("projectileDamage") ?: 7.0
     private val projectileKnockbackModifier = metadata.double("projectileKnockbackModifier") ?: 2.0
-    private val projectileVelocityMultiplier = metadata.double("projectileVelocityMultiplier") ?: 1.0
+    private val projectileVelocityMultiplier =
+        metadata.double("projectileVelocityMultiplier") ?: 1.0
     private val expirationTicks = metadata.long("expirationTicks") ?: 200L
     private val maxBounces = metadata.int("maxBounces") ?: 3
     private val effectRadius = metadata.double("effectRadius") ?: 3.0
@@ -43,11 +44,10 @@ class DazePotionAbility(player: Player) : BrawlAbility("daze_potion", player) {
 
     private fun throwDazePotion() {
         // Create potion item with visual effect
-        val potionItem = ItemStack(Material.SPLASH_POTION).apply {
-            itemMeta = (itemMeta as? PotionMeta)?.apply {
-                color = Color.GRAY
+        val potionItem =
+            ItemStack(Material.SPLASH_POTION).apply {
+                itemMeta = (itemMeta as? PotionMeta)?.apply { color = Color.GRAY }
             }
-        }
 
         var bounceCount = 0
 
@@ -104,7 +104,7 @@ class DazePotionAbility(player: Player) : BrawlAbility("daze_potion", player) {
             0.5,
             0.5,
             0.1,
-            ItemStack(Material.GRAY_DYE)
+            ItemStack(Material.GRAY_DYE),
         )
 
         location.world.spawnParticle(
@@ -114,50 +114,51 @@ class DazePotionAbility(player: Player) : BrawlAbility("daze_potion", player) {
             effectRadius / 2,
             effectRadius / 2,
             effectRadius / 2,
-            0.05
+            0.05,
         )
 
         // Find and affect nearby entities
-        val affectedCount = location
-            .getNearbyEntities(effectRadius, effectRadius, effectRadius)
-            .filterIsInstance<LivingEntity>()
-            .filter { it != player }
-            .onEach { entity ->
-                // Apply damage
-                val damageEvent =
-                    BrawlDamageEvent(
-                        entity,
-                        Damager.DamagerLivingEntity(player),
-                        projectileDamage,
+        val affectedCount =
+            location
+                .getNearbyEntities(effectRadius, effectRadius, effectRadius)
+                .filterIsInstance<LivingEntity>()
+                .filter { it != player }
+                .onEach { entity ->
+                    // Apply damage
+                    val damageEvent =
+                        BrawlDamageEvent(
+                            entity,
+                            Damager.DamagerLivingEntity(player),
+                            projectileDamage,
+                            projectileKnockbackModifier,
+                            BrawlDamageType.Explosion,
+                        )
+                    damageEvent.callEvent()
+
+                    // Apply knockback
+                    entity.doKnockback(
                         projectileKnockbackModifier,
-                        BrawlDamageType.Explosion,
+                        projectileDamage,
+                        entity.health,
+                        location.toVector(),
+                        null,
                     )
-                damageEvent.callEvent()
 
-                // Apply knockback
-                entity.doKnockback(
-                    projectileKnockbackModifier,
-                    projectileDamage,
-                    entity.health,
-                    location.toVector(),
-                    null
-                )
-
-                // Apply slowness effect
-                entity.removePotionEffect(PotionEffectType.SLOWNESS)
-                entity.addPotionEffect(
-                    PotionEffect(
-                        PotionEffectType.SLOWNESS,
-                        potionDurationTicks,
-                        potionAmplifier
+                    // Apply slowness effect
+                    entity.removePotionEffect(PotionEffectType.SLOWNESS)
+                    entity.addPotionEffect(
+                        PotionEffect(
+                            PotionEffectType.SLOWNESS,
+                            potionDurationTicks,
+                            potionAmplifier,
+                        )
                     )
-                )
 
-                player.sendDebugMessage(
-                    "[DP] ${entity.name} hit at distance ${entity.location.distance(location).round(1)}"
-                )
-            }
-            .size
+                    player.sendDebugMessage(
+                        "[DP] ${entity.name} hit at distance ${entity.location.distance(location).round(1)}"
+                    )
+                }
+                .size
 
         player.sendDebugMessage("[DP] Splash affected $affectedCount entities")
     }

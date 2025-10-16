@@ -25,13 +25,13 @@ class ChickenMissileAbility(player: Player) : BrawlAbility("chicken_missile", pl
     override fun activate() {
         super.activate()
 
-        val chicken = player.world.spawn(
-            player.eyeLocation.add(player.location.direction),
-            Chicken::class.java
-        ).apply {
-            setBaby()
-            ageLock = true
-        }
+        val chicken =
+            player.world
+                .spawn(player.eyeLocation.add(player.location.direction), Chicken::class.java)
+                .apply {
+                    setBaby()
+                    ageLock = true
+                }
 
         val direction = player.location.direction.multiply(velocityStrength)
         var lastLocation: Location? = null
@@ -58,9 +58,11 @@ class ChickenMissileAbility(player: Player) : BrawlAbility("chicken_missile", pl
                 if (elapsedTime >= durationMs) {
                     shouldDetonate = true
                 } else {
-                    val nearbyEntities = chicken.getNearbyEntities(directHitboxRadius)
-                        .filterIsInstance<LivingEntity>()
-                        .filter { it != player && it != chicken }
+                    val nearbyEntities =
+                        chicken
+                            .getNearbyEntities(directHitboxRadius)
+                            .filterIsInstance<LivingEntity>()
+                            .filter { it != player && it != chicken }
 
                     for (entity in nearbyEntities) {
                         if (canDamageEntity(entity)) {
@@ -69,7 +71,10 @@ class ChickenMissileAbility(player: Player) : BrawlAbility("chicken_missile", pl
                         }
                     }
 
-                    if (lastLocation != null && lastLocation!!.distance(chicken.location) < 0.2 || chicken.isOnGround) {
+                    if (
+                        lastLocation != null && lastLocation!!.distance(chicken.location) < 0.2 ||
+                            chicken.isOnGround
+                    ) {
                         shouldDetonate = true
                     }
                     lastLocation = chicken.location.clone()
@@ -86,20 +91,21 @@ class ChickenMissileAbility(player: Player) : BrawlAbility("chicken_missile", pl
     private fun detonateChicken(chicken: Chicken) {
         val explosionLocation = chicken.location
 
-        chicken.getNearbyEntities(explosionRadius)
+        chicken
+            .getNearbyEntities(explosionRadius)
             .filterIsInstance<LivingEntity>()
             .filter { it != player && it != chicken && canDamageEntity(it) }
             .forEach { entity ->
                 BrawlDamageEvent(
-                    entity,
-                    Damager.DamagerLivingEntity(player),
-                    damage,
-                    knockbackMultiplier = 0.0,
-                    damageType = BrawlDamageType.Explosion,
-                )
-//                    .apply {
-//                    setIgnoreDamageDelay(true)
-//                }
+                        entity,
+                        Damager.DamagerLivingEntity(player),
+                        damage,
+                        knockbackMultiplier = 0.0,
+                        damageType = BrawlDamageType.Explosion,
+                    )
+                    //                    .apply {
+                    //                    setIgnoreDamageDelay(true)
+                    //                }
                     .callEvent()
 
                 val living2d = entity.location.toVector().setY(0.0)
@@ -113,7 +119,7 @@ class ChickenMissileAbility(player: Player) : BrawlAbility("chicken_missile", pl
                     0.0,
                     knockbackYAdd,
                     knockbackYMax,
-                    true
+                    true,
                 )
             }
 
@@ -124,7 +130,7 @@ class ChickenMissileAbility(player: Player) : BrawlAbility("chicken_missile", pl
             0.0,
             0.0,
             0.0,
-            0.0
+            0.0,
         )
 
         explosionLocation.world.playSound(explosionLocation, Sound.ENTITY_GENERIC_EXPLODE, 2f, 1.2f)
@@ -139,18 +145,13 @@ class ChickenMissileAbility(player: Player) : BrawlAbility("chicken_missile", pl
         val fireworkMeta = firework.fireworkMeta
 
         fireworkMeta.addEffect(
-            FireworkEffect.builder()
-                .with(FireworkEffect.Type.BALL)
-                .withColor(Color.WHITE)
-                .build()
+            FireworkEffect.builder().with(FireworkEffect.Type.BALL).withColor(Color.WHITE).build()
         )
 
         fireworkMeta.power = 0
         firework.fireworkMeta = fireworkMeta
 
-        plugin.server.scheduler.runTaskLater(plugin, Runnable {
-            firework.detonate()
-        }, 1L)
+        plugin.server.scheduler.runTaskLater(plugin, Runnable { firework.detonate() }, 1L)
     }
 
     private fun canDamageEntity(entity: LivingEntity): Boolean {

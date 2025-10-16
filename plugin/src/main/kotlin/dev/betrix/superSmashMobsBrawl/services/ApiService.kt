@@ -21,6 +21,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -28,7 +29,6 @@ import kotlinx.serialization.json.Json
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import kotlin.time.Duration.Companion.minutes
 
 object ApiService : IManageable, KoinComponent {
     private val axiomLoggerHandler: AxiomLoggerHandler by inject()
@@ -76,18 +76,13 @@ object ApiService : IManageable, KoinComponent {
             }
         }
 
-    private val apiHealthCheckJob = repeatingTask(1.minutes.ticks) {
-        plugin.launch {
-            withContext(Dispatchers.IO) {
-                doApiHealthCheck()
-            }
+    private val apiHealthCheckJob =
+        repeatingTask(1.minutes.ticks) {
+            plugin.launch { withContext(Dispatchers.IO) { doApiHealthCheck() } }
         }
-    }
 
     override fun setup() {
-        runBlocking {
-            doApiHealthCheck()
-        }
+        runBlocking { doApiHealthCheck() }
     }
 
     override fun teardown() {
@@ -119,12 +114,14 @@ object ApiService : IManageable, KoinComponent {
             if (isDocker) {
                 throw RuntimeException(
                     "API health check failed with status ${response.status.value}. " +
-                            "Ensure the API container is running and accessible.",
+                        "Ensure the API container is running and accessible."
                 )
             }
 
-            throw RuntimeException("API health check failed with status ${response.status.value}. " +
-                    "If you're running the server locally, ensure the API is running at $baseApiUrl.")
+            throw RuntimeException(
+                "API health check failed with status ${response.status.value}. " +
+                    "If you're running the server locally, ensure the API is running at $baseApiUrl."
+            )
         }
 
         plugin.logger.info("API health check successful.")

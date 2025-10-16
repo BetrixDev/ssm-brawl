@@ -5,9 +5,7 @@ import java.io.File
 object DockerDetector {
 
     fun isRunningInDocker(): Boolean {
-        return checkDockerEnvFile() ||
-                checkCGroupFile() ||
-                checkEnvironmentVariables()
+        return checkDockerEnvFile() || checkCGroupFile() || checkEnvironmentVariables()
     }
 
     private fun checkDockerEnvFile(): Boolean {
@@ -16,9 +14,7 @@ object DockerDetector {
 
     private fun checkCGroupFile(): Boolean {
         return try {
-            File("/proc/1/cgroup").useLines { lines ->
-                lines.any { it.contains("docker") }
-            }
+            File("/proc/1/cgroup").useLines { lines -> lines.any { it.contains("docker") } }
         } catch (e: Exception) {
             false
         }
