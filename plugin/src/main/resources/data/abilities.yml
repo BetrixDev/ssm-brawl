@@ -302,8 +302,9 @@ abilities:
     hotbarItem: iron_axe
     displayItem: ice
     metadata:
-      path_duration: 4
-      bounce_height: 1
+      path_length: 16
+      melt_time_ms: 6000
+      launch_velocity_y: 0.5
 
   - id: snow_turret
     cooldown: 0.0
