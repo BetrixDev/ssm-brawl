@@ -91,7 +91,8 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
 
                 if (!isPlayerInMinigame(victimPlayer)) return@event
 
-                // Cancel all non-melee damage within this minigame - handled by BrawlDamageEvent
+                // Cancel all non-melee damage within this minigame - handled by
+                // BrawlDamageEvent
                 if (
                     cause != EntityDamageEvent.DamageCause.ENTITY_ATTACK &&
                         cause != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
@@ -117,6 +118,12 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
                 }
 
                 if (victimPlayer.gameMode != GameMode.SURVIVAL) return@event
+
+                // Check if victim is invincible
+                val victimKit = kitService.getKitForPlayer(victimPlayer)
+                if (victimKit?.isInvincible() == true) {
+                    return@event
+                }
 
                 val startingHealth = victimPlayer.health
                 val newHealth = (startingHealth - damage).coerceAtLeast(0.0)
@@ -150,7 +157,8 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
                 victimPlayer.playHurtAnimation(1f)
                 victimPlayer.playSound(victimPlayer.eyeLocation, Sound.ENTITY_PLAYER_HURT, 1f, 1f)
 
-                // Apply 1.8-style melee knockback only for melee damage (no special damage type)
+                // Apply 1.8-style melee knockback only for melee damage (no special damage
+                // type)
                 if (damageType == null) {
                     val damagerPlayer =
                         (damager as? Damager.DamagerLivingEntity)?.livingEntity as? Player
@@ -196,7 +204,8 @@ class DefaultCombatManager(private val minigame: BrawlMinigame) :
 
                 if (victimPlayer.gameMode != GameMode.SURVIVAL) return@event
 
-                // Cancel vanilla damage and route through SmashDamageEvent using kit melee damage
+                // Cancel vanilla damage and route through SmashDamageEvent using kit melee
+                // damage
                 isCancelled = true
 
                 // Enforce 1.8-style hit cooldown on victim (10 ticks)

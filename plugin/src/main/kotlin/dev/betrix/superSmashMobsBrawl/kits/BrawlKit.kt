@@ -31,11 +31,19 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
 
     protected var disguise: BrawlDisguise? = null
 
+    private var invincible: Boolean = false
+
     fun getMeleeDamage(): Double = kitData.meleeDamage
 
     fun getMeleeReach(): Double = kitData.meleeReach
 
     fun getKnockbackMultiplier(): Double = kitData.knockbackMultiplier
+
+    fun isInvincible(): Boolean = invincible
+
+    fun setInvincible(value: Boolean) {
+        invincible = value
+    }
 
     fun getPassive(id: String): BrawlPassive? {
         return passives.find { it.id == id }
