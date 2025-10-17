@@ -311,6 +311,12 @@ kits:
           metadata:
             healAmount: 0.35
       - id: giga_slime
+      - id: exp_charge
+        overrides:
+          metadata:
+            expAdd: 0.00321
+            chargeWhenInAir: true
+            chargeWhenSneaking: true
     abilities:
       - id: slime_rocket
       - id: slime_slam

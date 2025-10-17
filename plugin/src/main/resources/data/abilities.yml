@@ -338,7 +338,16 @@ abilities:
     usage: right_click
     hotbarItem: iron_axe
     displayItem: slime_block
-    metadata: {}
+    metadata:
+      damage: 7.0
+      hitboxRadius: 2.0
+      velocityStrength: 1.2
+      velocityYAdd: 0.2
+      velocityYMax: 1.2
+      recoilDamageMultiplier: 0.25
+      recoilKnockbackMultiplier: 2.0
+      knockbackMultiplier: 2.0
+      minimumLandingTimeMs: 1000
 
   - id: bouncy_bacon
     cooldown: 5.0

@@ -125,6 +125,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "corrupted_arrow" -> CorruptedArrowPassive(player)
                     "giga_slime" -> GigaSlimePassive(player)
                     "arctic_aura" -> ArcticAuraPassive(player)
+                    "exp_charge" -> ExpChargePassive(player)
                     else -> {
                         logger.severe(
                             "No passive found with id ${it.id} reference on kit ${kitData.id}"

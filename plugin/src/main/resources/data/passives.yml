@@ -96,3 +96,14 @@ passives:
     userFacing: true
     metadata:
       double_damage_condition: deaths_grasp_used
+
+  - id: exp_charge
+    displayItem: experience_bottle
+    userFacing: true
+    metadata:
+      expAdd: 0.01
+      delayTicks: 1
+      chargeWhenInAir: false
+      chargeWhenSneaking: true
+      startFullEnergy: false
+      enabled: true

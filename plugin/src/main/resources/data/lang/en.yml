@@ -122,6 +122,8 @@ abilities:
   slime_slam:
     name: "Slime Slam"
     description: "Crash downward and rebound to safety"
+    hit: "{lang:prefix} <text>You hit <primary>{target}</primary> <text>with <primary>{lang:abilities.{abilityId}.name}"
+    hitBy: "{lang:prefix} <warning>{attacker}</warning> <text>hit you with <warning>{lang:abilities.{abilityId}.name}"
   iron_hook:
     name: "Iron Hook"
     description: "Hook enemies and yank them toward you"
