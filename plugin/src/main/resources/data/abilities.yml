@@ -99,16 +99,23 @@ abilities:
       baseDamage: 4.5
 
   - id: spin_web
-    cooldown: 10.0
+    cooldown: 8.5
     itemSlot: 0
-    type: recovery
+    type: projectile
     usage: right_click
     hotbarItem: iron_axe
     displayItem: cobweb
     metadata:
-      launchVelocity: 1.0
-      dragDurationTicks: 20
-      slowDurationTicks: 40
+      webCount: 25
+      webDamage: 4.0
+      webKnockbackMultiplier: 0.0
+      webHitboxSize: 0.5
+      webLifetime: 2000
+      webBlockDurationTicks: 40
+      launchVelocityStrength: 1.2
+      launchVelocityY: 0.2
+      poisonDurationTicks: 40
+      poisonAmplifier: 0
 
   - id: blink
     cooldown: 6.0

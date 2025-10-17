@@ -183,7 +183,7 @@ kits:
 
   # Spider
   - id: spider
-    meleeDamage: 6.0
+    meleeDamage: 4.5
     armor: 6.0
     knockbackMultiplier: 1.5
     disguiseId: "spider"
