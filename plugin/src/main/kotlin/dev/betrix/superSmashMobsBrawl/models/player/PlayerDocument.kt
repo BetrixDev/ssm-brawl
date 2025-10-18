@@ -11,27 +11,29 @@ import kotlinx.serialization.Serializable
 data class PlayerDocument
 @OptIn(ExperimentalTime::class)
 constructor(
-    val isFirstTimeOnServer: Boolean,
-    @Serializable(with = InstantIsoSerializer::class) val lastJoinDate: Instant,
-    val headSkinBase64: String?,
-    var banData: List<PlayerBanData>?,
-    var selectedKitId: String,
+        @Serializable(with = InstantIsoSerializer::class) val firstJoinedDate: Instant,
+        @Serializable(with = InstantIsoSerializer::class) val lastJoinedDate: Instant,
+        val isFirstTimeOnServer: Boolean,
+        val username: String,
+        val uuid: String,
+        var selectedKitId: String,
+        val banData: BanData?
 )
 
 @Serializable(with = BannedBySerializer::class)
 sealed class BannedBy {
-    data object System : BannedBy()
+        data object System : BannedBy()
 
-    data class Moderator(val uuid: String) : BannedBy()
+        data class Moderator(val uuid: String) : BannedBy()
 }
 
 @Serializable
-data class PlayerBanData
+data class BanData
 @OptIn(ExperimentalTime::class)
 constructor(
-    val isBanned: Boolean,
-    val reason: String,
-    @Serializable(with = NullableInstantIsoSerializer::class) val expiresAt: Instant?,
-    val bannedAt: String,
-    val bannedBy: BannedBy,
+        val isBanned: Boolean,
+        val reason: String,
+        @Serializable(with = NullableInstantIsoSerializer::class) val expiresAt: Instant?,
+        @Serializable(with = InstantIsoSerializer::class) val bannedAt: Instant,
+        val bannedBy: BannedBy
 )

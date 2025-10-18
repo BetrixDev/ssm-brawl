@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "convex dev",
-    "dev:setup": "convex dev --configure --until-success",
-    "generate-spec": "convex-helpers open-api-spec"
+    "dev:setup": "convex dev --configure --until-success"
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +16,8 @@
     "@convex-dev/better-auth": "catalog:",
     "better-auth": "catalog:",
     "convex": "catalog:",
-    "convex-helpers": "^0.1.104"
+    "convex-helpers": "^0.1.104",
+    "hono": "4.9.8",
+    "strip-ansi": "^7.1.2"
   }
 }

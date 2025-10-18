@@ -13,6 +13,7 @@ import gg.flyte.twilight.scheduler.repeatingTask
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.bukkit.entity.Player
@@ -31,8 +32,15 @@ object PlayerDocumentService : KoinComponent, Manageable() {
     override fun setup() {
         plugin.server.onlinePlayers.forEach { player ->
             plugin.launch {
-                val document =
-                    withContext(Dispatchers.IO) { api.playersGetDocumentAsync(player, true) }
+                val deferredDocument = withContext(Dispatchers.IO) {
+                    val documentDeferred = async { api.playersGetDocumentAsync(player) }
+
+                    async { api.sendPlayerJoinEventAsync(player) }
+
+                    documentDeferred
+                }
+
+                val document = deferredDocument.await()
 
                 documents[player.uniqueId] = document
 
@@ -82,10 +90,15 @@ object PlayerDocumentService : KoinComponent, Manageable() {
             event<PlayerJoinEvent>(priority = EventPriority.LOWEST) {
                 runBlocking {
                     plugin.launch {
-                        val document =
-                            withContext(Dispatchers.IO) {
-                                api.playersGetDocumentAsync(player, true)
-                            }
+                        val deferredDocument = withContext(Dispatchers.IO) {
+                            val documentDeferred = async { api.playersGetDocumentAsync(player) }
+
+                            async { api.sendPlayerJoinEventAsync(player) }
+
+                            documentDeferred
+                        }
+
+                        val document = deferredDocument.await()
 
                         documents[player.uniqueId] = document
 
@@ -144,8 +157,11 @@ object PlayerDocumentService : KoinComponent, Manageable() {
     suspend fun getPlayerDocumentOrFetch(player: Player): PlayerDocument {
         return documents[player.uniqueId]
             ?: withContext(Dispatchers.IO) {
-                val document = api.playersGetDocumentAsync(player, true)
+                val document = api.playersGetDocumentAsync(player)
                 documents[player.uniqueId] = document
+
+                PlayerDocumentLoaded(player, document).callEvent()
+
                 document
             }
     }

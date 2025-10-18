@@ -7,16 +7,6 @@ export const searchByPlayerUsername = query({
     query: v.string(),
     pagination: paginationOptsValidator,
   },
-  returns: {
-    isDone: v.boolean(),
-    page: v.array(
-      v.object({
-        uuid: v.string(),
-        username: v.string(),
-        headSkinBase64: v.string(),
-      }),
-    ),
-  },
   handler: async (ctx, args) => {
     const results = await ctx.db
       .query("players")
@@ -28,7 +18,6 @@ export const searchByPlayerUsername = query({
       page: results.page.map((result) => ({
         uuid: result.uuid,
         username: result.username,
-        headSkinBase64: result.headSkinBase64,
       })),
     };
   },

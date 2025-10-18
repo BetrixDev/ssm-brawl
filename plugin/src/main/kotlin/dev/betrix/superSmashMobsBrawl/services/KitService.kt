@@ -6,6 +6,7 @@ import com.github.michaelbull.result.Result
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.events.PlayerDocumentLoaded
 import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
+import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.gui.BrawlGui.Companion.openInventory
 import dev.betrix.superSmashMobsBrawl.gui.brawlGui
 import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
@@ -52,6 +53,8 @@ object KitService : KoinComponent, Manageable() {
 
         listeners.add(
             event<PlayerDocumentLoaded> {
+                println(document)
+                player.sendDebugMessage("Document Loaded with selected kit: ${document.selectedKitId}")
                 playerSelectedKits[player.uniqueId] = document.selectedKitId
             }
         )

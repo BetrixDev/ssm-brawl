@@ -3,7 +3,6 @@ plugins {
     kotlin("plugin.serialization") version "2.2.0"
     id("com.gradleup.shadow") version "8.3.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
-    id("org.openapi.generator") version "7.16.0"
 }
 
 val ktor_version: String by project
@@ -54,32 +53,6 @@ dependencies {
     testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.20.0")
     testImplementation("io.insert-koin:koin-test:3.5.6")
     testImplementation("io.insert-koin:koin-test-junit5:3.5.6")
-}
-
-openApiGenerate {
-    generatorName.set("kotlin")
-    inputSpec.set("${project.projectDir}/spec.yaml")
-    outputDir.set("${projectDir}/src/generated")
-    packageName.set("dev.betrix.superSmashMobsBrawl.client")
-    apiPackage.set("dev.betrix.superSmashMobsBrawl.client.api")
-    modelPackage.set("dev.betrix.superSmashMobsBrawl.client.model")
-    configOptions.set(mapOf(
-        "library" to "jvm-ktor",
-        "serializationLibrary" to "kotlinx_serialization",
-        "dateLibrary" to "kotlinx-datetime"
-    ))
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir("$projectDir/src/generated/src/main/kotlin")
-        }
-    }
-}
-
-tasks.named("compileKotlin") {
-    dependsOn("openApiGenerate")
 }
 
 tasks {

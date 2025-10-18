@@ -12,6 +12,8 @@ import type * as auth from "../auth.js";
 import type * as healthCheck from "../healthCheck.js";
 import type * as http from "../http.js";
 import type * as players from "../players.js";
+import type * as plugin_players_document from "../plugin/players/document.js";
+import type * as plugin_players_events from "../plugin/players/events.js";
 
 import type {
   ApiFromModules,
@@ -32,6 +34,8 @@ declare const fullApi: ApiFromModules<{
   healthCheck: typeof healthCheck;
   http: typeof http;
   players: typeof players;
+  "plugin/players/document": typeof plugin_players_document;
+  "plugin/players/events": typeof plugin_players_events;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 
