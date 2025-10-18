@@ -11,9 +11,10 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type { ConvexReactClient } from "convex/react";
-import Header from "../components/header";
+import { Header } from "../components/header";
 import appCss from "../index.css?url";
 
+import { Footer } from "@/components/footer";
 import { authClient } from "@/lib/auth-client";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { fetchSession, getCookieName } from "@convex-dev/better-auth/react-start";
@@ -80,7 +81,10 @@ function RootDocument() {
         <body>
           <div className="grid h-svh grid-rows-[auto_1fr]">
             <Header />
-            <Outlet />
+            <div className="min-h-[calc(100vh-4rem)]">
+              <Outlet />
+            </div>
+            <Footer />
           </div>
           <Toaster richColors />
           <TanStackRouterDevtools position="bottom-left" />
