@@ -1,17 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Copy, Play } from "lucide-react";
-import { useState } from "react";
+import { Play } from "lucide-react";
+import { ServerIPButton } from "../server-ip-button";
 import { ServerStats } from "./server-stats";
 
 export function HeroSection() {
-  const [copied, setCopied] = useState(false);
-
-  const copyIP = () => {
-    navigator.clipboard.writeText("play.ssmbrawl.com");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
     <section
       id="home"
@@ -22,7 +14,7 @@ export function HeroSection() {
         <img
           src="/background.jpg"
           alt="Background"
-          className="w-full h-full object-cover opacity-40 blur-xs"
+          className="w-full h-full object-cover opacity-20 blur-xs"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
       </div>
@@ -48,15 +40,7 @@ export function HeroSection() {
               <Play className="mr-2 h-5 w-5" />
               PLAY NOW
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={copyIP}
-              className="border-primary text-foreground hover:bg-primary/10 font-semibold px-8 text-lg bg-transparent"
-            >
-              <Copy className="mr-2 h-5 w-5" />
-              {copied ? "COPIED!" : "play.ssmbrawl.com"}
-            </Button>
+            <ServerIPButton />
           </div>
         </div>
 

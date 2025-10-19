@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 import { Copy } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="relative py-16 px-6 border-t border-border">
+    <footer className="py-16 px-6 border-t border-border">
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           {/* Brand */}
@@ -63,14 +64,20 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-muted-foreground text-sm">© 2025 SSM Brawl. All rights reserved.</p>
+          <p className="text-muted-foreground text-sm">© {new Date().getFullYear()} SSM Brawl.</p>
           <div className="flex gap-6 text-sm">
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+            <Link
+              to="/privacy"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
               Privacy Policy
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+            </Link>
+            <Link
+              to="/terms"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
               Terms of Service
-            </a>
+            </Link>
           </div>
         </div>
       </div>

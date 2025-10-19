@@ -1,17 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
-import { Copy, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { ServerIPButton } from "./server-ip-button";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  const copyIP = () => {
-    navigator.clipboard.writeText("play.ssmbrawl.com");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   const navLinks = [
     { href: "/", label: "HOME" },
@@ -22,7 +16,7 @@ export function Header() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50 h-16">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-md border-b border-border">
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -48,15 +42,7 @@ export function Header() {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={copyIP}
-              className="border-primary/50 text-foreground hover:bg-primary/10 font-semibold bg-transparent"
-            >
-              <Copy className="mr-2 h-4 w-4" />
-              {copied ? "COPIED!" : "play.ssmbrawl.com"}
-            </Button>
+            <ServerIPButton />
           </div>
 
           {/* Mobile Menu Button */}
@@ -83,15 +69,9 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={copyIP}
-              className="w-full border-primary/50 text-foreground hover:bg-primary/10 font-semibold bg-transparent"
-            >
-              <Copy className="mr-2 h-4 w-4" />
-              {copied ? "COPIED!" : "play.ssmbrawl.com"}
-            </Button>
+            <div className="flex justify-center">
+              <ServerIPButton />
+            </div>
           </div>
         )}
       </nav>

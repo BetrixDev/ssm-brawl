@@ -77,15 +77,14 @@ function RootDocument() {
       <html lang="en" className="dark">
         <head>
           <HeadContent />
+          <script crossOrigin="anonymous" src="https://tweakcn.com/live-preview.min.js" />
         </head>
-        <body>
-          <div className="grid h-svh grid-rows-[auto_1fr]">
-            <Header />
-            <div className="min-h-[calc(100vh-4rem)]">
-              <Outlet />
-            </div>
-            <Footer />
+        <body className="bg-background text-primary-foreground">
+          <Header />
+          <div className="min-h-screen">
+            <Outlet />
           </div>
+          <Footer />
           <Toaster richColors />
           <TanStackRouterDevtools position="bottom-left" />
           <Scripts />

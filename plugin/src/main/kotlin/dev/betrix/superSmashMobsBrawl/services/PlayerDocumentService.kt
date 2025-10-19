@@ -1,6 +1,7 @@
 package dev.betrix.superSmashMobsBrawl.services
 
 import com.github.shynixn.mccoroutine.bukkit.launch
+import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.PlayerDocumentLoaded
@@ -44,7 +45,9 @@ object PlayerDocumentService : KoinComponent, Manageable() {
 
                 documents[player.uniqueId] = document
 
-                PlayerDocumentLoaded(player, document).callEvent()
+                withContext(plugin.minecraftDispatcher) {
+                    PlayerDocumentLoaded(player, document).callEvent()
+                }
             }
         }
 
@@ -102,7 +105,9 @@ object PlayerDocumentService : KoinComponent, Manageable() {
 
                         documents[player.uniqueId] = document
 
-                        PlayerDocumentLoaded(player, document).callEvent()
+                        withContext(plugin.minecraftDispatcher) {
+                            PlayerDocumentLoaded(player, document).callEvent()
+                        }
                     }
                 }
             }
