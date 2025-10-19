@@ -11,7 +11,7 @@ export type PillProps = ComponentProps<typeof Badge> & {
 
 export const Pill = ({ variant = "secondary", themed = false, className, ...props }: PillProps) => (
   <Badge
-    className={cn("gap-2 rounded-full px-3 py-1.5 font-normal", className)}
+    className={cn("gap-2 rounded-full px-3 py-1.5 font-normal shadow-s", className)}
     variant={variant}
     {...props}
   />

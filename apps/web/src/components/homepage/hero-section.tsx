@@ -33,11 +33,8 @@ export function HeroSection() {
           </h1>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              size="lg"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-8 text-lg"
-            >
-              <Play className="mr-2 h-5 w-5" />
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-8 shadow-l">
+              <Play className="h-5 w-5" />
               PLAY NOW
             </Button>
             <ServerIPButton />

@@ -51,14 +51,22 @@ export function Footer() {
                 <span className="font-mono">play.ssmbrawl.com</span>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="border-primary bg-transparent">
-                  <DiscIcon />
-                  Discord
-                </Button>
-                <Button variant="outline" size="sm" className="border-primary bg-transparent">
-                  <GithubIcon />
-                  GitHub
-                </Button>
+                <a href="https://discord.gg" target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="sm" className="border-primary bg-transparent">
+                    <DiscIcon />
+                    Discord
+                  </Button>
+                </a>
+                <a
+                  href="https://github.com/BetrixDev/ssm-brawl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="outline" size="sm" className="border-primary bg-transparent">
+                    <GithubIcon />
+                    GitHub
+                  </Button>
+                </a>
               </div>
             </div>
           </div>

@@ -13,7 +13,7 @@ export function ServerIPButton() {
   return (
     <FlipButton
       className="font-mono"
-      frontClassName="border-border border"
+      frontClassName="border-border border shadow-s"
       frontText="play.ssmbrawl.com"
       backText={copied ? "Copied!" : "Copy IP"}
       onClick={copyIP}
