@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export function ServerStats() {
   const serverStatus = useQuery(convexQuery(api.serverStatus.getServerStatus, {}));
+  const playerCount = useQuery(convexQuery(api.players.getOnlinePlayerCount, {}));
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-center gap-8 pt-8 text-sm">
@@ -22,7 +23,7 @@ export function ServerStats() {
       </Pill>
       <Pill variant="outline">
         <PillIcon icon={UsersIcon} />
-        {serverStatus.data?.playerCount} players online
+        {playerCount.data} players online
       </Pill>
       <Tooltip>
         <TooltipTrigger>
