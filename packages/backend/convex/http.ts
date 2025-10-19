@@ -82,6 +82,16 @@ app.post("/server/status", async (c) => {
   return c.json({ status: "ok" });
 });
 
+app.post("/server/status/sync-player-online-status", async (c) => {
+  const { onlinePlayerUuids } = await c.req.json();
+
+  await c.env.runMutation(internal.plugin.status.syncPlayerOnlineStatus, {
+    onlinePlayerUuids,
+  });
+
+  return c.json({ status: "ok" });
+});
+
 const http = new HttpRouterWithHono(app);
 
 authComponent.registerRoutes(http, createAuth);

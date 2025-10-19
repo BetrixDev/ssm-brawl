@@ -21,3 +21,18 @@ export const updateServerStatus = internalMutation({
     });
   },
 });
+
+export const syncPlayerOnlineStatus = internalMutation({
+  args: {
+    onlinePlayerUuids: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const playerDocuments = await ctx.db.query("players").collect();
+
+    for (const playerDocument of playerDocuments) {
+      await ctx.db.patch(playerDocument._id, {
+        isOnlineOnServer: args.onlinePlayerUuids.includes(playerDocument.uuid),
+      });
+    }
+  },
+});

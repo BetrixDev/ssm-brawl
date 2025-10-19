@@ -63,6 +63,16 @@ class StatisticsBroadcaster : KoinComponent {
                 }
             }
         }
+
+        repeatingTask(10.minutes.ticks) {
+            val onlinePlayers = Bukkit.getOnlinePlayers().map { it.uniqueId.toString() }
+
+            plugin.launch {
+                withContext(Dispatchers.IO) {
+                    api.serverSyncPlayerOnlineStatus(onlinePlayers)
+                }
+            }
+        }
     }
 
     private fun bytesToMb(bytes: Long?): Double? {
