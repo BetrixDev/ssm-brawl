@@ -69,9 +69,6 @@ export function FeaturesSection() {
           ))}
         </div>
       </div>
-
-      {/* Diagonal Accent */}
-      <div className="absolute top-1/2 right-0 w-64 h-64 bg-primary/5 -skew-x-12 translate-x-32 -translate-y-1/2" />
     </section>
   );
 }

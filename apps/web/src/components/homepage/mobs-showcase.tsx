@@ -1,34 +1,35 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { MobHead } from "../mob-head";
 
 const mobs = [
   {
+    id: "iron_golem",
     name: "IRON GOLEM",
     description: "Tank class with devastating melee attacks and high defense.",
-    image: "/minecraft-iron-golem-warrior-pose.jpg",
   },
   {
     name: "BLAZE",
+    id: "blaze",
     description: "Ranged attacker with fire-based abilities and aerial mobility.",
-    image: "/minecraft-blaze-combat-pose.jpg",
   },
   {
     name: "ENDERMAN",
+    id: "enderman",
     description: "Assassin class with teleportation and high burst damage.",
-    image: "/minecraft-enderman-battle-stance.jpg",
   },
   {
     name: "CREEPER",
+    id: "creeper",
     description: "Explosive specialist with area denial and surprise tactics.",
-    image: "/minecraft-creeper-action-pose.jpg",
   },
   {
     name: "SKELETON",
+    id: "skeleton",
     description: "Precision archer with long-range attacks and mobility.",
-    image: "/minecraft-skeleton-archer-pose.jpg",
   },
-];
+] as const;
 
 export function MobsShowcase() {
   return (
@@ -59,15 +60,10 @@ export function MobsShowcase() {
           {mobs.map((mob, index) => (
             <Card
               key={index}
-              className="bg-card border-border overflow-hidden group hover:border-primary/50 transition-all hover:scale-105"
+              className="bg-card border-border overflow-hidden group hover:border-primary/50 transition-all hover:scale-105 p-0"
             >
-              <div className="aspect-[3/4] relative overflow-hidden bg-secondary">
-                <img
-                  src={mob.image || "/placeholder.svg"}
-                  alt={mob.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+              <div className="aspect-[3/4] relative overflow-hidden bg-radial from-primary to-secondary">
+                <MobHead mob={mob.id} className="w-full h-full absolute pointer-events-none" />
               </div>
               <div className="p-4 space-y-2">
                 <h3 className="text-lg font-bold text-foreground">{mob.name}</h3>
@@ -77,9 +73,6 @@ export function MobsShowcase() {
           ))}
         </div>
       </div>
-
-      {/* Diagonal Accent */}
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 -skew-x-12 -translate-x-32 translate-y-32" />
     </section>
   );
 }

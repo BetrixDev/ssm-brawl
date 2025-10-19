@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
-import { Copy } from "lucide-react";
+import { Copy, DiscIcon, GithubIcon } from "lucide-react";
 
 export function Footer() {
   return (
@@ -52,10 +52,12 @@ export function Footer() {
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="border-primary bg-transparent">
+                  <DiscIcon />
                   Discord
                 </Button>
                 <Button variant="outline" size="sm" className="border-primary bg-transparent">
-                  Twitter
+                  <GithubIcon />
+                  GitHub
                 </Button>
               </div>
             </div>
@@ -81,9 +83,6 @@ export function Footer() {
           </div>
         </div>
       </div>
-
-      {/* Diagonal Accent */}
-      <div className="absolute bottom-0 right-0 w-48 h-48 bg-primary/5 -skew-x-12 translate-x-24 translate-y-24" />
     </footer>
   );
 }

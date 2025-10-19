@@ -49,14 +49,6 @@ export function StatsSection() {
                 <div className="text-4xl font-bold text-primary mb-2">10+</div>
                 <div className="text-muted-foreground">Game Modes</div>
               </Card>
-              <Card className="bg-card border-border p-6">
-                <div className="text-4xl font-bold text-primary mb-2">24/7</div>
-                <div className="text-muted-foreground">Active Servers</div>
-              </Card>
-              <Card className="bg-card border-border p-6">
-                <div className="text-4xl font-bold text-primary mb-2">100K+</div>
-                <div className="text-muted-foreground">Players</div>
-              </Card>
             </div>
           </div>
         </div>

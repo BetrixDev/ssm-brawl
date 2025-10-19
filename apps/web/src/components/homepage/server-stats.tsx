@@ -9,6 +9,8 @@ export function ServerStats() {
   const serverStatus = useQuery(convexQuery(api.serverStatus.getServerStatus, {}));
   const playerCount = useQuery(convexQuery(api.players.getOnlinePlayerCount, {}));
 
+  const actualPlayerCount = serverStatus.data?.isOnline ? playerCount.data : 0;
+
   return (
     <div className="flex flex-col sm:flex-row items-center justify-center gap-8 pt-8 text-sm">
       <Pill variant="outline">
@@ -23,7 +25,7 @@ export function ServerStats() {
       </Pill>
       <Pill variant="outline">
         <PillIcon icon={UsersIcon} />
-        {playerCount.data} players online
+        {actualPlayerCount} player{actualPlayerCount === 1 ? "" : "s"} online
       </Pill>
       <Tooltip>
         <TooltipTrigger>
