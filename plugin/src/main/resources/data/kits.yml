@@ -86,7 +86,6 @@ kits:
       - id: bile_blaster
       - id: deaths_grasp
     armorItems:
-      helmet: null
       chestplate: chainmail_chestplate
       leggings: chainmail_leggings
       boots: chainmail_boots
