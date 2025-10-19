@@ -64,7 +64,7 @@ class StatisticsBroadcaster : KoinComponent {
             }
         }
 
-        repeatingTask(10.minutes.ticks) {
+        repeatingTask(30.minutes.ticks) {
             val onlinePlayers = Bukkit.getOnlinePlayers().map { it.uniqueId.toString() }
 
             plugin.launch {
