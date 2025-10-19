@@ -179,4 +179,115 @@ export default defineSchema({
     .index("by_ability_id", ["abilityId"])
     .index("by_stat_id", ["statId"])
     .index("by_player_uuid_and_stat_id", ["playerUuid", "statId"]),
+
+  /**
+   * Game Data - Abilities, Kits, Maps, Minigames, Passives, Disguises
+   */
+
+  abilities: defineTable({
+    abilityId: v.string(),
+    cooldown: v.number(),
+    type: v.string(),
+    itemSlot: v.number(),
+    usage: v.string(),
+    hotbarItem: v.string(),
+    displayItem: v.string(),
+    metadata: v.any(),
+  }).index("by_ability_id", ["abilityId"]),
+
+  disguises: defineTable({
+    disguiseId: v.string(),
+  }).index("by_disguise_id", ["disguiseId"]),
+
+  passives: defineTable({
+    passiveId: v.string(),
+    userFacing: v.boolean(),
+    displayItem: v.optional(v.string()),
+    metadata: v.any(),
+  }).index("by_passive_id", ["passiveId"]),
+
+  kits: defineTable({
+    kitId: v.string(),
+    userFacing: v.optional(v.boolean()),
+    meleeDamage: v.number(),
+    armor: v.number(),
+    knockbackMultiplier: v.number(),
+    disguiseId: v.optional(v.string()),
+    selectionSound: v.optional(v.string()),
+    displayItem: v.optional(v.string()),
+    metadata: v.optional(v.any()),
+    passives: v.array(
+      v.object({
+        id: v.string(),
+        overrides: v.optional(v.any()),
+      }),
+    ),
+    abilities: v.array(
+      v.object({
+        id: v.string(),
+      }),
+    ),
+    armorItems: v.object({
+      helmet: v.union(v.string(), v.null()),
+      chestplate: v.union(v.string(), v.null()),
+      leggings: v.union(v.string(), v.null()),
+      boots: v.union(v.string(), v.null()),
+    }),
+  }).index("by_kit_id", ["kitId"]),
+
+  gameMaps: defineTable({
+    mapId: v.string(),
+    voidLevel: v.number(),
+    maxPlayers: v.number(),
+    worldBorderSize: v.number(),
+    creators: v.array(v.string()),
+    spectatorSpawnPoint: v.object({
+      x: v.number(),
+      y: v.number(),
+      z: v.number(),
+      yaw: v.number(),
+      pitch: v.number(),
+    }),
+    spawnPoints: v.array(
+      v.object({
+        x: v.number(),
+        y: v.number(),
+        z: v.number(),
+      }),
+    ),
+  }).index("by_map_id", ["mapId"]),
+
+  hubMaps: defineTable({
+    mapId: v.string(),
+    voidLevel: v.number(),
+    worldBorderSize: v.number(),
+    creators: v.array(v.string()),
+    spawnPoints: v.array(
+      v.object({
+        x: v.number(),
+        y: v.number(),
+        z: v.number(),
+        yaw: v.number(),
+        pitch: v.number(),
+      }),
+    ),
+  }).index("by_map_id", ["mapId"]),
+
+  minigames: defineTable({
+    minigameId: v.string(),
+    countdown: v.number(),
+    type: v.string(),
+    isHidden: v.boolean(),
+    minPlayers: v.optional(v.number()),
+    maxPlayers: v.number(),
+    kitSwitchingMode: v.string(),
+    allowParties: v.boolean(),
+    passiveBlacklist: v.optional(v.array(v.string())),
+    respawnDelaySeconds: v.number(),
+    allowRejoinAfterLeave: v.boolean(),
+    // Team-based fields
+    playersPerTeam: v.optional(v.number()),
+    amountOfTeams: v.optional(v.number()),
+    stocks: v.optional(v.number()),
+  }).index("by_minigame_id", ["minigameId"]),
 });
