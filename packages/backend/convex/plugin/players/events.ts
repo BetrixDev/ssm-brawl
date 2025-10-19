@@ -63,5 +63,9 @@ export const onPlayerLeave = internalMutation({
     if (!player) {
       return;
     }
+
+    await ctx.db.patch(player._id, {
+      isOnlineOnServer: false,
+    });
   },
 });

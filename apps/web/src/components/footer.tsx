@@ -46,7 +46,7 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-foreground">Connect</h4>
             <div className="space-y-3">
-              <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="flex items-center gap-2 text-muted-foreground border border-border rounded-md p-2 w-fit">
                 <Copy className="h-4 w-4" />
                 <span className="font-mono">play.ssmbrawl.com</span>
               </div>

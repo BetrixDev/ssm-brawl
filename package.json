@@ -22,7 +22,8 @@
     "check-types": "turbo check-types",
     "dev:web": "turbo -F @ssm-brawl/web dev",
     "dev:server": "turbo -F @ssm-brawl/backend dev",
-    "dev:setup": "turbo -F @ssm-brawl/backend dev:setup"
+    "dev:setup": "turbo -F @ssm-brawl/backend dev:setup",
+    "dev:!plugin": "turbo -F !@ssm-brawl/plugin dev"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
