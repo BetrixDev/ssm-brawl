@@ -129,11 +129,7 @@ kits:
       - id: bouncy_bacon
       - id: baby_bacon_bomb
     armorItems:
-      helmet: null
-      chestplate: null
-      leggings: null
-      boots: null
-
+    
   # Enderman
   - id: enderman
     meleeDamage: 7.0
