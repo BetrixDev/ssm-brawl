@@ -5,6 +5,7 @@ import dev.betrix.superSmashMobsBrawl.AxiomLoggerHandler
 import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.extensions.ticks
+import dev.betrix.superSmashMobsBrawl.models.ServerStatus
 import dev.betrix.superSmashMobsBrawl.models.player.PlayerDocument
 import gg.flyte.twilight.scheduler.repeatingTask
 import io.ktor.client.HttpClient
@@ -41,7 +42,7 @@ object ApiService : IManageable, KoinComponent {
     val apiClient =
             HttpClient(CIO) {
                 defaultRequest {
-                    if (!apiSecretKey.isNullOrBlank()) {
+                    if (apiSecretKey.isNotBlank()) {
                         header("Authorization", "Bearer $apiSecretKey")
                     }
                     contentType(ContentType.Application.Json)
@@ -63,7 +64,7 @@ object ApiService : IManageable, KoinComponent {
             }
 
     private val apiHealthCheckJob =
-            repeatingTask(1.minutes.ticks) {
+            repeatingTask(10.minutes.ticks) {
                 plugin.launch { withContext(Dispatchers.IO) { doApiHealthCheck() } }
             }
 
@@ -101,6 +102,13 @@ object ApiService : IManageable, KoinComponent {
     suspend fun sendPlayerLeaveEventAsync(player: Player) {
         apiClient.post("/players/${player.uniqueId}/events/leave") {
             contentType(ContentType.Application.Json)
+        }
+    }
+
+    suspend fun serverStatusPostAsync(status: ServerStatus) {
+        apiClient.post("/server/status") {
+            contentType(ContentType.Application.Json)
+            setBody(status)
         }
     }
 

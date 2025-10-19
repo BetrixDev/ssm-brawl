@@ -112,7 +112,13 @@ object PlayerDocumentService : KoinComponent, Manageable() {
             event<PlayerQuitEvent>(priority = EventPriority.LOWEST) {
                 documents.remove(player.uniqueId)?.let {
                     plugin.launch {
-                        withContext(Dispatchers.IO) { api.playersSetDocumentAsync(player, it) }
+                        withContext(Dispatchers.IO) {
+                            val setDocDeferred = async { api.playersSetDocumentAsync(player, it) }
+                            val sendLeaveDeferred = async { api.sendPlayerLeaveEventAsync(player) }
+                            
+                            setDocDeferred.await()
+                            sendLeaveDeferred.await()
+                        }
                     }
                 }
             }

@@ -22,7 +22,8 @@ export default defineSchema({
       searchField: "username",
       filterFields: ["uuid"],
     })
-    .index("by_uuid", ["uuid"]),
+    .index("by_uuid", ["uuid"])
+    .index("by_is_online_on_server", ["isOnlineOnServer"]),
 
   playerBans: defineTable({
     playerUuid: v.string(),
@@ -31,6 +32,15 @@ export default defineSchema({
     bannedAt: v.number(),
     expiresAt: v.number(),
   }).index("by_player_uuid", ["playerUuid"]),
+
+  serverStatus: defineTable({
+    playerCount: v.number(),
+    tps: v.number(),
+    memoryUsageMb: v.number(),
+    loadedChunks: v.number(),
+    loadedWorlds: v.number(),
+    averagePlayerPing: v.number(),
+  }),
 
   /**
    * Player Stats

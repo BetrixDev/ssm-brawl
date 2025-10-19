@@ -22,3 +22,14 @@ export const searchByPlayerUsername = query({
     };
   },
 });
+
+export const getOnlinePlayerCount = query({
+  handler: async (ctx) => {
+    const onlinePlayers = await ctx.db
+      .query("players")
+      .withIndex("by_is_online_on_server", (q) => q.eq("isOnlineOnServer", true))
+      .collect();
+
+    return onlinePlayers.length;
+  },
+});

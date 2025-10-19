@@ -66,6 +66,22 @@ app.post("/players/:uuid/events/leave", async (c) => {
   return c.json({ status: "ok" });
 });
 
+app.post("/server/status", async (c) => {
+  const { playerCount, tps, memoryUsageMb, loadedChunks, loadedWorlds, averagePlayerPing } =
+    await c.req.json();
+
+  await c.env.runMutation(internal.plugin.status.updateServerStatus, {
+    playerCount,
+    tps,
+    memoryUsageMb,
+    loadedChunks,
+    loadedWorlds,
+    averagePlayerPing,
+  });
+
+  return c.json({ status: "ok" });
+});
+
 const http = new HttpRouterWithHono(app);
 
 authComponent.registerRoutes(http, createAuth);

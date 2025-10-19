@@ -1,15 +1,21 @@
 package dev.betrix.superSmashMobsBrawl
 
+import com.github.shynixn.mccoroutine.bukkit.launch
 import dev.betrix.superSmashMobsBrawl.extensions.logJson
 import dev.betrix.superSmashMobsBrawl.extensions.ticks
+import dev.betrix.superSmashMobsBrawl.models.ServerStatus
+import dev.betrix.superSmashMobsBrawl.services.ApiService
 import dev.betrix.superSmashMobsBrawl.services.HubService
 import gg.flyte.twilight.extension.round
 import gg.flyte.twilight.scheduler.repeatingTask
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.lang.management.ManagementFactory
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
+import org.bukkit.Bukkit
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -17,6 +23,7 @@ class StatisticsBroadcaster : KoinComponent {
 
     private val plugin: SuperSmashMobsBrawl by inject()
     private val hubService: HubService by inject()
+    private val api: ApiService by inject()
 
     init {
         repeatingTask(5.minutes.ticks) {
@@ -46,6 +53,16 @@ class StatisticsBroadcaster : KoinComponent {
                 }
             )
         }
+
+        repeatingTask(1.minutes.ticks) {
+            val serverStatus = collectServerStatus()
+
+            plugin.launch {
+                withContext(Dispatchers.IO) {
+                    api.serverStatusPostAsync(serverStatus)
+                }
+            }
+        }
     }
 
     private fun bytesToMb(bytes: Long?): Double? {
@@ -55,5 +72,28 @@ class StatisticsBroadcaster : KoinComponent {
 
         val bytesInGigabyte = 1024.0 * 1024.0
         return (bytes / bytesInGigabyte).round(2).toDouble()
+    }
+
+    private fun collectServerStatus(): ServerStatus {
+        val runtime = Runtime.getRuntime()
+        val memoryUsageMb = (runtime.totalMemory() - runtime.freeMemory()) / 1048576
+
+        val onlinePlayers = Bukkit.getOnlinePlayers()
+        val averagePlayerPing = if (onlinePlayers.isEmpty()) {
+            0
+        } else {
+            onlinePlayers.sumOf { it.ping } / onlinePlayers.size
+        }
+
+        val worlds = Bukkit.getWorlds()
+
+        return ServerStatus(
+            playerCount = onlinePlayers.size,
+            tps = Bukkit.getTPS()[0], // 1-minute average
+            memoryUsageMb = memoryUsageMb,
+            loadedChunks = worlds.sumOf { it.loadedChunks.size },
+            loadedWorlds = worlds.size,
+            averagePlayerPing = averagePlayerPing
+        )
     }
 }
