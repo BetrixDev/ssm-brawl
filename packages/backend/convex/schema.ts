@@ -192,7 +192,7 @@ export default defineSchema({
     usage: v.string(),
     hotbarItem: v.string(),
     displayItem: v.string(),
-    metadata: v.any(),
+    metadata: v.optional(v.any()),
   }).index("by_ability_id", ["abilityId"]),
 
   disguises: defineTable({
@@ -203,7 +203,7 @@ export default defineSchema({
     passiveId: v.string(),
     userFacing: v.boolean(),
     displayItem: v.optional(v.string()),
-    metadata: v.any(),
+    metadata: v.optional(v.any()),
   }).index("by_passive_id", ["passiveId"]),
 
   kits: defineTable({
@@ -225,13 +225,14 @@ export default defineSchema({
     abilities: v.array(
       v.object({
         id: v.string(),
+        overrides: v.optional(v.any()),
       }),
     ),
     armorItems: v.object({
-      helmet: v.union(v.string(), v.null()),
-      chestplate: v.union(v.string(), v.null()),
-      leggings: v.union(v.string(), v.null()),
-      boots: v.union(v.string(), v.null()),
+      helmet: v.optional(v.string()),
+      chestplate: v.optional(v.string()),
+      leggings: v.optional(v.string()),
+      boots: v.optional(v.string()),
     }),
   }).index("by_kit_id", ["kitId"]),
 

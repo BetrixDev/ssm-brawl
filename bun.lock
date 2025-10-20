@@ -90,6 +90,7 @@
         "convex-helpers": "^0.1.104",
         "hono": "4.9.8",
         "strip-ansi": "^7.1.2",
+        "yaml": "^2.8.1",
       },
       "devDependencies": {
         "@types/node": "^24.3.0",
@@ -97,7 +98,7 @@
       },
     },
     "plugin": {
-      "name": "@ssmbrawl/plugin",
+      "name": "@ssm-brawl/plugin",
       "devDependencies": {
         "dotenv-cli": "^10.0.0",
         "nodemon": "^3.1.10",
@@ -647,11 +648,11 @@
 
     "@ssm-brawl/backend": ["@ssm-brawl/backend@workspace:packages/backend"],
 
+    "@ssm-brawl/plugin": ["@ssm-brawl/plugin@workspace:plugin"],
+
     "@ssm-brawl/web": ["@ssm-brawl/web@workspace:apps/web"],
 
     "@ssm-brawl/wiki": ["@ssm-brawl/wiki@workspace:apps/wiki"],
-
-    "@ssmbrawl/plugin": ["@ssmbrawl/plugin@workspace:plugin"],
 
     "@standard-schema/spec": ["@standard-schema/spec@1.0.0", "", {}, "sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA=="],
 
@@ -1582,6 +1583,8 @@
     "xmlchars": ["xmlchars@2.2.0", "", {}, "sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw=="],
 
     "yallist": ["yallist@5.0.0", "", {}, "sha512-YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw=="],
+
+    "yaml": ["yaml@2.8.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-lcYcMxX2PO9XMGvAJkJ3OsNMw+/7FKes7/hgerGUYWIoWu5j/+YQqcZr5JnPZWzOsEBgMbSbiSTn/dv/69Mkpw=="],
 
     "zod": ["zod@4.1.12", "", {}, "sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ=="],
 
