@@ -19,6 +19,24 @@ import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.persistence.PersistentDataType
 
 class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", player) {
+    companion object {
+        private val playerEnergy = mutableMapOf<java.util.UUID, Double>()
+        private val lastDamageTime = mutableMapOf<java.util.UUID, Long>()
+
+        fun getEnergy(player: Player): Double = playerEnergy[player.uniqueId] ?: 0.0
+
+        fun addEnergy(player: Player, amount: Double, multiplier: Double = 1.0) {
+            val current = playerEnergy[player.uniqueId] ?: 0.0
+            val maxEnergy = 100.0
+            playerEnergy[player.uniqueId] = (current + (amount * multiplier)).coerceIn(0.0, maxEnergy)
+            lastDamageTime[player.uniqueId] = System.currentTimeMillis()
+        }
+
+        fun clearEnergy(player: Player) {
+            playerEnergy.remove(player.uniqueId)
+            lastDamageTime.remove(player.uniqueId)
+        }
+    }
 
     private val maxCharge: Int
         get() = metadata.int("maxCharge") ?: 7
@@ -32,6 +50,24 @@ class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", pl
     private val chargeRateTicks: Long
         get() = metadata.long("chargeRateTicks") ?: 6L
 
+    private val minDamage: Double
+        get() = metadata.double("minDamage") ?: 5.0
+
+    private val maxDamage: Double
+        get() = metadata.double("maxDamage") ?: 12.0
+
+    private val energyPerDamage: Double
+        get() = metadata.double("energyPerDamage") ?: 1.5
+
+    private val energyDecayDelayMs: Long
+        get() = metadata.long("energyDecayDelayMs") ?: 3000L
+
+    private val energyDecayRate: Double
+        get() = metadata.double("energyDecayRate") ?: 10.0
+
+    private val baseBowDamageCap: Double
+        get() = metadata.double("baseBowDamageCap") ?: 5.0
+
     private var charge = 0
     private var chargeRunnable: TwilightRunnable? = null
     private val firedArrows = mutableListOf<Arrow>()
@@ -42,6 +78,8 @@ class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", pl
         setupItemHeldListener()
         setupBowFireListener()
         setupDamageListener()
+        setupDamageGainListener()
+        setupEnergyDecayTask()
         setupParticleTask()
         super.setup()
     }
@@ -115,32 +153,76 @@ class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", pl
                 val arrow = damager as? Arrow ?: return@event
                 val victim = entity as? org.bukkit.entity.LivingEntity ?: return@event
 
-                // Check if this arrow has corrupted charge
-                val arrowCharge =
-                    arrow.persistentDataContainer.get(damageBoostKey, PersistentDataType.INTEGER)
-                        ?: return@event
-
-                if (arrowCharge <= 0) return@event
-
                 // Check if arrow was shot by this player
                 if (arrow.shooter != player) return@event
 
                 // Cancel vanilla damage and apply our custom damage
                 isCancelled = true
 
-                val baseDamage = damage
-                val totalDamage = baseDamage + (arrowCharge * damagePerCharge)
+                // Check if this arrow has corrupted charge
+                val arrowCharge =
+                    arrow.persistentDataContainer.get(damageBoostKey, PersistentDataType.INTEGER)
+                        ?: 0
+
+                val calculatedDamage = if (arrowCharge > 0) {
+                    // Corrupted arrow: scale damage based on energy (5-12)
+                    val energy = getEnergy(player)
+                    val energyRatio = energy / 100.0
+                    minDamage + (maxDamage - minDamage) * energyRatio
+                } else {
+                    // Non-corrupted arrow: cap at base damage
+                    damage.coerceAtMost(baseBowDamageCap)
+                }
 
                 BrawlDamageEvent(
                         victim,
                         dev.betrix.superSmashMobsBrawl.events.Damager.DamagerLivingEntity(player),
-                        totalDamage,
+                        calculatedDamage,
                         damageType = BrawlDamageType.Projectile,
                     )
                     .callEvent()
 
                 // Remove arrow from tracking
                 firedArrows.remove(arrow)
+            }
+        )
+    }
+
+    private fun setupDamageGainListener() {
+        listeners.add(
+            event<BrawlDamageEvent> {
+                // Only track damage dealt by this player
+                if (damager !is dev.betrix.superSmashMobsBrawl.events.Damager.DamagerLivingEntity) return@event
+                val source = (damager as dev.betrix.superSmashMobsBrawl.events.Damager.DamagerLivingEntity).livingEntity
+                if (source != player) return@event
+
+                // Gain energy based on damage dealt
+                addEnergy(player, damage * energyPerDamage)
+
+                // Update exp bar to show energy
+                player.exp = kotlin.math.min(0.9999F, (getEnergy(player) / 100.0).toFloat())
+            }
+        )
+    }
+
+    private fun setupEnergyDecayTask() {
+        runnables.add(
+            repeatingTask(20) {
+                if (!player.isOnline || player.isDead) {
+                    return@repeatingTask
+                }
+
+                val timeSinceLastDamage = System.currentTimeMillis() - (lastDamageTime[player.uniqueId] ?: 0L)
+                
+                // Start decaying after delay
+                if (timeSinceLastDamage >= energyDecayDelayMs) {
+                    val currentEnergy = getEnergy(player)
+                    if (currentEnergy > 0) {
+                        val newEnergy = (currentEnergy - energyDecayRate).coerceAtLeast(0.0)
+                        playerEnergy[player.uniqueId] = newEnergy
+                        player.exp = kotlin.math.min(0.9999F, (newEnergy / 100.0).toFloat())
+                    }
+                }
             }
         )
     }
@@ -186,6 +268,17 @@ class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", pl
         charge++
         player.exp = min(0.9999F, charge.toFloat() / maxCharge.toFloat())
         player.playSound(player.eyeLocation, Sound.BLOCK_DISPENSER_FAIL, 0.5f, 1 + 0.1f * charge)
+        
+        // Show particle indicator when charging
+        Particle.DUST
+            .builder()
+            .location(player.eyeLocation.add(player.location.direction.normalize().multiply(0.5)))
+            .count(3)
+            .offset(0.1, 0.1, 0.1)
+            .extra(0.0)
+            .data(Particle.DustOptions(org.bukkit.Color.fromRGB(139, 0, 0), 0.8f))
+            .receivers(96, true)
+            .spawn()
     }
 
     private fun finishCharging() {
@@ -201,6 +294,7 @@ class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", pl
     override fun teardown() {
         finishCharging()
         firedArrows.clear()
+        clearEnergy(player)
         super.teardown()
     }
 }

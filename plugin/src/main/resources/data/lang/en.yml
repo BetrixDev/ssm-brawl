@@ -226,7 +226,7 @@ messages:
       attackToRestore: "<warning>Attack other players to restore hunger!</warning>"
     corrupted_arrow:
       name: "Corrupted Arrow"
-      description: "Empower bow shots after using Death's Grasp to deal brutal damage"
+      description: "Build Corrupted Energy by dealing damage to scale arrow power from 5-12 damage. Energy decays after 3 seconds of inactivity"
     wall_climb:
       name: "Wall Climb"
       description: "Hold sneak on a wall to climb and regain a midair reset"

@@ -417,7 +417,8 @@ abilities:
       throwbackYMax: 1.8
       hitboxRadius: 2.0
       rechargeTime: 2.0
-      arrowDamageMultiplier: 2.0
+      arrowDamageMultiplier: 1.5
+      arrowEnergyMultiplier: 1.5
 
   - id: iron_hook
     cooldown: 8.0

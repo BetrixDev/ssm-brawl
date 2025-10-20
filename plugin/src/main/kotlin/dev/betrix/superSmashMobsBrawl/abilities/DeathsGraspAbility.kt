@@ -5,6 +5,7 @@ import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.extensions.isOnBlock
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
+import dev.betrix.superSmashMobsBrawl.passives.CorruptedArrowPassive
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
@@ -47,7 +48,8 @@ class DeathsGraspAbility(player: Player) : BrawlAbility("deaths_grasp", player) 
     private val throwbackYMax = metadata.double("throwbackYMax") ?: 1.8
     private val hitboxRadius = metadata.double("hitboxRadius") ?: 2.0
     private val rechargeTime = metadata.double("rechargeTime") ?: 2.0
-    private val arrowDamageMultiplier = metadata.double("arrowDamageMultiplier") ?: 2.0
+    private val arrowDamageMultiplier = metadata.double("arrowDamageMultiplier") ?: 1.5
+    private val arrowEnergyMultiplier = metadata.double("arrowEnergyMultiplier") ?: 1.5
 
     override fun setup() {
         super.setup()
@@ -182,7 +184,12 @@ class DeathsGraspAbility(player: Player) : BrawlAbility("deaths_grasp", player) 
         val victim = event.victim
         if (!isWeakened(victim)) return
 
+        val baseDamage = event.damage
         event.damage *= arrowDamageMultiplier
+
+        // Grant bonus energy for empowered shots (1.5x energy on damage dealt)
+        val damageDealt = event.damage
+        CorruptedArrowPassive.addEnergy(player, damageDealt * 1.5, arrowEnergyMultiplier)
 
         Particle.DUST.builder()
             .location(victim.location.add(0.0, 1.0, 0.0))
