@@ -399,12 +399,25 @@ abilities:
       burpSoundChance: 0.15
 
   - id: deaths_grasp
-    cooldown: 10.0
+    cooldown: 12.0
     type: recovery
     itemSlot: 1
     usage: left_click
     hotbarItem: bow
     displayItem: bow
+    metadata:
+      damage: 2.0
+      leapDurationMs: 1000
+      weaknessDurationMs: 1000
+      leapVelocity: 1.4
+      leapYAdd: 0.2
+      leapYMax: 1.2
+      throwbackVelocity: 1.6
+      throwbackYAdd: 1.2
+      throwbackYMax: 1.8
+      hitboxRadius: 2.0
+      rechargeTime: 2.0
+      arrowDamageMultiplier: 2.0
 
   - id: iron_hook
     cooldown: 8.0

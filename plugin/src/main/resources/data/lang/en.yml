@@ -60,7 +60,9 @@ abilities:
     description: "Launch a caustic bile shot that primes enemies for follow-up strikes"
   deaths_grasp:
     name: "Death's Grasp"
-    description: "Lunge forward with a tethering grip to yank yourself toward safety"
+    description: "Leap forward and collide with enemies to throw them behind you"
+    hit: "{lang:prefix} <text>You hit <primary>{target}</primary> <text>with <primary>{lang:abilities.{abilityId}.name}"
+    hitBy: "{lang:prefix} <warning>{attacker}</warning> <text>hit you with <warning>{lang:abilities.{abilityId}.name}"
   blink:
     name: "Blink"
     description: ""
