@@ -95,7 +95,10 @@ passives:
     displayItem: arrow
     userFacing: true
     metadata:
-      double_damage_condition: deaths_grasp_used
+      maxCharge: 7
+      damagePerCharge: 0.9
+      chargeDelayTicks: 0
+      chargeRateTicks: 6
 
   - id: exp_charge
     displayItem: experience_bottle
