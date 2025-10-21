@@ -14,6 +14,7 @@ import type { ConvexReactClient } from "convex/react";
 import { Header } from "../components/header";
 import appCss from "../index.css?url";
 
+import { AuthProviders } from "@/auth-providers";
 import { Footer } from "@/components/footer";
 import { authClient } from "@/lib/auth-client";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
@@ -80,11 +81,13 @@ function RootDocument() {
           <script crossOrigin="anonymous" src="https://tweakcn.com/live-preview.min.js" />
         </head>
         <body className="bg-background text-primary-foreground">
-          <Header />
-          <div className="min-h-screen">
-            <Outlet />
-          </div>
-          <Footer />
+          <AuthProviders>
+            <Header />
+            <div className="min-h-screen">
+              <Outlet />
+            </div>
+            <Footer />
+          </AuthProviders>
           <Toaster richColors />
           <TanStackRouterDevtools position="bottom-left" />
           <Scripts />

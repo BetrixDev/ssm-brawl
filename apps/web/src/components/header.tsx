@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { SignedIn, SignedOut, UserButton } from "@daveyplate/better-auth-ui";
+import { Link, useLocation } from "@tanstack/react-router";
+import { LinkIcon, Menu, X } from "lucide-react";
 import { useState } from "react";
-import { ServerIPButton } from "./server-ip-button";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -42,7 +42,7 @@ export function Header() {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
-            <ServerIPButton />
+            <UserButtons />
           </div>
 
           {/* Mobile Menu Button */}
@@ -70,11 +70,59 @@ export function Header() {
               </Link>
             ))}
             <div className="flex justify-center">
-              <ServerIPButton />
+              <UserButtons />
             </div>
           </div>
         )}
       </nav>
     </header>
+  );
+}
+
+export function UserButtons({ muted }: { muted?: boolean }) {
+  const pathname = useLocation({
+    select: (location) => location.pathname,
+  });
+
+  return (
+    <div className="flex items-center gap-2 z-10">
+      <SignedIn>
+        <UserButton
+          size="sm"
+          className="hidden md:inline-flex text-foreground hover:bg-secondary/75 bg-secondary/50 border"
+          additionalLinks={[
+            {
+              href: "/auth/link-account",
+              icon: <LinkIcon className="h-4 w-4" />,
+              label: "Link Account",
+              signedIn: true,
+              separator: true,
+            },
+          ]}
+        />
+      </SignedIn>
+      <SignedOut>
+        <Link
+          to="/auth/$authView"
+          search={{ redirectTo: pathname }}
+          params={{ authView: "sign-in" }}
+        >
+          <Button variant="ghost" className="hidden md:inline-flex">
+            Log In
+          </Button>
+        </Link>
+        <Link
+          to="/auth/$authView"
+          search={{ redirectTo: pathname }}
+          params={{ authView: "sign-up" }}
+        >
+          <Button variant={muted ? "outline" : "default"}>Sign Up</Button>
+        </Link>
+      </SignedOut>
+      <Button variant="ghost" size="icon" className="md:hidden">
+        <Menu className="h-5 w-5" />
+        <span className="sr-only">Open menu</span>
+      </Button>
+    </div>
   );
 }

@@ -190,11 +190,20 @@ body {
 .shadow-s {
   box-shadow: var(--shadow-s);
 }
+button.shadow-s:active {
+  box-shadow: none;
+}
 .shadow-m {
   box-shadow: var(--shadow-m);
 }
+button.shadow-m:active {
+  box-shadow: none;
+}
 .shadow-l {
   box-shadow: var(--shadow-l);
+}
+button.shadow-l:active {
+  box-shadow: none;
 }
 
 .noise {

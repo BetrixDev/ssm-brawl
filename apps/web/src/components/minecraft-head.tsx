@@ -20,6 +20,7 @@ export function MinecraftHead({ textureUrl, className }: MinecraftHeadProps) {
       width: canvasRef.current.clientWidth,
       height: canvasRef.current.clientHeight,
       skin: textureUrl,
+      preserveDrawingBuffer: true,
     });
 
     // Remove background to make it transparent

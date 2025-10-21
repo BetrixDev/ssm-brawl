@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 export function StatsSection() {
@@ -31,12 +30,6 @@ export function StatsSection() {
                 strategies, unique mob combinations, and skill-based gameplay, no two battles are
                 ever alike. Adapt, overcome, and dominate the arena.
               </p>
-              <Button
-                size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-              >
-                FULL STORY
-              </Button>
             </div>
 
             {/* Stats Grid */}

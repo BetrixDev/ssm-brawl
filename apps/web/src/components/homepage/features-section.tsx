@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Link } from "@tanstack/react-router";
-import { ChevronsLeftRightEllipsis, Sword, Trophy, Users } from "lucide-react";
+import { ChevronRightIcon, ChevronsLeftRightEllipsis, Sword, Trophy, Users } from "lucide-react";
+import { motion } from "motion/react";
 
 const features = [
   {
@@ -61,7 +62,18 @@ export function FeaturesSection() {
                     to={feature.learnMoreUrl}
                     className="text-xs font-light text-primary tracking-wider hover:underline"
                   >
-                    Learn More
+                    <motion.div className="flex items-center" initial="rest" whileHover="hover">
+                      Learn More
+                      <motion.span
+                        variants={{
+                          rest: { opacity: 0, x: -10 },
+                          hover: { opacity: 1, x: 0, rotate: 180 },
+                        }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                      >
+                        <ChevronRightIcon className="w-4 h-4 ml-1" />
+                      </motion.span>
+                    </motion.div>
                   </Link>
                 )}
               </div>

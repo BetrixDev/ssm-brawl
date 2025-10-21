@@ -60,9 +60,9 @@ export function MobsShowcase() {
           {mobs.map((mob, index) => (
             <Card
               key={index}
-              className="bg-card border-border overflow-hidden group hover:border-primary/50 transition-all hover:scale-105 p-0"
+              className="bg-card border-border overflow-hidden group hover:border-primary/50 transition-all hover:scale-105 p-0 gap-0"
             >
-              <div className="aspect-[3/4] relative overflow-hidden noise bg-radial to-background from-white/25">
+              <div className="aspect-[3/4] relative overflow-hidden noise bg-radial to-background from-black/25">
                 <MobHead mob={mob.id} className="w-full h-full absolute pointer-events-none" />
               </div>
               <div className="p-4 space-y-2">
