@@ -18,6 +18,7 @@ import type * as plugin_players_events from "../plugin/players/events.js";
 import type * as plugin_status from "../plugin/status.js";
 import type * as pluginData from "../pluginData.js";
 import type * as serverStatus from "../serverStatus.js";
+import type * as util_kv from "../util/kv.js";
 
 import type {
   ApiFromModules,
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   "plugin/status": typeof plugin_status;
   pluginData: typeof pluginData;
   serverStatus: typeof serverStatus;
+  "util/kv": typeof util_kv;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

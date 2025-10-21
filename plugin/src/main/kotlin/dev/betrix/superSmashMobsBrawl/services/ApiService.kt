@@ -112,8 +112,8 @@ object ApiService : IManageable, KoinComponent {
         }
     }
 
-    suspend fun serverSyncPlayerOnlineStatus(onlinePlayerUuids: List<String>) {
-        apiClient.post("/server/status/sync-player-online-status") {
+    suspend fun serverSyncOnlinePlayers(onlinePlayerUuids: List<String>) {
+        apiClient.post("/server/status/sync-online-players") {
             contentType(ContentType.Application.Json)
             setBody(mapOf("onlinePlayerUuids" to onlinePlayerUuids))
         }

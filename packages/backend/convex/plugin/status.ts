@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internalMutation } from "../_generated/server";
+import { setKv } from "../util/kv";
 
 export const updateServerStatus = internalMutation({
   args: {
@@ -22,17 +23,11 @@ export const updateServerStatus = internalMutation({
   },
 });
 
-export const syncPlayerOnlineStatus = internalMutation({
+export const syncOnlinePlayerCount = internalMutation({
   args: {
     onlinePlayerUuids: v.array(v.string()),
   },
   handler: async (ctx, args) => {
-    const playerDocuments = await ctx.db.query("players").collect();
-
-    for (const playerDocument of playerDocuments) {
-      await ctx.db.patch(playerDocument._id, {
-        isOnlineOnServer: args.onlinePlayerUuids.includes(playerDocument.uuid),
-      });
-    }
+    await setKv(ctx, "online_player_count", args.onlinePlayerUuids.length);
   },
 });

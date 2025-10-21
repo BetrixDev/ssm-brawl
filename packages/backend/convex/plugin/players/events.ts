@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internalMutation } from "../../_generated/server";
+import { getKv, setKv } from "../../util/kv";
 
 export const onPlayerJoin = internalMutation({
   args: {
@@ -15,10 +16,8 @@ export const onPlayerJoin = internalMutation({
       return;
     }
 
-    await ctx.db.patch(player._id, {
-      isOnlineOnServer: true,
-      lastJoinedDate: new Date().toISOString(),
-    });
+    const onlinePlayerCount = await getKv(ctx, "online_player_count", 0);
+    await setKv(ctx, "online_player_count", onlinePlayerCount + 1);
 
     const joinCountStat = await ctx.db
       .query("playerGeneralStats")
@@ -64,8 +63,10 @@ export const onPlayerLeave = internalMutation({
       return;
     }
 
-    await ctx.db.patch(player._id, {
-      isOnlineOnServer: false,
-    });
+    const onlinePlayerCount = await getKv(ctx, "online_player_count", 0);
+
+    if (onlinePlayerCount > 0) {
+      await setKv(ctx, "online_player_count", onlinePlayerCount - 1);
+    }
   },
 });

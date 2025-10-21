@@ -69,7 +69,7 @@ class StatisticsBroadcaster : KoinComponent {
 
             plugin.launch {
                 withContext(Dispatchers.IO) {
-                    api.serverSyncPlayerOnlineStatus(onlinePlayers)
+                    api.serverSyncOnlinePlayers(onlinePlayers)
                 }
             }
         }

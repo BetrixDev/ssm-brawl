@@ -1,6 +1,7 @@
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import { query } from "./_generated/server";
+import { getKv } from "./util/kv";
 
 export const searchByPlayerUsername = query({
   args: {
@@ -25,11 +26,6 @@ export const searchByPlayerUsername = query({
 
 export const getOnlinePlayerCount = query({
   handler: async (ctx) => {
-    const onlinePlayers = await ctx.db
-      .query("players")
-      .withIndex("by_is_online_on_server", (q) => q.eq("isOnlineOnServer", true))
-      .collect();
-
-    return onlinePlayers.length;
+    return await getKv(ctx, "online_player_count", 0);
   },
 });

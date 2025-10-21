@@ -82,10 +82,10 @@ app.post("/server/status", async (c) => {
   return c.json({ status: "ok" });
 });
 
-app.post("/server/status/sync-player-online-status", async (c) => {
+app.post("/server/status/sync-online-players", async (c) => {
   const { onlinePlayerUuids } = await c.req.json();
 
-  await c.env.runMutation(internal.plugin.status.syncPlayerOnlineStatus, {
+  await c.env.runMutation(internal.plugin.status.syncOnlinePlayerCount, {
     onlinePlayerUuids,
   });
 

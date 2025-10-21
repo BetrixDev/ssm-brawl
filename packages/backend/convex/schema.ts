@@ -10,20 +10,21 @@ const playerGeneralStatId = v.union(
 );
 
 export default defineSchema({
+  kv: defineTable({
+    key: v.string(),
+    value: v.any(),
+  }).index("by_key", ["key"]),
+
   players: defineTable({
     uuid: v.string(),
     username: v.string(),
-    firstJoinedDate: v.string(),
-    lastJoinedDate: v.string(),
-    isOnlineOnServer: v.boolean(),
     selectedKitId: v.string(),
   })
     .searchIndex("search_username", {
       searchField: "username",
       filterFields: ["uuid"],
     })
-    .index("by_uuid", ["uuid"])
-    .index("by_is_online_on_server", ["isOnlineOnServer"]),
+    .index("by_uuid", ["uuid"]),
 
   playerBans: defineTable({
     playerUuid: v.string(),
