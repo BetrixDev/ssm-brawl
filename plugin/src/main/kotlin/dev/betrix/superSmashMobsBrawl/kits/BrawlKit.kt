@@ -65,7 +65,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "sulphur_bomb" -> SulphurBombAbility(player)
                     "explode" -> ExplodeAbility(player)
                     "roped_arrow" -> RopedArrowAbility(player)
-                    "bone_explosion" -> BoneExplosionAbility(player)
+                    "bone_blast" -> BoneBlastAbility(player)
                     "angry_herd" -> AngryHerdAbility(player)
                     "milk_spiral" -> MilkSpiralAbility(player)
                     "blink" -> BlinkAbility(player)

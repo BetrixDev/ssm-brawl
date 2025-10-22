@@ -60,7 +60,7 @@ kits:
             arrowIntervalTicks: 60
       - id: barrage
     abilities:
-      - id: bone_explosion
+      - id: bone_blast
       - id: roped_arrow
     armorItems:
       helmet: iron_helmet

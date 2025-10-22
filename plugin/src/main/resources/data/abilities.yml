@@ -26,7 +26,7 @@ abilities:
       explosionKnockbackMultiplier: 2.5
       explosionVelocityStrength: 1.8
 
-  - id: bone_explosion
+  - id: bone_blast
     cooldown: 10.0
     itemSlot: 0
     type: aoe

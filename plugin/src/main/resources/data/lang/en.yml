@@ -49,8 +49,8 @@ abilities:
   explode:
     name: "Explode"
     description: ""
-  bone_explosion:
-    name: "Bone Explosion"
+  bone_blast:
+    name: "Bone Blast"
     description: ""
   roped_arrow:
     name: "Roped Arrow"
