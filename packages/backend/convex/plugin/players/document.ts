@@ -29,6 +29,15 @@ export const createPlayerDocument = internalMutation({
     username: v.string(),
   },
   handler: async (ctx, args) => {
+    const existingPlayer = await ctx.db
+      .query("players")
+      .withIndex("by_uuid", (q) => q.eq("uuid", args.uuid))
+      .first();
+
+    if (existingPlayer) {
+      throw new ConvexError("Player already exists");
+    }
+
     const playerDocumentId = await ctx.db.insert("players", {
       uuid: args.uuid,
       username: args.username,
