@@ -343,3 +343,28 @@ kits:
       chestplate: iron_chestplate
       leggings: iron_leggings
       boots: diamond_boots
+
+  # Horse
+  - id: horse
+    meleeDamage: 5.0
+    armor: 6.5
+    knockbackMultiplier: 1.4
+    disguiseId: "horse"
+    selectionSound: "entity.horse.ambient"
+    displayItem: "saddle"
+    passives:
+      - id: double_jump
+      - id: regeneration
+        overrides:
+          metadata:
+            healAmount: 0.3
+      - id: hunger
+    abilities:
+      - id: hoof_bash
+      - id: harvest_rush
+      - id: gliding_gallop
+    armorItems:
+      helmet: iron_helmet
+      chestplate: chainmail_chestplate
+      leggings: chainmail_leggings
+      boots: iron_boots

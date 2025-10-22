@@ -456,3 +456,54 @@ abilities:
     hotbarItem: iron_shovel
     displayItem: iron_pickaxe
     metadata: {}
+
+  - id: hoof_bash
+    cooldown: 6.0
+    itemSlot: 0
+    type: melee
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: iron_horse_armor
+    metadata:
+      damage: 6.5
+      knockbackMultiplier: 4.0
+      range: 2.5
+      slowDurationTicks: 16
+      animationDurationMs: 1000
+
+  - id: harvest_rush
+    cooldown: 10.0
+    itemSlot: 1
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: bone
+    metadata:
+      durationMs: 1500
+      projectileDamage: 0.2
+      projectilesPerTick: 6
+      dashSpeed: 0.6
+      yLimit: 0.0
+      slamDamage: 4.0
+      slamRadius: 3.5
+      slamKnockbackMultiplier: 2.5
+      cancelTrigger: "SNEAK"
+
+  - id: gliding_gallop
+    cooldown: 8.0
+    itemSlot: 2
+    type: mobility
+    usage: right_click
+    hotbarItem: feather
+    displayItem: feather
+    metadata:
+      launchStrength: 1.0
+      launchYAdd: 1.5
+      launchYMax: 2.0
+      landingCheckDelayTicks: 10
+      landingCheckIntervalTicks: 1
+      impactDamage: 5.0
+      impactRadius: 4.0
+      impactKnockbackMultiplier: 2.0
+      impactEnemyLaunchStrength: 1.8
+      impactEnemyLaunchYAdd: 1.5
