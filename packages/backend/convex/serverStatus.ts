@@ -38,27 +38,24 @@ export const pruneServerStatus = internalMutation({
  * @returns Uptime percentage rounded to 2 decimal places
  */
 function calculateUptimePercent(
-  updates: Array<{ _creationTime: number }>,
+  updates: { _creationTime: number }[],
   periodStartMs: number,
   now: number,
-): number {
+) {
   if (updates.length === 0) {
     return 0;
   }
 
-  // Expected interval between updates (1 minute)
   const expectedIntervalMs = 60 * 1000;
-  // Maximum gap before considering server offline (2 minutes)
+
   const maxGapMs = 2 * 60 * 1000;
 
-  // Start from the earliest update in our period window
   const startTime = Math.max(updates[0]._creationTime, periodStartMs);
   const endTime = now;
   const totalTimeMs = endTime - startTime;
 
   let uptimeMs = 0;
 
-  // Check gaps between consecutive updates
   for (let i = 0; i < updates.length; i++) {
     const currentUpdate = updates[i];
     const nextUpdate = updates[i + 1];
@@ -67,40 +64,30 @@ function calculateUptimePercent(
       const gap = nextUpdate._creationTime - currentUpdate._creationTime;
 
       if (gap <= maxGapMs) {
-        // Normal gap, count as uptime
         uptimeMs += gap;
       } else {
-        // Gap too large, only count the expected interval as uptime
         uptimeMs += expectedIntervalMs;
-        // The rest is downtime (gap - expectedIntervalMs)
       }
     } else {
-      // Last update - check gap to current time
       const gap = endTime - currentUpdate._creationTime;
 
       if (gap <= maxGapMs) {
-        // Recent update, count as uptime
         uptimeMs += gap;
       } else {
-        // Old update, only count expected interval as uptime
         uptimeMs += expectedIntervalMs;
       }
     }
   }
 
-  // Calculate percentage
   const uptimePercent = totalTimeMs > 0 ? (uptimeMs / totalTimeMs) * 100 : 0;
 
-  // Round to 2 decimal places
   return Math.round(uptimePercent * 100) / 100;
 }
 
 export const getServerStatus = query({
   handler: async (ctx) => {
-    // Get the most recent status
     const recentStatus = await ctx.db.query("serverStatus").order("desc").first();
 
-    // Default values if no status exists
     if (!recentStatus) {
       return {
         isOnline: false,
@@ -114,11 +101,9 @@ export const getServerStatus = query({
 
     const now = Date.now();
 
-    // Server is considered online if the last update was within 3 minutes
     const threeMinutesInMs = 3 * 60 * 1000;
     const isOnline = now - recentStatus._creationTime < threeMinutesInMs;
 
-    // Get all status updates
     const allStatusUpdates = await ctx.db.query("serverStatus").order("asc").collect();
 
     const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
@@ -135,3 +120,156 @@ export const getServerStatus = query({
     };
   },
 });
+
+export const getHistoricServerUptimeChartData = query({
+  args: {
+    period: v.union(v.literal("1d"), v.literal("7d"), v.literal("30d")),
+  },
+  returns: v.array(
+    v.object({
+      date: v.string(),
+      isOnline: v.boolean(),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const periodStartMs = getPeriodStartMs(args.period);
+
+    const allStatusUpdates = await ctx.db.query("serverStatus").order("asc").collect();
+    const updates = allStatusUpdates.filter((s) => s._creationTime >= periodStartMs);
+
+    const intervalMs = 60 * 60 * 1000;
+    const uptimeData: Array<{ date: string; isOnline: boolean }> = [];
+
+    const maxGapMs = 2 * 60 * 1000;
+
+    for (let timestamp = periodStartMs; timestamp <= now; timestamp += intervalMs) {
+      let mostRecentUpdate = null;
+      for (let i = updates.length - 1; i >= 0; i--) {
+        if (updates[i]._creationTime <= timestamp) {
+          mostRecentUpdate = updates[i];
+          break;
+        }
+      }
+
+      const isOnline = mostRecentUpdate
+        ? timestamp - mostRecentUpdate._creationTime <= maxGapMs
+        : false;
+
+      uptimeData.push({
+        date: new Date(timestamp).toISOString(),
+        isOnline,
+      });
+    }
+
+    return uptimeData;
+  },
+});
+
+export const getHistoricServerTpsChartData = query({
+  args: {
+    period: v.union(v.literal("1d"), v.literal("7d"), v.literal("30d")),
+  },
+  handler: async (ctx, args) => {
+    const allStatusUpdates = await ctx.db.query("serverStatus").order("asc").collect();
+    const periodStartMs = getPeriodStartMs(args.period);
+
+    const updates = allStatusUpdates.filter((s) => s._creationTime >= periodStartMs);
+
+    const tpsData = updates.map((s) => ({
+      date: new Date(s._creationTime).toISOString(),
+      tps: s.tps,
+    }));
+
+    return tpsData;
+  },
+});
+
+export const getHistoricServerMemoryUsageChartData = query({
+  args: {
+    period: v.union(v.literal("1d"), v.literal("7d"), v.literal("30d")),
+  },
+  handler: async (ctx, args) => {
+    const allStatusUpdates = await ctx.db.query("serverStatus").order("asc").collect();
+    const periodStartMs = getPeriodStartMs(args.period);
+
+    const updates = allStatusUpdates.filter((s) => s._creationTime >= periodStartMs);
+
+    const memoryUsageData = updates.map((s) => ({
+      date: new Date(s._creationTime).toISOString(),
+      memoryUsage: s.memoryUsageMb,
+    }));
+
+    return memoryUsageData;
+  },
+});
+
+export const getHistoricServerLoadedChunksChartData = query({
+  args: {
+    period: v.union(v.literal("1d"), v.literal("7d"), v.literal("30d")),
+  },
+  handler: async (ctx, args) => {
+    const allStatusUpdates = await ctx.db.query("serverStatus").order("asc").collect();
+    const periodStartMs = getPeriodStartMs(args.period);
+
+    const updates = allStatusUpdates.filter((s) => s._creationTime >= periodStartMs);
+
+    const loadedChunksData = updates.map((s) => ({
+      date: new Date(s._creationTime).toISOString(),
+      loadedChunks: s.loadedChunks,
+    }));
+
+    return loadedChunksData;
+  },
+});
+
+export const getHistoricServerLoadedWorldsChartData = query({
+  args: {
+    period: v.union(v.literal("1d"), v.literal("7d"), v.literal("30d")),
+  },
+  handler: async (ctx, args) => {
+    const allStatusUpdates = await ctx.db.query("serverStatus").order("asc").collect();
+    const periodStartMs = getPeriodStartMs(args.period);
+
+    const updates = allStatusUpdates.filter((s) => s._creationTime >= periodStartMs);
+
+    const loadedWorldsData = updates.map((s) => ({
+      date: new Date(s._creationTime).toISOString(),
+      loadedWorlds: s.loadedWorlds,
+    }));
+
+    return loadedWorldsData;
+  },
+});
+
+export const getHistoricServerPlayerCountChartData = query({
+  args: {
+    period: v.union(v.literal("1d"), v.literal("7d"), v.literal("30d")),
+  },
+  handler: async (ctx, args) => {
+    const allStatusUpdates = await ctx.db.query("serverStatus").order("asc").collect();
+    const periodStartMs = getPeriodStartMs(args.period);
+
+    const updates = allStatusUpdates.filter((s) => s._creationTime >= periodStartMs);
+
+    const playerCountData = updates.map((s) => ({
+      date: new Date(s._creationTime).toISOString(),
+      playerCount: s.playerCount,
+    }));
+
+    return playerCountData;
+  },
+});
+
+function getPeriodStartMs(period: string) {
+  switch (period) {
+    case "1d":
+      return Date.now() - 24 * 60 * 60 * 1000;
+    case "7d":
+      return Date.now() - 7 * 24 * 60 * 60 * 1000;
+    case "30d":
+      return Date.now() - 30 * 24 * 60 * 60 * 1000;
+    default:
+      throw new Error("Invalid period");
+  }
+}
