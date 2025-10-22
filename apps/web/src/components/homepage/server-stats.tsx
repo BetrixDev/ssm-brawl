@@ -21,7 +21,7 @@ export function ServerStats() {
             <XCircleIcon className="text-red-500" size={12} />
           )}
         </PillStatus>
-        {serverStatus.data?.isOnline ? "Online" : "Offline"}
+        {serverStatus.data?.isOnline ? "Server Online" : "Server Offline"}
       </Pill>
       <Pill variant="outline">
         <PillIcon icon={UsersIcon} />
