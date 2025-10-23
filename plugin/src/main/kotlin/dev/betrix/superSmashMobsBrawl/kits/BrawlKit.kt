@@ -94,6 +94,9 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "ice_path" -> IcePathAbility(player)
                     "snow_turret" -> SnowTurretAbility(player)
                     "fissure" -> FissureAbility(player)
+                    "strawbury_swirl" -> StrawburySwirlAbility(player)
+                    "moostrike" -> MoostrikeAbility(player)
+                    "fungal_trampoline" -> FungalTrampolineAbility(player)
                     "hoof_bash" -> HoofBashAbility(player)
                     "harvest_rush" -> HarvestRushAbility(player)
                     "gliding_gallop" -> GlidingGallopAbility(player)
@@ -129,6 +132,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "giga_slime" -> GigaSlimePassive(player)
                     "arctic_aura" -> ArcticAuraPassive(player)
                     "exp_charge" -> ExpChargePassive(player)
+                    "overgrowth" -> OvergrowthPassive(player)
                     else -> {
                         logger.severe(
                             "No passive found with id ${it.id} reference on kit ${kitData.id}"

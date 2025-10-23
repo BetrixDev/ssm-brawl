@@ -106,6 +106,13 @@ passives:
       energyDecayRate: 10.0
       baseBowDamageCap: 5.0
 
+  - id: overgrowth
+    displayItem: golden_apple
+    userFacing: true
+    metadata:
+      absorptionRatio: 0.25
+      maxAbsorptionHearts: 4.0
+      absorptionDurationTicks: 200
   - id: exp_charge
     displayItem: experience_bottle
     userFacing: true

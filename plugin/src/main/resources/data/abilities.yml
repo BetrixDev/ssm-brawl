@@ -457,6 +457,50 @@ abilities:
     displayItem: iron_pickaxe
     metadata: {}
 
+  - id: strawbury_swirl
+    cooldown: 7.0
+    itemSlot: 0
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: sweet_berries
+    metadata:
+      spiralDurationMs: 2000
+      velocityDurationMs: 1200
+      hitboxRadius: 1.8
+      baseDamage: 4.0
+      damagePerCombo: 0.75
+      maxTimesHit: 1
+      damageCooldownMs: 250
+      particleSpiralRadius: 0.9
+
+  - id: moostrike
+    cooldown: 10.0
+    itemSlot: 1
+    type: melee
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: iron_ingot
+    metadata:
+      grabRadius: 3.0
+      launchStrength: 1.2
+      maxGrabDurationMs: 2500
+      slamDamage: 6.0
+      slamKnockbackMultiplier: 2.0
+
+  - id: fungal_trampoline
+    cooldown: 12.0
+    itemSlot: 2
+    type: aoe
+    usage: right_click
+    hotbarItem: iron_sword
+    displayItem: red_mushroom
+    metadata:
+      platformSize: 3
+      durationMs: 4000
+      bounceStrength: 1.2
+      bounceYAdd: 0.8
+      particleIntervalTicks: 5
   - id: hoof_bash
     cooldown: 6.0
     itemSlot: 0

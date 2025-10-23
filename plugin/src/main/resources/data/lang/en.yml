@@ -42,6 +42,9 @@ kits:
   snowman:
     name: "Snowman"
     description: "Close-range brawler that freezes foes and excels at ledge pressure"
+  mooshroom:
+    name: "Mooshroom"
+    description: "Combo-focused glass cannon that rewards aggressive play with damage scaling and sustain"
 abilities:
   sulphur_bomb:
     name: "Sulphur Bomb"
@@ -144,6 +147,15 @@ abilities:
   snow_turret:
     name: "Snow Turret"
     description: "Summon a frosty sentry that peppers enemies with snowballs"
+  strawbury_swirl:
+    name: "Strawbury Swirl"
+    description: "Launch a spiraling beam that scales damage with your combo count"
+  moostrike:
+    name: "Moostrike"
+    description: "Grab a nearby enemy and slam them into the ground for devastating impact"
+  fungal_trampoline:
+    name: "Fungal Trampoline"
+    description: "Spawn a bouncy mushroom platform that launches anyone who lands on it"
 maps:
   blue_forest:
     name: "Blue Forest"
@@ -242,6 +254,9 @@ messages:
   arctic_aura:
     name: "Arctic Aura"
     description: "Radiate chilling snow that slows enemies and empowers your strikes"
+  overgrowth:
+    name: "Overgrowth"
+    description: "Gain absorption hearts based on damage dealt, rewarding aggressive combos"
   projectiles:
     arrow: "Arrow"
     barrage_arrow: "Barrage Arrow"

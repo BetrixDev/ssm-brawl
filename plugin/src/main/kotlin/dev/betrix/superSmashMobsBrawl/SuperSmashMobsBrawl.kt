@@ -57,6 +57,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                     single(createdAtStart = true) { LangService(this@SuperSmashMobsBrawl) }
                     single { WorldService }
                     single { HubService }
+                    single { ComboTrackerService }
                 }
             )
         }
@@ -68,6 +69,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
         HubProtectionService.registerEvents()
         DebugService.initialize(this)
         PlayerDocumentService.setup()
+        ComboTrackerService.setup()
 
         server.motd(lang.t("motd"))
 
@@ -121,6 +123,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
         DebugService.teardown()
         KitService.teardown()
         PlayerDocumentService.teardown()
+        ComboTrackerService.teardown()
 
         stopKoin()
     }

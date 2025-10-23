@@ -344,6 +344,32 @@ kits:
       leggings: iron_leggings
       boots: diamond_boots
 
+  # Mooshroom
+  - id: mooshroom
+    meleeDamage: 6.0
+    armor: 3.5
+    knockbackMultiplier: 1.8
+    disguiseId: mooshroom
+    selectionSound: "entity.mooshroom.ambient"
+    displayItem: "red_mushroom"
+    passives:
+      - id: double_jump
+      - id: regeneration
+        overrides:
+          metadata:
+            healAmount: 0.2
+            healIntervalTicks: 60
+      - id: overgrowth
+      - id: hunger
+    abilities:
+      - id: strawbury_swirl
+      - id: moostrike
+      - id: fungal_trampoline
+    armorItems:
+      helmet: null
+      chestplate: chainmail_chestplate
+      leggings: chainmail_leggings
+      boots: chainmail_boots
   # Horse
   - id: horse
     meleeDamage: 5.0
