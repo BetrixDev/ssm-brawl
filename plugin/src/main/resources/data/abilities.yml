@@ -551,3 +551,48 @@ abilities:
       impactKnockbackMultiplier: 2.0
       impactEnemyLaunchStrength: 1.8
       impactEnemyLaunchYAdd: 1.5
+
+  - id: static_laser
+    cooldown: 7.0
+    itemSlot: 0
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_sword
+    displayItem: lightning_rod
+    metadata:
+      damage: 7.0
+      hitboxRadius: 1.5
+      damageRadius: 2.5
+      knockbackMultiplier: 3.0
+      range: 40.0
+      maxCharge: 0.99
+      chargePerTick: 0.035
+
+  - id: wool_mine
+    cooldown: 0.0
+    itemSlot: 1
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: white_wool
+    metadata:
+      afterDetonateCooldown: 8.0
+      explosionDamage: 12.0
+      damageRadius: 9.0
+      knockbackMultiplier: 2.0
+      delayMs: 800
+      autoDetonateDelayMs: 8000
+
+  - id: wooly_rocket
+    cooldown: 10.0
+    itemSlot: 2
+    type: mobility
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: firework_rocket
+    metadata:
+      damage: 8.0
+      damageRadius: 2.0
+      knockbackMultiplier: 2.5
+      minimumVelocityTimeMs: 200
+      maximumVelocityTimeMs: 1200

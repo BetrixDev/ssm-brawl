@@ -394,3 +394,28 @@ kits:
       chestplate: chainmail_chestplate
       leggings: chainmail_leggings
       boots: iron_boots
+
+  # Sheep
+  - id: sheep
+    meleeDamage: 5.0
+    armor: 5.0
+    knockbackMultiplier: 1.7
+    disguiseId: "sheep"
+    selectionSound: "entity.sheep.ambient"
+    displayItem: "white_wool"
+    passives:
+      - id: double_jump
+      - id: regeneration
+        overrides:
+          metadata:
+            healAmount: 0.25
+      - id: hunger
+    abilities:
+      - id: static_laser
+      - id: wool_mine
+      - id: wooly_rocket
+    armorItems:
+      helmet: null
+      chestplate: chainmail_chestplate
+      leggings: chainmail_leggings
+      boots: chainmail_boots
