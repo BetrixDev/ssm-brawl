@@ -255,3 +255,4 @@ class StaticLaserAbility(player: Player) :
     }
 }
 
+
