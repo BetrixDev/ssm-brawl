@@ -9,6 +9,7 @@ enum class KitSwitchingMode {
     NEVER,
     ON_DEATH,
     IMMEDIATE,
+    MYSTERY,
 }
 
 @Serializable data class MinigameDefFile(val minigames: List<MinigameDef>)

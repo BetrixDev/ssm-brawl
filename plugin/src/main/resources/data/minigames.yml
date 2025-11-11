@@ -22,3 +22,14 @@ minigames:
     allowParties: false
     respawnDelaySeconds: 5
     allowRejoinAfterLeave: true
+
+  - id: mystery_kit
+    countdown: 5
+    type: ffa
+    isHidden: false
+    minPlayers: 2
+    maxPlayers: 4
+    kitSwitchingMode: mystery
+    allowParties: true
+    respawnDelaySeconds: 5
+    allowRejoinAfterLeave: true

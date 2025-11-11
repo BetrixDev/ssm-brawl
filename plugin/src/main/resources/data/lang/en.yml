@@ -170,6 +170,9 @@ minigames:
   two_player_duels:
     name: "1v1 Duels"
     description: "A competitive 1v1 game mode"
+  mystery_kit:
+    name: "Mystery Kits"
+    description: "Respawn with a random kit after each death!"
 prefix: "<ui-shadow>[<gradient:accent:ui-shadow>Brawl</gradient><ui-shadow>]<reset>"
 messages:
   debug: "{lang:prefix} <text-dark>[DEBUG] {message}"
