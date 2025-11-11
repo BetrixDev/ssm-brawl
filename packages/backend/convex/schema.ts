@@ -17,7 +17,7 @@ export default defineSchema({
 
   players: defineTable({
     uuid: v.string(),
-    username: v.string(),
+    username: v.optional(v.string()),
     selectedKitId: v.string(),
   })
     .searchIndex("search_username", {

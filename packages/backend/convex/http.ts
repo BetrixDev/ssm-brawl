@@ -24,25 +24,37 @@ app.get("/hc", async (c) => {
   return c.json({ status: "ok" });
 });
 
-app.get("/players/:uuid/document", async (c) => {
+app.post("/players/:uuid/document/ensure", async (c) => {
   const { uuid } = c.req.param();
   const username = c.req.query("username") ?? "Unknown";
 
-  let document = await c.env.runQuery(internal.plugin.players.document.getPlayerDocument, {
+  await c.env.runMutation(internal.plugin.players.document.ensurePlayerDocument, {
+    uuid,
+    username,
+  });
+
+  return c.json({ status: "ok" });
+});
+
+app.get("/players/:uuid/kit", async (c) => {
+  const { uuid } = c.req.param();
+
+  const selectedKitId = await c.env.runQuery(internal.plugin.players.document.getSelectedKit, {
     uuid,
   });
 
-  if (!document) {
-    document = await c.env.runMutation(internal.plugin.players.document.createPlayerDocument, {
-      uuid,
-      username,
-    });
-  }
-
-  return c.json(document);
+  return c.json({ selectedKitId });
 });
 
-app.put("/players/:uuid/document", async (c) => {
+app.post("/players/:uuid/kit", async (c) => {
+  const { uuid } = c.req.param();
+  const { kitId } = await c.req.json();
+
+  await c.env.runMutation(internal.plugin.players.document.updateSelectedKit, {
+    uuid,
+    kitId,
+  });
+
   return c.json({ status: "ok" });
 });
 

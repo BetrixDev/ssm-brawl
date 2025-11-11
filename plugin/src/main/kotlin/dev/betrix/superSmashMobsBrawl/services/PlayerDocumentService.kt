@@ -5,19 +5,11 @@ import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.events.PlayerDocumentLoaded
-import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
-import dev.betrix.superSmashMobsBrawl.extensions.ticks
-import dev.betrix.superSmashMobsBrawl.extensions.warn
-import dev.betrix.superSmashMobsBrawl.models.player.PlayerDocument
 import gg.flyte.twilight.event.event
-import gg.flyte.twilight.scheduler.repeatingTask
-import java.util.UUID
-import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -28,152 +20,49 @@ object PlayerDocumentService : KoinComponent, Manageable() {
     private val api: ApiService by inject()
     private val plugin: SuperSmashMobsBrawl by inject()
 
-    private val documents = hashMapOf<UUID, PlayerDocument>()
-
     override fun setup() {
         plugin.server.onlinePlayers.forEach { player ->
             plugin.launch {
-                val deferredDocument = withContext(Dispatchers.IO) {
-                    val documentDeferred = async { api.playersGetDocumentAsync(player) }
-
+                withContext(Dispatchers.IO) {
+                    val task = async { api.playersEnsureDocumentAsync(player) }
                     async { api.sendPlayerJoinEventAsync(player) }
 
-                    documentDeferred
-                }
+                    task.await()
 
-                val document = deferredDocument.await()
-
-                documents[player.uniqueId] = document
-
-                withContext(plugin.minecraftDispatcher) {
-                    PlayerDocumentLoaded(player, document).callEvent()
+                    withContext(plugin.minecraftDispatcher) {
+                        PlayerDocumentLoaded(player).callEvent()
+                    }
                 }
             }
         }
 
         listeners.add(
-            event<PlayerSelectKitEvent> {
-                val document = documents[player.uniqueId] ?: return@event
-                document.selectedKitId = kit.id
-            }
-        )
+                event<PlayerJoinEvent>(priority = EventPriority.LOWEST) {
+                    runBlocking {
+                        plugin.launch {
+                            withContext(Dispatchers.IO) {
+                                val task = async { api.playersEnsureDocumentAsync(player) }
+                                async { api.sendPlayerJoinEventAsync(player) }
 
-        runnables.add(
-            repeatingTask(5.minutes.ticks) {
-                val entries = documents.entries.toList()
-                entries.forEach { (uuid, document) ->
-                    plugin.launch {
-                        withContext(Dispatchers.IO) {
-                            val player = plugin.server.getPlayer(uuid)
+                                task.await()
 
-                            if (player == null) {
-                                plugin.logger.warn(
-                                    "Player with UUID {uuid} not found, removing from cache and skipping persistence.",
-                                    uuid,
-                                )
-                                documents.remove(uuid)
-                                return@withContext
-                            }
-
-                            runCatching { api.playersSetDocumentAsync(player, document) }
-                                .onFailure {
-                                    plugin.logger.warn(
-                                        "Failed to persist document for {playerName}: {errorMessage}",
-                                        player.name,
-                                        it.message ?: "No error message",
-                                    )
+                                withContext(plugin.minecraftDispatcher) {
+                                    PlayerDocumentLoaded(player).callEvent()
                                 }
+                            }
                         }
                     }
                 }
-            }
         )
 
         listeners.add(
-            event<PlayerJoinEvent>(priority = EventPriority.LOWEST) {
-                runBlocking {
-                    plugin.launch {
-                        val deferredDocument = withContext(Dispatchers.IO) {
-                            val documentDeferred = async { api.playersGetDocumentAsync(player) }
-
-                            async { api.sendPlayerJoinEventAsync(player) }
-
-                            documentDeferred
-                        }
-
-                        val document = deferredDocument.await()
-
-                        documents[player.uniqueId] = document
-
-                        withContext(plugin.minecraftDispatcher) {
-                            PlayerDocumentLoaded(player, document).callEvent()
-                        }
-                    }
-                }
-            }
-        )
-
-        listeners.add(
-            event<PlayerQuitEvent>(priority = EventPriority.LOWEST) {
-                documents.remove(player.uniqueId)?.let {
+                event<PlayerQuitEvent>(priority = EventPriority.LOWEST) {
                     plugin.launch {
                         withContext(Dispatchers.IO) {
-                            val setDocDeferred = async { api.playersSetDocumentAsync(player, it) }
-                            val sendLeaveDeferred = async { api.sendPlayerLeaveEventAsync(player) }
-                            
-                            setDocDeferred.await()
-                            sendLeaveDeferred.await()
+                            async { api.sendPlayerLeaveEventAsync(player) }
                         }
                     }
                 }
-            }
         )
-    }
-
-    override fun teardown() {
-        val entries = documents.entries.toList()
-        runBlocking {
-            entries.forEach { (uuid, doc) ->
-                val player = plugin.server.getPlayer(uuid)
-
-                if (player == null) {
-                    plugin.logger.warn(
-                        "Player with UUID {uuid} not found, skipping persistence.",
-                        uuid,
-                    )
-                    return@forEach
-                }
-
-                withContext(Dispatchers.IO) {
-                    runCatching { api.playersSetDocumentAsync(player, doc) }
-                        .onFailure {
-                            plugin.logger.warn(
-                                "Flush failed for {playerName}: {errorMessage}",
-                                player.name,
-                                it.message ?: "No error message",
-                            )
-                        }
-                }
-            }
-        }
-        documents.clear()
-    }
-
-    fun getPlayerDocument(player: Player): PlayerDocument =
-        documents[player.uniqueId]
-            ?: error("Player document for ${player.name} not found in cache.")
-
-    fun getPlayerDocumentOrNull(player: Player): PlayerDocument? = documents[player.uniqueId]
-
-    suspend fun getPlayerDocumentOrFetch(player: Player): PlayerDocument {
-        return documents[player.uniqueId]
-            ?: withContext(Dispatchers.IO) {
-                val document = api.playersGetDocumentAsync(player)
-                documents[player.uniqueId] = document
-
-                PlayerDocumentLoaded(player, document).callEvent()
-
-                document
-            }
     }
 }

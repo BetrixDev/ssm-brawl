@@ -5,8 +5,8 @@ import dev.betrix.superSmashMobsBrawl.AxiomLoggerHandler
 import dev.betrix.superSmashMobsBrawl.IManageable
 import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
 import dev.betrix.superSmashMobsBrawl.extensions.ticks
+import dev.betrix.superSmashMobsBrawl.extensions.warn
 import dev.betrix.superSmashMobsBrawl.models.ServerStatus
-import dev.betrix.superSmashMobsBrawl.models.player.PlayerDocument
 import gg.flyte.twilight.scheduler.repeatingTask
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -16,7 +16,6 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
-import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
@@ -77,19 +76,26 @@ object ApiService : IManageable, KoinComponent {
         apiClient.close()
     }
 
-    suspend fun playersGetDocumentAsync(
-            player: Player,
-    ): PlayerDocument {
-        val response: PlayerDocument =
-            apiClient.get("players/${player.uniqueId}/document?username=${player.name}").body()
-
-        return response
+    suspend fun playersEnsureDocumentAsync(player: Player) {
+        apiClient.post("players/${player.uniqueId}/document/ensure?username=${player.name}") {
+            contentType(ContentType.Application.Json)
+        }
     }
 
-    suspend fun playersSetDocumentAsync(player: Player, document: PlayerDocument) {
-        apiClient.put("players/${player.uniqueId}/document") {
+    suspend fun playersSetSelectedKitAsync(player: Player, kitId: String) {
+        apiClient.post("players/${player.uniqueId}/kit") {
             contentType(ContentType.Application.Json)
-            setBody(document)
+            setBody(mapOf("kitId" to kitId))
+        }
+    }
+
+    suspend fun playersGetSelectedKitAsync(player: Player): String {
+        val response = apiClient.get("players/${player.uniqueId}/kit").body<Map<String, String>>()
+
+        return response["selectedKitId"] ?: run {
+            plugin.logger.warn("Player {uuid} had no selected kit id from API", player.uniqueId)
+
+            "skeleton"
         }
     }
 
