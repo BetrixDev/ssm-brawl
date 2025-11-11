@@ -4,8 +4,6 @@ import dev.betrix.superSmashMobsBrawl.extensions.sendDebugMessage
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
 import gg.flyte.twilight.event.event
 import gg.flyte.twilight.scheduler.repeatingTask
-import kotlin.math.max
-import kotlin.math.min
 import org.bukkit.GameMode
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -23,21 +21,14 @@ class SpiderLeapPassive(player: Player) :
 
     override val doubleJumpSound: Sound = Sound.ENTITY_SPIDER_AMBIENT
 
-    private val energyPerJump: Float
-        get() = (metadata.double("energyPerJump") ?: 16.6).toFloat()
+    private val energyPerJump: Double
+        get() = metadata.double("energyPerJump") ?: 16.6
 
-    private val minEnergyToJump: Float
-        get() = (metadata.double("minEnergyToJump") ?: 16.6).toFloat()
-
-    private val maxEnergy: Float
-        get() = (metadata.double("maxEnergy") ?: 100.0).toFloat()
-
-    private val energyRegenRate: Float
-        get() = (metadata.double("energyRegenRate") ?: 15.0).toFloat()
+    private val minEnergyToJump: Double
+        get() = metadata.double("minEnergyToJump") ?: 16.6
 
     override fun setup() {
         super.setup()
-        setupEnergyRegeneration()
     }
 
     override fun setupRechargeTask() {
@@ -53,6 +44,11 @@ class SpiderLeapPassive(player: Player) :
                     canDoubleJump = true
                     // Only allow flight if we have enough energy
                     player.allowFlight = canUseJump()
+                } else if (
+                    System.currentTimeMillis() - lastJumpTimeMs >= rechargeDelayMs && canUseJump()
+                ) {
+                    canDoubleJump = true
+                    player.allowFlight = true
                 }
             }
         )
@@ -100,30 +96,16 @@ class SpiderLeapPassive(player: Player) :
         )
     }
 
-    private fun setupEnergyRegeneration() {
-        runnables.add(
-            repeatingTask(1) {
-                val currentEnergy = player.exp * maxEnergy
-                val newEnergy = min(maxEnergy, currentEnergy + (energyRegenRate / 20f))
-                player.exp = min(0.9999f, newEnergy / maxEnergy)
-            }
-        )
-    }
-
     override fun canUseJump(): Boolean {
-        val currentEnergy = player.exp * maxEnergy
-        return currentEnergy >= minEnergyToJump
+        return energyManager?.hasEnergy(minEnergyToJump) ?: false
     }
 
     override fun activate() {
         // Spider leap goes exactly in the direction the player is looking
         player.setVelocity(player.location.direction, power, false, 0.0, 0.2, height, true)
 
-        // Deduct energy (convert from percentage to actual value)
-        val currentEnergyPercent = player.exp
-        val energyPerJumpPercent = energyPerJump / maxEnergy
-        val newEnergyPercent = max(0f, currentEnergyPercent - energyPerJumpPercent)
-        player.exp = newEnergyPercent
+        // Deduct energy using energy manager
+        energyManager?.consumeEnergy(energyPerJump)
 
         // Interact with wall climb passive if present
         val kit = kitService.getKitForPlayer(player)

@@ -2,13 +2,12 @@ package dev.betrix.superSmashMobsBrawl.passives
 
 import dev.betrix.superSmashMobsBrawl.utils.isOnGround
 import gg.flyte.twilight.scheduler.repeatingTask
-import kotlin.math.min
 import org.bukkit.entity.Player
 
 class ExpChargePassive(player: Player) : BrawlPassive("exp_charge", player) {
 
-    private val expAdd: Float
-        get() = (metadata.double("expAdd") ?: 0.01).toFloat()
+    private val expAdd: Double
+        get() = metadata.double("expAdd") ?: 0.01
 
     private val delayTicks: Long
         get() = metadata.long("delayTicks") ?: 1L
@@ -28,10 +27,10 @@ class ExpChargePassive(player: Player) : BrawlPassive("exp_charge", player) {
     override fun setup() {
         // Set full energy if configured
         if (startFullEnergy) {
-            player.exp = 1.0f
+            energyManager?.setEnergy(energyManager?.getMaxEnergy() ?: 100.0)
         }
 
-        // Setup the repeating task to charge XP
+        // Setup the repeating task to charge energy
         val chargeTask =
             repeatingTask(delayTicks) {
                 if (!player.isOnline || player.isDead) {
@@ -62,8 +61,10 @@ class ExpChargePassive(player: Player) : BrawlPassive("exp_charge", player) {
 
     private fun activate() {
         if (enabled && !player.isDead) {
-            val xp = player.exp
-            player.exp = min(xp + expAdd, 1.0f)
+            // Convert expAdd (0-1 range) to actual energy amount
+            val maxEnergy = energyManager?.getMaxEnergy() ?: 100.0
+            val energyToAdd = expAdd * maxEnergy
+            energyManager?.addEnergy(energyToAdd)
         }
     }
 }

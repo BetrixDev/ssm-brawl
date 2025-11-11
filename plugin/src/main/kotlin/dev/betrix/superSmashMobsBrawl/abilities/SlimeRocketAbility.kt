@@ -14,6 +14,7 @@ class SlimeRocketAbility(player: Player) : BrawlAbility("slime_rocket", player) 
     private var chargingTask: TwilightRunnable? = null
     private var chargeStartTimeMs: Long = 0L
     private var isCharging = false
+    private var currentFuel: Float = 1.0f
 
     private val maxChargeTimeMs = metadata.long("maxChargeTimeMs") ?: 3000L
     private val maxChargeDurationMs = metadata.long("maxChargeDurationMs") ?: 5000L
@@ -50,6 +51,7 @@ class SlimeRocketAbility(player: Player) : BrawlAbility("slime_rocket", player) 
     private fun startCharging() {
         isCharging = true
         chargeStartTimeMs = System.currentTimeMillis()
+        currentFuel = 1.0f
 
         // Call activate to set cooldown and send message
         activate()
@@ -73,19 +75,23 @@ class SlimeRocketAbility(player: Player) : BrawlAbility("slime_rocket", player) 
                 val elapsedMs = System.currentTimeMillis() - chargeStartTimeMs
                 val elapsedSeconds = (elapsedMs / 1000.0).coerceAtMost(3.0)
 
-                // Check if exp is too low or max duration reached
+                // Drain fuel only during the first 3 seconds
+                if (elapsedMs < maxChargeTimeMs) {
+                    currentFuel = (currentFuel - expDrainPerTick).coerceAtLeast(0f)
+                    energyManager?.setOverlay(currentFuel, id)
+                    if (energyManager == null) {
+                        player.exp = currentFuel
+                    }
+                }
+
+                // Check if fuel is too low or max duration reached
                 if (
-                    player.exp < minExpToCharge ||
+                    currentFuel < minExpToCharge ||
                         elapsedMs >= maxChargeDurationMs
                 ) {
                     stopCharging(false)
                     fireRocket()
                     return@repeatingTask
-                }
-
-                // Drain exp only during the first 3 seconds
-                if (elapsedMs < maxChargeTimeMs) {
-                    player.exp = (player.exp - expDrainPerTick).coerceAtLeast(0f)
                 }
 
                 // Play charging sound
@@ -118,6 +124,8 @@ class SlimeRocketAbility(player: Player) : BrawlAbility("slime_rocket", player) 
         isCharging = false
         chargingTask?.cancel()
         chargingTask = null
+        energyManager?.clearOverlay(id)
+        currentFuel = 1.0f
 
         if (!cancelled) {
             player.sendMessage(

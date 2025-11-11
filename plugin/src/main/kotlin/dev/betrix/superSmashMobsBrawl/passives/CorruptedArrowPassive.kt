@@ -20,20 +20,23 @@ import org.bukkit.persistence.PersistentDataType
 
 class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", player) {
     companion object {
-        private val playerEnergy = mutableMapOf<java.util.UUID, Double>()
         private val lastDamageTime = mutableMapOf<java.util.UUID, Long>()
 
-        fun getEnergy(player: Player): Double = playerEnergy[player.uniqueId] ?: 0.0
+        fun getEnergy(player: Player, energyManager: dev.betrix.superSmashMobsBrawl.kits.KitEnergyManager?): Double {
+            return energyManager?.getCurrentEnergy() ?: 0.0
+        }
 
-        fun addEnergy(player: Player, amount: Double, multiplier: Double = 1.0) {
-            val current = playerEnergy[player.uniqueId] ?: 0.0
-            val maxEnergy = 100.0
-            playerEnergy[player.uniqueId] = (current + (amount * multiplier)).coerceIn(0.0, maxEnergy)
+        fun addEnergy(
+            player: Player,
+            amount: Double,
+            multiplier: Double = 1.0,
+            energyManager: dev.betrix.superSmashMobsBrawl.kits.KitEnergyManager?,
+        ) {
+            energyManager?.addEnergy(amount * multiplier)
             lastDamageTime[player.uniqueId] = System.currentTimeMillis()
         }
 
         fun clearEnergy(player: Player) {
-            playerEnergy.remove(player.uniqueId)
             lastDamageTime.remove(player.uniqueId)
         }
     }
@@ -166,8 +169,9 @@ class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", pl
 
                 val calculatedDamage = if (arrowCharge > 0) {
                     // Corrupted arrow: scale damage based on energy (5-12)
-                    val energy = getEnergy(player)
-                    val energyRatio = energy / 100.0
+                    val maxEnergy = energyManager?.getMaxEnergy() ?: 100.0
+                    val energy = getEnergy(player, energyManager)
+                    val energyRatio = energy / maxEnergy
                     minDamage + (maxDamage - minDamage) * energyRatio
                 } else {
                     // Non-corrupted arrow: cap at base damage
@@ -197,10 +201,7 @@ class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", pl
                 if (source != player) return@event
 
                 // Gain energy based on damage dealt
-                addEnergy(player, damage * energyPerDamage)
-
-                // Update exp bar to show energy
-                player.exp = kotlin.math.min(0.9999F, (getEnergy(player) / 100.0).toFloat())
+                addEnergy(player, damage * energyPerDamage, 1.0, energyManager)
             }
         )
     }
@@ -216,11 +217,10 @@ class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", pl
                 
                 // Start decaying after delay
                 if (timeSinceLastDamage >= energyDecayDelayMs) {
-                    val currentEnergy = getEnergy(player)
+                    val currentEnergy = getEnergy(player, energyManager)
                     if (currentEnergy > 0) {
                         val newEnergy = (currentEnergy - energyDecayRate).coerceAtLeast(0.0)
-                        playerEnergy[player.uniqueId] = newEnergy
-                        player.exp = kotlin.math.min(0.9999F, (newEnergy / 100.0).toFloat())
+                        energyManager?.setEnergy(newEnergy)
                     }
                 }
             }
@@ -266,7 +266,11 @@ class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", pl
 
     private fun incrementCharge() {
         charge++
-        player.exp = min(0.9999F, charge.toFloat() / maxCharge.toFloat())
+        val chargeProgress = min(0.9999F, charge.toFloat() / maxCharge.toFloat())
+        energyManager?.setOverlay(chargeProgress, id)
+        if (energyManager == null) {
+            player.exp = chargeProgress
+        }
         player.playSound(player.eyeLocation, Sound.BLOCK_DISPENSER_FAIL, 0.5f, 1 + 0.1f * charge)
         
         // Show particle indicator when charging
@@ -287,7 +291,10 @@ class CorruptedArrowPassive(player: Player) : BrawlPassive("corrupted_arrow", pl
             it.cancel()
         }
         chargeRunnable = null
-        player.exp = 0f
+        energyManager?.clearOverlay(id)
+        if (energyManager == null) {
+            player.exp = 0f
+        }
         charge = 0
     }
 

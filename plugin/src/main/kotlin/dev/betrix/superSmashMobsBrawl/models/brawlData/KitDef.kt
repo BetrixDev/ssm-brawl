@@ -23,6 +23,7 @@ data class KitDef(
     @Serializable(with = MaterialSerializer::class) val displayItem: Material? = null,
     @Serializable(with = SoundSerializer::class) val selectionSound: Sound? = null,
     val userFacing: Boolean = true,
+    val energy: KitEnergyDef? = null,
 )
 
 @Serializable
@@ -41,4 +42,13 @@ data class KitArmorItemsDef(
     val chestplate: String? = null,
     val leggings: String? = null,
     val boots: String? = null,
+)
+
+@Serializable
+data class KitEnergyDef(
+    val maxEnergy: Double = 100.0,
+    val regenRate: Double = 0.0,
+    val startFull: Boolean = false,
+    val regenWhenInAir: Boolean = false,
+    val regenWhenSneaking: Boolean = true,
 )

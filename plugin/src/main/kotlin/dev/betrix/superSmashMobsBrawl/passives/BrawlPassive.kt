@@ -34,6 +34,9 @@ abstract class BrawlPassive(val id: String, val player: Player) : Manageable(), 
         return@lazy dataService.getKit(kitId)
     }
 
+    protected val energyManager
+        get() = kitService.getKitForPlayer(player)?.energyManager
+
     protected val metadata: MetadataAccessor =
         object : MetadataAccessor {
             override fun string(key: String): String? = getValue<String>(key)

@@ -56,13 +56,17 @@ class StampedePassive(player: Player) : BrawlPassive("stampede", player) {
                     )
                 }
 
-                if (stacks < maxStacks) {
+                val stackProgress = if (stacks < maxStacks) {
                     val elapsedMs = System.currentTimeMillis() - startTimeMs
                     val denominator =
                         if (stackIncreaseTimeMs > 0) stackIncreaseTimeMs.toFloat() else 1f
-                    player.exp = kotlin.math.min(0.9999f, elapsedMs.toFloat() / denominator)
+                    kotlin.math.min(0.9999f, elapsedMs.toFloat() / denominator)
                 } else {
-                    player.exp = 0.9999f
+                    0.9999f
+                }
+                energyManager?.setOverlay(stackProgress, id)
+                if (energyManager == null) {
+                    player.exp = stackProgress
                 }
 
                 if (System.currentTimeMillis() - startTimeMs < stackIncreaseTimeMs) {
@@ -133,7 +137,10 @@ class StampedePassive(player: Player) : BrawlPassive("stampede", player) {
     private fun removeStampede() {
         stacks = -1
         player.removePotionEffect(PotionEffectType.SPEED)
-        player.exp = 0f
+        energyManager?.clearOverlay(id)
+        if (energyManager == null) {
+            player.exp = 0f
+        }
     }
 
     override fun teardown() {

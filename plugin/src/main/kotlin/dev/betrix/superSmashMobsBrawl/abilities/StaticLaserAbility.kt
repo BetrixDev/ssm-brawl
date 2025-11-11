@@ -21,6 +21,7 @@ class StaticLaserAbility(player: Player) :
 
     private var chargingTask: TwilightRunnable? = null
     private var isCharging = false
+    private var currentCharge: Float = 0f
 
     private val damage = metadata.double("damage") ?: 7.0
     private val hitboxRadius = metadata.double("hitboxRadius") ?: 1.5
@@ -76,20 +77,24 @@ class StaticLaserAbility(player: Player) :
                     return@repeatingTask
                 }
 
-                player.exp = min(maxCharge, player.exp + chargePerTick)
+                currentCharge = min(maxCharge, currentCharge + chargePerTick)
+                energyManager?.setOverlay(currentCharge, id)
+                if (energyManager == null) {
+                    player.exp = currentCharge
+                }
 
                 player.world.playSound(
                     player.location,
                     Sound.BLOCK_FIRE_EXTINGUISH,
-                    0.25f + player.exp,
-                    0.75f + player.exp,
+                    0.25f + currentCharge,
+                    0.75f + currentCharge,
                 )
 
                 setSheepColor(
                     if (Math.random() > 0.5) DyeColor.YELLOW else DyeColor.BLACK
                 )
 
-                if (player.exp >= maxCharge) {
+                if (currentCharge >= maxCharge) {
                     stopCharging()
                     fireLaser()
                     cancel()
@@ -107,13 +112,17 @@ class StaticLaserAbility(player: Player) :
     }
 
     private fun fireLaser() {
-        if (player.exp <= 0.2) {
+        val chargeLevel = currentCharge
+        energyManager?.clearOverlay(id)
+
+        if (chargeLevel <= 0.2f) {
             setSheepColor(DyeColor.WHITE)
-            player.exp = 0f
+            currentCharge = 0f
+            if (energyManager == null) {
+                player.exp = 0f
+            }
             return
         }
-
-        val chargeLevel = player.exp
         val effectiveRange = range * chargeLevel
 
         val start = player.eyeLocation
@@ -186,7 +195,11 @@ class StaticLaserAbility(player: Player) :
         )
 
         setSheepColor(DyeColor.WHITE)
-        player.exp = 0f
+        currentCharge = 0f
+        energyManager?.clearOverlay(id)
+        if (energyManager == null) {
+            player.exp = 0f
+        }
     }
 
     private fun drawLaserBeam(start: Location, end: Location) {
@@ -251,6 +264,8 @@ class StaticLaserAbility(player: Player) :
     override fun teardown() {
         stopCharging()
         setSheepColor(DyeColor.WHITE)
+        currentCharge = 0f
+        energyManager?.clearOverlay(id)
         super.teardown()
     }
 }

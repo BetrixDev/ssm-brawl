@@ -133,7 +133,11 @@ class BarragePassive(player: Player) : BrawlPassive("barrage", player) {
 
     private fun incrementCharge() {
         charge++
-        player.exp = min(0.9999F, charge.toFloat() / maxCharge.toFloat())
+        val chargeProgress = min(0.9999F, charge.toFloat() / maxCharge.toFloat())
+        energyManager?.setOverlay(chargeProgress, id)
+        if (energyManager == null) {
+            player.exp = chargeProgress
+        }
         player.playSound(player.eyeLocation, Sound.BLOCK_DISPENSER_FAIL, 1f, 1 + 0.1f * charge)
     }
 
@@ -143,7 +147,10 @@ class BarragePassive(player: Player) : BrawlPassive("barrage", player) {
             it.cancel()
         }
         chargeRunnable = null
-        player.exp = 0f
+        energyManager?.clearOverlay(id)
+        if (energyManager == null) {
+            player.exp = 0f
+        }
         charge = 0
     }
 }

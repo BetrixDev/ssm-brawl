@@ -76,6 +76,12 @@ kits:
     disguiseId: "zombie"
     selectionSound: "entity.zombie.ambient"
     displayItem: "rotten_flesh"
+    energy:
+      maxEnergy: 100.0
+      regenRate: 0.0
+      startFull: false
+      regenWhenInAir: true
+      regenWhenSneaking: true
     passives:
       - id: regeneration
         overrides:
@@ -162,6 +168,12 @@ kits:
     disguiseId: "chicken"
     selectionSound: "entity.chicken.ambient"
     displayItem: "feather"
+    energy:
+      maxEnergy: 100.0
+      regenRate: 4.0
+      startFull: false
+      regenWhenInAir: false
+      regenWhenSneaking: true
     passives:
       - id: flap
       - id: regeneration
@@ -184,6 +196,12 @@ kits:
     disguiseId: "spider"
     selectionSound: "entity.spider.ambient"
     displayItem: "cobweb"
+    energy:
+      maxEnergy: 100.0
+      regenRate: 15.0
+      startFull: false
+      regenWhenInAir: true
+      regenWhenSneaking: true
     passives:
       - id: double_jump
         overrides:
@@ -300,6 +318,12 @@ kits:
     disguiseId: "slime"
     selectionSound: "entity.slime.squish"
     displayItem: "slime_ball"
+    energy:
+      maxEnergy: 100.0
+      regenRate: 0.0
+      startFull: false
+      regenWhenInAir: true
+      regenWhenSneaking: true
     passives:
       - id: regeneration
         overrides:

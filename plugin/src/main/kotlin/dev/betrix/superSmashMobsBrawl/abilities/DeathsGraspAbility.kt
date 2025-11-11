@@ -189,7 +189,7 @@ class DeathsGraspAbility(player: Player) : BrawlAbility("deaths_grasp", player) 
 
         // Grant bonus energy for empowered shots (1.5x energy on damage dealt)
         val damageDealt = event.damage
-        CorruptedArrowPassive.addEnergy(player, damageDealt * 1.5, arrowEnergyMultiplier)
+        CorruptedArrowPassive.addEnergy(player, damageDealt * 1.5, arrowEnergyMultiplier, energyManager)
 
         Particle.DUST.builder()
             .location(victim.location.add(0.0, 1.0, 0.0))

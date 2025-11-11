@@ -1,7 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.passives
 
 import gg.flyte.twilight.scheduler.repeatingTask
-import kotlin.math.max
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
 import org.koin.core.component.KoinComponent
@@ -11,17 +10,14 @@ class WallClimbPassive(player: Player) : BrawlPassive("wall_climb", player), Koi
     private val power: Double
         get() = metadata.double("wallClimbPower") ?: 0.4
 
-    private val energyPerUse: Float
-        get() = (metadata.double("energyPerUse") ?: 0.5).toFloat()
+    private val energyPerUse: Double
+        get() = metadata.double("energyPerUse") ?: 0.5
 
     private val cooldownMs: Long
         get() = metadata.long("cooldownMs") ?: 75L
 
     private val doubleJumpCooldownMs: Long
         get() = metadata.long("doubleJumpCooldownMs") ?: 150L
-
-    private val maxEnergy: Float
-        get() = (metadata.double("maxEnergy") ?: 100.0).toFloat()
 
     private val blockCheckRadius: Int
         get() = metadata.int("blockCheckRadius") ?: 1
@@ -66,8 +62,7 @@ class WallClimbPassive(player: Player) : BrawlPassive("wall_climb", player), Koi
         }
 
         // Check if player has enough energy
-        val currentEnergy = player.exp * maxEnergy
-        if (currentEnergy < energyPerUse) {
+        if (!energyManager?.hasEnergy(energyPerUse) ?: false) {
             return
         }
 
@@ -105,11 +100,8 @@ class WallClimbPassive(player: Player) : BrawlPassive("wall_climb", player), Koi
         // Apply upward velocity
         player.velocity = Vector(0.0, power, 0.0)
 
-        // Deduct energy
-        val currentEnergyPercent = player.exp
-        val energyPerUsePercent = energyPerUse / maxEnergy
-        val newEnergyPercent = max(0f, currentEnergyPercent - energyPerUsePercent)
-        player.exp = newEnergyPercent
+        // Deduct energy using energy manager
+        energyManager?.consumeEnergy(energyPerUse)
 
         // Recharge double jump if not already charged
         if (!chargedDoubleJump) {

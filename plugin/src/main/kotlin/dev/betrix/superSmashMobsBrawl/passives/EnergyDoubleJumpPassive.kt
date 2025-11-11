@@ -71,6 +71,6 @@ open class EnergyDoubleJumpPassive(
     }
 
     override fun canUseJump(): Boolean {
-        return player.exp > 0f
+        return energyManager?.hasEnergy(0.1) ?: (player.exp > 0f)
     }
 }

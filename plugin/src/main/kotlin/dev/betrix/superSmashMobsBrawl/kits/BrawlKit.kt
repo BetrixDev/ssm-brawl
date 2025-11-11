@@ -31,6 +31,8 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
 
     protected var disguise: BrawlDisguise? = null
 
+    protected var energyManager: KitEnergyManager? = null
+
     private var invincible: Boolean = false
 
     fun getMeleeDamage(): Double = kitData.meleeDamage
@@ -54,6 +56,12 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
     }
 
     open fun setup() {
+        // Initialize energy manager if kit has energy configuration
+        kitData.energy?.let { energyDef ->
+            energyManager = KitEnergyManager(player, energyDef)
+            energyManager?.setup()
+        }
+
         disguise = kitData.disguiseId?.let { BrawlDisguiseFactory.create(player, it) }
         if (kitData.disguiseId != null && disguise == null) {
             logger.severe("No disguise known with id ${kitData.disguiseId}")
@@ -154,7 +162,10 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
         player.heal()
         player.feed()
         player.clearActivePotionEffects()
-        player.exp = 0f
+        // Energy manager handles XP bar, only reset if no energy manager
+        if (energyManager == null) {
+            player.exp = 0f
+        }
         player.level = 0
         player.totalExperience = 0
 
@@ -186,6 +197,9 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
     }
 
     open fun teardown() {
+        energyManager?.teardown()
+        energyManager = null
+
         disguise?.teardown()
         disguise = null
 

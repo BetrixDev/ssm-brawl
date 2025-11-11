@@ -44,6 +44,9 @@ abstract class BrawlAbility(val id: String, val player: Player) : Manageable(), 
     protected val kitData
         get() = kitService.getKitForPlayer(player)?.let { dataService.getKit(it.id) }
 
+    protected val energyManager
+        get() = kitService.getKitForPlayer(player)?.energyManager
+
     private val abilityKey = NamespacedKey(plugin, "abilityId")
 
     protected var lastUsed: Long = 0

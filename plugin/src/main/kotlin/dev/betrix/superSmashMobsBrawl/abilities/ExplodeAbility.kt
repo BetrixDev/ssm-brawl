@@ -72,18 +72,21 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
 
         player.velocity = Vector()
         player.level = 0
-        player.exp = 0f
 
         var iteration = 0
         runnables.add(
             repeatingTask(1) {
                 if (iteration == fuseTimeTicks || !isExplodeActive) {
                     cancel()
-
+                    energyManager?.clearOverlay(id)
                     return@repeatingTask
                 }
 
-                player.exp = min((iteration + 1) / fuseTimeTicks.toFloat(), 0.9999f)
+                val fuseProgress = min((iteration + 1) / fuseTimeTicks.toFloat(), 0.9999f)
+                energyManager?.setOverlay(fuseProgress, id)
+                if (energyManager == null) {
+                    player.exp = fuseProgress
+                }
 
                 val volume = 0.5f + iteration / 20f
 
@@ -147,6 +150,9 @@ class ExplodeAbility(player: Player) : BrawlAbility("explode", player) {
 
     private fun resetPlayerData() {
         player.level = 0
-        player.exp = 0f
+        energyManager?.clearOverlay(id)
+        if (energyManager == null) {
+            player.exp = 0f
+        }
     }
 }
