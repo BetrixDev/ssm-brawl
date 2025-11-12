@@ -38,6 +38,7 @@ export const onPlayerJoin = internalMutation({
 
       await ctx.db.patch(joinCountStat._id, {
         value: newJoinCount,
+        updatedAt: Date.now(),
       });
 
       await ctx.db.insert("playerGeneralStatsHistory", {

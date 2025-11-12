@@ -38,17 +38,13 @@ object PlayerDocumentService : KoinComponent, Manageable() {
 
         listeners.add(
                 event<PlayerJoinEvent>(priority = EventPriority.LOWEST) {
-                    runBlocking {
-                        plugin.launch {
-                            withContext(Dispatchers.IO) {
-                                val task = async { api.playersEnsureDocumentAsync(player) }
-                                async { api.sendPlayerJoinEventAsync(player) }
+                    plugin.launch {
+                        withContext(Dispatchers.IO) {
+                            api.playersEnsureDocumentAsync(player)
+                            api.sendPlayerJoinEventAsync(player)
 
-                                task.await()
-
-                                withContext(plugin.minecraftDispatcher) {
-                                    PlayerDocumentLoaded(player).callEvent()
-                                }
+                            withContext(plugin.minecraftDispatcher) {
+                                PlayerDocumentLoaded(player).callEvent()
                             }
                         }
                     }

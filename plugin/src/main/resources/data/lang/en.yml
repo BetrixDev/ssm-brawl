@@ -196,6 +196,7 @@ messages:
       success_never: "{lang:prefix} <text>You have selected kit <primary>{lang:kits.{kitId}.name}<text>, but kit switching is disabled in this minigame"
       success_on_death: "{lang:prefix} <text>You have selected kit <primary>{lang:kits.{kitId}.name}<text>. Your kit will switch after you respawn"
       success_immediate: "{lang:prefix} <text>You have selected and switched to kit <primary>{lang:kits.{kitId}.name}"
+      already_selected: "{lang:prefix} <text>You already have kit <primary>{lang:kits.{kitId}.name}<text> selected"
   players:
     joinServer: "{lang:prefix} <primary>{playerName} <text>has joined the server"
   minigames:

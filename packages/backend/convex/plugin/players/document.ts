@@ -2,28 +2,6 @@ import { ConvexError, v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { internalMutation, internalQuery } from "../../_generated/server";
 
-export const getPlayerDocument = internalQuery({
-  args: {
-    uuid: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const player = await ctx.db
-      .query("players")
-      .withIndex("by_uuid", (q) => q.eq("uuid", args.uuid))
-      .first();
-
-    if (!player) {
-      return null;
-    }
-
-    return {
-      uuid: player.uuid,
-      username: player.username,
-      selectedKitId: player.selectedKitId,
-    };
-  },
-});
-
 export const createPlayerDocument = internalMutation({
   args: {
     uuid: v.string(),

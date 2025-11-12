@@ -1,5 +1,6 @@
 package dev.betrix.superSmashMobsBrawl.commands
 
+import dev.betrix.superSmashMobsBrawl.extensions.playErrorSound
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitDef
 import dev.betrix.superSmashMobsBrawl.models.brawlData.KitSwitchingMode
 import dev.betrix.superSmashMobsBrawl.services.KitService
@@ -27,6 +28,14 @@ class KitCommand : KoinComponent {
 
     @Execute
     fun kit(@Context player: Player, @Arg kit: KitDef) {
+        // Check if player already has this kit selected
+        val currentSelectedKit = kitService.currentSelectedKitForPlayer(player)
+        if (currentSelectedKit.id == kit.id) {
+            player.sendMessage(lang.t("messages.kits.select.already_selected") { "kitId" to kit.id })
+            player.playErrorSound()
+            return
+        }
+
         kitService.playerSelectKit(player, kit)
 
         // Determine the message to show based on the player's current minigame

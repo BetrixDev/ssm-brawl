@@ -47,7 +47,7 @@ object KitService : KoinComponent, Manageable() {
     private val playerSelectedKits = ConcurrentHashMap<UUID, String>() // kit id
     private val assignedBrawlKits = ConcurrentHashMap<UUID, BrawlKit>()
 
-    init {
+    override fun setup() {
         listeners.add(
             event<PlayerQuitEvent> {
                 unassignKit(player)

@@ -67,6 +67,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
         HubService.initialize(this)
         HubProtectionService.registerEvents()
         DebugService.initialize(this)
+        KitService.setup()
         PlayerDocumentService.setup()
 
         server.motd(lang.t("motd"))
