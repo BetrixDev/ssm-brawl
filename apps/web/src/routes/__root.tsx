@@ -1,23 +1,42 @@
-import Footer from "@/components/footer";
-import Loader from "@/components/loader";
 import { Toaster } from "@/components/ui/sonner";
-import type { createORPCReactQueryUtils } from "@orpc/react-query";
+
+import type { ConvexQueryClient } from "@convex-dev/react-query";
 import type { QueryClient } from "@tanstack/react-query";
 import {
   HeadContent,
   Outlet,
   Scripts,
   createRootRouteWithContext,
-  useRouterState,
+  useRouteContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import type { AppRouterClient } from "../../../backend/src/routers";
-import Header from "../components/header";
+import type { ConvexReactClient } from "convex/react";
+import { Header } from "../components/header";
 import appCss from "../index.css?url";
+
+import { AuthProviders } from "@/auth-providers";
+import { Footer } from "@/components/footer";
+import { authClient } from "@/lib/auth-client";
+import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import { fetchSession, getCookieName } from "@convex-dev/better-auth/react-start";
+import { createAuth } from "@ssm-brawl/backend/convex/auth";
+import { createServerFn } from "@tanstack/react-start";
+import { getCookie, getRequest } from "@tanstack/react-start/server";
+
+const fetchAuth = createServerFn({ method: "GET" }).handler(async () => {
+  const { session } = await fetchSession(getRequest());
+  const sessionCookieName = getCookieName(createAuth);
+  const token = getCookie(sessionCookieName);
+  return {
+    userId: session?.user.id,
+    token,
+  };
+});
 
 export interface RouterAppContext {
   queryClient: QueryClient;
-  rpc: ReturnType<typeof createORPCReactQueryUtils<AppRouterClient>>;
+  convexClient: ConvexReactClient;
+  convexQueryClient: ConvexQueryClient;
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
@@ -43,28 +62,37 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   }),
 
   component: RootDocument,
+  beforeLoad: async (ctx) => {
+    const { userId, token } = await fetchAuth();
+    if (token) {
+      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
+    }
+    return { userId, token };
+  },
 });
 
 function RootDocument() {
-  const isFetching = useRouterState({ select: (s) => s.isLoading });
-
+  const context = useRouteContext({ from: Route.id });
   return (
-    <html lang="en" className="dark">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <div className="grid h-svh grid-rows-[auto_1fr]">
-          <Header />
-          <div className="flex-1 min-h-[calc(100vh-9rem-4rem)]">
-            {isFetching ? <Loader /> : <Outlet />}
-          </div>
-          <Footer />
-        </div>
-        <Toaster richColors />
-        <TanStackRouterDevtools position="bottom-left" />
-        <Scripts />
-      </body>
-    </html>
+    <ConvexBetterAuthProvider client={context.convexClient} authClient={authClient}>
+      <html lang="en" className="dark">
+        <head>
+          <HeadContent />
+          <script crossOrigin="anonymous" src="https://tweakcn.com/live-preview.min.js" />
+        </head>
+        <body className="bg-background text-primary-foreground">
+          <AuthProviders>
+            <Header />
+            <div className="min-h-screen">
+              <Outlet />
+            </div>
+            <Footer />
+          </AuthProviders>
+          <Toaster richColors />
+          <TanStackRouterDevtools position="bottom-left" />
+          <Scripts />
+        </body>
+      </html>
+    </ConvexBetterAuthProvider>
   );
 }

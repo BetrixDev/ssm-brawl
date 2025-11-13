@@ -1,5 +1,5 @@
 {
-  "name": "@ssmbrawl/plugin",
+  "name": "@ssm-brawl/plugin",
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env -- nodemon --watch src --ext kt,yaml,yml --exec \"bun run --env-file=../.env.development ./scripts/run-gradle.mjs\" runServer",

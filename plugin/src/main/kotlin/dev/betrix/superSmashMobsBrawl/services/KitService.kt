@@ -3,6 +3,8 @@ package dev.betrix.superSmashMobsBrawl.services
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.shynixn.mccoroutine.bukkit.launch
+import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.events.PlayerDocumentLoaded
 import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
@@ -15,6 +17,8 @@ import gg.flyte.twilight.event.event
 import io.papermc.paper.datacomponent.DataComponentTypes
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -38,11 +42,12 @@ object KitService : KoinComponent, Manageable() {
     private val plugin: JavaPlugin by inject()
     private val dataService: DataService by inject()
     private val minigameService: MinigameService by inject()
+    private val api: ApiService by inject()
 
     private val playerSelectedKits = ConcurrentHashMap<UUID, String>() // kit id
     private val assignedBrawlKits = ConcurrentHashMap<UUID, BrawlKit>()
 
-    init {
+    override fun setup() {
         listeners.add(
             event<PlayerQuitEvent> {
                 unassignKit(player)
@@ -52,13 +57,34 @@ object KitService : KoinComponent, Manageable() {
 
         listeners.add(
             event<PlayerDocumentLoaded> {
-                playerSelectedKits[player.uniqueId] = document.selectedKitId
+                plugin.launch {
+                    withContext(Dispatchers.IO) {
+                        val kitId = api.playersGetSelectedKitAsync(player)
+
+                        withContext(plugin.minecraftDispatcher) {
+                            playerSelectedKits[player.uniqueId] = kitId
+                        }
+                    }
+                }
             }
         )
     }
 
     fun playerSelectKit(player: Player, kit: KitDef) {
         playerSelectedKits[player.uniqueId] = kit.id
+
+        // Save to backend asynchronously
+        plugin.launch {
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    api.playersSetSelectedKitAsync(player, kit.id)
+                }.onFailure {
+                    plugin.logger.warning(
+                        "Failed to save selected kit for ${player.name}: ${it.message}"
+                    )
+                }
+            }
+        }
 
         // Determine if the player should switch kits immediately based on their current minigame
         val currentMinigame = minigameService.getMinigameForPlayer(player)

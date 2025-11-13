@@ -73,3 +73,11 @@ fun Player.playSound(sound: Sound, pitch: Float = 1f, volume: Float = 1f) {
 fun Player.isCreativeMode(): Boolean {
     return gameMode == GameMode.CREATIVE
 }
+
+fun Player.playSuccessSound() {
+    playSound(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, pitch = 1f, volume = 1f)
+}
+
+fun Player.playErrorSound() {
+    playSound(Sound.ENTITY_VILLAGER_NO, pitch = 1f, volume = 1f)
+}

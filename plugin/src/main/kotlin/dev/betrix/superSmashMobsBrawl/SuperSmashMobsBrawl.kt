@@ -68,6 +68,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
         HubService.initialize(this)
         HubProtectionService.registerEvents()
         DebugService.initialize(this)
+        KitService.setup()
         PlayerDocumentService.setup()
         ComboTrackerService.setup()
 
