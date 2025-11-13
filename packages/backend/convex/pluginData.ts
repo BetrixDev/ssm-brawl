@@ -12,29 +12,57 @@ export const syncPluginData = internalAction({
       args.urlPrefix ??
       "https://raw.githubusercontent.com/BetrixDev/ssm-brawl/refs/heads/reimagined/plugin/src/main/resources/data";
 
-    const { abilities } = await ctx.runAction(internal.pluginData.fetchPluginData, {
-      url: `${urlPrefix}/abilities.yml`,
-    });
+    const [
+      { abilities },
+      { passives },
+      { kits },
+      { gameMaps, hubMaps },
+      { disguises },
+      { minigames },
+    ] = await Promise.all([
+      ctx.runAction(internal.pluginData.fetchPluginData, {
+        url: `${urlPrefix}/abilities.yml`,
+      }),
+      ctx.runAction(internal.pluginData.fetchPluginData, {
+        url: `${urlPrefix}/passives.yml`,
+      }),
+      ctx.runAction(internal.pluginData.fetchPluginData, {
+        url: `${urlPrefix}/kits.yml`,
+      }),
+      ctx.runAction(internal.pluginData.fetchPluginData, {
+        url: `${urlPrefix}/maps.yml`,
+      }),
+      ctx.runAction(internal.pluginData.fetchPluginData, {
+        url: `${urlPrefix}/disguises.yml`,
+      }),
+      ctx.runAction(internal.pluginData.fetchPluginData, {
+        url: `${urlPrefix}/minigames.yml`,
+      }),
+    ]);
 
-    const { passives } = await ctx.runAction(internal.pluginData.fetchPluginData, {
-      url: `${urlPrefix}/passives.yml`,
-    });
-
-    const { kits } = await ctx.runAction(internal.pluginData.fetchPluginData, {
-      url: `${urlPrefix}/kits.yml`,
-    });
-
-    await ctx.runMutation(internal.pluginData.upsertKits, {
-      kits: kits,
-    });
-
-    await ctx.runMutation(internal.pluginData.upsertPassives, {
-      passives: passives,
-    });
-
-    await ctx.runMutation(internal.pluginData.upsertAbilities, {
-      abilities: abilities,
-    });
+    await Promise.all([
+      ctx.runMutation(internal.pluginData.upsertKits, {
+        kits: kits,
+      }),
+      ctx.runMutation(internal.pluginData.upsertPassives, {
+        passives: passives,
+      }),
+      ctx.runMutation(internal.pluginData.upsertAbilities, {
+        abilities: abilities,
+      }),
+      ctx.runMutation(internal.pluginData.upsertGameMaps, {
+        gameMaps: gameMaps,
+      }),
+      ctx.runMutation(internal.pluginData.upsertHubMaps, {
+        hubMaps: hubMaps,
+      }),
+      ctx.runMutation(internal.pluginData.upsertDisguises, {
+        disguises: disguises,
+      }),
+      ctx.runMutation(internal.pluginData.upsertMinigames, {
+        minigames: minigames,
+      }),
+    ]);
 
     return "ok";
   },
@@ -143,12 +171,150 @@ export const upsertKits = internalMutation({
           metadata: kit.metadata,
           passives: kit.passives ?? [],
           abilities: kit.abilities ?? [],
-          armorItems: kit.armorItems,
+          armorItems: kit.armorItems ?? {},
           meleeDamage: kit.meleeDamage,
           armor: kit.armor,
           knockbackMultiplier: kit.knockbackMultiplier,
           disguiseId: kit.disguiseId,
           selectionSound: kit.selectionSound,
+        });
+      }
+    }
+  },
+});
+
+export const upsertGameMaps = internalMutation({
+  args: {
+    gameMaps: v.array(v.any()),
+  },
+  handler: async (ctx, args) => {
+    for (const map of args.gameMaps) {
+      const existingMap = await ctx.db
+        .query("gameMaps")
+        .withIndex("by_map_id", (q) => q.eq("mapId", map.id))
+        .first();
+
+      if (existingMap) {
+        await ctx.db.patch(existingMap._id, {
+          voidLevel: map.voidLevel,
+          maxPlayers: map.maxPlayers,
+          worldBorderSize: map.worldBorderSize,
+          creators: map.creators,
+          spawnPoints: map.spawnPoints,
+        });
+      } else {
+        await ctx.db.insert("gameMaps", {
+          mapId: map.id,
+          voidLevel: map.voidLevel,
+          maxPlayers: map.maxPlayers,
+          worldBorderSize: map.worldBorderSize,
+          creators: map.creators,
+          spawnPoints: map.spawnPoints,
+          spectatorSpawnPoint: map.spectatorSpawnPoint,
+        });
+      }
+    }
+  },
+});
+
+export const upsertHubMaps = internalMutation({
+  args: {
+    hubMaps: v.array(v.any()),
+  },
+  handler: async (ctx, args) => {
+    for (const map of args.hubMaps) {
+      const existingMap = await ctx.db
+        .query("hubMaps")
+        .withIndex("by_map_id", (q) => q.eq("mapId", map.id))
+        .first();
+
+      if (existingMap) {
+        await ctx.db.patch(existingMap._id, {
+          voidLevel: map.voidLevel,
+          worldBorderSize: map.worldBorderSize,
+          creators: map.creators,
+          spawnPoints: map.spawnPoints,
+        });
+      } else {
+        await ctx.db.insert("hubMaps", {
+          mapId: map.id,
+          voidLevel: map.voidLevel,
+          worldBorderSize: map.worldBorderSize,
+          creators: map.creators,
+          spawnPoints: map.spawnPoints,
+        });
+      }
+    }
+  },
+});
+
+export const upsertDisguises = internalMutation({
+  args: {
+    disguises: v.array(v.any()),
+  },
+  handler: async (ctx, args) => {
+    for (const disguise of args.disguises) {
+      const existingDisguise = await ctx.db
+        .query("disguises")
+        .withIndex("by_disguise_id", (q) => q.eq("disguiseId", disguise.id))
+        .first();
+
+      if (existingDisguise) {
+        await ctx.db.patch(existingDisguise._id, {
+          disguiseId: disguise.id,
+        });
+      } else {
+        await ctx.db.insert("disguises", {
+          disguiseId: disguise.id,
+        });
+      }
+    }
+  },
+});
+
+export const upsertMinigames = internalMutation({
+  args: {
+    minigames: v.array(v.any()),
+  },
+  handler: async (ctx, args) => {
+    for (const minigame of args.minigames) {
+      const existingMinigame = await ctx.db
+        .query("minigames")
+        .withIndex("by_minigame_id", (q) => q.eq("minigameId", minigame.id))
+        .first();
+
+      if (existingMinigame) {
+        await ctx.db.patch(existingMinigame._id, {
+          countdown: minigame.countdown,
+          type: minigame.type,
+          isHidden: minigame.isHidden,
+          minPlayers: minigame.minPlayers,
+          maxPlayers: minigame.maxPlayers,
+          kitSwitchingMode: minigame.kitSwitchingMode,
+          allowParties: minigame.allowParties,
+          passiveBlacklist: minigame.passiveBlacklist,
+          respawnDelaySeconds: minigame.respawnDelaySeconds,
+          allowRejoinAfterLeave: minigame.allowRejoinAfterLeave,
+          playersPerTeam: minigame.playersPerTeam,
+          amountOfTeams: minigame.amountOfTeams,
+          stocks: minigame.stocks,
+        });
+      } else {
+        await ctx.db.insert("minigames", {
+          minigameId: minigame.id,
+          countdown: minigame.countdown,
+          type: minigame.type,
+          isHidden: minigame.isHidden,
+          minPlayers: minigame.minPlayers,
+          maxPlayers: minigame.maxPlayers,
+          kitSwitchingMode: minigame.kitSwitchingMode,
+          allowParties: minigame.allowParties,
+          passiveBlacklist: minigame.passiveBlacklist,
+          respawnDelaySeconds: minigame.respawnDelaySeconds,
+          allowRejoinAfterLeave: minigame.allowRejoinAfterLeave,
+          playersPerTeam: minigame.playersPerTeam,
+          amountOfTeams: minigame.amountOfTeams,
+          stocks: minigame.stocks,
         });
       }
     }
