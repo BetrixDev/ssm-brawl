@@ -19,6 +19,7 @@ export const syncPluginData = internalAction({
       { gameMaps, hubMaps },
       { disguises },
       { minigames },
+      lang,
     ] = await Promise.all([
       ctx.runAction(internal.pluginData.fetchPluginData, {
         url: `${urlPrefix}/abilities.yml`,
@@ -38,29 +39,39 @@ export const syncPluginData = internalAction({
       ctx.runAction(internal.pluginData.fetchPluginData, {
         url: `${urlPrefix}/minigames.yml`,
       }),
+      ctx.runAction(internal.pluginData.fetchPluginData, {
+        url: `${urlPrefix}/lang/en.yml`,
+      }),
     ]);
 
     await Promise.all([
       ctx.runMutation(internal.pluginData.upsertKits, {
         kits: kits,
+        lang,
       }),
       ctx.runMutation(internal.pluginData.upsertPassives, {
         passives: passives,
+        lang,
       }),
       ctx.runMutation(internal.pluginData.upsertAbilities, {
         abilities: abilities,
+        lang,
       }),
       ctx.runMutation(internal.pluginData.upsertGameMaps, {
         gameMaps: gameMaps,
+        lang,
       }),
       ctx.runMutation(internal.pluginData.upsertHubMaps, {
         hubMaps: hubMaps,
+        lang,
       }),
       ctx.runMutation(internal.pluginData.upsertDisguises, {
         disguises: disguises,
+        lang,
       }),
       ctx.runMutation(internal.pluginData.upsertMinigames, {
         minigames: minigames,
+        lang,
       }),
     ]);
 
@@ -83,6 +94,7 @@ export const fetchPluginData = internalAction({
 export const upsertAbilities = internalMutation({
   args: {
     abilities: v.array(v.any()),
+    lang: v.any(),
   },
   handler: async (ctx, args) => {
     for (const ability of args.abilities) {
@@ -90,6 +102,9 @@ export const upsertAbilities = internalMutation({
         .query("abilities")
         .withIndex("by_ability_id", (q) => q.eq("abilityId", ability.id))
         .first();
+
+      const displayName = args.lang.abilities?.[ability.id]?.name ?? ability.id;
+      const description = args.lang.abilities?.[ability.id]?.description ?? ability.id;
 
       if (existingAbility) {
         await ctx.db.patch(existingAbility._id, {
@@ -100,6 +115,8 @@ export const upsertAbilities = internalMutation({
           hotbarItem: ability.hotbarItem,
           displayItem: ability.displayItem,
           metadata: ability.metadata,
+          displayName: displayName,
+          description: description,
         });
       } else {
         await ctx.db.insert("abilities", {
@@ -111,6 +128,8 @@ export const upsertAbilities = internalMutation({
           hotbarItem: ability.hotbarItem,
           displayItem: ability.displayItem,
           metadata: ability.metadata,
+          displayName: displayName,
+          description: description,
         });
       }
     }
@@ -120,6 +139,7 @@ export const upsertAbilities = internalMutation({
 export const upsertPassives = internalMutation({
   args: {
     passives: v.array(v.any()),
+    lang: v.any(),
   },
   handler: async (ctx, args) => {
     for (const passive of args.passives) {
@@ -128,11 +148,16 @@ export const upsertPassives = internalMutation({
         .withIndex("by_passive_id", (q) => q.eq("passiveId", passive.id))
         .first();
 
+      const displayName = args.lang.passives?.[passive.id]?.name ?? passive.id;
+      const description = args.lang.passives?.[passive.id]?.description ?? passive.id;
+
       if (existingPassive) {
         await ctx.db.patch(existingPassive._id, {
           userFacing: passive.userFacing,
           displayItem: passive.displayItem,
           metadata: passive.metadata,
+          displayName: displayName,
+          description: description,
         });
       } else {
         await ctx.db.insert("passives", {
@@ -140,6 +165,8 @@ export const upsertPassives = internalMutation({
           userFacing: passive.userFacing,
           displayItem: passive.displayItem,
           metadata: passive.metadata,
+          displayName: displayName,
+          description: description,
         });
       }
     }
@@ -149,6 +176,7 @@ export const upsertPassives = internalMutation({
 export const upsertKits = internalMutation({
   args: {
     kits: v.array(v.any()),
+    lang: v.any(),
   },
   handler: async (ctx, args) => {
     for (const kit of args.kits) {
@@ -157,15 +185,30 @@ export const upsertKits = internalMutation({
         .withIndex("by_kit_id", (q) => q.eq("kitId", kit.id))
         .first();
 
+      const displayName = args.lang.kits?.[kit.id]?.name ?? kit.id;
+      const description = args.lang.kits?.[kit.id]?.description ?? kit.id;
+
       if (existingKit) {
         await ctx.db.patch(existingKit._id, {
           userFacing: kit.userFacing,
           displayItem: kit.displayItem,
           metadata: kit.metadata,
+          displayName: displayName,
+          description: description,
+          passives: kit.passives ?? [],
+          abilities: kit.abilities ?? [],
+          armorItems: kit.armorItems ?? {},
+          meleeDamage: kit.meleeDamage,
+          armor: kit.armor,
+          knockbackMultiplier: kit.knockbackMultiplier,
+          disguiseId: kit.disguiseId,
+          selectionSound: kit.selectionSound,
         });
       } else {
         await ctx.db.insert("kits", {
           kitId: kit.id,
+          displayName: displayName,
+          description: description,
           userFacing: kit.userFacing,
           displayItem: kit.displayItem,
           metadata: kit.metadata,
@@ -186,6 +229,7 @@ export const upsertKits = internalMutation({
 export const upsertGameMaps = internalMutation({
   args: {
     gameMaps: v.array(v.any()),
+    lang: v.any(),
   },
   handler: async (ctx, args) => {
     for (const map of args.gameMaps) {
@@ -194,6 +238,9 @@ export const upsertGameMaps = internalMutation({
         .withIndex("by_map_id", (q) => q.eq("mapId", map.id))
         .first();
 
+      const displayName = args.lang.maps?.[map.id]?.name ?? map.id;
+      const description = args.lang.maps?.[map.id]?.description ?? map.id;
+
       if (existingMap) {
         await ctx.db.patch(existingMap._id, {
           voidLevel: map.voidLevel,
@@ -201,6 +248,8 @@ export const upsertGameMaps = internalMutation({
           worldBorderSize: map.worldBorderSize,
           creators: map.creators,
           spawnPoints: map.spawnPoints,
+          displayName: displayName,
+          description: description,
         });
       } else {
         await ctx.db.insert("gameMaps", {
@@ -211,6 +260,8 @@ export const upsertGameMaps = internalMutation({
           creators: map.creators,
           spawnPoints: map.spawnPoints,
           spectatorSpawnPoint: map.spectatorSpawnPoint,
+          displayName: displayName,
+          description: description,
         });
       }
     }
@@ -220,6 +271,7 @@ export const upsertGameMaps = internalMutation({
 export const upsertHubMaps = internalMutation({
   args: {
     hubMaps: v.array(v.any()),
+    lang: v.any(),
   },
   handler: async (ctx, args) => {
     for (const map of args.hubMaps) {
@@ -228,12 +280,17 @@ export const upsertHubMaps = internalMutation({
         .withIndex("by_map_id", (q) => q.eq("mapId", map.id))
         .first();
 
+      const displayName = args.lang.maps?.[map.id]?.name ?? map.id;
+      const description = args.lang.maps?.[map.id]?.description ?? map.id;
+
       if (existingMap) {
         await ctx.db.patch(existingMap._id, {
           voidLevel: map.voidLevel,
           worldBorderSize: map.worldBorderSize,
           creators: map.creators,
           spawnPoints: map.spawnPoints,
+          displayName: displayName,
+          description: description,
         });
       } else {
         await ctx.db.insert("hubMaps", {
@@ -242,6 +299,8 @@ export const upsertHubMaps = internalMutation({
           worldBorderSize: map.worldBorderSize,
           creators: map.creators,
           spawnPoints: map.spawnPoints,
+          displayName: displayName,
+          description: description,
         });
       }
     }
@@ -251,6 +310,7 @@ export const upsertHubMaps = internalMutation({
 export const upsertDisguises = internalMutation({
   args: {
     disguises: v.array(v.any()),
+    lang: v.any(),
   },
   handler: async (ctx, args) => {
     for (const disguise of args.disguises) {
@@ -259,13 +319,17 @@ export const upsertDisguises = internalMutation({
         .withIndex("by_disguise_id", (q) => q.eq("disguiseId", disguise.id))
         .first();
 
+      const displayName = args.lang.maps?.[disguise.id]?.name ?? disguise.id;
+
       if (existingDisguise) {
         await ctx.db.patch(existingDisguise._id, {
           disguiseId: disguise.id,
+          displayName: displayName,
         });
       } else {
         await ctx.db.insert("disguises", {
           disguiseId: disguise.id,
+          displayName: displayName,
         });
       }
     }
@@ -275,6 +339,7 @@ export const upsertDisguises = internalMutation({
 export const upsertMinigames = internalMutation({
   args: {
     minigames: v.array(v.any()),
+    lang: v.any(),
   },
   handler: async (ctx, args) => {
     for (const minigame of args.minigames) {
@@ -282,6 +347,9 @@ export const upsertMinigames = internalMutation({
         .query("minigames")
         .withIndex("by_minigame_id", (q) => q.eq("minigameId", minigame.id))
         .first();
+
+      const displayName = args.lang.minigames?.[minigame.id]?.name ?? minigame.id;
+      const description = args.lang.minigames?.[minigame.id]?.description ?? minigame.id;
 
       if (existingMinigame) {
         await ctx.db.patch(existingMinigame._id, {
@@ -298,6 +366,8 @@ export const upsertMinigames = internalMutation({
           playersPerTeam: minigame.playersPerTeam,
           amountOfTeams: minigame.amountOfTeams,
           stocks: minigame.stocks,
+          displayName: displayName,
+          description: description,
         });
       } else {
         await ctx.db.insert("minigames", {
@@ -315,6 +385,8 @@ export const upsertMinigames = internalMutation({
           playersPerTeam: minigame.playersPerTeam,
           amountOfTeams: minigame.amountOfTeams,
           stocks: minigame.stocks,
+          displayName: displayName,
+          description: description,
         });
       }
     }

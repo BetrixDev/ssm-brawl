@@ -187,6 +187,8 @@ export default defineSchema({
 
   abilities: defineTable({
     abilityId: v.string(),
+    displayName: v.string(),
+    description: v.string(),
     cooldown: v.number(),
     type: v.string(),
     itemSlot: v.number(),
@@ -198,10 +200,13 @@ export default defineSchema({
 
   disguises: defineTable({
     disguiseId: v.string(),
+    displayName: v.string(),
   }).index("by_disguise_id", ["disguiseId"]),
 
   passives: defineTable({
     passiveId: v.string(),
+    displayName: v.string(),
+    description: v.string(),
     userFacing: v.boolean(),
     displayItem: v.optional(v.string()),
     metadata: v.optional(v.any()),
@@ -209,6 +214,8 @@ export default defineSchema({
 
   kits: defineTable({
     kitId: v.string(),
+    displayName: v.string(),
+    description: v.string(),
     userFacing: v.optional(v.boolean()),
     meleeDamage: v.number(),
     armor: v.number(),
@@ -239,6 +246,8 @@ export default defineSchema({
 
   gameMaps: defineTable({
     mapId: v.string(),
+    displayName: v.string(),
+    description: v.string(),
     voidLevel: v.number(),
     maxPlayers: v.number(),
     worldBorderSize: v.number(),
@@ -261,6 +270,8 @@ export default defineSchema({
 
   hubMaps: defineTable({
     mapId: v.string(),
+    displayName: v.string(),
+    description: v.string(),
     voidLevel: v.number(),
     worldBorderSize: v.number(),
     creators: v.array(v.string()),
@@ -277,6 +288,8 @@ export default defineSchema({
 
   minigames: defineTable({
     minigameId: v.string(),
+    displayName: v.string(),
+    description: v.string(),
     countdown: v.number(),
     type: v.string(),
     isHidden: v.boolean(),
