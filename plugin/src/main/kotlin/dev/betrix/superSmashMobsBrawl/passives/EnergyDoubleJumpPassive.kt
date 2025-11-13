@@ -27,8 +27,7 @@ open class EnergyDoubleJumpPassive(
                     canDoubleJump = true
                     player.allowFlight = true
                 } else if (
-                    System.currentTimeMillis() - lastJumpTimeMs >= rechargeDelayMs &&
-                        canUseJump()
+                    System.currentTimeMillis() - lastJumpTimeMs >= rechargeDelayMs && canUseJump()
                 ) {
                     canDoubleJump = true
                     player.allowFlight = true
@@ -75,4 +74,3 @@ open class EnergyDoubleJumpPassive(
         return player.exp > 0f
     }
 }
-

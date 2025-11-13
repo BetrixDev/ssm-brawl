@@ -11,24 +11,24 @@ class FlapPassive(player: Player) : EnergyDoubleJumpPassive("flap", player) {
 
     override val power: Double
         get() = metadata.double("flapStrengthMultiplier") ?: 0.95
-    
+
     override val height: Double
         get() = metadata.double("flapHeightMax") ?: 0.9
-    
+
     private val verticalBoost: Double
         get() = metadata.double("flapVerticalBoost") ?: 0.15
-    
+
     override val doubleJumpSound: Sound = Sound.ENTITY_CHICKEN_AMBIENT
-    
+
     private val energyPerFlap: Float
         get() = (metadata.double("energyPerFlap") ?: 12.5).toFloat()
-    
+
     private val minEnergyToFlap: Float
         get() = (metadata.double("minEnergyToFlap") ?: 12.5).toFloat()
-    
+
     private val maxEnergy: Float
         get() = (metadata.double("maxEnergy") ?: 100.0).toFloat()
-    
+
     private val energyRegenRate: Float
         get() = (metadata.double("energyRegenRate") ?: 4.0).toFloat()
 
@@ -44,22 +44,30 @@ class FlapPassive(player: Player) : EnergyDoubleJumpPassive("flap", player) {
                 if (!groundCheck()) {
                     return@repeatingTask
                 }
-                
+
                 val currentEnergy = player.exp * maxEnergy
                 val newEnergy = min(maxEnergy, currentEnergy + (energyRegenRate / 20f))
                 player.exp = min(0.9999f, newEnergy / maxEnergy)
             }
         )
     }
-    
+
     override fun canUseJump(): Boolean {
         val currentEnergy = player.exp * maxEnergy
         return currentEnergy >= minEnergyToFlap
     }
 
     override fun activate() {
-        player.setVelocity(player.location.direction, power, true, power, verticalBoost, height, true)
-        
+        player.setVelocity(
+            player.location.direction,
+            power,
+            true,
+            power,
+            verticalBoost,
+            height,
+            true,
+        )
+
         // Deduct energy (convert from percentage to actual value)
         val currentEnergyPercent = player.exp
         val energyPerFlapPercent = energyPerFlap / maxEnergy

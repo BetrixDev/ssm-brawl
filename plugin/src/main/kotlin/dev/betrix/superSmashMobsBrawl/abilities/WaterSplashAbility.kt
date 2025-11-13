@@ -73,10 +73,7 @@ class WaterSplashAbility(player: Player) : BrawlAbility("water_splash", player) 
             .filter { it != player }
             .forEach { entity ->
                 val trajectory =
-                    player.location
-                        .toVector()
-                        .subtract(entity.location.toVector())
-                        .normalize()
+                    player.location.toVector().subtract(entity.location.toVector()).normalize()
                 trajectory.y = pullYStrength
 
                 entity.setVelocity(
@@ -149,18 +146,12 @@ class WaterSplashAbility(player: Player) : BrawlAbility("water_splash", player) 
     private fun performSplash() {
         val ownerLocation = player.location
 
-        player.sendDebugMessage("[WaterSplash] Landing splash at ${ownerLocation.x}, ${ownerLocation.y}, ${ownerLocation.z}")
+        player.sendDebugMessage(
+            "[WaterSplash] Landing splash at ${ownerLocation.x}, ${ownerLocation.y}, ${ownerLocation.z}"
+        )
 
         // Firework particles
-        player.world.spawnParticle(
-            Particle.FIREWORK,
-            player.eyeLocation,
-            50,
-            0.0,
-            0.0,
-            0.0,
-            0.5,
-        )
+        player.world.spawnParticle(Particle.FIREWORK, player.eyeLocation, 50, 0.0, 0.0, 0.0, 0.5)
 
         // Block effects
         triggerBlockEffects()
@@ -175,7 +166,8 @@ class WaterSplashAbility(player: Player) : BrawlAbility("water_splash", player) 
             .filter { it != player }
             .forEach { target ->
                 val distance = target.location.distance(ownerLocation)
-                val normalizedDistance = ((damageRadius - distance) / damageRadius).coerceAtLeast(0.0)
+                val normalizedDistance =
+                    ((damageRadius - distance) / damageRadius).coerceAtLeast(0.0)
                 val scaledDamage = damage * normalizedDistance
 
                 player.sendDebugMessage("[WaterSplash] Damaging ${target.name} for $scaledDamage")

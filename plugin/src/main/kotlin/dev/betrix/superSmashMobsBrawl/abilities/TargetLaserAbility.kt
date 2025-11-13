@@ -80,9 +80,7 @@ class TargetLaserAbility(player: Player) : BrawlAbility("target_laser", player) 
         if (targetPlayer != null) {
             if (sendMessage) {
                 player.sendMessage(
-                    lang.t("messages.abilities.targetLaser.alreadyTargeting") {
-                        "abilityId" to id
-                    }
+                    lang.t("messages.abilities.targetLaser.alreadyTargeting") { "abilityId" to id }
                 )
             }
             return false
@@ -91,9 +89,7 @@ class TargetLaserAbility(player: Player) : BrawlAbility("target_laser", player) 
         if (!player.isOnBlock()) {
             if (sendMessage) {
                 player.sendMessage(
-                    lang.t("messages.abilities.targetLaser.mustBeOnGround") {
-                        "abilityId" to id
-                    }
+                    lang.t("messages.abilities.targetLaser.mustBeOnGround") { "abilityId" to id }
                 )
             }
             return false
@@ -162,8 +158,7 @@ class TargetLaserAbility(player: Player) : BrawlAbility("target_laser", player) 
                     return@repeatingTask
                 }
 
-                Particle.ENCHANTED_HIT
-                    .builder()
+                Particle.ENCHANTED_HIT.builder()
                     .location(target.location.add(0.0, 0.5, 0.0))
                     .offset(0.5, 1.0, 0.5)
                     .count(10)

@@ -60,7 +60,7 @@ kits:
             arrowIntervalTicks: 60
       - id: barrage
     abilities:
-      - id: bone_explosion
+      - id: bone_blast
       - id: roped_arrow
     armorItems:
       helmet: iron_helmet
@@ -86,7 +86,6 @@ kits:
       - id: bile_blaster
       - id: deaths_grasp
     armorItems:
-      helmet: null
       chestplate: chainmail_chestplate
       leggings: chainmail_leggings
       boots: chainmail_boots
@@ -130,11 +129,7 @@ kits:
       - id: bouncy_bacon
       - id: baby_bacon_bomb
     armorItems:
-      helmet: null
-      chestplate: null
-      leggings: null
-      boots: null
-
+    
   # Enderman
   - id: enderman
     meleeDamage: 7.0
@@ -183,7 +178,7 @@ kits:
 
   # Spider
   - id: spider
-    meleeDamage: 6.0
+    meleeDamage: 4.5
     armor: 6.0
     knockbackMultiplier: 1.5
     disguiseId: "spider"
@@ -311,6 +306,12 @@ kits:
           metadata:
             healAmount: 0.35
       - id: giga_slime
+      - id: exp_charge
+        overrides:
+          metadata:
+            expAdd: 0.00321
+            chargeWhenInAir: true
+            chargeWhenSneaking: true
     abilities:
       - id: slime_rocket
       - id: slime_slam
@@ -342,3 +343,79 @@ kits:
       chestplate: iron_chestplate
       leggings: iron_leggings
       boots: diamond_boots
+
+  # Mooshroom
+  - id: mooshroom
+    meleeDamage: 6.0
+    armor: 3.5
+    knockbackMultiplier: 1.8
+    disguiseId: mooshroom
+    selectionSound: "entity.mooshroom.ambient"
+    displayItem: "red_mushroom"
+    passives:
+      - id: double_jump
+      - id: regeneration
+        overrides:
+          metadata:
+            healAmount: 0.2
+            healIntervalTicks: 60
+      - id: overgrowth
+      - id: hunger
+    abilities:
+      - id: strawbury_swirl
+      - id: moostrike
+      - id: fungal_trampoline
+    armorItems:
+      helmet: null
+      chestplate: chainmail_chestplate
+      leggings: chainmail_leggings
+      boots: chainmail_boots
+  # Horse
+  - id: horse
+    meleeDamage: 5.0
+    armor: 6.5
+    knockbackMultiplier: 1.4
+    disguiseId: "horse"
+    selectionSound: "entity.horse.ambient"
+    displayItem: "saddle"
+    passives:
+      - id: double_jump
+      - id: regeneration
+        overrides:
+          metadata:
+            healAmount: 0.3
+      - id: hunger
+    abilities:
+      - id: hoof_bash
+      - id: harvest_rush
+      - id: gliding_gallop
+    armorItems:
+      helmet: iron_helmet
+      chestplate: chainmail_chestplate
+      leggings: chainmail_leggings
+      boots: iron_boots
+
+  # Sheep
+  - id: sheep
+    meleeDamage: 5.0
+    armor: 5.0
+    knockbackMultiplier: 1.7
+    disguiseId: "sheep"
+    selectionSound: "entity.sheep.ambient"
+    displayItem: "white_wool"
+    passives:
+      - id: double_jump
+      - id: regeneration
+        overrides:
+          metadata:
+            healAmount: 0.25
+      - id: hunger
+    abilities:
+      - id: static_laser
+      - id: wool_mine
+      - id: wooly_rocket
+    armorItems:
+      helmet: null
+      chestplate: chainmail_chestplate
+      leggings: chainmail_leggings
+      boots: chainmail_boots

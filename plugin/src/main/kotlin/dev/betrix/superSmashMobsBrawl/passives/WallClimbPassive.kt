@@ -1,13 +1,10 @@
 package dev.betrix.superSmashMobsBrawl.passives
 
-import dev.betrix.superSmashMobsBrawl.services.KitService
 import gg.flyte.twilight.scheduler.repeatingTask
 import kotlin.math.max
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.util.Vector
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class WallClimbPassive(player: Player) : BrawlPassive("wall_climb", player), KoinComponent {
 

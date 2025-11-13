@@ -207,6 +207,39 @@ class KitHandlerWithSwitchingAfterDeath(private val minigame: BrawlMinigame) :
     }
 }
 
+/** Assigns a random kit to players on each respawn, avoiding consecutive duplicates */
+class MysteryKitHandler(private val minigame: BrawlMinigame) : IKitHandler, KoinComponent {
+    private val kitService: KitService by inject()
+    private val lastAssignedKits = mutableMapOf<UUID, KitDef>()
+
+    override fun assignKitToPlayer(player: OfflinePlayer) {
+        val availableKits = kitService.getAllKitData().filter { it.userFacing }
+
+        if (availableKits.isEmpty()) {
+            // Fallback to default kit if no user-facing kits available
+            kitService.assignKit(player)
+            return
+        }
+
+        val lastKit = lastAssignedKits[player.uniqueId]
+        val kitToAssign =
+            if (availableKits.size > 1 && lastKit != null) {
+                // Exclude the last kit to avoid consecutive duplicates
+                availableKits.filter { it.id != lastKit.id }.random()
+            } else {
+                // If only one kit available or no last kit, just pick randomly
+                availableKits.random()
+            }
+
+        lastAssignedKits[player.uniqueId] = kitToAssign
+        kitService.assignKit(player, kitToAssign)
+    }
+
+    override fun removeKitFromPlayer(player: OfflinePlayer) {
+        kitService.unassignKit(player)
+    }
+}
+
 class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>) :
     Manageable(), KoinComponent {
 
@@ -239,6 +272,7 @@ class BrawlMinigame(val minigameDef: MinigameDef, val teams: List<MinigameTeam>)
             KitSwitchingMode.NEVER -> DefaultKitHandler(this)
             KitSwitchingMode.ON_DEATH -> KitHandlerWithSwitchingAfterDeath(this)
             KitSwitchingMode.IMMEDIATE -> KitHandlerWithSwitching(this)
+            KitSwitchingMode.MYSTERY -> MysteryKitHandler(this)
         }
 
     fun allPlayers(): List<OfflinePlayer> = teams.flatMap { it.players }

@@ -1,8 +1,8 @@
 package dev.betrix.superSmashMobsBrawl.abilities
 
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageEvent
-import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
+import dev.betrix.superSmashMobsBrawl.events.BrawlDeathEvent
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.extensions.event
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
@@ -130,7 +130,8 @@ class BatWaveAbility(player: Player) : BrawlAbility("bat_wave", player) {
                             (Math.random() - 0.5) / 2,
                         )
 
-                    val currentBatSpeed = if (bat.isLeashed) batSpeed * leashedBatSpeedMultiplier else batSpeed
+                    val currentBatSpeed =
+                        if (bat.isLeashed) batSpeed * leashedBatSpeedMultiplier else batSpeed
                     val batVelocity =
                         startLocation!!.direction.clone().multiply(currentBatSpeed).add(random)
                     bat.velocity = batVelocity

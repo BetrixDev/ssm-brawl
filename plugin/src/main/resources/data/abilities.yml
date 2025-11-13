@@ -26,7 +26,7 @@ abilities:
       explosionKnockbackMultiplier: 2.5
       explosionVelocityStrength: 1.8
 
-  - id: bone_explosion
+  - id: bone_blast
     cooldown: 10.0
     itemSlot: 0
     type: aoe
@@ -99,16 +99,23 @@ abilities:
       baseDamage: 4.5
 
   - id: spin_web
-    cooldown: 10.0
+    cooldown: 8.5
     itemSlot: 0
-    type: recovery
+    type: projectile
     usage: right_click
     hotbarItem: iron_axe
     displayItem: cobweb
     metadata:
-      launchVelocity: 1.0
-      dragDurationTicks: 20
-      slowDurationTicks: 40
+      webCount: 25
+      webDamage: 4.0
+      webKnockbackMultiplier: 0.0
+      webHitboxSize: 0.5
+      webLifetime: 2000
+      webBlockDurationTicks: 40
+      launchVelocityStrength: 1.2
+      launchVelocityY: 0.2
+      poisonDurationTicks: 40
+      poisonAmplifier: 0
 
   - id: blink
     cooldown: 6.0
@@ -302,8 +309,9 @@ abilities:
     hotbarItem: iron_axe
     displayItem: ice
     metadata:
-      path_duration: 4
-      bounce_height: 1
+      path_length: 16
+      melt_time_ms: 6000
+      launch_velocity_y: 0.5
 
   - id: snow_turret
     cooldown: 0.0
@@ -324,7 +332,11 @@ abilities:
     usage: right_click
     hotbarItem: iron_sword
     displayItem: slime_ball
-    metadata: {}
+    metadata:
+      maxChargeTimeMs: 3000
+      maxChargeDurationMs: 5000
+      expDrainPerTick: 0.00916
+      minExpToCharge: 0.1
 
   - id: slime_slam
     cooldown: 10.0
@@ -333,7 +345,16 @@ abilities:
     usage: right_click
     hotbarItem: iron_axe
     displayItem: slime_block
-    metadata: {}
+    metadata:
+      damage: 7.0
+      hitboxRadius: 2.0
+      velocityStrength: 1.2
+      velocityYAdd: 0.2
+      velocityYMax: 1.2
+      recoilDamageMultiplier: 0.25
+      recoilKnockbackMultiplier: 2.0
+      knockbackMultiplier: 2.0
+      minimumLandingTimeMs: 1000
 
   - id: bouncy_bacon
     cooldown: 5.0
@@ -378,12 +399,26 @@ abilities:
       burpSoundChance: 0.15
 
   - id: deaths_grasp
-    cooldown: 10.0
+    cooldown: 12.0
     type: recovery
     itemSlot: 1
     usage: left_click
     hotbarItem: bow
     displayItem: bow
+    metadata:
+      damage: 2.0
+      leapDurationMs: 1000
+      weaknessDurationMs: 1000
+      leapVelocity: 1.4
+      leapYAdd: 0.2
+      leapYMax: 1.2
+      throwbackVelocity: 1.6
+      throwbackYAdd: 1.2
+      throwbackYMax: 1.8
+      hitboxRadius: 2.0
+      rechargeTime: 2.0
+      arrowDamageMultiplier: 1.5
+      arrowEnergyMultiplier: 1.5
 
   - id: iron_hook
     cooldown: 8.0
@@ -421,3 +456,143 @@ abilities:
     hotbarItem: iron_shovel
     displayItem: iron_pickaxe
     metadata: {}
+
+  - id: strawbury_swirl
+    cooldown: 7.0
+    itemSlot: 0
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: sweet_berries
+    metadata:
+      spiralDurationMs: 2000
+      velocityDurationMs: 1200
+      hitboxRadius: 1.8
+      baseDamage: 4.0
+      damagePerCombo: 0.75
+      maxTimesHit: 1
+      damageCooldownMs: 250
+      particleSpiralRadius: 0.9
+
+  - id: moostrike
+    cooldown: 10.0
+    itemSlot: 1
+    type: melee
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: iron_ingot
+    metadata:
+      grabRadius: 3.0
+      launchStrength: 1.2
+      maxGrabDurationMs: 2500
+      slamDamage: 6.0
+      slamKnockbackMultiplier: 2.0
+
+  - id: fungal_trampoline
+    cooldown: 12.0
+    itemSlot: 2
+    type: aoe
+    usage: right_click
+    hotbarItem: iron_sword
+    displayItem: red_mushroom
+    metadata:
+      platformSize: 3
+      durationMs: 4000
+      bounceStrength: 1.2
+      bounceYAdd: 0.8
+      particleIntervalTicks: 5
+  - id: hoof_bash
+    cooldown: 6.0
+    itemSlot: 0
+    type: melee
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: iron_horse_armor
+    metadata:
+      damage: 6.5
+      knockbackMultiplier: 4.0
+      range: 2.5
+      slowDurationTicks: 16
+      animationDurationMs: 1000
+
+  - id: harvest_rush
+    cooldown: 10.0
+    itemSlot: 1
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: bone
+    metadata:
+      durationMs: 1500
+      projectileDamage: 0.2
+      projectilesPerTick: 6
+      dashSpeed: 0.6
+      yLimit: 0.0
+      slamDamage: 4.0
+      slamRadius: 3.5
+      slamKnockbackMultiplier: 2.5
+      cancelTrigger: "SNEAK"
+
+  - id: gliding_gallop
+    cooldown: 8.0
+    itemSlot: 2
+    type: mobility
+    usage: right_click
+    hotbarItem: feather
+    displayItem: feather
+    metadata:
+      launchStrength: 1.0
+      launchYAdd: 1.5
+      launchYMax: 2.0
+      landingCheckDelayTicks: 10
+      landingCheckIntervalTicks: 1
+      impactDamage: 5.0
+      impactRadius: 4.0
+      impactKnockbackMultiplier: 2.0
+      impactEnemyLaunchStrength: 1.8
+      impactEnemyLaunchYAdd: 1.5
+
+  - id: static_laser
+    cooldown: 7.0
+    itemSlot: 0
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_sword
+    displayItem: lightning_rod
+    metadata:
+      damage: 7.0
+      hitboxRadius: 1.5
+      damageRadius: 2.5
+      knockbackMultiplier: 3.0
+      range: 40.0
+      maxCharge: 0.99
+      chargePerTick: 0.035
+
+  - id: wool_mine
+    cooldown: 0.0
+    itemSlot: 1
+    type: projectile
+    usage: right_click
+    hotbarItem: iron_axe
+    displayItem: white_wool
+    metadata:
+      afterDetonateCooldown: 8.0
+      explosionDamage: 12.0
+      damageRadius: 9.0
+      knockbackMultiplier: 2.0
+      delayMs: 800
+      autoDetonateDelayMs: 8000
+
+  - id: wooly_rocket
+    cooldown: 10.0
+    itemSlot: 2
+    type: mobility
+    usage: right_click
+    hotbarItem: iron_shovel
+    displayItem: firework_rocket
+    metadata:
+      damage: 8.0
+      damageRadius: 2.0
+      knockbackMultiplier: 2.5
+      minimumVelocityTimeMs: 200
+      maximumVelocityTimeMs: 1200

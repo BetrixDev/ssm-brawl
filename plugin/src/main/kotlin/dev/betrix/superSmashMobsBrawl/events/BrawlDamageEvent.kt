@@ -9,6 +9,8 @@ sealed class BrawlDamageType {
     data object Explosion : BrawlDamageType()
 
     data object MeleeAttack : BrawlDamageType()
+
+    data object Slam : BrawlDamageType()
 }
 
 sealed class Damager {

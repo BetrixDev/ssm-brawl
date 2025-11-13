@@ -31,11 +31,19 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
 
     protected var disguise: BrawlDisguise? = null
 
+    private var invincible: Boolean = false
+
     fun getMeleeDamage(): Double = kitData.meleeDamage
 
     fun getMeleeReach(): Double = kitData.meleeReach
 
     fun getKnockbackMultiplier(): Double = kitData.knockbackMultiplier
+
+    fun isInvincible(): Boolean = invincible
+
+    fun setInvincible(value: Boolean) {
+        invincible = value
+    }
 
     fun getPassive(id: String): BrawlPassive? {
         return passives.find { it.id == id }
@@ -57,7 +65,7 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "sulphur_bomb" -> SulphurBombAbility(player)
                     "explode" -> ExplodeAbility(player)
                     "roped_arrow" -> RopedArrowAbility(player)
-                    "bone_explosion" -> BoneExplosionAbility(player)
+                    "bone_blast" -> BoneBlastAbility(player)
                     "angry_herd" -> AngryHerdAbility(player)
                     "milk_spiral" -> MilkSpiralAbility(player)
                     "blink" -> BlinkAbility(player)
@@ -86,6 +94,15 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "ice_path" -> IcePathAbility(player)
                     "snow_turret" -> SnowTurretAbility(player)
                     "fissure" -> FissureAbility(player)
+                    "strawbury_swirl" -> StrawburySwirlAbility(player)
+                    "moostrike" -> MoostrikeAbility(player)
+                    "fungal_trampoline" -> FungalTrampolineAbility(player)
+                    "hoof_bash" -> HoofBashAbility(player)
+                    "harvest_rush" -> HarvestRushAbility(player)
+                    "gliding_gallop" -> GlidingGallopAbility(player)
+                    "static_laser" -> StaticLaserAbility(player)
+                    "wool_mine" -> WoolMineAbility(player)
+                    "wooly_rocket" -> WoolyRocketAbility(player)
                     else -> {
                         logger.severe(
                             "No ability found with id ${it.id} reference on kit ${kitData.id}"
@@ -117,6 +134,8 @@ open class BrawlKit(val id: String, val player: Player) : KoinComponent {
                     "corrupted_arrow" -> CorruptedArrowPassive(player)
                     "giga_slime" -> GigaSlimePassive(player)
                     "arctic_aura" -> ArcticAuraPassive(player)
+                    "exp_charge" -> ExpChargePassive(player)
+                    "overgrowth" -> OvergrowthPassive(player)
                     else -> {
                         logger.severe(
                             "No passive found with id ${it.id} reference on kit ${kitData.id}"

@@ -9,7 +9,7 @@ import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 
-class BoneExplosionAbility(player: Player) : BrawlAbility("bone_explosion", player) {
+class BoneBlastAbility(player: Player) : BrawlAbility("bone_blast", player) {
 
     private val explosionRadius = metadata.double("explosionRadius") ?: 7.0
     private val baseDamage = metadata.double("baseDamage") ?: 6.0

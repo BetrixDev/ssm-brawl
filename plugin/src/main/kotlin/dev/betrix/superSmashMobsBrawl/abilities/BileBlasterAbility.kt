@@ -28,7 +28,8 @@ class BileBlasterAbility(player: Player) : BrawlAbility("bile_blaster", player) 
     private val projectileSize = (metadata.double("projectileSize") ?: 0.25).coerceAtLeast(0.1)
     private val projectileSpread = metadata.double("projectileSpread") ?: 0.525
     private val projectileBaseVelocity = metadata.double("projectileBaseVelocity") ?: 0.8
-    private val projectileVelocityRandomness = metadata.double("projectileVelocityRandomness") ?: 0.2
+    private val projectileVelocityRandomness =
+        metadata.double("projectileVelocityRandomness") ?: 0.2
     private val burpSoundChance = metadata.double("burpSoundChance") ?: 0.15
 
     private val activeProjectiles = mutableListOf<BrawlProjectile>()
@@ -52,25 +53,30 @@ class BileBlasterAbility(player: Player) : BrawlAbility("bile_blaster", player) 
 
         spewStartTimeMs = System.currentTimeMillis()
 
-        spewTask = repeatingTask(0) {
-            val elapsedTime = System.currentTimeMillis() - spewStartTimeMs
+        spewTask =
+            repeatingTask(0) {
+                val elapsedTime = System.currentTimeMillis() - spewStartTimeMs
 
-            if (elapsedTime >= spewDurationMs) {
-                stopSpewing()
-                cancel()
-                return@repeatingTask
-            }
+                if (elapsedTime >= spewDurationMs) {
+                    stopSpewing()
+                    cancel()
+                    return@repeatingTask
+                }
 
-            // Random burp sound
-            if (Math.random() < burpSoundChance) {
-                player.playSound(Sound.ENTITY_PLAYER_BURP, volume = 1.0f, pitch = (Math.random() + 0.5).toFloat())
-            }
+                // Random burp sound
+                if (Math.random() < burpSoundChance) {
+                    player.playSound(
+                        Sound.ENTITY_PLAYER_BURP,
+                        volume = 1.0f,
+                        pitch = (Math.random() + 0.5).toFloat(),
+                    )
+                }
 
-            // Shoot projectiles
-            for (i in 0 until projectilesPerTick) {
-                throwBileProjectile()
+                // Shoot projectiles
+                for (i in 0 until projectilesPerTick) {
+                    throwBileProjectile()
+                }
             }
-        }
 
         runnables.add(spewTask!!)
     }
@@ -81,38 +87,41 @@ class BileBlasterAbility(player: Player) : BrawlAbility("bile_blaster", player) 
     }
 
     private fun throwBileProjectile() {
-        val bileProjectile = BrawlProjectile.potion(
-            player,
-            ItemStack.of(Material.ROTTEN_FLESH),
-            "abilities.bile_blaster.name"
-        )
-            .setInitialVelocity { projectile ->
-                val random = Vector(
-                    (Math.random() - 0.5) * projectileSpread,
-                    (Math.random() - 0.5) * projectileSpread,
-                    (Math.random() - 0.5) * projectileSpread
+        val bileProjectile =
+            BrawlProjectile.potion(
+                    player,
+                    ItemStack.of(Material.ROTTEN_FLESH),
+                    "abilities.bile_blaster.name",
                 )
+                .setInitialVelocity { projectile ->
+                    val random =
+                        Vector(
+                            (Math.random() - 0.5) * projectileSpread,
+                            (Math.random() - 0.5) * projectileSpread,
+                            (Math.random() - 0.5) * projectileSpread,
+                        )
 
-                val baseDirection = player.location.direction.add(random)
-                val velocity = projectileBaseVelocity + (projectileVelocityRandomness * Math.random())
+                    val baseDirection = player.location.direction.add(random)
+                    val velocity =
+                        projectileBaseVelocity + (projectileVelocityRandomness * Math.random())
 
-                projectile.velocity = baseDirection.normalize().multiply(velocity)
-            }
-            .projectileSize(projectileSize)
-            .onHitEntity { entity, projectile ->
-                handleBileHit(entity, projectile)
-                ProjectileAction.DESTROY
-            }
-            .onHitBlock { _, projectile ->
-                handleBileHit(null, projectile)
-                ProjectileAction.DESTROY
-            }
-            .onExpire { projectile ->
-                handleBileHit(null, projectile)
-                ProjectileAction.DESTROY
-            }
-            .onTeardown { activeProjectiles.remove(it) }
-            .launch()
+                    projectile.velocity = baseDirection.normalize().multiply(velocity)
+                }
+                .projectileSize(projectileSize)
+                .onHitEntity { entity, projectile ->
+                    handleBileHit(entity, projectile)
+                    ProjectileAction.DESTROY
+                }
+                .onHitBlock { _, projectile ->
+                    handleBileHit(null, projectile)
+                    ProjectileAction.DESTROY
+                }
+                .onExpire { projectile ->
+                    handleBileHit(null, projectile)
+                    ProjectileAction.DESTROY
+                }
+                .onTeardown { activeProjectiles.remove(it) }
+                .launch()
 
         activeProjectiles.add(bileProjectile)
     }
@@ -127,13 +136,14 @@ class BileBlasterAbility(player: Player) : BrawlAbility("bile_blaster", player) 
         if (entity != null && entity is LivingEntity) {
             player.sendDebugMessage("[BB] ${entity.name} was hit")
 
-            val damageEvent = BrawlDamageEvent(
-                entity,
-                Damager.DamagerLivingEntity(player),
-                projectileDamage,
-                0.0,
-                BrawlDamageType.Projectile
-            )
+            val damageEvent =
+                BrawlDamageEvent(
+                    entity,
+                    Damager.DamagerLivingEntity(player),
+                    projectileDamage,
+                    0.0,
+                    BrawlDamageType.Projectile,
+                )
 
             damageEvent.callEvent()
 
@@ -142,7 +152,7 @@ class BileBlasterAbility(player: Player) : BrawlAbility("bile_blaster", player) 
                 projectileDamage,
                 entity.health,
                 projectile.projectileEntity?.location?.toVector(),
-                null
+                null,
             )
         } else {
             player.sendDebugMessage("[BB] No entity was hit")

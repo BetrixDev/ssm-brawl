@@ -13,16 +13,14 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerToggleFlightEvent
 
-open class DoubleJumpPassive(
-    id: String = "double_jump",
-    player: Player,
-) : BrawlPassive(id, player) {
+open class DoubleJumpPassive(id: String = "double_jump", player: Player) :
+    BrawlPassive(id, player) {
 
     protected open val power: Double = 0.9
     protected open val height: Double = 0.9
     protected open val doubleJumpSound: Sound = Sound.ENTITY_BLAZE_SHOOT
     protected open val rechargeDelayMs: Long = 0L
-    
+
     protected var lastJumpTimeMs: Long = 0L
     protected var canDoubleJump: Boolean = true
 
@@ -49,10 +47,8 @@ open class DoubleJumpPassive(
                 if (System.currentTimeMillis() - lastJumpTimeMs < rechargeDelayMs) {
                     return@repeatingTask
                 }
-                
-                if (
-                    (groundCheck() || canDoubleJump) && (!canDoubleJump || !player.allowFlight)
-                ) {
+
+                if ((groundCheck() || canDoubleJump) && (!canDoubleJump || !player.allowFlight)) {
                     canDoubleJump = true
                     player.allowFlight = true
                 }
@@ -112,7 +108,7 @@ open class DoubleJumpPassive(
                 if (entity != this@DoubleJumpPassive.player) {
                     return@DamageEvent
                 }
-                
+
                 if (cause == EntityDamageEvent.DamageCause.FALL) {
                     isCancelled = true
                     player.sendDebugMessage("[DJ] Fall damage cancelled")

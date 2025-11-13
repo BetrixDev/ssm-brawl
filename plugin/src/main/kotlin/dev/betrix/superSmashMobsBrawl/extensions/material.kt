@@ -83,12 +83,13 @@ fun Material.isHubInteractable(): Boolean {
 }
 
 val Material.isSword: Boolean
-    get() = when (this) {
-        Material.WOODEN_SWORD,
-        Material.STONE_SWORD,
-        Material.IRON_SWORD,
-        Material.GOLDEN_SWORD,
-        Material.DIAMOND_SWORD,
-        Material.NETHERITE_SWORD -> true
-        else -> false
-    }
+    get() =
+        when (this) {
+            Material.WOODEN_SWORD,
+            Material.STONE_SWORD,
+            Material.IRON_SWORD,
+            Material.GOLDEN_SWORD,
+            Material.DIAMOND_SWORD,
+            Material.NETHERITE_SWORD -> true
+            else -> false
+        }
