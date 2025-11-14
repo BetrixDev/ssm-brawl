@@ -350,7 +350,7 @@ kits:
     armor: 3.5
     knockbackMultiplier: 1.8
     disguiseId: mooshroom
-    selectionSound: "entity.mooshroom.ambient"
+    selectionSound: "entity.mooshroom.convert"
     displayItem: "red_mushroom"
     passives:
       - id: double_jump
