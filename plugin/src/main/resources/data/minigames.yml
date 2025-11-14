@@ -2,7 +2,7 @@ minigames:
   - id: prototyping
     countdown: 0
     type: ffa
-    isHidden: false
+    isHidden: true
     minPlayers: 1
     maxPlayers: 4
     kitSwitchingMode: immediate
@@ -10,6 +10,7 @@ minigames:
     passiveBlacklist: [hunger]
     respawnDelaySeconds: 5
     allowRejoinAfterLeave: true
+    displayItem: COMMAND_BLOCK
 
   - id: two_player_duels
     countdown: 5
@@ -22,14 +23,16 @@ minigames:
     allowParties: false
     respawnDelaySeconds: 5
     allowRejoinAfterLeave: true
+    displayItem: DIAMOND_SWORD
 
   - id: mystery_kit
     countdown: 5
     type: ffa
     isHidden: false
-    minPlayers: 2
+    minPlayers: 1
     maxPlayers: 4
     kitSwitchingMode: mystery
     allowParties: true
     respawnDelaySeconds: 5
     allowRejoinAfterLeave: true
+    displayItem: CHEST

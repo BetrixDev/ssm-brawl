@@ -275,7 +275,7 @@ kits:
     knockbackMultiplier: 1.4
     disguiseId: "snowman"
     selectionSound: "entity.snow_golem.ambient"
-    displayItem: "snow_block"
+    displayItem: "snowball"
     passives:
       - id: arctic_aura
       - id: regeneration
@@ -402,7 +402,7 @@ kits:
     knockbackMultiplier: 1.7
     disguiseId: "sheep"
     selectionSound: "entity.sheep.ambient"
-    displayItem: "white_wool"
+    displayItem: "shears"
     passives:
       - id: double_jump
       - id: regeneration

@@ -284,5 +284,14 @@ gui:
     passiveList:
       title: "<!i><secondary>Passive"
       entry: "<!i><secondary>• <accent-warm>{lang:passives.{abilityId}.name}"
+  queueSelection:
+    title: "<!i><ui-bg><shadow:ui-shadow>Join a minigame queue"
+    minigameName: "<!i><text>{lang:minigames.{minigameId}.name}"
+    queuedMinigameName: "<!i><success>✔ In Queue <secondary>- <text>{lang:minigames.{minigameId}.name}"
+    playerCount: "<!i><secondary>Players in queue: <accent-warm>{current}"
+    requiredPlayers: "<!i><secondary>Required players: <accent-warm>{required}"
+    description: "<!i><text-muted>{lang:minigames.{minigameId}.description}"
+    clickToJoin: "<!i><info>Click to join queue"
+    clickToLeave: "<!i><danger>Click to leave queue"
 motd: "<info>The brawl reborn <secondary>-- <info>a wondrous thing<accent-teal>!"
 newline: "<text-dark>--------------------------------"

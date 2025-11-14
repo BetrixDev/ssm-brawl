@@ -1,8 +1,10 @@
 package dev.betrix.superSmashMobsBrawl.models.brawlData
 
 import com.charleskorn.kaml.YamlScalar
+import dev.betrix.superSmashMobsBrawl.serializers.MaterialSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.bukkit.Material
 
 @Serializable
 enum class KitSwitchingMode {
@@ -27,6 +29,7 @@ sealed class MinigameDef {
     abstract val overrides: MinigameDefOverrides?
     abstract val allowRejoinAfterLeave: Boolean
     abstract val kitSwitchingMode: KitSwitchingMode
+    @Serializable(with = MaterialSerializer::class) abstract val displayItem: Material?
 
     fun isPassiveValid(passiveId: String): Boolean {
         if (passiveBlacklist?.contains(passiveId) == true) {
@@ -55,6 +58,7 @@ data class FfaMinigameDef(
     override val overrides: MinigameDefOverrides? = null,
     override val allowRejoinAfterLeave: Boolean = true,
     override val kitSwitchingMode: KitSwitchingMode = KitSwitchingMode.NEVER,
+    @Serializable(with = MaterialSerializer::class) override val displayItem: Material? = null,
     val minPlayers: Int,
     val maxPlayers: Int,
 ) : MinigameDef()
@@ -73,6 +77,7 @@ data class TeamBasedStocksMinigameDef(
     override val overrides: MinigameDefOverrides? = null,
     override val allowRejoinAfterLeave: Boolean = true,
     override val kitSwitchingMode: KitSwitchingMode = KitSwitchingMode.NEVER,
+    @Serializable(with = MaterialSerializer::class) override val displayItem: Material? = null,
     val playersPerTeam: Int,
     val amountOfTeams: Int,
     val stocks: Int,

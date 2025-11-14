@@ -96,4 +96,14 @@ class QueueCommand : KoinComponent {
             )
             .let { sender.sendMessage(it) }
     }
+
+    @Execute(name = "gui")
+    fun queueGui(@Context sender: CommandSender) {
+        if (sender !is Player) {
+            sender.sendMessage(lang.t("messages.commands.onlyPlayers"))
+            return
+        }
+
+        QueueService.openQueueSelectionGui(sender)
+    }
 }
