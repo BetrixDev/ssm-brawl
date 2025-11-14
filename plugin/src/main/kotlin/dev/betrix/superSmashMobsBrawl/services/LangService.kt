@@ -189,6 +189,8 @@ class LangService(private val plugin: JavaPlugin) {
         fun build(): Map<String, Any?> = map.toMap()
     }
 
+    fun getThemeColors(): Map<String, String> = tokenToHex
+
     private fun loadLangWithDefaults(relativePath: String): YamlConfiguration {
         val file = dataFolder.resolve(relativePath)
 

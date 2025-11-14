@@ -182,6 +182,9 @@ minigames:
 prefix: "<ui-shadow>[<gradient:accent:ui-shadow>Brawl</gradient><ui-shadow>]<reset>"
 messages:
   debug: "{lang:prefix} <text-dark>[DEBUG] {message}"
+  colors:
+    header: "{lang:prefix} <gradient:accent:ui-shadow>Theme Colors</gradient> <text-muted>({count} colors)"
+    entry: "<{hex}>● {name}</{hex}> <text-muted>- <{hex}>Sample text in this color</{hex}>"
   kick:
     serverStarting: "Server is still starting! Please come back in a moment"
   commands:
@@ -282,3 +285,4 @@ gui:
       title: "<!i><secondary>Passive"
       entry: "<!i><secondary>• <accent-warm>{lang:passives.{abilityId}.name}"
 motd: "<info>The brawl reborn <secondary>-- <info>a wondrous thing<accent-teal>!"
+newline: "<text-dark>--------------------------------"

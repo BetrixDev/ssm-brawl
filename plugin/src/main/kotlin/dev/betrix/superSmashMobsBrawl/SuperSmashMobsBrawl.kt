@@ -82,6 +82,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                 .commands(KitCommand())
                 .commands(LeaveCommand())
                 .commands(DebugCommand())
+                .commands(ColorsCommand())
                 .build()
 
         event<PlayerDropItemEvent> {
