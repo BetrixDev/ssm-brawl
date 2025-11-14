@@ -8,6 +8,7 @@ import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import dev.betrix.superSmashMobsBrawl.Manageable
 import dev.betrix.superSmashMobsBrawl.events.PlayerDocumentLoaded
 import dev.betrix.superSmashMobsBrawl.events.PlayerSelectKitEvent
+import dev.betrix.superSmashMobsBrawl.extensions.playErrorSound
 import dev.betrix.superSmashMobsBrawl.gui.BrawlGui.Companion.openInventory
 import dev.betrix.superSmashMobsBrawl.gui.brawlGui
 import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
@@ -309,6 +310,16 @@ object KitService : KoinComponent, Manageable() {
                                     }
                                 loreList.addAll(abilityList)
 
+                                loreList.add(lang.t("gui.kitSelection.passiveList.title"))
+
+                                val passiveList =
+                                    kit.passives.map {
+                                        lang.t("gui.kitSelection.passiveList.entry") {
+                                            "abilityId" to it.id
+                                        }
+                                    }
+                                loreList.addAll(passiveList)
+
                                 meta.lore(loreList)
 
                                 itemMeta = meta
@@ -319,6 +330,14 @@ object KitService : KoinComponent, Manageable() {
                                 )
                             },
                         ) {
+                            val currentSelectedKit = currentSelectedKitForPlayer(player)
+
+                            if (currentSelectedKit.id == kit.id) {
+                                player.sendMessage(lang.t("messages.kits.select.already_selected") { "kitId" to kit.id })
+                                player.playErrorSound()
+                                return@set
+                            }
+
                             playerSelectKit(player, kit)
                             player.closeInventory()
                             player.sendMessage(

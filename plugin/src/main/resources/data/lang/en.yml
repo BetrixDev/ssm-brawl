@@ -278,4 +278,7 @@ gui:
     abilityList:
       title: "<!i><secondary>Abilities"
       entry: "<!i><secondary>• <accent-warm>{lang:abilities.{abilityId}.name}"
+    passiveList:
+      title: "<!i><secondary>Passive"
+      entry: "<!i><secondary>• <accent-warm>{lang:passives.{abilityId}.name}"
 motd: "<info>The brawl reborn <secondary>-- <info>a wondrous thing<accent-teal>!"
