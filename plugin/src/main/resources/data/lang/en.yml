@@ -16,6 +16,12 @@ kits:
   pig:
     name: "Pig"
     description: "Spam energy bacon to harass foes, but mind your weak recovery"
+  sheep:
+    name: "Sheep"
+    description: ""
+  horse:
+    name: "Horse"
+    description: ""
   chicken:
     name: "Chicken"
     description: "High mobility flier with eggs and a peck of explosives"
