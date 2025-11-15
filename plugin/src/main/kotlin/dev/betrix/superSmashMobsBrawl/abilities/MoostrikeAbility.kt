@@ -5,6 +5,7 @@ import dev.betrix.superSmashMobsBrawl.events.BrawlDamageType
 import dev.betrix.superSmashMobsBrawl.events.Damager
 import dev.betrix.superSmashMobsBrawl.extensions.setVelocity
 import dev.betrix.superSmashMobsBrawl.services.MinigameService
+import dev.betrix.superSmashMobsBrawl.utils.isOnGround
 import gg.flyte.twilight.extension.addY
 import gg.flyte.twilight.scheduler.TwilightRunnable
 import gg.flyte.twilight.scheduler.repeatingTask
@@ -112,7 +113,7 @@ class MoostrikeAbility(player: Player) : BrawlAbility("moostrike", player), Koin
                     .receivers(96, true)
                     .spawn()
 
-                if (player.isOnGround && !hasSlammed) {
+                if (isOnGround(player) && !hasSlammed) {
                     performSlam()
                     cancel()
                 }

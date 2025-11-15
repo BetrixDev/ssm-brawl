@@ -1,7 +1,10 @@
 package dev.betrix.superSmashMobsBrawl.services
 
 import com.github.michaelbull.result.*
+import com.github.michaelbull.result.Ok
 import com.github.shynixn.mccoroutine.bukkit.launch
+import dev.betrix.superSmashMobsBrawl.SuperSmashMobsBrawl
+import dev.betrix.superSmashMobsBrawl.hotbar.HubHotbarPreset
 import dev.betrix.superSmashMobsBrawl.kits.BrawlKit
 import dev.betrix.superSmashMobsBrawl.models.BrawlHubWorld
 import dev.betrix.superSmashMobsBrawl.utils.createLocation
@@ -18,16 +21,16 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerTeleportEvent
-import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 /** Service responsible for managing hub worlds and player hub interactions */
 object HubService : KoinComponent {
     private lateinit var defaultHubWorld: BrawlHubWorld
-    private lateinit var plugin: JavaPlugin
+    private lateinit var plugin: SuperSmashMobsBrawl
     private val dataService: DataService by inject()
     private val lang: LangService by inject()
+    private val hotbarService: HotbarService by inject()
     private val playersInHub = mutableSetOf<Player>()
     private val playerHubKits = mutableMapOf<Player, BrawlKit>()
 
@@ -38,7 +41,7 @@ object HubService : KoinComponent {
         plugin.logger.info("Hub service cleaned up")
     }
 
-    fun initialize(plugin: JavaPlugin) {
+    fun initialize(plugin: SuperSmashMobsBrawl) {
         this.plugin = plugin
 
         val defaultHubId = UUID.randomUUID().toString()
@@ -132,7 +135,6 @@ object HubService : KoinComponent {
             return Err(RuntimeException("Teleport to hub failed for ${player.name}"))
         }
 
-        player.inventory.clear()
         player.feed()
         player.heal()
         player.resetWalkSpeed()
@@ -148,13 +150,21 @@ object HubService : KoinComponent {
         if (!::defaultHubWorld.isInitialized) {
             return Err(IllegalStateException("Default hub world is not yet initialized"))
         }
-        return teleportToHub(player, defaultHubWorld)
+        val result = teleportToHub(player, defaultHubWorld)
+        if (result.isOk) {
+            giveHubPassives(player)
+        }
+        return result
     }
 
     fun tryTeleportToDefaultHub(player: Player): Result<Unit, Exception> {
         return if (::defaultHubWorld.isInitialized) {
             try {
-                teleportToHub(player, defaultHubWorld)
+                val result = teleportToHub(player, defaultHubWorld)
+                if (result.isOk) {
+                    giveHubPassives(player)
+                }
+                result
             } catch (e: Exception) {
                 Err(e)
             }
@@ -179,9 +189,14 @@ object HubService : KoinComponent {
         hubKit.setup()
 
         playerHubKits[player] = hubKit
+
+        player.inventory.clear()
+        hotbarService.applyPreset(player, HubHotbarPreset)
     }
 
     private fun removeHubPassives(player: Player) {
+        hotbarService.clearHotbar(player)
+
         val hubKit = playerHubKits.remove(player)
         hubKit?.teardown()
 

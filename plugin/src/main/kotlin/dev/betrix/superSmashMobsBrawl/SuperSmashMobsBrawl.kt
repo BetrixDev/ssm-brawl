@@ -51,6 +51,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                     single { this@SuperSmashMobsBrawl.axiomLoggerHandler }
                     single { ApiService }
                     single { PlayerDocumentService }
+                    single { QueueService }
                     single(createdAtStart = true) { DataService() }
                     single { MinigameService() }
                     single { KitService }
@@ -58,6 +59,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
                     single { WorldService }
                     single { HubService }
                     single { ComboTrackerService }
+                    single(createdAtStart = true) { HotbarService }
                 }
             )
         }
@@ -71,6 +73,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
         KitService.setup()
         PlayerDocumentService.setup()
         ComboTrackerService.setup()
+        HotbarService.setup()
 
         server.motd(lang.t("motd"))
 
@@ -126,6 +129,7 @@ class SuperSmashMobsBrawl : SuspendingJavaPlugin(), KoinComponent {
         KitService.teardown()
         PlayerDocumentService.teardown()
         ComboTrackerService.teardown()
+        HotbarService.teardown()
 
         stopKoin()
     }

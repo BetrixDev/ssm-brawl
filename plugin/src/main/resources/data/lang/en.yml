@@ -228,6 +228,11 @@ messages:
       already_selected: "{lang:prefix} <text>You already have kit <primary>{lang:kits.{kitId}.name}<text> selected"
   players:
     joinServer: "{lang:prefix} <primary>{playerName} <text>has joined the server"
+  hub:
+    hotbar:
+      queueCompass:
+        title: "<!i><accent>Join Queue"
+        description: "<!i><text-muted>Click to browse minigames"
   minigames:
     leave:
       success: "{lang:prefix} <text>You have left <primary>{lang:minigames.{minigameId}.name}"
